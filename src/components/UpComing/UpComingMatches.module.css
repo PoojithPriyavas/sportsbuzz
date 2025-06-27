@@ -1,0 +1,48 @@
+.section {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 1rem;
+}
+
+.header a {
+    text-decoration: underline;
+    font-size: 13px;
+    color: #0070f3;
+}
+
+.card {
+    background: #fafafa;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 13px;
+}
+
+.labels span {
+    margin-right: 5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    background-color: #0070f3;
+    color: white;
+}
+
+.upcoming {
+    background-color: #ff5e5e;
+}
+
+.teams {
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+
+.details {
+    color: #444;
+}

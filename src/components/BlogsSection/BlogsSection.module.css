@@ -1,0 +1,43 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.featuredBlog {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.featuredBlog .image {
+    height: 150px;
+    background: #ddd;
+}
+
+.featuredBlog .content {
+    padding: 1rem;
+}
+
+.blogGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.blogCard {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.blogCard .image {
+    height: 100px;
+    background: #eee;
+}
+
+.blogCard .content {
+    padding: 0.75rem;
+    font-size: 14px;
+}

@@ -1,0 +1,117 @@
+.wrapper {
+  background: #f5f5f5;
+  padding: 1rem;
+}
+
+.nav {
+  display: flex;
+  gap: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  padding-left: 0.5rem;
+}
+
+.nav span {
+  cursor: pointer;
+  color: #333;
+}
+
+.nav .active {
+  font-weight: bold;
+  border-bottom: 2px solid #000;
+}
+
+.cardRow {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 1rem;
+  scroll-snap-type: x mandatory;
+}
+
+.cardRow::-webkit-scrollbar {
+  height: 8px;
+}
+
+.cardRow::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.cardRow::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.card {
+  min-width: 250px;
+  max-width: 250px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+.status {
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #111;
+}
+
+.liveDot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: red;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.title {
+  font-size: 13px;
+  color: #6c6b6b;
+  margin-bottom: 0.8rem;
+}
+
+.teams {
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding: 0.5rem 0;
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0;
+}
+
+.flag {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+}
+
+.score {
+  color: #0070f3;
+  font-size: 14px;
+}
+
+.note {
+  font-size: 13px;
+  color: red;
+  margin-top: 0.5rem;
+}
+
+.ad {
+  text-align: center;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  font-weight: bold;
+  font-size: 16px;
+}
