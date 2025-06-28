@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '.UpComing/UpcomingMatches.module.css';
+import styles from './UpcomingMatches.module.css';
 
 export default function UpcomingMatches() {
     return (
