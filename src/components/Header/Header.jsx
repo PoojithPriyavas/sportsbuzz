@@ -9,8 +9,8 @@ export default function Header() {
     <header className={styles.header}>
       <div className={styles.container}>
         <div className={styles.logo}>
-          <img src="/logo.png" alt="COD HATCH" className={styles.logoImg} />
-          <span className={styles.logoText}>Logo</span>
+          <img src="SportsBuz.png" alt="COD HATCH" className={styles.logoImg} />
+
           <span className={styles.separator}>|</span>
           <nav className={styles.nav}>
             <a href="#" className={`${styles.navItem} ${styles.active}`}>Home</a>
