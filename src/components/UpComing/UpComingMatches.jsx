@@ -1,12 +1,12 @@
 import React from 'react';
-import styles from './UpcomingMatches.module.css';
+import styles from '.UpComing/UpcomingMatches.module.css';
 
 export default function UpcomingMatches() {
     return (
         <div className={styles.section}>
             <div className={styles.header}>
-                <h4 style={{color:'#000'}}>Cricket Schedules</h4>
-                <a href="#" style={{textDecoration:'none'}}>view all</a>
+                <h4 style={{ color: '#000' }}>Cricket Schedules</h4>
+                <a href="#" style={{ textDecoration: 'none' }}>view all</a>
             </div>
 
             <div className={styles.card}>
