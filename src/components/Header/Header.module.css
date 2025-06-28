@@ -1,11 +1,10 @@
 .header {
   background-color: #0066da;
-  padding: 10px 0;
+  padding: 35px 0;
   color: white;
 }
 
 .container {
-  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
   display: flex;
@@ -17,12 +16,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .logoImg {
   width: 32px;
   height: 32px;
-  background: white; /* Placeholder, replace with actual image */
+  background: white;
   border-radius: 4px;
 }
 
@@ -32,9 +32,18 @@
   line-height: 1.2;
 }
 
+.separator {
+  margin-left: 10px;
+  margin-right: 10px;
+  opacity: 0.6;
+  font-size: 16px;
+}
+
 .nav {
   display: flex;
-  gap: 20px;
+  gap: 30px;
+  justify-content: center;
+  flex: 1;
 }
 
 .navItem {
@@ -65,6 +74,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .languageSelector {

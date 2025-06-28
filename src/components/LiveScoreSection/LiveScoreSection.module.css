@@ -44,8 +44,8 @@
 }
 
 .card {
-  min-width: 250px;
-  max-width: 250px;
+  min-width: 325px;
+  max-width: 325px;
   background: #fff;
   border-radius: 10px;
   padding: 1rem;
@@ -114,4 +114,7 @@
   color: black;
   font-weight: bold;
   font-size: 16px;
+}
+.teams .team span{
+  color: black;
 }

@@ -5,8 +5,8 @@ export default function UpcomingMatches() {
     return (
         <div className={styles.section}>
             <div className={styles.header}>
-                <h4>Cricket Schedules</h4>
-                <a href="#">view all</a>
+                <h4 style={{color:'#000'}}>Cricket Schedules</h4>
+                <a href="#" style={{textDecoration:'none'}}>view all</a>
             </div>
 
             <div className={styles.card}>
@@ -15,7 +15,7 @@ export default function UpcomingMatches() {
                     <span className={styles.upcoming}>Up Coming</span>
                 </div>
                 <div className={styles.teams}>
-                    Australia <strong>vs</strong> Australia
+                    Australia <strong>vs</strong> England
                 </div>
                 <div className={styles.details}>
                     <span>West Indies tour of Ireland, 2025</span><br />

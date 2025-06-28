@@ -1,9 +1,9 @@
-
 .card {
   background: white;
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Ensures content doesn't spill out */
 }
 
 .header {
@@ -13,7 +13,25 @@
   margin-bottom: 1rem;
 }
 
+.header h4 {
+  color: black;
+}
+
+.card ol {
+  padding-left: 1rem; /* Control indentation */
+  margin: 0;
+  list-style-position: inside; /* Bullets stay inside card */
+}
+
+.card li {
+  color: #595252;
+  font-size: 15px;
+  margin-bottom: 0.5rem;
+  word-wrap: break-word; /* Prevents overflow due to long text */
+}
+
 .meta {
   font-size: 12px;
   color: #888;
+  margin-top: 1rem;
 }

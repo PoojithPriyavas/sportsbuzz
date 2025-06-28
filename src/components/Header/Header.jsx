@@ -11,13 +11,15 @@ export default function Header() {
         <div className={styles.logo}>
           <img src="/logo.png" alt="COD HATCH" className={styles.logoImg} />
           <span className={styles.logoText}>Logo</span>
+          <span className={styles.separator}>|</span>
+          <nav className={styles.nav}>
+            <a href="#" className={`${styles.navItem} ${styles.active}`}>Home</a>
+            <a href="#" className={styles.navItem}>Best Betting Apps</a>
+            <a href="#" className={styles.navItem}>News</a>
+          </nav>
+
         </div>
 
-        <nav className={styles.nav}>
-          <a href="#" className={`${styles.navItem} ${styles.active}`}>Home</a>
-          <a href="#">Best Betting Apps</a>
-          <a href="#">News</a>
-        </nav>
 
         <div className={styles.rightSection}>
           <select className={styles.languageSelector}>

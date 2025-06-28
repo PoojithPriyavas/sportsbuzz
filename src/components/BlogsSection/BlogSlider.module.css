@@ -1,0 +1,16 @@
+.slider {
+  width: 100%;
+  padding: 1rem 0;
+}
+
+.slide {
+  height: 180px;
+  background: #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  color: #444;
+}

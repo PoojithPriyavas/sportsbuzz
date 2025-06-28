@@ -1,0 +1,132 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.headingRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headingRow h3 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #222;
+}
+
+.viewAll {
+  font-size: 14px;
+  color: #0070f3;
+  text-decoration: none;
+}
+
+.viewAll:hover {
+  text-decoration: underline;
+}
+
+/* Featured Blog - Full Width Horizontal Layout */
+.featuredBlog {
+  display: flex;
+  flex-wrap: wrap;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  min-height: 195px;
+}
+
+.featuredImage {
+  flex: 1;
+  min-width: 40%;
+  background: #ddd;
+}
+
+.featuredImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.featuredContent {
+  flex: 1;
+  min-width: 50%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.featuredContent h4 {
+  color: #1b1b1b;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+  max-height: 2.8em; /* 2 lines */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.featuredContent p {
+  color: rgb(118, 115, 115);
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+}
+
+.featuredContent a {
+  color: #0070f3;
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.featuredContent a:hover {
+  text-decoration: underline;
+}
+
+/* Grid of other blogs */
+.blogGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.blogCard {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.blogImage {
+  height: 100px;
+  background: #eee;
+}
+
+.blogContent {
+  padding: 0.75rem;
+  font-size: 14px;
+}
+
+.blogContent h5 {
+  color: #1b1b1b;
+  padding-bottom: 5px;
+}
+
+.blogContent p {
+  color: #767373;
+  padding-bottom: 5px;
+}
+
+.blogContent a {
+  color: #484747;
+  text-decoration: none;
+}
+
+.blogContent a:hover {
+  text-decoration: underline;
+}

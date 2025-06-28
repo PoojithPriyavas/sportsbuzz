@@ -20,6 +20,21 @@
     padding: 1rem;
 }
 
+.featuredBlog .content h4 {
+    color: rgb(27, 27, 27);
+    padding-bottom: 5px;
+}
+
+.featuredBlog .content p {
+    color: rgb(118, 115, 115);
+    padding-bottom: 5px;
+}
+
+.featuredBlog .content a {
+    color: rgb(72, 71, 71);
+    padding-bottom: 5px;
+}
+
 .blogGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -41,3 +56,45 @@
     padding: 0.75rem;
     font-size: 14px;
 }
+
+.blogCard .content h5 {
+    color: rgb(27, 27, 27);
+    padding-bottom: 5px;
+}
+
+.blogCard .content p {
+    color: rgb(118, 115, 115);
+    padding-bottom: 5px;
+}
+
+.blogCard .content a {
+    color: rgb(72, 71, 71);
+    padding-bottom: 5px;
+}
+
+
+/* Header row for Latest Blogs and View All */
+.headingRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.headingRow h3 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #222;
+}
+
+.viewAll {
+  font-size: 14px;
+  color: #0070f3;
+  text-decoration: none;
+}
+
+.viewAll:hover {
+  text-decoration: underline;
+}
+
+/* Keep existing styles for .featuredBlog, .blogGrid, .blogCard, etc. */

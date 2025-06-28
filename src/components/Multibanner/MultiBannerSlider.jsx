@@ -1,5 +1,31 @@
 import styles from './MultiBannerSlider.module.css';
-
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
 export default function MultiBannerSlider() {
-    return <div className={styles.slider}>Multiple Banner Part</div>;
+    const slides = [
+        'Slide 1',
+        'Slide 2',
+        'Slide 3',
+        'Slide 4',
+        'Slide 5',
+    ];
+    return (
+        <div className={styles.sliderWrapper}>
+            <Swiper
+                modules={[Autoplay, Pagination]}
+                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                pagination={{ clickable: true }}
+                loop={true}
+                className={styles.swiperContainer}
+            >
+                {slides.map((text, idx) => (
+                    <SwiperSlide key={idx}>
+                        <div className={styles.slide}>{text}</div>
+                    </SwiperSlide>
+                ))}
+            </Swiper>
+        </div>
+    );
 }

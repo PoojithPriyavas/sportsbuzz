@@ -13,6 +13,8 @@ import MultiBannerSlider from "@/components/Multibanner/MultiBannerSlider";
 import BlogSection from "@/components/BlogsSection/BlogsSection";
 import AdsSlider from "@/components/AdSlider/AdSlider";
 import BestBettingApps from "@/components/Betting/BestBettingApps";
+import HeroCarousal from "@/components/HeroCarousal/Carousal";
+import GoogleAds from "@/components/googleAds/GoogleAds";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,10 +29,14 @@ const geistMono = Geist_Mono({
 export default function Home() {
   return (
     <>
+      <Head>
+        <title>Sports Buzz</title>
+        <meta name="description" content="Your site description here" />
+      </Head>
       <Header />
       <div className={`${geistSans.variable} ${geistMono.variable} container`}>
         <LiveScores />
-
+        <HeroCarousal />
         <div className={styles.mainContent}>
           <div className={styles.leftSection}>
             <BonusTable />
@@ -44,7 +50,7 @@ export default function Home() {
         </div>
 
         <div className={styles.mainContent}>
-          <div className={styles.leftSection}>
+          <div className={styles.leftSection2}>
             <PredictionSection />
             <MultiBannerSlider />
             <TopNewsSection />
@@ -54,12 +60,13 @@ export default function Home() {
             <BlogSection />
           </div>
 
-          <div className={styles.rightSection}>
+          <div className={styles.rightSection2}>
             <AdsSlider />
             <BestBettingApps />
             <SmallAdBox />
           </div>
         </div>
+        <GoogleAds />
       </div>
     </>
   );
