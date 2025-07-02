@@ -31,8 +31,14 @@
 }
 
 .cardRow::-webkit-scrollbar {
-  height: 8px;
+  display: none;
 }
+
+.cardRow {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 
 .cardRow::-webkit-scrollbar-thumb {
   background: #ccc;
@@ -88,6 +94,11 @@
   margin: 4px 0;
 }
 
+.teamInfo {
+  display: flex;
+  align-items: center;
+}
+
 .flag {
   width: 20px;
   height: 20px;
@@ -115,6 +126,7 @@
   font-weight: bold;
   font-size: 16px;
 }
-.teams .team span{
+
+.teams .team span {
   color: black;
 }

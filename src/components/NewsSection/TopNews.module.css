@@ -3,7 +3,8 @@
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Ensures content doesn't spill out */
+  overflow: hidden;
+  /* Ensures content doesn't spill out */
 }
 
 .header {
@@ -18,16 +19,17 @@
 }
 
 .card ol {
-  padding-left: 1rem; /* Control indentation */
+  padding-left: 1rem;
   margin: 0;
-  list-style-position: inside; /* Bullets stay inside card */
+  list-style-position: inside;
 }
 
 .card li {
   color: #595252;
   font-size: 15px;
   margin-bottom: 0.5rem;
-  word-wrap: break-word; /* Prevents overflow due to long text */
+  word-wrap: break-word;
+  padding: 10px;
 }
 
 .meta {

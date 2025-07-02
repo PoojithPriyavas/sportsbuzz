@@ -1,3 +1,4 @@
+'use client'
 import styles from './BlogCard.module.css';
 import Link from 'next/link';
 

@@ -54,16 +54,21 @@ export default function LiveScores() {
           <div className={styles.title}>{match.title}</div>
           <div className={styles.teams}>
             <div className={styles.team}>
-              <img src="/team1.png" alt="Team 1" className={styles.flag} />
-              <span>{match.team1.name}</span>
+              <div className={styles.teamInfo}>
+                <img src="/team1.png" alt="Team 1" className={styles.flag} />
+                <span>{match.team1.name}</span>
+              </div>
               <strong className={styles.score}>{match.team1.score}</strong>
             </div>
             <div className={styles.team}>
-              <img src="/team2.png" alt="Team 2" className={styles.flag} />
-              <span>{match.team2.name}</span>
+              <div className={styles.teamInfo}>
+                <img src="/team2.png" alt="Team 2" className={styles.flag} />
+                <span>{match.team2.name}</span>
+              </div>
               <strong className={styles.score}>{match.team2.score}</strong>
             </div>
           </div>
+
           <div className={styles.note}>{match.note}</div>
         </div>
       );

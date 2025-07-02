@@ -43,3 +43,31 @@
 .navBtn:hover {
   background-color: rgba(255, 255, 255, 0.9);
 }
+
+.swiper-pagination {
+  position: absolute;
+  text-align: center;
+  transition: 300ms opacity;
+  transform: translate3d(0, 0, 0);
+  z-index: 10;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+}
+
+
+.swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  opacity: 0.6;
+  margin: 0 4px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.swiper-pagination-bullet-active {
+  opacity: 1;
+  background: #0070f3;
+}
+

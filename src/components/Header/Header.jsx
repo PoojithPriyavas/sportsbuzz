@@ -14,13 +14,10 @@ export default function Header() {
           <span className={styles.separator}>|</span>
           <nav className={styles.nav}>
             <a href="#" className={`${styles.navItem} ${styles.active}`}>Home</a>
-            <a href="#" className={styles.navItem}>Best Betting Apps</a>
+            <a href='/best-betting-apps' className={styles.navItem}>Best Betting Apps</a>
             <a href="#" className={styles.navItem}>News</a>
           </nav>
-
         </div>
-
-
         <div className={styles.rightSection}>
           <select className={styles.languageSelector}>
             <option>English</option>

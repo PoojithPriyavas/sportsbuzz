@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './BonusTable.module.css';
-
 export default function BonusTable() {
+    const [copied, setCopied] = useState(false);
+    const code = 'SPORTS123';
+    const handleCopy = () => {
+        navigator.clipboard.writeText(code).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        });
+    };
     return (
         <div className={styles.wrapper}>
             <table className={styles.table}>
@@ -14,7 +21,7 @@ export default function BonusTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    {[1, 2, 3].map((_, i) => (
+                    {[1, 2, 3].map((key, i) => (
                         <tr className={styles.bodyRow} key={i}>
                             <td className={styles.site}>
                                 <img src="/parimatch.png" alt="Parimatch" />
@@ -35,7 +42,9 @@ export default function BonusTable() {
                             </td>
                             <td className={styles.actions}>
                                 <button className={styles.getBtn}>GET BONUS</button>
-                                <button className={styles.codeBtn}>Sports Code</button>
+                                <button key={key} className={styles.codeBtn} onClick={handleCopy}>
+                                    {copied ? 'Copied!' : 'Sports Code'}
+                                </button>
                             </td>
                         </tr>
                     ))}

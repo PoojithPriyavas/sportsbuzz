@@ -1,9 +1,10 @@
 'use client';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation } from 'swiper/modules';
+import { Autoplay, Navigation,Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import styles from './Carousal.module.css';
 
 export default function HeroCarousal() {
@@ -16,13 +17,14 @@ export default function HeroCarousal() {
   return (
     <div className={styles.carouselWrapper} style={{marginTop:'20px'}}>
       <Swiper
-        modules={[Autoplay, Navigation]}
+        modules={[Autoplay, Navigation,Pagination]}
         autoplay={{ delay: 4000, disableOnInteraction: false }}
         loop={true}
-        navigation={{
-          nextEl: '.nextBtn',
-          prevEl: '.prevBtn',
-        }}
+        // navigation={{
+        //   nextEl: '.nextBtn',
+        //   prevEl: '.prevBtn',
+        // }}
+        pagination={{clickable:true}}
         className={styles.swiperContainer}
       >
         {slides.map((src, index) => (
@@ -31,9 +33,8 @@ export default function HeroCarousal() {
           </SwiperSlide>
         ))}
 
-        {/* Custom nav buttons */}
-        <button className={`prevBtn ${styles.navBtn} ${styles.leftBtn}`}>&lt;</button>
-        <button className={`nextBtn ${styles.navBtn} ${styles.rightBtn}`}>&gt;</button>
+        {/* <button className={`prevBtn ${styles.navBtn} ${styles.leftBtn}`}>&lt;</button>
+        <button className={`nextBtn ${styles.navBtn} ${styles.rightBtn}`}>&gt;</button> */}
       </Swiper>
     </div>
   );
