@@ -1,0 +1,118 @@
+.wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+  border: none;
+}
+
+.table thead tr {
+  background: #e8e8e8;
+}
+
+.table thead tr th {
+  padding: 1rem;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  min-width: 150px;
+  color: black;
+  border-bottom: none;
+}
+
+.table tbody tr td {
+  padding: 1rem;
+  vertical-align: top;
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background-color: #f9f9f9; 
+}
+
+.table tbody tr td li {
+  color: #000;
+}
+
+.site img {
+  width: 100px;
+  max-width: 100%;
+}
+
+.features ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+}
+
+.bonus {
+  font-size: 14px;
+}
+
+.bonus .label {
+  font-weight: bold;
+  color: #444;
+}
+
+.bonus .amount {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.bonus .limit {
+  color: #555;
+}
+
+.bonus .stars {
+  color: gold;
+  margin-top: 0.5rem;
+}
+
+.bonus .review {
+  font-size: 13px;
+  color: #888;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.getBtn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  background-color: #0070f3;
+  color: white;
+}
+
+.codeBtn {
+  padding: 8px 12px;
+  border: 2px dotted #0070f3;
+  background-color: transparent;
+  color: #0070f3;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.codeBtn:hover {
+  background-color: #0070f310; 
+}
+
+@media (max-width: 768px) {
+  .actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

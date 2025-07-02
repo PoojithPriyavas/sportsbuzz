@@ -1,7 +1,7 @@
 import Header from "@/components/Header/Header";
 import LiveScores from "@/components/LiveScoreSection/LiveScoreSection";
 import Head from "next/head";
-import BonusTable from "@/components/BonusTable/BonusTable";
+import BettingAppsTable from "@/components/BestBettingApps/BestBettingApps";
 import UpcomingMatches from "@/components/UpComing/UpComingMatches";
 import styles from '../../styles/Home.module.css';
 import AutoSlider from "@/components/AutoSlider/AutoSlider";
@@ -21,7 +21,7 @@ export default function BestBettingApps() {
                 <LiveScores />
                 <div className={styles.mainContent}>
                     <div className={styles.leftSection}>
-                        <BonusTable />
+                        <BettingAppsTable />
                     </div>
 
                     <div className={styles.rightSection}>

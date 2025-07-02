@@ -12,7 +12,7 @@ import TopNewsSection from "@/components/NewsSection/TopNews";
 import MultiBannerSlider from "@/components/Multibanner/MultiBannerSlider";
 import BlogSection from "@/components/BlogsSection/BlogsSection";
 import AdsSlider from "@/components/AdSlider/AdSlider";
-import BestBettingApps from "@/components/Betting/BestBettingApps";
+import CricketPrediction from "@/components/Betting/CricketPrediction";
 import HeroCarousal from "@/components/HeroCarousal/Carousal";
 import GoogleAds from "@/components/googleAds/GoogleAds";
 
@@ -62,7 +62,7 @@ export default function Home() {
 
           <div className={styles.rightSection2}>
             <AdsSlider />
-            <BestBettingApps />
+            <CricketPrediction />
             <SmallAdBox />
           </div>
         </div>

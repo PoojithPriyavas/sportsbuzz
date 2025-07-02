@@ -3,7 +3,7 @@ import BlogDetailContent from './BlogDetailsContent';
 import BlogSlider from './BlogSlider';
 import TopNewsSection from '../NewsSection/TopNews';
 import MultiBannerSlider from '../Multibanner/MultiBannerSlider';
-import BestBettingApps from '../Betting/BestBettingApps';
+
 import PredictionSection from '../Prediction/Prediction';
 import AdsSlider from '../AdSlider/AdSlider';
 import UpcomingMatches from '../UpComing/UpComingMatches';

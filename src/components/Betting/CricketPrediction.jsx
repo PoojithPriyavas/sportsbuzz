@@ -1,6 +1,6 @@
-import styles from './BestBettingApps.module.css';
+import styles from './CricketPrediction.module.css';
 
-export default function BestBettingApps() {
+export default function CricketPrediction() {
     return (
         <div className={styles.card}>
             <h4>Cricket Predictions ➤</h4>

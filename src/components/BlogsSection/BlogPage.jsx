@@ -3,7 +3,7 @@ import BlogCard from './BlogCards';
 import BlogSearchFilter from './BlogSearchFilter';
 import TopNewsSection from '../NewsSection/TopNews';
 import MultiBannerSlider from '../Multibanner/MultiBannerSlider';
-import BestBettingApps from '../Betting/BestBettingApps';
+import CricketPrediction from '../Betting/CricketPrediction';
 import PredictionSection from '../Prediction/Prediction';
 import GoogleAds from '../googleAds/GoogleAds';
 
@@ -27,7 +27,7 @@ export default function BlogsPage() {
                 </div>
                 <div className={styles.right}>
                     <PredictionSection />
-                    <BestBettingApps />
+                    <CricketPrediction />
                     <MultiBannerSlider />
                     <TopNewsSection />
                 </div>
