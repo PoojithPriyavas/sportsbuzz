@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Sports Buzz</title>
+        <title>Sportsbuz</title>
         <meta name="description" content="Your site description here" />
       </Head>
       <Header />
