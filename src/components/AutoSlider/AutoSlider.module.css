@@ -19,7 +19,8 @@
   object-fit: contain;
   display: block;
   margin: 0 auto;
-  padding: 20px;
+  /* padding: 20px; */
+  aspect-ratio: 2/3;
 }
 
 /* Swiper Pagination Dots */
