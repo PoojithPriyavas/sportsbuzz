@@ -14,7 +14,7 @@ export default function UpcomingMatches() {
             try {
                 const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/upcoming', {
                     headers: {
-                        'X-RapidAPI-Key': '28acac3c58mshd83e0915f78a287p129875jsna833d4039a3e',
+                        'X-RapidAPI-Key': '017dac301bmshe6ef4a628428634p17177bjsnc738cb420a49',
                     },
                 });
 

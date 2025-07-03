@@ -5,7 +5,7 @@ import styles from './LiveScoreSection.module.css';
 import axios from 'axios';
 
 export default function LiveScores() {
-  const [matchData, setMatchData] = useState([]);
+  const [apiResponse, setApiResponse] = useState(null);
   const [matchTypes, setMatchTypes] = useState([]);
   const [activeType, setActiveType] = useState('');
 
@@ -14,15 +14,20 @@ export default function LiveScores() {
       try {
         const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live', {
           headers: {
-            'X-RapidAPI-Key': '28acac3c58mshd83e0915f78a287p129875jsna833d4039a3e',
+            'X-RapidAPI-Key': '017dac301bmshe6ef4a628428634p17177bjsnc738cb420a49',
           },
         });
 
-        const data = res.data.typeMatches || [];
-        setMatchData(data);
-        const types = data.map(item => item.matchType);
-        setMatchTypes(types);
-        setActiveType(types[0]);
+        setApiResponse(res.data);
+        
+        // Extract match types from filters.matchType
+        const filterTypes = res.data.filters?.matchType || [];
+        setMatchTypes(filterTypes);
+        
+        // Set initial active type
+        if (filterTypes.length > 0) {
+          setActiveType(filterTypes[0]);
+        }
       } catch (error) {
         console.error('Failed to fetch live matches:', error);
       }
@@ -32,16 +37,32 @@ export default function LiveScores() {
   }, []);
 
   const renderCards = () => {
-    const currentType = matchData.find(type => type.matchType === activeType);
-    if (!currentType) return null;
+    if (!apiResponse) return null;
+
+    // Find matches for active type
+    const typeMatch = apiResponse.typeMatches?.find(
+      tm => tm.matchType === activeType
+    );
+    
+    if (!typeMatch) {
+      return (
+        <div className={styles.card}>
+          No live matches for {activeType}
+        </div>
+      );
+    }
 
     const cards = [];
+    let matchCount = 0;
 
-    currentType.seriesMatches.forEach((series, seriesIndex) => {
-      const seriesName = series.seriesAdWrapper?.seriesName || '';
-      const matches = series.seriesAdWrapper?.matches || [];
+    typeMatch.seriesMatches?.forEach((series, seriesIndex) => {
+      if (!series.seriesAdWrapper) return;
+      
+      const { seriesName, matches } = series.seriesAdWrapper;
+      if (!matches) return;
 
       matches.forEach((match, matchIndex) => {
+        matchCount++;
         const info = match.matchInfo;
         const score = match.matchScore;
         const team1 = info.team1;
@@ -52,7 +73,6 @@ export default function LiveScores() {
             <div className={styles.status}>
               <span className={styles.liveDot}></span>
               <span style={{ color: 'red' }}><strong>Live  </strong> </span>
-              {/* <strong>{info.state}</strong> - {info.matchFormat} */}
               <strong>{activeType}</strong>
             </div>
             <div className={styles.title}>{seriesName} - {info.matchDesc}</div>
@@ -82,7 +102,8 @@ export default function LiveScores() {
           </div>
         );
 
-        if ((cards.length + 1) % 3 === 0) {
+        // Insert ad after every 2 matches
+        if (matchCount % 2 === 0) {
           cards.push(
             <div key={`ad-${seriesIndex}-${matchIndex}`} className={styles.card}>
               <div className={styles.ad}>Google Ads</div>
@@ -92,7 +113,9 @@ export default function LiveScores() {
       });
     });
 
-    return cards;
+    return cards.length > 0 ? cards : (
+      <div className={styles.card}>No live matches available</div>
+    );
   };
 
   return (
