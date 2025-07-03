@@ -123,9 +123,14 @@ export default function LiveScores() {
                   )}
                   <span>{team1.teamName}</span>
                 </div>
-                <strong className={styles.score}>
-                  {score?.team1Score?.inngs1?.runs}/{score?.team1Score?.inngs1?.wickets} ({score?.team1Score?.inngs1?.overs})
-                </strong>
+                {score?.team1Score?.inngs1?.runs != null &&
+                  score?.team1Score?.inngs1?.wickets != null &&
+                  score?.team1Score?.inngs1?.overs != null && (
+                    <strong className={styles.score}>
+                      {score.team1Score.inngs1.runs}/{score.team1Score.inngs1.wickets} ({score.team1Score.inngs1.overs})
+                    </strong>
+                  )}
+
               </div>
               <div className={styles.team}>
                 <div className={styles.teamInfo}>
@@ -138,9 +143,14 @@ export default function LiveScores() {
                   )}
                   <span>{team2.teamName}</span>
                 </div>
-                <strong className={styles.score}>
-                  {score?.team2Score?.inngs1?.runs}/{score?.team2Score?.inngs1?.wickets} ({score?.team2Score?.inngs1?.overs})
-                </strong>
+                {score?.team2Score?.inngs1?.runs != null &&
+                  score?.team2Score?.inngs1?.wickets != null &&
+                  score?.team2Score?.inngs1?.overs != null && (
+                    <strong className={styles.score}>
+                      {score.team2Score.inngs1.runs}/{score.team2Score.inngs1.wickets} ({score.team2Score.inngs1.overs})
+                    </strong>
+                  )}
+
               </div>
             </div>
 
