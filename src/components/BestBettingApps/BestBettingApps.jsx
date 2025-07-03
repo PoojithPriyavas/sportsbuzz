@@ -49,6 +49,7 @@ export default function BettingAppsTable() {
                         <table className={styles.table}>
                             <thead>
                                 <tr className={styles.headerRow}>
+                                    <th>Rank</th>
                                     <th>Site</th>
                                     <th>Features</th>
                                     <th>Welcome Bonus</th>
@@ -58,6 +59,7 @@ export default function BettingAppsTable() {
                             <tbody>
                                 {section.best_betting_apps.map((app) => (
                                     <tr className={styles.bodyRow} key={app.id}>
+                                        <td style={{ color: "black" }}><strong>#{app.id}</strong></td>
                                         <td className={styles.site}>
                                             <img src={`https://admin.sportsbuz.com${app.image}`} alt="Betting App" />
                                         </td>
@@ -70,15 +72,14 @@ export default function BettingAppsTable() {
                                                 className={styles.amount}
                                                 dangerouslySetInnerHTML={{ __html: app.welcome_bonus }}
                                             />
-                                            <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
-                                            <a
-                                                className={styles.review}
-                                                href={app.review_link}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                            <button
+                                                className={styles.codeBtn}
+                                                onClick={() => window.open(app.review_link, '_blank', 'noopener,noreferrer')}
                                             >
-                                                ! Review
-                                            </a>
+                                                Read Review
+                                            </button>
+
+                                            <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
                                         </td>
                                         <td className={styles.actions}>
                                             <a

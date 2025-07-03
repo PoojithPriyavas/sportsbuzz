@@ -100,8 +100,9 @@
 
 .codeBtn {
   padding: 8px 12px;
+  margin-top: 10px;
   border: 2px dotted #0070f3;
-  background-color: transparent;
+  background-color: #8fc9ff6b;
   color: #0070f3;
   border-radius: 4px;
   cursor: pointer;
