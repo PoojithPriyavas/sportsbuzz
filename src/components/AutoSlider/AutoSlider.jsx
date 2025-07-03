@@ -17,11 +17,11 @@ export default function AutoSlider() {
         const data = await res.json();
 
         // Filter and sort banners
-        const activeBanners = data
-          .filter(b => b.is_active === 'Active' && b.location === 2)
-          .sort((a, b) => a.order_by - b.order_by);
+        // const activeBanners = data
+        //   .filter(b => b.is_active === 'Active' && b.location === 2)
+        //   .sort((a, b) => a.order_by - b.order_by);
 
-        setBanners(activeBanners);
+        setBanners(data);
       } catch (error) {
         console.error('Failed to fetch banners:', error);
       }
@@ -30,6 +30,7 @@ export default function AutoSlider() {
     fetchBanners();
   }, []);
 
+  console.log(banners,"bannerds")
   return (
     <div className={styles.sliderWrapper}>
       <Swiper
