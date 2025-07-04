@@ -44,8 +44,6 @@ export default function Home() {
 
           <div className={styles.rightSection}>
             <AutoSlider />
-            <UpcomingMatches />
-            <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
           </div>
         </div>
 
@@ -61,6 +59,8 @@ export default function Home() {
           </div>
 
           <div className={styles.rightSection2}>
+            <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
+            <UpcomingMatches />
             <AdsSlider />
             <CricketPrediction />
             <SmallAdBox />

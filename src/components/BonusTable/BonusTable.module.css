@@ -9,11 +9,13 @@
   background: white;
   border-radius: 10px;
   overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+  border: none;
+  margin-bottom: 20px;
 }
 
-/* ✅ Scoped table row/column styling via the class */
 .table thead tr {
-  background: #f5f2f2;
+  background: #e8e8e8;
 }
 
 .table thead tr th {
@@ -21,16 +23,19 @@
   text-align: center;
   font-weight: bold;
   font-size: 14px;
-  border-bottom: 1px solid #000;
   min-width: 150px;
   color: black;
+  border-bottom: none;
 }
 
 .table tbody tr td {
   padding: 1rem;
-  border-bottom: 1px solid #eee;
   vertical-align: top;
+  border-bottom: none;
+}
 
+.table tbody tr:hover {
+  background-color: #f9f9f9; 
 }
 
 .table tbody tr td li {
@@ -60,6 +65,7 @@
 .bonus .amount {
   font-size: 16px;
   font-weight: bold;
+  color: #000 !important;
 }
 
 .bonus .limit {
@@ -94,8 +100,9 @@
 
 .codeBtn {
   padding: 8px 12px;
+  margin-top: 10px;
   border: 2px dotted #0070f3;
-  background-color: transparent;
+  background-color: #8fc9ff6b;
   color: #0070f3;
   border-radius: 4px;
   cursor: pointer;
@@ -103,16 +110,28 @@
 }
 
 .codeBtn:hover {
-  background-color: #0070f310;
-  /* subtle hover effect */
+  background-color: #0070f310; 
 }
 
-
-
-/* Responsive: Stack actions horizontally on small screens */
 @media (max-width: 768px) {
   .actions {
     flex-direction: row;
     flex-wrap: wrap;
   }
+}
+
+.heading {
+  color: black;
+}
+
+.heading * {
+  color: black !important;
+}
+
+.description {
+  color: black;
+}
+
+.description * {
+  color: black !important;
 }
