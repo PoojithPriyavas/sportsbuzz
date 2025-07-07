@@ -58,8 +58,8 @@ export default function BlogsPage({ blogs = [] }) {
                                 <Link href={`/blog-details/${displayedFeatured?.slug}`} className={styles.featuredBlog}>
                                     <div className={styles.featuredImage}>
                                         <img
-                                            src={displayedFeatured?.image_big}
-                                            alt={displayedFeatured?.alt_big || displayedFeatured?.title}
+                                            src={displayedFeatured?.image}
+                                            alt={displayedFeatured?.alt || displayedFeatured?.title}
                                             className={styles.featuredImg}
                                         />
                                     </div>

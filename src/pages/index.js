@@ -31,7 +31,7 @@ const geistMono = Geist_Mono({
 
 
 export default function Home() {
-  const { blogCategories, blogs, sections } = useGlobalData();
+  const { blogCategories, blogs, sections, apiResponse, matchTypes, teamImages, upcomingMatches } = useGlobalData();
 
 
   return (
@@ -42,7 +42,7 @@ export default function Home() {
       </Head>
       <Header categories={blogCategories} />
       <div className={`${geistSans.variable} ${geistMono.variable} container`}>
-        <LiveScores />
+        {/* <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} /> */}
         <HeroCarousal />
         <div className={styles.mainContent}>
           <div className={styles.leftSection}>
@@ -67,7 +67,7 @@ export default function Home() {
 
           <div className={styles.rightSection2}>
             <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
-            <UpcomingMatches />
+            {/* <UpcomingMatches upcomingMatches={upcomingMatches} /> */}
             <AdsSlider />
             <CricketPrediction />
             <SmallAdBox />

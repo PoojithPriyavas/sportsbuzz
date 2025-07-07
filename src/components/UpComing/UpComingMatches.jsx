@@ -6,56 +6,56 @@ import styles from './UpComingMatches.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faClock } from '@fortawesome/free-solid-svg-icons';
 
-export default function UpcomingMatches() {
-    const [matches, setMatches] = useState([]);
+export default function UpcomingMatches({upcomingMatches=[]}) {
+    // const [matches, setMatches] = useState([]);
 
-    useEffect(() => {
-        async function fetchData() {
-            try {
-                const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/upcoming', {
-                    headers: {
-                        'X-RapidAPI-Key': '017dac301bmshe6ef4a628428634p17177bjsnc738cb420a49',
-                    },
-                });
+    // useEffect(() => {
+    //     async function fetchData() {
+    //         try {
+    //             const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/upcoming', {
+    //                 headers: {
+    //                     'X-RapidAPI-Key': '017dac301bmshe6ef4a628428634p17177bjsnc738cb420a49',
+    //                 },
+    //             });
 
-                const upcoming = [];
+    //             const upcoming = [];
 
-                res.data.typeMatches.forEach(typeBlock => {
-                    const matchType = typeBlock.matchType;
+    //             res.data.typeMatches.forEach(typeBlock => {
+    //                 const matchType = typeBlock.matchType;
 
-                    typeBlock.seriesMatches.forEach(seriesWrapper => {
-                        const series = seriesWrapper.seriesAdWrapper;
-                        if (series?.matches && Array.isArray(series.matches)) {
-                            series.matches.forEach(match => {
-                                const info = match.matchInfo;
+    //                 typeBlock.seriesMatches.forEach(seriesWrapper => {
+    //                     const series = seriesWrapper.seriesAdWrapper;
+    //                     if (series?.matches && Array.isArray(series.matches)) {
+    //                         series.matches.forEach(match => {
+    //                             const info = match.matchInfo;
 
-                                const date = new Date(Number(info.startDate));
-                                const dateStr = date.toISOString().split('T')[0];
-                                const timeStr = date.toISOString().split('T')[1].slice(0, 5);
+    //                             const date = new Date(Number(info.startDate));
+    //                             const dateStr = date.toISOString().split('T')[0];
+    //                             const timeStr = date.toISOString().split('T')[1].slice(0, 5);
 
-                                upcoming.push({
-                                    matchId: info.matchId,
-                                    type: matchType,
-                                    team1: info.team1.teamName,
-                                    team2: info.team2.teamName,
-                                    seriesName: series.seriesName,
-                                    dateStr,
-                                    timeStr,
-                                });
-                            });
-                        }
-                    });
+    //                             upcoming.push({
+    //                                 matchId: info.matchId,
+    //                                 type: matchType,
+    //                                 team1: info.team1.teamName,
+    //                                 team2: info.team2.teamName,
+    //                                 seriesName: series.seriesName,
+    //                                 dateStr,
+    //                                 timeStr,
+    //                             });
+    //                         });
+    //                     }
+    //                 });
 
-                });
+    //             });
 
-                setMatches(upcoming);
-            } catch (error) {
-                console.error('Failed to fetch upcoming matches:', error);
-            }
-        }
+    //             setMatches(upcoming);
+    //         } catch (error) {
+    //             console.error('Failed to fetch upcoming matches:', error);
+    //         }
+    //     }
 
-        fetchData();
-    }, []);
+    //     fetchData();
+    // }, []);
 
     return (
         <div className={styles.section}>
@@ -64,7 +64,7 @@ export default function UpcomingMatches() {
                 <a href="#" style={{ textDecoration: 'none' }}>view all</a>
             </div>
 
-            {matches.map(match => (
+            {upcomingMatches.map(match => (
                 <div key={match.matchId} className={styles.card}>
                     <div className={styles.labels}>
                         <span className={styles.intl}>{match.type}</span>

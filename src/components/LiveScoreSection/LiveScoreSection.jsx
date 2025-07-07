@@ -1,86 +1,27 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styles from './LiveScoreSection.module.css';
-import axios from 'axios';
+import { useGlobalData } from '../Context/ApiContext';
+export default function LiveScores({ apiResponse = [], matchTypes = [], teamImages = [] }) {
 
-export default function LiveScores() {
-  const [apiResponse, setApiResponse] = useState(null);
-  const [matchTypes, setMatchTypes] = useState([]);
   const [activeType, setActiveType] = useState('');
-  const [teamImages, setTeamImages] = useState({});
-
-  const rapidApiKey = '017dac301bmshe6ef4a628428634p17177bjsnc738cb420a49';
 
   useEffect(() => {
-    const fetchMatches = async () => {
-      try {
-        const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live', {
-          headers: { 'X-RapidAPI-Key': rapidApiKey },
-        });
-
-        setApiResponse(res.data);
-        const filterTypes = res.data.filters?.matchType || [];
-        setMatchTypes(filterTypes);
-
-        if (filterTypes.length > 0) {
-          setActiveType(filterTypes[0]);
-        }
-
-        const imageIds = new Set();
-        res.data.typeMatches?.forEach(type =>
-          type.seriesMatches?.forEach(series => {
-            const matches = series.seriesAdWrapper?.matches || [];
-            matches.forEach(match => {
-              const t1 = match.matchInfo?.team1?.imageId;
-              const t2 = match.matchInfo?.team2?.imageId;
-              if (t1) imageIds.add(t1);
-              if (t2) imageIds.add(t2);
-            });
-          })
-        );
-
-        const newTeamImages = {};
-        await Promise.all(
-          Array.from(imageIds).map(async id => {
-            try {
-              const response = await axios.get(
-                `https://cricbuzz-cricket.p.rapidapi.com/img/v1/i1/c${id}/i.jpg`,
-                {
-                  headers: { 'X-RapidAPI-Key': rapidApiKey },
-                  responseType: 'blob',
-                }
-              );
-              const imageURL = URL.createObjectURL(response.data);
-              newTeamImages[id] = imageURL;
-            } catch (err) {
-              console.error('Failed to fetch image for ID:', id, err);
-            }
-          })
-        );
-        setTeamImages(newTeamImages);
-
-      } catch (error) {
-        console.error('Failed to fetch live matches:', error);
-      }
-    };
-
-    fetchMatches();
-  }, []);
+    if (matchTypes.length > 0) {
+      setActiveType(matchTypes[0]);
+    }
+  }, [matchTypes]);
 
   const renderCards = () => {
-    if (!apiResponse) return null;
+    if (!apiResponse || !activeType) return null;
 
     const typeMatch = apiResponse.typeMatches?.find(
       tm => tm.matchType === activeType
     );
 
     if (!typeMatch) {
-      return (
-        <div className={styles.card}>
-          No live matches for {activeType}
-        </div>
-      );
+      return <div className={styles.card}>No live matches for {activeType}</div>;
     }
 
     const cards = [];
@@ -115,11 +56,7 @@ export default function LiveScores() {
               <div className={styles.team}>
                 <div className={styles.teamInfo}>
                   {team1Img && (
-                    <img
-                      src={team1Img}
-                      alt={team1.teamSName}
-                      className={styles.flag}
-                    />
+                    <img src={team1Img} alt={team1.teamSName} className={styles.flag} />
                   )}
                   <span>{team1.teamName}</span>
                 </div>
@@ -130,16 +67,11 @@ export default function LiveScores() {
                       {score.team1Score.inngs1.runs}/{score.team1Score.inngs1.wickets} ({score.team1Score.inngs1.overs})
                     </strong>
                   )}
-
               </div>
               <div className={styles.team}>
                 <div className={styles.teamInfo}>
                   {team2Img && (
-                    <img
-                      src={team2Img}
-                      alt={team2.teamSName}
-                      className={styles.flag}
-                    />
+                    <img src={team2Img} alt={team2.teamSName} className={styles.flag} />
                   )}
                   <span>{team2.teamName}</span>
                 </div>
@@ -150,7 +82,6 @@ export default function LiveScores() {
                       {score.team2Score.inngs1.runs}/{score.team2Score.inngs1.wickets} ({score.team2Score.inngs1.overs})
                     </strong>
                   )}
-
               </div>
             </div>
 

@@ -62,11 +62,121 @@ export const DataProvider = ({ children }) => {
             console.error('Error fetching best betting headings:', error);
         }
     };
+    // CRICKET LIVE SCORE SECTION
+
+    const rapidApiKey = '017dac301bmshe6ef4a628428634p17177bjsnc738cb420a49';
+
+    const [apiResponse, setApiResponse] = useState(null);
+    const [matchTypes, setMatchTypes] = useState([]);
+    const [teamImages, setTeamImages] = useState({});
+
+    const fetchMatches = async () => {
+        try {
+            const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live', {
+                headers: { 'X-RapidAPI-Key': rapidApiKey },
+            });
+
+            setApiResponse(res.data);
+
+            const filterTypes = res.data.filters?.matchType || [];
+            setMatchTypes(filterTypes);
+
+            const imageIds = new Set();
+            res.data.typeMatches?.forEach(type =>
+                type.seriesMatches?.forEach(series => {
+                    const matches = series.seriesAdWrapper?.matches || [];
+                    matches.forEach(match => {
+                        const t1 = match.matchInfo?.team1?.imageId;
+                        const t2 = match.matchInfo?.team2?.imageId;
+                        if (t1) imageIds.add(t1);
+                        if (t2) imageIds.add(t2);
+                    });
+                })
+            );
+
+            const newTeamImages = {};
+            await Promise.all(
+                Array.from(imageIds).map(async id => {
+                    try {
+                        const response = await axios.get(
+                            `https://cricbuzz-cricket.p.rapidapi.com/img/v1/i1/c${id}/i.jpg`,
+                            {
+                                headers: { 'X-RapidAPI-Key': rapidApiKey },
+                                responseType: 'blob',
+                            }
+                        );
+                        const imageURL = URL.createObjectURL(response.data);
+                        newTeamImages[id] = imageURL;
+                    } catch (err) {
+                        console.error('Failed to fetch image for ID:', id, err);
+                    }
+                })
+            );
+            setTeamImages(newTeamImages);
+        } catch (error) {
+            console.error('Failed to fetch live matches:', error);
+        }
+    };
+
+    // CRICKET UPCOMING MATCH SECTION 
+
+    const [upcomingMatches, setUpcomingMatches] = useState([]);
+
+    const fetchUpcomingMatches = async () => {
+        try {
+            const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/upcoming', {
+                headers: {
+                    'X-RapidAPI-Key': rapidApiKey,
+                },
+            });
+
+            const upcoming = [];
+
+            res.data.typeMatches.forEach(typeBlock => {
+                const matchType = typeBlock.matchType;
+
+                typeBlock.seriesMatches.forEach(seriesWrapper => {
+                    const series = seriesWrapper.seriesAdWrapper;
+                    if (series?.matches && Array.isArray(series.matches)) {
+                        series.matches.forEach(match => {
+                            const info = match.matchInfo;
+
+                            const date = new Date(Number(info.startDate));
+                            const dateStr = date.toISOString().split('T')[0];
+                            const timeStr = date.toISOString().split('T')[1].slice(0, 5);
+
+                            upcoming.push({
+                                matchId: info.matchId,
+                                type: matchType,
+                                team1: info.team1.teamName,
+                                team2: info.team2.teamName,
+                                seriesName: series.seriesName,
+                                dateStr,
+                                timeStr,
+                            });
+                        });
+                    }
+                });
+            });
+
+            setUpcomingMatches(upcoming);
+        } catch (error) {
+            console.error('Failed to fetch upcoming matches:', error);
+        }
+    };
+
+    // FOOTBALL LIVE SCORE SECTION
+
+
+
+
     useEffect(() => {
         fetchBlogCategories();
         fetchBlogs();
         fetchBettingApps();
-        fetchBestBettingApps()
+        fetchBestBettingApps();
+        fetchMatches();
+        fetchUpcomingMatches();
     }, []);
 
     return (
@@ -75,7 +185,11 @@ export const DataProvider = ({ children }) => {
                 blogCategories,
                 blogs,
                 sections,
-                bestSections
+                bestSections,
+                apiResponse,
+                matchTypes,
+                teamImages,
+                upcomingMatches
             }}>
             {children}
         </DataContext.Provider>

@@ -12,7 +12,6 @@ export default function BlogSection({ blogs = [] }) {
   const otherBlogs = blogs.slice(1);
   return (
     <div className={styles.wrapper}>
-      {/* Heading Row */}
       <div className={styles.headingRow}>
         <h3>Latest Blogs</h3>
         <Link href="/blogs/pages/all-blogs" className={styles.viewAll}>
@@ -20,23 +19,23 @@ export default function BlogSection({ blogs = [] }) {
         </Link>
       </div>
 
-      {/* Featured Blog */}
       <div className={styles.featuredBlog}>
-        <div className={styles.image}>
-          <img
-            src={featuredBlog.image_big}
-            alt={featuredBlog.alt_big || featuredBlog.title}
-            className={styles.featuredImg}
-          />
-        </div>
-        <div className={styles.content}>
-          <h4>{featuredBlog.title}</h4>
-          <p>{featuredBlog.author} <span>· {featuredBlog.date}</span></p>
-          <Link href={`/blog-details/${featuredBlog.slug}`}>Read More</Link>
-        </div>
+        <Link href={`/blog-details/${featuredBlog.slug}`}>
+          <div className={styles.image}>
+            <img
+              src={featuredBlog.image}
+              alt={featuredBlog.alt_big || featuredBlog.title}
+              className={styles.featuredImg}
+            />
+          </div>
+          <div className={styles.content}>
+            <h4>{featuredBlog.title}</h4>
+            <p>{featuredBlog.author} <span>· {featuredBlog.date}</span></p>
+            <Link href={`/blog-details/${featuredBlog.slug}`}>Read More</Link>
+          </div>
+        </Link>
       </div>
 
-      {/* Blog Grid */}
       <div className={styles.blogGrid}>
         {otherBlogs.map((blog) => (
           <Link
