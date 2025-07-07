@@ -18,6 +18,7 @@ import HeroCarousal from "@/components/HeroCarousal/Carousal";
 import GoogleAds from "@/components/googleAds/GoogleAds";
 import CustomAxios from "@/components/utilities/CustomAxios";
 import { useGlobalData } from "@/components/Context/ApiContext";
+import TestLive from "@/components/LiveScoreSection/TestLive";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default function Home() {
       <Header categories={blogCategories} />
       <div className={`${geistSans.variable} ${geistMono.variable} container`}>
         {/* <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} /> */}
+        <TestLive />
         <HeroCarousal />
         <div className={styles.mainContent}>
           <div className={styles.leftSection}>

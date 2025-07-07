@@ -1,7 +1,9 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import CustomAxios from '../utilities/CustomAxios';
+import axios from 'axios';
 const DataContext = createContext();
+
 
 export const DataProvider = ({ children }) => {
     const [blogCategories, setBlogCategories] = useState([]);
@@ -43,6 +45,7 @@ export const DataProvider = ({ children }) => {
             console.error('Error fetching best betting headings:', error);
         }
     };
+    
     const fetchBestBettingApps = async () => {
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
@@ -166,6 +169,30 @@ export const DataProvider = ({ children }) => {
     };
 
     // FOOTBALL LIVE SCORE SECTION
+    const [stages, setStages] = useState([]);
+    const liveFootBall = async () => {
+        const options = {
+            method: 'GET',
+            url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
+            params: {
+                Category: 'soccer',
+                Date: '20250706',
+                Timezone: '-7'
+            },
+            headers: {
+                'X-RapidAPI-Key': '28acac3c58mshd83e0915f78a287p129875jsna833d4039a3e',
+
+            }
+        };
+
+        try {
+            const response = await axios.request(options);
+            setStages(response.data)
+        } catch (error) {
+            console.error('Error fetching football matches:', error);
+        }
+    };
+
 
 
 
@@ -175,8 +202,9 @@ export const DataProvider = ({ children }) => {
         fetchBlogs();
         fetchBettingApps();
         fetchBestBettingApps();
-        fetchMatches();
-        fetchUpcomingMatches();
+        // fetchMatches();
+        // fetchUpcomingMatches();
+        liveFootBall();
     }, []);
 
     return (
@@ -189,7 +217,8 @@ export const DataProvider = ({ children }) => {
                 apiResponse,
                 matchTypes,
                 teamImages,
-                upcomingMatches
+                upcomingMatches,
+                stages
             }}>
             {children}
         </DataContext.Provider>
