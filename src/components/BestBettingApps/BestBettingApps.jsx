@@ -1,28 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styles from './BestBettingApps.module.css';
 import Head from 'next/head';
+import CustomAxios from '../utilities/CustomAxios';
+import { useGlobalData } from '../Context/ApiContext';
 
 export default function BettingAppsTable() {
-    const [sections, setSections] = useState([]);
     const [copiedId, setCopiedId] = useState(null);
 
-    useEffect(() => {
-        const fetchBettingApps = async () => {
-            try {
-                const res = await fetch(
-                    'https://admin.sportsbuz.com/api/best-betting-headings?country_code=in'
-                );
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    setSections(data);
-                }
-            } catch (error) {
-                console.error('Error fetching betting apps:', error);
-            }
-        };
-
-        fetchBettingApps();
-    }, []);
+    const { bestSections } = useGlobalData();
 
     const handleCopy = (code, id) => {
         navigator.clipboard.writeText(code).then(() => {
@@ -31,17 +16,17 @@ export default function BettingAppsTable() {
         });
     };
 
-    if (sections.length === 0) return null;
+    if (bestSections.length === 0) return null;
 
     return (
         <>
             {/* Use the first section for SEO meta */}
             <Head>
-                <title>{sections[0]?.metatitle}</title>
-                <meta name="description" content={stripHtml(sections[0]?.meta_description)} />
+                <title>{bestSections[0]?.metatitle}</title>
+                <meta name="description" content={stripHtml(bestSections[0]?.meta_description)} />
             </Head>
 
-            {sections.map((section) => (
+            {bestSections.map((section) => (
                 <div className={styles.wrapper} key={section.id}>
                     <h2 className={styles.heading}>{section.heading}</h2>
 

@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { useEffect, useState } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import Header from "@/components/Header/Header";
@@ -15,6 +16,8 @@ import AdsSlider from "@/components/AdSlider/AdSlider";
 import CricketPrediction from "@/components/Betting/CricketPrediction";
 import HeroCarousal from "@/components/HeroCarousal/Carousal";
 import GoogleAds from "@/components/googleAds/GoogleAds";
+import CustomAxios from "@/components/utilities/CustomAxios";
+import { useGlobalData } from "@/components/Context/ApiContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,20 +29,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+
 export default function Home() {
+  const { blogCategories, blogs, sections } = useGlobalData();
+
+
   return (
     <>
       <Head>
         <title>Sportsbuz</title>
         <meta name="description" content="Your site description here" />
       </Head>
-      <Header />
+      <Header categories={blogCategories} />
       <div className={`${geistSans.variable} ${geistMono.variable} container`}>
         <LiveScores />
         <HeroCarousal />
         <div className={styles.mainContent}>
           <div className={styles.leftSection}>
-            <BonusTable />
+            <BonusTable sections={sections} />
           </div>
 
           <div className={styles.rightSection}>
@@ -55,7 +62,7 @@ export default function Home() {
           </div>
 
           <div className={styles.centerSection}>
-            <BlogSection />
+            <BlogSection blogs={blogs} />
           </div>
 
           <div className={styles.rightSection2}>

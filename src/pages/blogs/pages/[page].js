@@ -2,7 +2,10 @@ import Header from "@/components/Header/Header";
 import BlogsPage from "@/components/BlogsSection/BlogPage";
 import LiveScores from "@/components/LiveScoreSection/LiveScoreSection";
 import Head from "next/head";
+import { useGlobalData } from "@/components/Context/ApiContext";
+
 export default function BlogPages() {
+    const { blogs, } = useGlobalData()
 
     return (
         <>
@@ -13,7 +16,7 @@ export default function BlogPages() {
             <Header />
             <div className='container'>
                 <LiveScores />
-                <BlogsPage />
+                <BlogsPage blogs={blogs} />
             </div>
         </>
     )

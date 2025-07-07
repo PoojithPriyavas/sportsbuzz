@@ -66,7 +66,8 @@
   font-size: 1rem;
   margin-bottom: 0.5rem;
   line-height: 1.4;
-  max-height: 2.8em; /* 2 lines */
+  max-height: 2.8em;
+  /* 2 lines */
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -105,6 +106,15 @@
 .blogImage {
   height: 100px;
   background: #eee;
+  width: 100%;
+  overflow: hidden;
+}
+
+.blogImage img {
+  object-fit: contain;
+  position: relative;
+  width: 100%;
+
 }
 
 .blogContent {
@@ -129,4 +139,64 @@
 
 .blogContent a:hover {
   text-decoration: underline;
+}
+
+.filterBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filterBar h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* Dropdown */
+.controls select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background-color: #fff;
+  cursor: pointer;
+  color: #333;
+}
+
+/* Search input wrapper */
+.searchWrapper {
+  display: flex;
+  align-items: center;
+  background-color: #f2f2f2;
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  width: 370px;
+  height: 48px;
+  border: 1px solid #d9d9d9;
+
+}
+
+.searchIcon {
+  font-size: 1rem;
+  color: #888;
+  margin-right: 0.6rem;
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  flex: 1;
+  color: #333;
 }

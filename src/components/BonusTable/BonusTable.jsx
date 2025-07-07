@@ -1,29 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styles from './BonusTable.module.css';
 import Head from 'next/head';
+import CustomAxios from '../utilities/CustomAxios';
 
-export default function BonusTable() {
-    const [sections, setSections] = useState([]);
+export default function BonusTable({ sections = [] }) {
+    console.log(sections, "datatatatatat")
+
     const [copiedId, setCopiedId] = useState(null);
 
-    useEffect(() => {
-        const fetchBettingApps = async () => {
-            try {
-                const res = await fetch(
-                    'https://admin.sportsbuz.com/api/best-betting-headings?country_code=in&filter_by=current_month'
-                );
-
-                const data = await res.json();
-                if (Array.isArray(data)) {
-                    setSections(data);
-                }
-            } catch (error) {
-                console.error('Error fetching betting apps:', error);
-            }
-        };
-
-        fetchBettingApps();
-    }, []);
 
     const handleCopy = (code, id) => {
         navigator.clipboard.writeText(code).then(() => {

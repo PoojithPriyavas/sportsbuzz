@@ -12,7 +12,6 @@ export default function blogDetailsMain() {
             </Head>
             <Header />
             <div className="container">
-                <LiveScores />
                 <BlogDetailsPage />
             </div>
         </>

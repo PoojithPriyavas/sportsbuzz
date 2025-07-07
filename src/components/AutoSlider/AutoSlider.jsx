@@ -6,6 +6,7 @@ import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import styles from './AutoSlider.module.css';
+import CustomAxios from '../utilities/CustomAxios';
 
 export default function AutoSlider() {
   const [banners, setBanners] = useState([]);
@@ -13,24 +14,19 @@ export default function AutoSlider() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await fetch('https://admin.sportsbuz.com/api/side-banners'); // 🔁 Replace with actual API if different
-        const data = await res.json();
-
-        // Filter and sort banners
-        // const activeBanners = data
-        //   .filter(b => b.is_active === 'Active' && b.location === 2)
-        //   .sort((a, b) => a.order_by - b.order_by);
-
+        const response = await CustomAxios.get('/side-banners');
+        const data = response.data;
         setBanners(data);
       } catch (error) {
-        console.error('Failed to fetch banners:', error);
+        console.error('Error fetching side banners:', error);
+        throw error;
       }
     };
 
     fetchBanners();
   }, []);
 
-  console.log(banners,"bannerds")
+  console.log(banners, "bannerds")
   return (
     <div className={styles.sliderWrapper}>
       <Swiper

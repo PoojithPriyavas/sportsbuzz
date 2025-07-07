@@ -1,14 +1,15 @@
+'use client';
+import { useEffect, useState } from 'react';
 import styles from './BlogsSection.module.css';
 import Link from 'next/link';
+import axios from 'axios';
+import CustomAxios from '../utilities/CustomAxios';
 
-export default function BlogSection() {
-  const blogs = [
-    { id: 1, title: "Blog title 1", date: "Jun 24 2025", slug: "blog-title-1" },
-    { id: 2, title: "Blog title 2", date: "Jun 23 2025", slug: "blog-title-2" },
-    { id: 3, title: "Blog title 3", date: "Jun 22 2025", slug: "blog-title-3" },
-    { id: 4, title: "Blog title 4", date: "Jun 21 2025", slug: "blog-title-4" },
-  ];
+export default function BlogSection({ blogs = [] }) {
+  if (blogs.length === 0) return null;
 
+  const featuredBlog = blogs[0];
+  const otherBlogs = blogs.slice(1);
   return (
     <div className={styles.wrapper}>
       {/* Heading Row */}
@@ -23,32 +24,32 @@ export default function BlogSection() {
       <div className={styles.featuredBlog}>
         <div className={styles.image}>
           <img
-            src="/images/blog1.jpg"
-            alt="Featured Blog"
+            src={featuredBlog.image_big}
+            alt={featuredBlog.alt_big || featuredBlog.title}
             className={styles.featuredImg}
           />
         </div>
         <div className={styles.content}>
-          <h4>
-            Here Goes News title maximum of two lines akjshd skhdf jsh sh hskjhd sdfds fsdfsdfsd kj
-          </h4>
-          <p>Cod Hatch <span>· Jun 24 2025</span></p>
-          <Link href="/blog-details/featured-blog-slug">Read More</Link>
+          <h4>{featuredBlog.title}</h4>
+          <p>{featuredBlog.author} <span>· {featuredBlog.date}</span></p>
+          <Link href={`/blog-details/${featuredBlog.slug}`}>Read More</Link>
         </div>
       </div>
 
       {/* Blog Grid */}
       <div className={styles.blogGrid}>
-        {blogs.map((blog) => (
+        {otherBlogs.map((blog) => (
           <Link
             href={`/blog-details/${blog.slug}`}
             key={blog.id}
             className={styles.blogCard}
           >
-            <div className={styles.image}></div>
+            <div className={styles.image}>
+              <img src={blog.image} alt={blog.alt || blog.title} />
+            </div>
             <div className={styles.content}>
               <h5>{blog.title}</h5>
-              <p>Cod Hatch <span>{blog.date}</span></p>
+              <p>{blog.author} <span>{blog.date}</span></p>
               <span className={styles.readMore}>Read More</span>
             </div>
           </Link>
