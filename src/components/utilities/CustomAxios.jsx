@@ -1,4 +1,3 @@
-// utils/axiosInstance.js
 import axios from 'axios';
 
 const CustomAxios = axios.create({
@@ -6,7 +5,7 @@ const CustomAxios = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // Optional: 10s timeout
+  timeout: 10000, 
 });
 
 export default CustomAxios;

@@ -45,7 +45,7 @@ export const DataProvider = ({ children }) => {
             console.error('Error fetching best betting headings:', error);
         }
     };
-    
+
     const fetchBestBettingApps = async () => {
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
@@ -102,7 +102,7 @@ export const DataProvider = ({ children }) => {
                 Array.from(imageIds).map(async id => {
                     try {
                         const response = await axios.get(
-                            `https://cricbuzz-cricket.p.rapidapi.com/img/v1/i1/c${id}/i.jpg`,
+                           ` https://cricbuzz-cricket.p.rapidapi.com/img/v1/i1/c${id}/i.jpg`,
                             {
                                 headers: { 'X-RapidAPI-Key': rapidApiKey },
                                 responseType: 'blob',
@@ -171,13 +171,15 @@ export const DataProvider = ({ children }) => {
     // FOOTBALL LIVE SCORE SECTION
     const [stages, setStages] = useState([]);
     const liveFootBall = async () => {
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0].replace(/-/g, '');
         const options = {
             method: 'GET',
             url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
             params: {
                 Category: 'soccer',
-                Date: '20250706',
-                Timezone: '-7'
+                Date: formattedDate,
+                Timezone: '-5'
             },
             headers: {
                 'X-RapidAPI-Key': '28acac3c58mshd83e0915f78a287p129875jsna833d4039a3e',
