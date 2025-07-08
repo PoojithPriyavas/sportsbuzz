@@ -21,6 +21,7 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 import TestLive from "@/components/LiveScoreSection/TestLive";
 import LoadingScreen from "@/components/Loader/Loader";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
+import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -80,7 +81,8 @@ export default function Home() {
               <div className={styles.twoSplitRow}>
                 <div className={styles.leftSplit}>
                   <PredictionSection />
-                  <MultiBannerSlider />
+                  {/* <MultiBannerSlider /> */}
+                   <AutoSlider />
                   <TopNewsSection />
                 </div>
                 <div className={styles.centerSplit}>
@@ -92,6 +94,7 @@ export default function Home() {
             {/* Column 4 - AutoSlider on top and others below */}
             <div className={styles.fourthColumn}>
               <BettingCard />
+              <UpcomingFootballMatches />
               <AutoSlider />
 
               <AdsSlider />

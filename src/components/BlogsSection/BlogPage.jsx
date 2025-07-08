@@ -11,6 +11,7 @@ import GoogleAds from '../googleAds/GoogleAds';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaSearch } from 'react-icons/fa';
+import AutoSlider from '../AutoSlider/AutoSlider';
 
 export default function BlogsPage({ blogs = [] }) {
     // Fake blogs data
@@ -54,7 +55,7 @@ export default function BlogsPage({ blogs = [] }) {
 
                         <div className={styles.wrapper}>
                             {/* Featured Blog */}
-                            {displayedFeatured && (
+                            {/* {displayedFeatured && (
                                 <Link href={`/blog-details/${displayedFeatured?.slug}`} className={styles.featuredBlog}>
                                     <div className={styles.featuredImage}>
                                         <img
@@ -69,7 +70,7 @@ export default function BlogsPage({ blogs = [] }) {
                                         <span className={styles.readMore}>Read More</span>
                                     </div>
                                 </Link>
-                            )}
+                            )} */}
                             {selectedSubcategoryId && (
                                 <div className={styles.clearFilterWrapper}>
                                     <Link href="/blogs/pages/all-blogs" className={styles.clearFilter}>
@@ -79,7 +80,8 @@ export default function BlogsPage({ blogs = [] }) {
                             )}
                             {/* Blog Grid */}
                             <div className={styles.blogGrid}>
-                                {otherBlogs.map((blog) => (
+                                {/* {otherBlogs.map((blog) => ( */}
+                                {filteredBlogs.map((blog) => (
                                     <Link
                                         key={blog.id}
                                         href={`/blog-details/${blog?.slug}`}
@@ -104,7 +106,8 @@ export default function BlogsPage({ blogs = [] }) {
                 <div className={styles.right}>
                     <PredictionSection />
                     <CricketPrediction />
-                    <MultiBannerSlider />
+                    {/* <MultiBannerSlider /> */}
+                    <AutoSlider />
                     <TopNewsSection />
                 </div>
             </div>

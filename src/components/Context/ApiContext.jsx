@@ -7,6 +7,7 @@ const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
     const [blogCategories, setBlogCategories] = useState([]);
+    const [recentBlogs, setrecentBlogs] = useState([]);
     const [blogs, setBlogs] = useState([]);
     const [sections, setSections] = useState([]);
     const [bestSections, setBestSections] = useState([]);
@@ -19,6 +20,17 @@ export const DataProvider = ({ children }) => {
             console.error('Error fetching blog categories:', error);
         }
     };
+
+
+    const fetchRecentBlogs = async () => {
+        try {
+            const response = await CustomAxios.get('/recent-posts');
+            setrecentBlogs(response.data);
+        } catch (error) {
+            console.error('Error fetching blog categories:', error);
+        }
+    };
+
 
     const fetchBlogs = async () => {
         try {
@@ -197,23 +209,53 @@ export const DataProvider = ({ children }) => {
     };
 
 
+    // FOOTBALL UPCOMING MATCHES SECTION
+
+    const [upcoming, setUpcoming] = useState([]);
+    const upcomingFootBall = async () => {
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0].replace(/-/g, '');
+        const options = {
+            method: 'GET',
+            url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
+            params: {
+                Category: 'soccer',
+                Date: "20250707",
+                Timezone: '-5'
+            },
+            headers: {
+                'X-RapidAPI-Key': '28acac3c58mshd83e0915f78a287p129875jsna833d4039a3e',
+
+            }
+        };
+
+        try {
+            const response = await axios.request(options);
+            setUpcoming(response.data)
+        } catch (error) {
+            console.error('Error fetching football matches:', error);
+        }
+    };
 
 
 
     useEffect(() => {
         fetchBlogCategories();
+        fetchRecentBlogs();
         fetchBlogs();
         fetchBettingApps();
         fetchBestBettingAppsPrevious();
         // fetchMatches();
         // fetchUpcomingMatches();
         liveFootBall();
+        upcomingFootBall();
     }, []);
 
     return (
         <DataContext.Provider
             value={{
                 blogCategories,
+                recentBlogs,
                 blogs,
                 sections,
                 bestSections,
@@ -221,7 +263,8 @@ export const DataProvider = ({ children }) => {
                 matchTypes,
                 teamImages,
                 upcomingMatches,
-                stages
+                stages,
+                upcoming
             }}>
             {children}
         </DataContext.Provider>
