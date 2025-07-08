@@ -1,4 +1,5 @@
 'use client';
+
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -21,6 +22,8 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 import TestLive from "@/components/LiveScoreSection/TestLive";
 import LoadingScreen from "@/components/Loader/Loader";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,15 +49,9 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fixed: Timer was setting loading to true instead of false
-    const timer1 = setTimeout(() => setLoading(false), 3000);
+    const timer1 = setTimeout(() => setLoading(true), 3000); // adjust time as per animation duration
     return () => clearTimeout(timer1);
   }, []);
-
-  // // Show loading screen while loading
-  // if (loading) {
-  //   return <LoadingScreen onFinish={() => setLoading(false)} />;
-  // }
 
   return (
     <>
@@ -62,17 +59,18 @@ export default function Home() {
         <title>Sportsbuz</title>
         <meta name="description" content="Your site description here" />
       </Head>
+
+
+
       <>
         <LoadingScreen onFinish={() => setLoading(false)} />
-
         <div className={`${geistSans.variable} ${geistMono.variable} container`}>
           {/* Top Hero Section */}
           <TestLive />
           <HeroCarousal />
 
-          {/* Main Layout: 4 Columns */}
+          {/* Bonus + AutoSlider Section */}
           <div className={styles.fourColumnRow}>
-            {/* Left 3 columns combined */}
             <div className={styles.leftThreeColumns}>
               <BonusTable sections={sections} />
 
@@ -91,9 +89,9 @@ export default function Home() {
 
             {/* Column 4 - AutoSlider on top and others below */}
             <div className={styles.fourthColumn}>
-              <BettingCard />
               <AutoSlider />
 
+              <BettingCard />
               <AdsSlider />
               <CricketPrediction />
               <SmallAdBox />
@@ -102,6 +100,7 @@ export default function Home() {
 
           <GoogleAds />
         </div>
+
       </>
     </>
   );

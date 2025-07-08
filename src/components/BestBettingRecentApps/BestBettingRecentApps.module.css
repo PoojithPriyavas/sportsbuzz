@@ -1,4 +1,65 @@
-/* Enhanced Betting Apps Table Styling */
+.cardGrid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  /* exactly 3 in a row */
+  margin-top: 40px;
+}
+
+@media (max-width: 1024px) {
+  .cardGrid {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 in a row on tablets */
+  }
+}
+
+@media (max-width: 600px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+    /* 1 in a row on mobile */
+  }
+}
+
+
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  padding: 16px;
+  /* reduce padding */
+  min-height: 150px;
+  max-height: 230px;
+  /* fixed height for uniformity */
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: flex-start;
+}
+
+.cardImage {
+  max-width: 120px;
+  height: 100px;
+  /* fixed height */
+  object-fit: contain;
+  margin-bottom: 10px;
+  background-color: #f5f5f5;
+  /* fallback background */
+  display: block;
+  width: 100%;
+  align-items: left;
+}
+
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+
+
 
 .table {
   width: 100%;
@@ -6,9 +67,9 @@
   background: white;
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   border: none;
-  margin-bottom: 0px;
+  margin-bottom: 20px;
   position: relative;
 }
 
@@ -307,39 +368,15 @@
   box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
 }
 
-/* .copyCodeBtn,
-.actions .codeBtn {
-  display: inline-block;
-  padding: 10px 18px;
-  margin: 5px;
-  border: 2px dotted #0066da;
-  background: linear-gradient(135deg, #e3f0ff, #c3dbff);
-  color: #0049a7;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-}
 
-.copyCodeBtn:hover,
-.actions .codeBtn:hover {
-  background: linear-gradient(135deg, #0066da, #0049a7);
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 102, 218, 0.3);
-  border-style: solid;
-} */
 
 
 /* Heading Styling */
 .heading {
   color: #333;
-  font-size: 28px;
+  font-size: 25px;
   font-weight: 800;
-  text-align: center;
+  text-align: left;
   margin-bottom: 30px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -351,7 +388,7 @@
   content: '';
   position: absolute;
   bottom: 0;
-  left: 50%;
+  left: 50px;
   transform: translateX(-50%);
   width: 100px;
   height: 4px;
@@ -441,4 +478,12 @@
     display: block;
     margin: 3px 0;
   }
+}
+
+.description {
+  color: black;
+}
+
+.description * {
+  color: black !important;
 }

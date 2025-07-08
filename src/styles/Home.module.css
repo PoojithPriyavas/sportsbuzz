@@ -1,67 +1,112 @@
-/* Responsive Three-column layout */
-.mainContent {
+/* Container */
+.container {
+  width: 100%;
+  padding: 0 1rem;
+  margin: 0 auto;
+  max-width: 1400px;
+  box-sizing: border-box;
+}
+
+/* Layout: 4 Columns */
+.fourColumnRow {
   display: flex;
   flex-direction: row;
   gap: 1rem;
   margin-top: 2rem;
-  align-items: flex-start;
-  flex-wrap: wrap;
   width: 100%;
+  min-height: 500px;
+  /* Ensure minimum height */
 }
 
-.leftSection {
-  flex: 4;
-  min-width: 0;
-  width: 100%;
-}
-
-.centerSection {
+/* Left 3 columns combined */
+.leftThreeColumns {
   flex: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   min-width: 0;
+  /* Prevent flex item from overflowing */
+}
+
+/* Inside leftThreeColumns: 2-column split */
+.twoSplitRow {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex: 1;
+}
+
+/* 1: Prediction, Banners, News */
+.leftSplit {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-width: 0;
 }
 
-.rightSection {
-  flex: 1;
-  min-width: 0;
+/* 2: Blogs */
+.centerSplit {
+  flex: 2;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-width: 0;
 }
 
-.leftSection2 {
+/* Column 4: AutoSlider + BettingCard, etc. */
+.fourthColumn {
   flex: 1;
-  min-width: 0;
-}
-.rightSection2 {
-  flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
+  min-width: 250px;
+  /* Minimum width for sidebar */
 }
 
-.bannerPlaceholder {
-  background: #eee;
-  height: 380px;
-  border-radius: 8px;
-  text-align: center;
-  line-height: 150px;
-  color: #666;
-  font-weight: bold;
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-  .mainContent {
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .fourColumnRow {
     flex-direction: column;
   }
 
-  .leftSection,
-  .centerSection,
-  .rightSection {
+  .leftThreeColumns,
+  .fourthColumn {
     flex: 1 1 100%;
+  }
+
+  .fourthColumn {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .twoSplitRow {
+    flex-direction: column;
+  }
+
+  .leftSplit,
+  .centerSplit {
+    flex: 1 1 100%;
+  }
+
+  .container {
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .fourColumnRow {
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .leftThreeColumns,
+  .twoSplitRow {
+    gap: 0.5rem;
+  }
+
+  .fourthColumn {
+    gap: 0.5rem;
   }
 }

@@ -46,11 +46,12 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-    const fetchBestBettingApps = async () => {
+    const fetchBestBettingAppsPrevious = async () => {
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
                 params: {
                     country_code: 'in',
+                    filter_by: 'previous_month'
                 },
             });
 
@@ -203,7 +204,7 @@ export const DataProvider = ({ children }) => {
         fetchBlogCategories();
         fetchBlogs();
         fetchBettingApps();
-        fetchBestBettingApps();
+        fetchBestBettingAppsPrevious();
         // fetchMatches();
         // fetchUpcomingMatches();
         liveFootBall();

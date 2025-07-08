@@ -1,0 +1,73 @@
+/* 3:1 Row Layout */
+.twoColumnLayout {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    margin-top: 2rem;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.bonusTableContainer {
+    flex: 3;
+    min-width: 0;
+}
+
+.rightSection2 {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* 1:2:1 Layout for Main Content Row */
+.mainContent {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    margin-top: 2rem;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.leftSection2 {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.centerSection {
+    flex: 2;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.rightSection {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Responsive for Mobile */
+@media (max-width: 768px) {
+
+    .twoColumnLayout,
+    .mainContent {
+        flex-direction: column;
+    }
+
+    .bonusTableContainer,
+    .rightSection2,
+    .leftSection2,
+    .centerSection,
+    .rightSection {
+        flex: 1 1 100%;
+    }
+}

@@ -1,173 +1,191 @@
+/* Main Loader Wrapper */
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+/* Header Container: Horizontal layout between left & right */
+.headerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 20px;
+}
+
+/* Left Side */
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+
+/* Header Container: Flex between left and right */
+.headerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+}
+
+/* Left Section: Logo + Navigation */
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
 .loaderWrapper {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
   width: 100%;
+  height: 100vh;
   background-color: #0046aa;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
   z-index: 9999;
-  transition: height 1s ease, padding 1s ease;
+  transition: height 0.8s ease, align-items 0.8s ease;
   flex-direction: column;
+  /* Ensures vertical stacking if needed */
 }
 
-/* Shrinking Phases */
-.logoPhase .logo {
-  bottom: 20px;
+
+/* Dark Mode */
+.darkMode {
+  background-color: #1a1a1a;
 }
 
-.shrink {
-  height: 80px;
-  align-items: flex-start;
-}
 
-.shrink .loaderGif {
-  opacity: 0;
-  transform: scale(0.5);
-}
 
-.shrink .videoElement {
-  opacity: 0;
-  transform: scale(0.8);
-}
-
-.shrink .logo {
-  bottom: 20px;
-  opacity: 1;
-  transform: none;
-}
-
-/* Loaded Header State */
-.loaded {
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-}
-
-.loaded .logo {
-  position: static;
-  bottom: auto;
-  left: auto;
-  transform: none;
-  width: 120px;
-  height: auto;
-}
-
-.loaded .navSection {
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-}
-
-.loaded .rightSection {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Elements */
-.loaderGif {
-  width: 100px;
-  height: 100px;
-  z-index: 2;
-  transition: opacity 1s ease, transform 1s ease;
-}
-
-.videoElement {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity 1s ease, transform 1s ease;
-}
-
+/* Logo */
 .logo {
   position: absolute;
-  bottom: -100px;
   left: 20px;
   width: 120px;
-  transition: bottom 1s ease;
-  z-index: 3;
-  opacity: 1 !important;
+  height: auto;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
-/* Navigation */
+/* Navigation Section */
+.navSection {
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.separator {
+  color: white;
+  font-size: 16px;
+  margin: 0 15px;
+}
+
 .nav {
   display: flex;
-  gap: 30px;
-  justify-content: center;
-  flex: 1;
+  align-items: center;
+  gap: 25px;
 }
 
 .navItem {
-  text-decoration: none;
   color: white;
+  text-decoration: none;
   font-size: 14px;
-  position: relative;
-  padding-bottom: 2px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.navItem:hover,
+.navItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .active {
   font-weight: bold;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .active::after {
   content: '';
   position: absolute;
-  left: 0;
   bottom: -4px;
+  left: 0;
   width: 100%;
   height: 2px;
   background: white;
   border-radius: 1px;
 }
 
-.separator {
-  margin-left: 10px;
-  margin-right: 10px;
-  opacity: 0.6;
-  font-size: 16px;
-  color: white;
-}
-
 /* Right Section */
 .rightSection {
-  display: none;
+  position: absolute;
+  right: 20px;
+  display: flex;
   align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
+  gap: 15px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
 .languageSelector {
   background: transparent;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
+  outline: none;
+}
+
+.languageSelector:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.languageSelector option {
+  background: #0046aa;
+  color: white;
 }
 
 .darkModeToggle {
-  background-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.15);
   border: none;
-  padding: 5px 8px;
+  color: white;
+  padding: 8px 10px;
   border-radius: 6px;
   cursor: pointer;
-  color: white;
+  font-size: 14px;
+  transition: all 0.3s ease;
 }
 
-/* Dropdown Menu */
+.darkModeToggle:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Dropdown */
 .dropdown {
   position: relative;
 }
 
 .submenu {
-  display: none;
   position: absolute;
   top: 100%;
   left: 0;
@@ -176,24 +194,164 @@
   border-radius: 4px;
   padding: 8px 0;
   min-width: 160px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 9999;
   list-style: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
 }
 
 .dropdown:hover .submenu {
-  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .submenuItem {
   padding: 8px 16px;
   display: block;
-  white-space: nowrap;
   color: #333;
   text-decoration: none;
   font-size: 13px;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
 }
 
 .submenuItem:hover {
   background-color: #f0f0f0;
+}
+
+.loaderGif {
+  width: 100px;
+  height: 100px;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+}
+
+/* Shrink phase: fade out gif */
+.shrink .loaderGif {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Complete: ensure it's hidden */
+.complete .loaderGif {
+  display: none;
+}
+
+/* Phase: Shrink */
+.shrink {
+  height: 70px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.shrink .loaderGif {
+  opacity: 0;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shrink .logo {
+  opacity: 1;
+  /* position: static; */
+}
+
+.shrink .navSection {
+  opacity: 1;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shrink .rightSection {
+  opacity: 1;
+  position: static;
+}
+
+/* Phase: Complete */
+.complete {
+  height: 70px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.complete .loaderGif {
+  opacity: 0;
+  display: none;
+}
+
+.complete .logo {
+  opacity: 1;
+  position: static;
+}
+
+.complete .navSection {
+  opacity: 1;
+}
+
+.complete .rightSection {
+  opacity: 1;
+  position: static;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav {
+    gap: 15px;
+  }
+
+  .navItem {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  .logo {
+    width: 100px;
+    left: 15px;
+  }
+
+  .rightSection {
+    right: 15px;
+    gap: 10px;
+  }
+
+  .languageSelector {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .darkModeToggle {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    gap: 10px;
+  }
+
+  .navItem {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+
+  .separator {
+    font-size: 14px;
+    margin: 0 10px;
+  }
+
+  .logo {
+    width: 90px;
+    left: 10px;
+  }
+
+  .rightSection {
+    right: 10px;
+    gap: 8px;
+  }
 }

@@ -7,7 +7,7 @@ import { useGlobalData } from '../Context/ApiContext';
 export default function BettingAppsTable() {
     const [copiedId, setCopiedId] = useState(null);
 
-    const { bestSections } = useGlobalData();
+    const { sections } = useGlobalData();
 
     const handleCopy = (code, id) => {
         navigator.clipboard.writeText(code).then(() => {
@@ -16,21 +16,20 @@ export default function BettingAppsTable() {
         });
     };
 
-    if (bestSections.length === 0) return null;
+    if (sections.length === 0) return null;
 
     return (
         <>
             {/* Use the first section for SEO meta */}
             <Head>
-                <title>{bestSections[0]?.metatitle}</title>
-                <meta name="description" content={stripHtml(bestSections[0]?.meta_description)} />
+                <title>{sections[0]?.metatitle}</title>
+                <meta name="description" content={stripHtml(sections[0]?.meta_description)} />
             </Head>
 
-            {bestSections.map((section) => (
+            {sections.map((section) => (
                 <div className={styles.wrapper} key={section.id}>
                     <h1 className={styles.heading}>{section.heading}</h1>
-                    <br />
-                    <br />
+
 
 
                     {section.best_betting_apps?.length > 0 && (
@@ -110,6 +109,8 @@ export default function BettingAppsTable() {
                         dangerouslySetInnerHTML={{ __html: section.description }}
                     />
                 </div>
+
+
             ))}
         </>
     );
