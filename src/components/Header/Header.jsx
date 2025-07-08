@@ -13,21 +13,21 @@ export default function Header() {
   const [visible, setVisible] = useState(false);
   const { blogCategories = [] } = useGlobalData();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!visible && window.scrollY > 20) {
-        setVisible(true);
-      }
-    };
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     if (!visible && window.scrollY > 20) {
+  //       setVisible(true);
+  //     }
+  //   };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [visible]);
+  //   window.addEventListener('scroll', handleScroll);
+  //   return () => window.removeEventListener('scroll', handleScroll);
+  // }, [visible]);
 
   const showCategories = pathname === '/blogs/pages/all-blogs';
 
   return (
-    <header className={`${styles.header} ${visible ? styles.visible : ''}`}>
+    <header className={`${styles.header}`}>
       <div className={styles.container}>
         <div className={styles.logo}>
           <img src="/sportsbuz.png" alt="COD HATCH" className={styles.logoImg} />

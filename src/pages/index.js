@@ -61,53 +61,45 @@ export default function Home() {
         <meta name="description" content="Your site description here" />
       </Head>
 
-      {loading ? (
+      <>
         <LoadingScreen onFinish={() => setLoading(false)} />
-      ) : (
-        <>
-          <Header categories={blogCategories} />
-          <div className={`${geistSans.variable} ${geistMono.variable} container`}>
-            {/* <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} /> */}
-            <TestLive />
-            <HeroCarousal />
-            <div className={styles.mainContent}>
-              <div className={styles.leftSection}>
-                <BonusTable sections={sections} />
-              </div>
+        <div className={`${geistSans.variable} ${geistMono.variable} container`}>
+          <TestLive />
+          <HeroCarousal />
 
-              <div className={styles.rightSection}>
-                <AutoSlider />
-              </div>
+          {/* Top Row - Bonus Table + Right Sidebar */}
+          <div className={styles.topRow}>
+            <div className={styles.bonusTableContainer}>
+              <BonusTable sections={sections} />
             </div>
-
-            <div className={styles.mainContent}>
-              <div className={styles.leftSection2}>
-                <PredictionSection />
-
-                <MultiBannerSlider />
-
-                <TopNewsSection />
-              </div>
-
-              <div className={styles.centerSection}>
-                <BlogSection blogs={blogs} />
-              </div>
-
-              <div className={styles.rightSection2}>
-                <BettingCard />
-                {/* <UpcomingMatches upcomingMatches={upcomingMatches} /> */}
-
-                <AdsSlider />
-
-                <CricketPrediction />
-                <SmallAdBox />
-              </div>
+            <div className={styles.rightSidebar}>
+              <AutoSlider />
             </div>
-
-            <GoogleAds />
           </div>
-        </>
-      )}
+
+          {/* Main Content Area */}
+          <div className={styles.mainContent}>
+            <div className={styles.leftSection}>
+              <PredictionSection />
+              <MultiBannerSlider />
+              <TopNewsSection />
+            </div>
+
+            <div className={styles.centerSection}>
+              <BlogSection blogs={blogs} />
+            </div>
+
+            <div className={styles.rightSection}>
+              <BettingCard />
+              <AdsSlider />
+              <CricketPrediction />
+              <SmallAdBox />
+            </div>
+          </div>
+
+          <GoogleAds />
+        </div>
+      </>
     </>
   );
 }
