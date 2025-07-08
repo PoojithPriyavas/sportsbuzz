@@ -44,7 +44,7 @@ export default function BettingAppsTable() {
                             <tbody>
                                 {section.best_betting_apps.map((app) => (
                                     <tr className={styles.bodyRow} key={app.id}>
-                                        <td style={{ color: "black" }}><strong>#{app.id}</strong></td>
+                                        <td style={{ color: "black", fontSize: "25px" }}><strong>#{app.id}</strong></td>
                                         <td className={styles.site}>
                                             <img src={`https://admin.sportsbuz.com${app.image}`} alt="Betting App" />
                                         </td>
@@ -64,7 +64,21 @@ export default function BettingAppsTable() {
                                                 Read Review
                                             </button>
 
-                                            <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
+                                            {/* <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
+                                             */}
+                                            <div className={styles.stars}>
+                                                {Array.from({ length: 5 }, (_, index) => {
+                                                    const ratingValue = index + 1;
+                                                    if (app.rating >= ratingValue) {
+                                                        return <span key={index} className={styles.full}>★</span>;
+                                                    } else if (app.rating >= ratingValue - 0.5) {
+                                                        return <span key={index} className={styles.half}>★</span>;
+                                                    } else {
+                                                        return <span key={index} className={styles.empty}>★</span>;
+                                                    }
+                                                })}
+                                            </div>
+
                                         </td>
                                         <td className={styles.actions}>
                                             <a
@@ -79,7 +93,7 @@ export default function BettingAppsTable() {
                                                 className={styles.codeBtn}
                                                 onClick={() => handleCopy(app.referall_code, app.id)}
                                             >
-                                                {copiedId === app.id ? 'Copied!' : 'Copy Code'}
+                                                {copiedId === app.id ? 'Copied!' : app.referall_code}
                                             </button>
                                         </td>
                                     </tr>

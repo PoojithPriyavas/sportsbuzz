@@ -79,7 +79,7 @@ export default function BonusTable({ sections = [] }) {
                                                 className={styles.codeBtn}
                                                 onClick={() => handleCopy(app.referall_code, app.id)}
                                             >
-                                                {copiedId === app.id ? 'Copied!' : 'Copy Code'}
+                                                {copiedId === app.id ? 'Copied!' : app.referall_code}
                                             </button>
                                         </td>
                                     </tr>

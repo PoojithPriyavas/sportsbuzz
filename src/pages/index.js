@@ -22,6 +22,9 @@ import GoogleAds from "@/components/googleAds/GoogleAds";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import TestLive from "@/components/LiveScoreSection/TestLive";
 import LoadingScreen from "@/components/Loader/Loader";
+import BettingCard from '@/components/OddsMultiply/BettingCard';
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -80,7 +83,9 @@ export default function Home() {
             <div className={styles.mainContent}>
               <div className={styles.leftSection2}>
                 <PredictionSection />
+
                 <MultiBannerSlider />
+
                 <TopNewsSection />
               </div>
 
@@ -89,9 +94,11 @@ export default function Home() {
               </div>
 
               <div className={styles.rightSection2}>
-                <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
+                <BettingCard />
                 {/* <UpcomingMatches upcomingMatches={upcomingMatches} /> */}
+
                 <AdsSlider />
+
                 <CricketPrediction />
                 <SmallAdBox />
               </div>

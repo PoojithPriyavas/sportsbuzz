@@ -102,7 +102,7 @@ export const DataProvider = ({ children }) => {
                 Array.from(imageIds).map(async id => {
                     try {
                         const response = await axios.get(
-                           ` https://cricbuzz-cricket.p.rapidapi.com/img/v1/i1/c${id}/i.jpg`,
+                            ` https://cricbuzz-cricket.p.rapidapi.com/img/v1/i1/c${id}/i.jpg`,
                             {
                                 headers: { 'X-RapidAPI-Key': rapidApiKey },
                                 responseType: 'blob',
@@ -178,7 +178,7 @@ export const DataProvider = ({ children }) => {
             url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
             params: {
                 Category: 'soccer',
-                Date: formattedDate,
+                Date: "20250706",
                 Timezone: '-5'
             },
             headers: {

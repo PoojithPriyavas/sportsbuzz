@@ -13,7 +13,7 @@ export default function BlogSection({ blogs = [] }) {
   return (
     <div className={styles.wrapper}>
       <div className={styles.headingRow}>
-        <h3>Latest Blogs</h3>
+        <h3>Highlights</h3>
         <Link href="/blogs/pages/all-blogs" className={styles.viewAll}>
           View All
         </Link>
@@ -36,8 +36,9 @@ export default function BlogSection({ blogs = [] }) {
         </Link>
       </div>
 
+
       <div className={styles.blogGrid}>
-        {otherBlogs.map((blog) => (
+        {otherBlogs.slice(0, 3).map((blog) => (
           <Link
             href={`/blog-details/${blog.slug}`}
             key={blog.id}

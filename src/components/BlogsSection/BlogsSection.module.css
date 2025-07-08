@@ -16,32 +16,48 @@
     background: #ddd;
 }
 
-.featuredBlog .content {
+/* .featuredBlog .content {
     padding: 1rem;
     background: #fff;
     position: relative;
+} */
+
+.featuredBlog .content {
+    padding: 1rem;
+    background: linear-gradient(to bottom, transparent, #000000);
+    position: relative;
 }
 
+
+
+
 .featuredBlog .content h4 {
-    color: rgb(27, 27, 27);
+    color: rgb(255, 255, 255);
     padding-bottom: 5px;
 }
 
 .featuredBlog .content p {
-    color: rgb(118, 115, 115);
+    color: rgb(255, 255, 255);
     padding-bottom: 5px;
 }
 
 .featuredBlog .content a {
-    color: rgb(72, 71, 71);
+    color: rgb(247, 247, 247);
     padding-bottom: 5px;
 }
 
-.blogGrid {
+/* .blogGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
+} */
+
+.blogGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
 }
+
 
 .blogCard {
     background: white;
@@ -49,16 +65,28 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.blogCard .image {
+/* .blogCard .image {
+    aspect-ratio: 5 / 1;
     height: 100px;
     background: #eee;
+} */
+
+.blogCard .image {
+    height: 135px;
+    width: 100%;
+    background: #eee;
+    overflow: hidden;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }
 
 .blogCard .image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
 }
+
 
 .blogCard .content {
     padding: 0.75rem;
@@ -76,6 +104,7 @@
     color: rgb(118, 115, 115);
     padding-bottom: 5px;
 }
+
 .blogCard .content span {
     color: rgb(178, 178, 178);
     padding-bottom: 5px;

@@ -1,0 +1,94 @@
+// matchesData.js or inside BettingCards component
+
+export const matchCards = [
+    // ⚽ Football Matches
+    {
+        provider: 'Bet22',
+        logo: 'B2',
+        matchType: 'Premier League',
+        matchInfo: 'Today, 3:00 PM • Old Trafford Stadium',
+        isLive: true,
+        team1: { code: 'MU', name: 'Manchester United' },
+        team2: { code: 'LIV', name: 'Liverpool FC' },
+        odds: [
+            { label: 'W1', value: 2.1 },
+            { label: 'X', value: 3.25 },
+            { label: 'W2', value: 2.85 },
+        ],
+        oddsTitle: 'Match Result Odds',
+    },
+    {
+        provider: '1xBet',
+        logo: '1X',
+        matchType: 'La Liga',
+        matchInfo: 'Tomorrow, 9:00 PM • Camp Nou',
+        isLive: false,
+        team1: { code: 'BAR', name: 'FC Barcelona' },
+        team2: { code: 'RMA', name: 'Real Madrid' },
+        odds: [
+            { label: 'W1', value: 2.0 },
+            { label: 'X', value: 3.5 },
+            { label: 'W2', value: 2.75 },
+        ],
+        oddsTitle: 'Full Time Result',
+    },
+    {
+        provider: 'Dafabet',
+        logo: 'DF',
+        matchType: 'Serie A',
+        matchInfo: 'July 14, 7:30 PM • San Siro',
+        isLive: false,
+        team1: { code: 'INT', name: 'Inter Milan' },
+        team2: { code: 'ACM', name: 'AC Milan' },
+        odds: [
+            { label: 'W1', value: 1.95 },
+            { label: 'X', value: 3.1 },
+            { label: 'W2', value: 2.95 },
+        ],
+        oddsTitle: 'Winner Odds',
+    },
+
+    // 🏏 Cricket Matches
+    {
+        provider: 'FairPlay',
+        logo: 'FP',
+        matchType: 'IPL 2024',
+        matchInfo: 'Today, 7:30 PM • Wankhede Stadium',
+        isLive: true,
+        team1: { code: 'MI', name: 'Mumbai Indians' },
+        team2: { code: 'CSK', name: 'Chennai Super Kings' },
+        odds: [
+            { label: 'W1', value: 1.85 },
+            { label: 'W2', value: 2.05 },
+        ],
+        oddsTitle: 'Match Winner Odds',
+    },
+    {
+        provider: 'Betway',
+        logo: 'BW',
+        matchType: 'T20 World Cup',
+        matchInfo: 'Tomorrow, 6:00 PM • Eden Gardens',
+        isLive: false,
+        team1: { code: 'IND', name: 'India' },
+        team2: { code: 'PAK', name: 'Pakistan' },
+        odds: [
+            { label: 'W1', value: 1.75 },
+            { label: 'W2', value: 2.25 },
+        ],
+        oddsTitle: 'Match Winner Odds',
+    },
+    {
+        provider: 'Bet365',
+        logo: 'B3',
+        matchType: 'ODI Series',
+        matchInfo: 'July 15, 1:30 PM • MCG',
+        isLive: false,
+        team1: { code: 'AUS', name: 'Australia' },
+        team2: { code: 'ENG', name: 'England' },
+        odds: [
+            { label: 'W1', value: 1.95 },
+            { label: 'W2', value: 2.05 },
+        ],
+        oddsTitle: 'Winner Odds',
+    },
+];
