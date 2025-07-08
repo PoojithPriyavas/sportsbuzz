@@ -28,7 +28,10 @@ export default function BettingAppsTable() {
 
             {bestSections.map((section) => (
                 <div className={styles.wrapper} key={section.id}>
-                    <h2 className={styles.heading}>{section.heading}</h2>
+                    <h1 className={styles.heading}>{section.heading}</h1>
+                    <br />
+                    <br />
+
 
                     {section.best_betting_apps?.length > 0 && (
                         <table className={styles.table}>
