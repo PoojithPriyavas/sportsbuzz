@@ -1,7 +1,10 @@
+'use client';
+
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import styles from "@/styles/Home.module.css";
+
 import Header from "@/components/Header/Header";
 import LiveScores from "@/components/LiveScoreSection/LiveScoreSection";
 import BonusTable from "@/components/BonusTable/BonusTable";
@@ -16,9 +19,9 @@ import AdsSlider from "@/components/AdSlider/AdSlider";
 import CricketPrediction from "@/components/Betting/CricketPrediction";
 import HeroCarousal from "@/components/HeroCarousal/Carousal";
 import GoogleAds from "@/components/googleAds/GoogleAds";
-import CustomAxios from "@/components/utilities/CustomAxios";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import TestLive from "@/components/LiveScoreSection/TestLive";
+import LoadingScreen from "@/components/Loader/Loader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +33,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-
 export default function Home() {
-  const { blogCategories, blogs, sections, apiResponse, matchTypes, teamImages, upcomingMatches } = useGlobalData();
+  const {
+    blogCategories,
+    blogs,
+    sections,
+    apiResponse,
+    matchTypes,
+    teamImages,
+    upcomingMatches
+  } = useGlobalData();
 
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer1 = setTimeout(() => setLoading(true), 3000); // adjust time as per animation duration
+    return () => clearTimeout(timer1);
+  }, []);
 
   return (
     <>
@@ -41,42 +57,50 @@ export default function Home() {
         <title>Sportsbuz</title>
         <meta name="description" content="Your site description here" />
       </Head>
-      <Header categories={blogCategories} />
-      <div className={`${geistSans.variable} ${geistMono.variable} container`}>
-        {/* <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} /> */}
-        <TestLive />
-        <HeroCarousal />
-        <div className={styles.mainContent}>
-          <div className={styles.leftSection}>
-            <BonusTable sections={sections} />
-          </div>
 
-          <div className={styles.rightSection}>
-            <AutoSlider />
-          </div>
-        </div>
+      {loading ? (
+        <LoadingScreen onFinish={() => setLoading(false)} />
+      ) : (
+        <>
+          <Header categories={blogCategories} />
+          <div className={`${geistSans.variable} ${geistMono.variable} container`}>
+            {/* <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} /> */}
+            <TestLive />
+            <HeroCarousal />
+            <div className={styles.mainContent}>
+              <div className={styles.leftSection}>
+                <BonusTable sections={sections} />
+              </div>
 
-        <div className={styles.mainContent}>
-          <div className={styles.leftSection2}>
-            <PredictionSection />
-            <MultiBannerSlider />
-            <TopNewsSection />
-          </div>
+              <div className={styles.rightSection}>
+                <AutoSlider />
+              </div>
+            </div>
 
-          <div className={styles.centerSection}>
-            <BlogSection blogs={blogs} />
-          </div>
+            <div className={styles.mainContent}>
+              <div className={styles.leftSection2}>
+                <PredictionSection />
+                <MultiBannerSlider />
+                <TopNewsSection />
+              </div>
 
-          <div className={styles.rightSection2}>
-            <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
-            {/* <UpcomingMatches upcomingMatches={upcomingMatches} /> */}
-            <AdsSlider />
-            <CricketPrediction />
-            <SmallAdBox />
+              <div className={styles.centerSection}>
+                <BlogSection blogs={blogs} />
+              </div>
+
+              <div className={styles.rightSection2}>
+                <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
+                {/* <UpcomingMatches upcomingMatches={upcomingMatches} /> */}
+                <AdsSlider />
+                <CricketPrediction />
+                <SmallAdBox />
+              </div>
+            </div>
+
+            <GoogleAds />
           </div>
-        </div>
-        <GoogleAds />
-      </div>
+        </>
+      )}
     </>
   );
 }

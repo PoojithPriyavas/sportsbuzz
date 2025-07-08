@@ -1,0 +1,56 @@
+.loaderWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100%;
+  background-color: #0046aa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  z-index: 9999;
+  transition: height 1s ease, opacity 1s ease;
+}
+
+/* Loader GIF in center */
+.loaderGif {
+  width: 100px;
+  height: 100px;
+  z-index: 2;
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+/* Logo starts hidden off-screen */
+.logo {
+  position: absolute;
+  bottom: -100px;
+  left: 20px;
+  width: 120px;
+  transition: transform 1s ease, bottom 1s ease;
+  z-index: 3;
+}
+
+/* PHASE: logo enters */
+.logoPhase .logo {
+  bottom: 20px;
+}
+
+/* PHASE: shrink transition */
+.shrink {
+  height: 80px; /* header height */
+}
+
+.shrink .loaderGif {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.shrink .logo {
+  bottom: 20px;
+}
+
+/* PHASE: done - just in case */
+.done {
+  display: none;
+}
