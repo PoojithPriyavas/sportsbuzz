@@ -51,7 +51,7 @@ export default function LoadingScreen({ onFinish }) {
               <Link href="/best-betting-apps" className={`${styles.navItem} ${pathname === '/best-betting-apps' ? styles.active : ''}`}>Best Betting Apps</Link>
               <Link href="/news" className={styles.navItem}>News</Link>
 
-              {showCategories && blogCategories.map((cat) => (
+              {blogCategories.map((cat) => (
                 <div key={cat.id} className={styles.dropdown}>
                   <span className={styles.navItem}>
                     {cat.name} <FaChevronDown />
