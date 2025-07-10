@@ -37,7 +37,6 @@ import { useGlobalData } from "../Context/ApiContext";
 
 export default function BlogSlider() {
   const { recentBlogs } = useGlobalData();
-  console.log(recentBlogs, "recent")
   return (
     <div className={styles.sliderWrapper}>
       {recentBlogs?.map((blog) => (

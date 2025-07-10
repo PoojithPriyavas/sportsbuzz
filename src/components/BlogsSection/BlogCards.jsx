@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { FaSearch } from 'react-icons/fa';
 
 export default function BlogCard({ blogs = [] }) {
-  console.log(blogs, "blogs")
+  // console.log(blogs, "blogs")
   // const blogsData = [
   //   { id: 1, title: "Blog title 1", author: "Cod Hatch", date: "Jun 24 2025", slug: "blog-title-2" },
   //   { id: 2, title: "Blog title 2", author: "Cod Hatch", date: "Jun 23 2025", slug: "blog-title-3" },
@@ -16,7 +16,6 @@ export default function BlogCard({ blogs = [] }) {
   const featuredBlog = blogs[0];
   const otherBlogs = blogs.slice(1);
 
-  console.log(featuredBlog, "fr")
   return (
     <>
       <div className={styles.filterBar}>

@@ -42,14 +42,15 @@ export const DataProvider = ({ children }) => {
     };
 
     const fetchBettingApps = async () => {
+        console.log("sections is called")
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
                 params: { country_code: 'IN', filter_by: 'current_month' },
             });
 
             const data = response.data;
-            if (Array.isArray(data)) {
-                setSections(data);
+            if (Array.isArray(data.results)) {
+                setSections(data.results);
             } else {
                 console.warn('Expected an array, but received:', data);
             }
@@ -59,6 +60,7 @@ export const DataProvider = ({ children }) => {
     };
 
     const fetchBestBettingAppsPrevious = async () => {
+         console.log("previous sections is called")
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
                 params: {
@@ -69,8 +71,8 @@ export const DataProvider = ({ children }) => {
 
             const data = response.data;
 
-            if (Array.isArray(data)) {
-                setBestSections(data);
+            if (Array.isArray(data.results)) {
+                setBestSections(data.results);
             } else {
                 console.warn('Expected an array, but received:', data);
             }

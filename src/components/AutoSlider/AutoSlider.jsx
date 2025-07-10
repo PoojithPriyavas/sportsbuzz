@@ -26,7 +26,6 @@ export default function AutoSlider() {
     fetchBanners();
   }, []);
 
-  console.log(banners, "bannerds")
   return (
     <div className={styles.sliderWrapper}>
       <Swiper

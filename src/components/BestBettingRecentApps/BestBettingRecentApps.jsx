@@ -28,7 +28,7 @@ export default function BettingAppsTable() {
             <div className={styles.cardGrid}>
                 {bestSections.map((section) => {
                     const imageUrl = `https://admin.sportsbuz.com${section.best_betting_apps[0]?.image}`;
-                    console.log("Image URL:", imageUrl); // 👈 This logs the image URL
+                    {/* console.log("Image URL:", imageUrl);  */}
 
                     return (
                         <div className={styles.card} key={section.id}>

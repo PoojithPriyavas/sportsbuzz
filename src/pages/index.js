@@ -44,7 +44,7 @@ export default function Home() {
     teamImages,
     upcomingMatches
   } = useGlobalData();
-
+  console.log(sections, "sections")
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
