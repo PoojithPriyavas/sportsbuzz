@@ -44,7 +44,7 @@ export const DataProvider = ({ children }) => {
     const fetchBettingApps = async () => {
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
-                params: { country_code: 'in', filter_by: 'current_month' },
+                params: { country_code: 'IN', filter_by: 'current_month' },
             });
 
             const data = response.data;
@@ -62,7 +62,7 @@ export const DataProvider = ({ children }) => {
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
                 params: {
-                    country_code: 'in',
+                    country_code: 'IN',
                     filter_by: 'previous_month'
                 },
             });

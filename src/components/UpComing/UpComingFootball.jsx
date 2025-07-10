@@ -1,3 +1,5 @@
+
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -37,6 +39,17 @@ function formatDate(esd) {
     }
 }
 
+// Get just the time
+function getTime(esd) {
+    const raw = esd?.toString();
+    if (!raw || raw.length !== 14) return '';
+
+    const hour = parseInt(raw.slice(8, 10));
+    const minute = raw.slice(10, 12);
+
+    return `${hour.toString().padStart(2, '0')}:${minute}`;
+}
+
 export default function UpcomingFootballMatches() {
     const { upcoming } = useGlobalData();
     const [selectedLeague, setSelectedLeague] = useState('All');
@@ -44,94 +57,106 @@ export default function UpcomingFootballMatches() {
     // Prepare league names
     const allLeagues = upcoming?.Stages?.map(stage => stage?.Cnm).filter(Boolean) || [];
     const uniqueLeagues = Array.from(new Set(allLeagues));
-    const topLeagues = uniqueLeagues.slice(0, 5);
-    const otherLeagues = uniqueLeagues.slice(5);
+
+    // Group matches by league
+    const groupedMatches = {};
+    upcoming?.Stages
+        ?.filter(stage => selectedLeague === 'All' || stage?.Cnm === selectedLeague)
+        ?.forEach(stage => {
+            const leagueKey = stage?.Cnm;
+            if (!groupedMatches[leagueKey]) {
+                groupedMatches[leagueKey] = {
+                    stage: stage,
+                    matches: []
+                };
+            }
+            stage?.Events?.forEach(event => {
+                groupedMatches[leagueKey].matches.push(event);
+            });
+        });
 
     return (
-        <>
-            {/* Match Cards */}
-            <div className={styles.header}>
-                <h4>Football Schedules</h4>
-                <a href="#">view all</a>
-            </div>
-            <div className={styles.cardsContainer}>
-                {upcoming?.Stages
-                    ?.filter(stage => selectedLeague === 'All' || stage?.Cnm === selectedLeague)
-                    ?.flatMap(stage =>
-                        stage?.Events?.map((event, eventIdx) => ({
-                            event,
-                            stage,
-                        }))
-                    )
-                    .slice(0, 4) 
-                    .map(({ event, stage }, index) => {
-                        const team1 = event.T1?.[0];
-                        const team2 = event.T2?.[0];
-
-                        const status = event.Eps;
-                        const isFinished = status === 'FT';
-                        const isLive = status === 'LIVE';
-
-                        const matchStatusStyle = isFinished
-                            ? { background: '#95a5a6' }
-                            : isLive
-                                ? { background: 'red' }
-                                : { background: '#3498db' };
-
-                        return (
-                            <div key={index} className={styles.matchCard}>
-                                {/* League info */}
-                                <div className={styles.leagueHeader}>
-                                    <div className={styles.leagueName}>{stage?.Cnm || 'League'}</div>
-                                    <div className={styles.subLeague}>Group • {stage?.Snm}</div>
-                                </div>
-
-                                {/* Teams and scores */}
-                                <div className={styles.matchContent}>
-                                    <div className={styles.teamsContainer}>
-                                        <div className={styles.team}>
-                                            <div className={styles.teamLogo}>
-                                                <img
-                                                    src={`https://lsm-static-prod.livescore.com/medium/${team1?.Img}`}
-                                                    alt={team1?.Nm}
-                                                    className={styles.logoImage}
-                                                />
-                                            </div>
-                                            <div className={styles.teamName}>{team1?.Nm}</div>
-                                        </div>
-
-                                        <div className={styles.scoreSection}>
-                                            <div className={styles.score}>{event.Tr1 ?? '-'}</div>
-                                            <div className={styles.vs}>VS</div>
-                                            <div className={styles.score}>{event.Tr2 ?? '-'}</div>
-                                        </div>
-
-                                        <div className={styles.team}>
-                                            <div className={styles.teamLogo}>
-                                                <img
-                                                    src={`https://lsm-static-prod.livescore.com/medium/${team2?.Img}`}
-                                                    alt={team2?.Nm}
-                                                    className={styles.logoImage}
-                                                />
-                                            </div>
-                                            <div className={styles.teamName}>{team2?.Nm}</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Match time & status */}
-                                <div className={styles.matchInfo}>
-                                    <div className={styles.matchTime}>{formatDate(event.Esd)}</div>
-                                    <div className={styles.matchStatus} style={matchStatusStyle}>
-                                        {isLive && <span className={styles.liveIndicator}></span>}
-                                        {status}
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
+        <div className={styles["football-matches-container"]}>
+            {/* Header */}
+            <div className={styles["football-matches-header"]}>
+                <h4 className={styles["football-matches-title"]}>Football Schedules</h4>
+                <a href="#" className={styles["football-matches-view-all"]}>view all</a>
             </div>
 
-        </>
+            {/* Match List */}
+            <div className={styles["football-matches-list"]}>
+                {Object.entries(groupedMatches).map(([leagueName, { stage, matches }]) => (
+                    <div key={leagueName}>
+                        {matches.slice(0, 3).map((event, index) => {
+                            const team1 = event.T1?.[0];
+                            const team2 = event.T2?.[0];
+                            const status = event.Eps;
+                            const isFinished = status === 'FT';
+                            const isLive = status === 'LIVE';
+
+                            return (
+                                <div key={index} className={styles["football-match-item"]}>
+                                    {/* League Info */}
+                                    {index === 0 && (
+                                        <div className={styles["football-league-section"]}>
+                                            <div className={styles["football-league-info"]}>
+                                                <div className={styles["football-league-icon"]}>⚽</div>
+                                                <div>
+                                                    <div className={styles["football-league-title"]}>{stage?.Snm}</div>
+                                                    <div className={styles["football-league-subtitle"]}>{stage?.Cnm}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Match Row */}
+                                    <div className={styles["football-match-row"]}>
+                                        {/* Time */}
+                                        <div className={styles["football-time-section"]}>
+                                            <div className={styles["football-time"]}>
+                                                {isFinished ? '00:' + getTime(event.Esd).split(':')[1] : getTime(event.Esd)}
+                                            </div>
+                                            <div className={`${styles["football-status"]} ${isLive ? styles["live"] : ""} ${isFinished ? styles["finished"] : ""}`}>
+                                                {isFinished ? 'FT' : (isLive ? 'LIVE' : '-')}
+                                            </div>
+                                        </div>
+
+                                        {/* Teams */}
+                                        <div className={styles["football-teams-section"]}>
+                                            <div className={styles["football-team-row"]}>
+                                                <div className={styles["football-team-logo"]}>
+                                                    {team1?.Nm?.slice(0, 2).toUpperCase()}
+                                                </div>
+                                                <div className={styles["football-team-name"]}>{team1?.Nm}</div>
+                                            </div>
+                                            <div className={styles["football-team-row"]}>
+                                                <div className={styles["football-team-logo"]}>
+                                                    {team2?.Nm?.slice(0, 2).toUpperCase()}
+                                                </div>
+                                                <div className={styles["football-team-name"]}>{team2?.Nm}</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Score */}
+                                        <div className={styles["football-score-section"]}>
+                                            <div className={styles["football-score"]}>
+                                                {event.Tr1 ?? '-'}
+                                            </div>
+                                            <div className={styles["football-score"]}>
+                                                {event.Tr2 ?? '-'}
+                                            </div>
+                                        </div>
+
+                                        {/* Favorite Icon */}
+                                        <div className={styles["football-favorite-icon"]}>⭐</div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                ))}
+            </div>
+        </div>
+
     );
 }

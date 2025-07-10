@@ -23,6 +23,7 @@ import LoadingScreen from "@/components/Loader/Loader";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -80,10 +81,11 @@ export default function Home() {
               {/* 1-2 Split under BonusTable */}
               <div className={styles.twoSplitRow}>
                 <div className={styles.leftSplit}>
-                  <PredictionSection />
-                  {/* <MultiBannerSlider /> */}
-                   <AutoSlider />
                   <TopNewsSection />
+                  {/* <PredictionSection /> */}
+                  {/* <MultiBannerSlider /> */}
+                  <AutoSlider />
+
                 </div>
                 <div className={styles.centerSplit}>
                   <BlogSection blogs={blogs} />

@@ -1,39 +1,293 @@
-.card {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  /* Ensures content doesn't spill out */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 10px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
+  text-align: center;
+  margin-bottom: 30px;
+  animation: fadeInDown 0.8s ease-out;
+  flex-shrink: 0;
+}
+
+.header h2 {
+  font-size: 25px;
+  /* background: linear-gradient(45deg, #667eea, #764ba2); */
+  background:
+    #000;
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+
+.header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.newsList {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 10px;
+  /* This adds space between each card */
+  overflow-y: auto;
+  max-height: 70vh;
+  /* Add this if not present */
+  padding-right: 10px;
+}
+
+
+.news-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.news-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.news-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  border-radius: 10px;
+}
+
+.news-list::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #5a67d8, #6b46c1);
+}
+
+.newsItem {
+  display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+  animation: fadeInUp 0.6s ease-out both;
 }
 
-.header h4 {
-  color: black;
+
+.thumbnail::before {
+  content: '📷';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  color: #999;
 }
 
-.card ol {
-  padding-left: 1rem;
+.newsInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.newsTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2d3748;
   margin: 0;
-  list-style-position: inside;
 }
 
-.card li {
-  color: #595252;
-  font-size: 15px;
-  margin-bottom: 0.5rem;
-  word-wrap: break-word;
-  padding: 10px;
+.newsMeta {
+  font-size: 0.85rem;
+  color: #718096;
 }
 
-.meta {
-  font-size: 12px;
-  color: #888;
-  margin-top: 1rem;
+.news-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+.news-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  border-color: #667eea;
+}
+
+.thumbnail {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+  position: relative;
+  overflow: hidden;
+}
+
+.thumbnail::before {
+  content: '📷';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  color: #999;
+}
+
+.news-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.news-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2d3748;
+  line-height: 1.4;
+  margin-bottom: 5px;
+}
+
+.news-summary {
+  color: #718096;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.news-meta {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 0.85rem;
+  color: #a0aec0;
+}
+
+.news-date,
+.news-source,
+.news-category {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.news-category {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.bookmark-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #cbd5e0;
+  transition: color 0.3s ease;
+}
+
+.bookmark-btn:hover {
+  color: #667eea;
+}
+
+.bookmark-btn.active {
+  color: #f6ad55;
+}
+
+.share-btn {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.share-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+    margin: 10px;
+  }
+
+  .news-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .thumbnail {
+    width: 100%;
+    height: 150px;
+  }
+
+  .actions {
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
 }

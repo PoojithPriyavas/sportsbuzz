@@ -1,279 +1,210 @@
-.header {
+/* FootballMatches.css */
+.football-matches-container {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.football-matches-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #000;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    background: #f9fafb;
 }
 
-.header h4 {
-    color: black !important;
+.football-matches-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: #1f2937;
 }
 
-.cardsContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    /* overflow-x: auto; */
-    padding: 10px 0;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.cardsContainer::-webkit-scrollbar {
-    display: none;
-}
-
-
-
-.matchCard {
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.03);
-    overflow: hidden;
-    width: 100%;
-    max-width: 100%;
-    /* min-width: 340px; */
-    transition: transform 0.3s ease;
-    height: 260px;
-    display: flex;
-    flex-direction: column;
-    /* Key change: make it a flex container */
-}
-
-.matchCard:hover {
-    transform: translateY(-5px);
-}
-
-.leagueHeader {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-    padding: 15px 20px;
-    text-align: center;
-    flex-shrink: 0;
-    /* Prevent shrinking */
-}
-
-.leagueName {
-    font-size: 15px;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.subLeague {
-    font-size: 12px;
-    opacity: 0.9;
-    color: #bdc3c7;
-}
-
-.matchContent {
-    padding: 20px 10px;
-    flex-grow: 1;
-    /* Key change: make this section grow to fill available space */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    /* Center the content vertically */
-}
-
-.teamsContainer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-}
-
-.team {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-}
-
-/* .teamLogo {
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    font-size: 15px;
-    color: white;
-    font-weight: bold;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-} */
-.teamLogo {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    overflow: hidden;
-    background: #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.logoImage {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.home {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-}
-
-.away {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-}
-
-.teamName {
-    font-size: 13px;
-    font-weight: bold;
-    color: #2c3e50;
-    text-align: center;
-    max-width: 80px;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    line-height: 1.2;
-    max-height: calc(1.2em * 2);
-    /* 2 lines * line-height */
-}
-
-
-.scoreSection {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0.5;
-}
-
-.score {
-    font-size: 33px;
-    font-weight: bold;
-    color: #2c3e50;
-    margin: 0 15px;
-}
-
-.vs {
+.football-matches-view-all {
+    color: #6b7280;
+    text-decoration: none;
     font-size: 14px;
-    color: #7f8c8d;
-    font-weight: bold;
+    font-weight: 500;
+    transition: color 0.2s ease;
 }
 
-.matchInfo {
+.football-matches-view-all:hover {
+    color: #374151;
+}
+
+.football-matches-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.football-match-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
+}
+
+.football-match-item:hover {
+    background-color: #f9fafb;
+}
+
+.football-match-item:last-child {
+    border-bottom: none;
+}
+
+.football-league-section {
+    margin-bottom: 8px;
+}
+
+.football-league-info {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    background: #f8f9fa;
-    border-top: 1px solid #ecf0f1;
-    flex-shrink: 0;
-    /* Key change: prevent shrinking and keep at bottom */
-    margin-top: auto;
-    /* Push to bottom */
+    gap: 8px;
+    margin-bottom: 4px;
 }
 
-.matchTime {
-    font-size: 12px;
-    color: #7f8c8d;
-}
-
-.matchStatus {
-    background: #27ae60;
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: bold;
-}
-
-.liveIndicator {
-    width: 8px;
-    height: 8px;
-    background: #e74c3c;
+.football-league-icon {
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    display: inline-block;
-    margin-right: 5px;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
-
-.upcomingDetails {
-    text-align: center;
-    margin-top: 15px;
-}
-
-.kickoffTime {
+    background: #f3f4f6;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 10px;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
 }
 
-.leagueSelector {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    align-items: center;
-    overflow-x: auto;
-    white-space: nowrap;
+.football-league-title {
+    font-size: 13px;
+    color: #374151;
+    font-weight: 500;
 }
 
-.leagueItem {
-    cursor: pointer;
-    color: #555;
-    font-size: 16px;
+.football-league-subtitle {
+    font-size: 13px;
+    color: #6b7280;
     font-weight: 400;
 }
 
-.selectedLeague {
-    cursor: pointer;
+.football-match-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.football-time-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+}
+
+.football-time {
+    font-size: 14px;
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.football-status {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.football-status.live {
+    color: #dc2626;
     font-weight: 600;
-    /* text-decoration: underline; */
-    color: #0066da;
 }
 
-/* 
-.leagueDropdown {
-    font-size: 14px;
-    color: #000;
-    padding: 10px 6px;
-    margin-left: 20px;
-} */
+.football-status.finished {
+    color: #059669;
+    font-weight: 500;
+}
 
-.leagueDropdown {
+.football-teams-section {
+    flex: 1;
+    margin-left: 16px;
+}
+
+.football-team-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.football-team-logo {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #374151;
+    font-weight: bold;
+    border: 1px solid #e5e7eb;
+}
+
+.football-team-name {
     font-size: 14px;
-    padding: 3px 12px;
-    /* Increases height */
-    line-height: 1.5;
-    color: #000;
-    border-radius: 6px;
-    background: #fff;
-    border: 1px solid #ccc;
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.football-score-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 40px;
+}
+
+.football-score {
+    font-size: 16px;
+    color: #1f2937;
+    font-weight: bold;
+}
+
+.football-favorite-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d1d5db;
     cursor: pointer;
-    appearance: none;
-    /* min-height: 30px; */
-    /* Ensures tall enough box */
+    transition: color 0.2s ease;
 }
 
-/* Optional: Style the options inside the dropdown (some browsers support this) */
-.leagueDropdown option {
-    padding: 10px;
-    font-size: 14px;
+.football-favorite-icon:hover {
+    color: #fbbf24;
+}
+
+.football-favorite-icon.active {
+    color: #f59e0b;
+}
+
+/* Scrollbar styling for webkit browsers */
+.football-matches-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.football-matches-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.football-matches-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.football-matches-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
