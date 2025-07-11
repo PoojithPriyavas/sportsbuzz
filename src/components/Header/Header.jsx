@@ -3,28 +3,51 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import styles from './Header.module.css';
-import { FaMoon } from 'react-icons/fa';
-import { FaChevronDown } from 'react-icons/fa';
+import { FaMoon, FaChevronDown } from 'react-icons/fa';
 import { useGlobalData } from '../Context/ApiContext';
 import Link from 'next/link';
 
 export default function Header() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
-  const { blogCategories = [] } = useGlobalData();
+  const { blogCategories = [], language, setLanguage, translateText } = useGlobalData();
 
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     if (!visible && window.scrollY > 20) {
-  //       setVisible(true);
-  //     }
-  //   };
-
-  //   window.addEventListener('scroll', handleScroll);
-  //   return () => window.removeEventListener('scroll', handleScroll);
-  // }, [visible]);
+  const [translatedLabels, setTranslatedLabels] = useState({
+    home: 'Home',
+    bestApps: 'Best Betting Apps',
+    news: 'News',
+  });
 
   const showCategories = pathname === '/blogs/pages/all-blogs';
+
+  // 🌐 Translate labels when language changes
+  useEffect(() => {
+    const translateLabels = async () => {
+      try {
+        const [home, bestApps, news] = await Promise.all([
+          translateText('Home', 'en', language),
+          translateText('Best Betting Apps', 'en', language),
+          translateText('News', 'en', language),
+        ]);
+
+        setTranslatedLabels({
+          home,
+          bestApps,
+          news,
+        });
+      } catch (error) {
+        console.error('Translation failed:', error);
+        // fallback
+        setTranslatedLabels({
+          home: 'Home',
+          bestApps: 'Best Betting Apps',
+          news: 'News',
+        });
+      }
+    };
+
+    translateLabels();
+  }, [language]);
 
   return (
     <header className={`${styles.header}`}>
@@ -33,9 +56,15 @@ export default function Header() {
           <img src="/sportsbuz.png" alt="COD HATCH" className={styles.logoImg} />
           <span className={styles.separator}>|</span>
           <nav className={styles.nav}>
-            <a href="/" className={`${styles.navItem} ${styles.active}`}>Home</a>
-            <a href="/best-betting-apps" className={styles.navItem}>Best Betting Apps</a>
-            <a href="#" className={styles.navItem}>News</a>
+            <a href="/" className={`${styles.navItem} ${styles.active}`}>
+              {translatedLabels.home}
+            </a>
+            <a href="/best-betting-apps" className={styles.navItem}>
+              {translatedLabels.bestApps}
+            </a>
+            <a href="#" className={styles.navItem}>
+              {translatedLabels.news}
+            </a>
 
             {showCategories &&
               blogCategories.map((cat) => (
@@ -43,8 +72,7 @@ export default function Header() {
                   <a href="#" className={styles.navItem}>
                     {cat.name} <span><FaChevronDown /></span>
                   </a>
-
-                  {cat.subcategories && cat.subcategories.length > 0 && (
+                  {cat.subcategories?.length > 0 && (
                     <ul className={styles.submenu}>
                       {cat.subcategories.map((sub) => (
                         <li key={sub.id}>
@@ -64,9 +92,13 @@ export default function Header() {
         </div>
 
         <div className={styles.rightSection}>
-          <select className={styles.languageSelector}>
-            <option>English</option>
-            <option>Hindi</option>
+          <select
+            className={styles.languageSelector}
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+          >
+            <option value="en">English</option>
+            <option value="ml">Malayalam</option>
           </select>
           <button className={styles.darkModeToggle}><FaMoon /></button>
         </div>

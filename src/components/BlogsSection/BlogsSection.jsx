@@ -2,18 +2,39 @@
 import { useEffect, useState } from 'react';
 import styles from './BlogsSection.module.css';
 import Link from 'next/link';
-import axios from 'axios';
-import CustomAxios from '../utilities/CustomAxios';
+import { useGlobalData } from '../Context/ApiContext';
 
 export default function BlogSection({ blogs = [] }) {
-  if (blogs.length === 0) return null;
+  const { translateText, language } = useGlobalData();
+  const [translatedBlogs, setTranslatedBlogs] = useState([]);
 
-  const featuredBlog = blogs[0];
-  const otherBlogs = blogs.slice(1);
+  useEffect(() => {
+    const translateBlogs = async () => {
+      if (blogs.length === 0) return;
+
+      const updated = await Promise.all(
+        blogs.map(async (blog) => ({
+          ...blog,
+          title: await translateText(blog.title),
+          author: await translateText(blog.author),
+        }))
+      );
+
+      setTranslatedBlogs(updated);
+    };
+
+    translateBlogs();
+  }, [blogs, translateText, language]);
+
+  if (translatedBlogs.length === 0) return null;
+
+  const featuredBlog = translatedBlogs[0];
+  const otherBlogs = translatedBlogs.slice(1);
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.headingRow}>
-        <h3>Highlights</h3>
+        <h3>{translateText && typeof translateText === 'function' ? 'Highlights' : 'Highlights'}</h3>
         <Link href="/blogs/pages/all-blogs" className={styles.viewAll}>
           View All
         </Link>
@@ -30,12 +51,13 @@ export default function BlogSection({ blogs = [] }) {
           </div>
           <div className={styles.content}>
             <h4>{featuredBlog.title}</h4>
-            <p>{featuredBlog.author} <span>· {featuredBlog.date}</span></p>
+            <p>
+              {featuredBlog.author} <span>· {featuredBlog.date}</span>
+            </p>
             <Link href={`/blog-details/${featuredBlog.slug}`}>Read More</Link>
           </div>
         </Link>
       </div>
-
 
       <div className={styles.blogGrid}>
         {otherBlogs.slice(0, 3).map((blog) => (
@@ -49,7 +71,9 @@ export default function BlogSection({ blogs = [] }) {
             </div>
             <div className={styles.content}>
               <h5>{blog.title}</h5>
-              <p>{blog.author} <span>{blog.date}</span></p>
+              <p>
+                {blog.author} <span>{blog.date}</span>
+              </p>
               <span className={styles.readMore}>Read More</span>
             </div>
           </Link>

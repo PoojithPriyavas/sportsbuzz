@@ -12,6 +12,37 @@ export const DataProvider = ({ children }) => {
     const [sections, setSections] = useState([]);
     const [bestSections, setBestSections] = useState([]);
 
+    // TRANSLATION API IMPLEMENTATION 
+
+    const [language, setLanguage] = useState('en');
+
+    const translateText = async (text, from = 'en', toLang = language) => {
+        // Ensure ISO code format
+        const langMap = {
+            English: 'en',
+            Malayalam: 'ml',
+        };
+        const to = langMap[toLang] || toLang;
+        const fromCode = langMap[from] || from;
+
+        if (fromCode === to) return text;
+
+        try {
+            const response = await axios.post('/api/translate', {
+                text,
+                from: fromCode,
+                to,
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Translation error:', error);
+            return text;
+        }
+    };
+
+
+    // BLOG SECTION
+
     const fetchBlogCategories = async () => {
         try {
             const response = await CustomAxios.get('/blog-categories');
@@ -40,6 +71,8 @@ export const DataProvider = ({ children }) => {
             console.error('Failed to fetch blogs:', error);
         }
     };
+
+    // BETTING TABLE DATA - API IMPLEMENTATIONS
 
     const fetchBettingApps = async () => {
         try {
@@ -293,9 +326,9 @@ export const DataProvider = ({ children }) => {
         fetchBestBettingAppsPrevious();
         // fetchMatches();
         // fetchUpcomingMatches();
-        liveFootBall();
-        upcomingFootBall();
-        fetchNews();
+        // liveFootBall();
+        // upcomingFootBall();
+        // fetchNews();
     }, []);
 
     return (
@@ -314,7 +347,10 @@ export const DataProvider = ({ children }) => {
                 upcoming,
                 news,
                 selectedNews,
-                fetchNewsDetails
+                fetchNewsDetails,
+                language,
+                setLanguage,
+                translateText,
             }}>
             {children}
         </DataContext.Provider>

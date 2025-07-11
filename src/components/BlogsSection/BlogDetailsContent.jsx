@@ -1,41 +1,75 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useGlobalData } from '../Context/ApiContext';
 import styles from './BlogDetailContent.module.css';
 import Head from 'next/head';
 
 export default function BlogDetailContent() {
-  const { blogs } = useGlobalData();
-  console.log(blogs, "blogs")
+  const { blogs, translateText, language } = useGlobalData();
+  console.log(blogs,"blogs")
   const params = useParams();
   const slug = params?.slug;
 
   const blog = blogs?.find((item) => item.slug === slug);
+  const [translatedBlog, setTranslatedBlog] = useState(null);
+
+  useEffect(() => {
+    const translateBlog = async () => {
+      if (!blog || !translateText) return;
+
+      const [title, metaTitle, metaDesc, textEditor] = await Promise.all([
+        translateText(blog.title),
+        translateText(blog.meta_title),
+        translateText(blog.meta_desc),
+        translateText(blog.text_editor, 'en', language, 'html'), // HTML type
+      ]);
+
+      const translatedTags = await Promise.all(
+        (blog.tags || []).map((tag) => translateText(tag))
+      );
+
+      setTranslatedBlog({
+        ...blog,
+        title,
+        meta_title: metaTitle,
+        meta_desc: metaDesc,
+        tags: translatedTags,
+        text_editor: textEditor,
+      });
+    };
+
+    translateBlog();
+  }, [blog, translateText, language]);
 
   if (!blog) {
     return <div className={styles.blogContent}>Blog not found.</div>;
   }
 
+  if (!translatedBlog) {
+    return <div className={styles.blogContent}>Translating blog...</div>;
+  }
+
   return (
     <>
       <Head>
-        <title>{blog.meta_title}</title>
-        <meta name="description" content={blog.meta_desc} />
-        <meta name="keywords" content={blog.tags?.join(', ')} />
-        <meta property="og:title" content={blog.meta_title} />
-        <meta property="og:description" content={blog.meta_desc} />
-        <meta property="og:image" content={blog.image_big || blog.image} />
+        <title>{translatedBlog.meta_title}</title>
+        <meta name="description" content={translatedBlog.meta_desc} />
+        <meta name="keywords" content={translatedBlog.tags?.join(', ')} />
+        <meta property="og:title" content={translatedBlog.meta_title} />
+        <meta property="og:description" content={translatedBlog.meta_desc} />
+        <meta property="og:image" content={translatedBlog.image_big || translatedBlog.image} />
       </Head>
 
       <div className={styles.blogContent}>
-        <h1 className={styles.title}>{blog.title}</h1>
+        <h1 className={styles.title}>{translatedBlog.title}</h1>
 
-        {blog.image && (
+        {translatedBlog.image && (
           <div className={styles.thumbnail}>
             <img
-              src={blog.image_big}
-              alt={blog.alt_big || 'Blog thumbnail'}
+              src={translatedBlog.image_big}
+              alt={translatedBlog.alt_big || 'Blog thumbnail'}
               className={styles.thumbnailImg}
             />
           </div>
@@ -43,18 +77,8 @@ export default function BlogDetailContent() {
 
         <div
           className={styles.description}
-          dangerouslySetInnerHTML={{ __html: blog.text_editor }}
+          dangerouslySetInnerHTML={{ __html: translatedBlog.text_editor }}
         />
-
-        {/* {blog.image_big && (
-          <div className={styles.featureImage}>
-            <img
-              src={blog.image_big}
-              alt={blog.alt_big || 'Featured image'}
-              className={styles.featureImg}
-            />
-          </div>
-        )} */}
       </div>
     </>
   );

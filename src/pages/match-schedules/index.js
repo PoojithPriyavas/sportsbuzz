@@ -55,7 +55,7 @@ export default function MatchSchedulerScreen() {
 
                     <div className={styles.rightSection}>
 
-                        <UpcomingMatches />
+                        {/* <UpcomingMatches /> */}
                         <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
 
                     </div>
