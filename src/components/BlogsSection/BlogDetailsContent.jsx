@@ -7,6 +7,7 @@ import Head from 'next/head';
 
 export default function BlogDetailContent() {
   const { blogs } = useGlobalData();
+  console.log(blogs, "blogs")
   const params = useParams();
   const slug = params?.slug;
 

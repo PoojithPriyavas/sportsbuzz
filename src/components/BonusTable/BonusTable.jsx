@@ -3,9 +3,7 @@ import styles from './BonusTable.module.css';
 import Head from 'next/head';
 import CustomAxios from '../utilities/CustomAxios';
 
-export default function BonusTable({ sections = [] }) {
-    console.log(sections, "datatatatatat")
-
+export default function BonusTable({ sections  }) {
     const [copiedId, setCopiedId] = useState(null);
 
 

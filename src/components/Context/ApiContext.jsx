@@ -42,7 +42,6 @@ export const DataProvider = ({ children }) => {
     };
 
     const fetchBettingApps = async () => {
-        console.log("sections is called")
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
                 params: { country_code: 'IN', filter_by: 'current_month' },
@@ -60,7 +59,7 @@ export const DataProvider = ({ children }) => {
     };
 
     const fetchBestBettingAppsPrevious = async () => {
-         console.log("previous sections is called")
+        console.log("previous sections is called")
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
                 params: {
@@ -239,7 +238,52 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+    // NEWS SECTION
+    const [news, setNews] = useState([]);
 
+    const fetchNews = async () => {
+        // const today = new Date();
+        // const formattedDate = today.toISOString().split('T')[0].replace(/-/g, '');
+        const options = {
+            method: 'GET',
+            url: 'https://livescore6.p.rapidapi.com/news/v2/list',
+
+            headers: {
+                'X-RapidAPI-Key': '28acac3c58mshd83e0915f78a287p129875jsna833d4039a3e',
+
+            }
+        };
+
+        try {
+            const response = await axios.request(options);
+            setNews(response.data?.homepageArticles[0])
+        } catch (error) {
+            console.error('Error fetching football matches:', error);
+        }
+    };
+
+
+    //// NEWS DETAIL SECTION 
+
+    const [selectedNews, setSelectedNews] = useState(null);
+
+    const fetchNewsDetails = async (id) => {
+        try {
+            const response = await axios.get(
+                `https://livescore6.p.rapidapi.com/news/v2/detail`,
+                {
+                    params: { id },
+                    headers: {
+                        'X-RapidAPI-Key': '28acac3c58mshd83e0915f78a287p129875jsna833d4039a3e',
+                    },
+                }
+            );
+            setSelectedNews(response.data);
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching news details:", error);
+        }
+    };
 
     useEffect(() => {
         fetchBlogCategories();
@@ -251,6 +295,7 @@ export const DataProvider = ({ children }) => {
         // fetchUpcomingMatches();
         liveFootBall();
         upcomingFootBall();
+        fetchNews();
     }, []);
 
     return (
@@ -266,7 +311,10 @@ export const DataProvider = ({ children }) => {
                 teamImages,
                 upcomingMatches,
                 stages,
-                upcoming
+                upcoming,
+                news,
+                selectedNews,
+                fetchNewsDetails
             }}>
             {children}
         </DataContext.Provider>
