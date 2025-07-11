@@ -17,7 +17,6 @@ export const DataProvider = ({ children }) => {
     const [language, setLanguage] = useState('en');
 
     const translateText = async (text, from = 'en', toLang = language) => {
-        // Ensure ISO code format
         const langMap = {
             English: 'en',
             Malayalam: 'ml',
