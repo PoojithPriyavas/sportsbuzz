@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import styles from './BlogPage.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaChevronDown, FaTimes } from 'react-icons/fa';
 import { useGlobalData } from '../Context/ApiContext';
 
 import TopNewsSection from '../NewsSection/TopNews';
@@ -35,9 +35,12 @@ export default function BlogsPage({ blogs = [] }) {
   // Filter blogs by selected subcategory
   const filteredBlogs = selectedSubcategoryId
     ? blogs.filter((blog) =>
-        blog.subcategory && blog.subcategory.includes(selectedSubcategoryId)
-      )
+      blog.subcategory && blog.subcategory.includes(selectedSubcategoryId)
+    )
     : blogs;
+
+  // Check if any filters are active
+  const hasActiveFilters = selectedSubcategoryId || filterValue !== "all";
 
   // Dynamic translation effect
   useEffect(() => {
@@ -64,6 +67,12 @@ export default function BlogsPage({ blogs = [] }) {
     fetchTranslations();
   }, [language]);
 
+  const handleClearFilters = () => {
+    setFilterValue("all");
+    // Navigate to clear subcategory filter
+    window.location.href = "/blogs/pages/all-blogs";
+  };
+
   return (
     <>
       <div className={styles.container}>
@@ -72,10 +81,27 @@ export default function BlogsPage({ blogs = [] }) {
             <div className={styles.filterBar}>
               <h2 style={{ color: 'black' }}>{translations.latestBlogs}</h2>
               <div className={styles.controls}>
-                <select value={filterValue} onChange={(e) => setFilterValue(e.target.value)}>
-                  <option value="all">{translations.all}</option>
-                  <option value="latest">{translations.latest}</option>
-                </select>
+                {hasActiveFilters && (
+                  <button
+                    onClick={handleClearFilters}
+                    className={styles.clearFilterButton}
+                  >
+                    <FaTimes className={styles.clearIcon} />
+                    {translations.clearFilter}
+                  </button>
+                )}
+
+                <div className={styles.selectWrapper}>
+                  <select
+                    value={filterValue}
+                    onChange={(e) => setFilterValue(e.target.value)}
+                    className={styles.professionalSelect}
+                  >
+                    <option value="all">{translations.all}</option>
+                    <option value="latest">{translations.latest}</option>
+                  </select>
+                  <FaChevronDown className={styles.selectIcon} />
+                </div>
 
                 <div className={styles.searchWrapper}>
                   <FaSearch className={styles.searchIcon} />
@@ -89,14 +115,6 @@ export default function BlogsPage({ blogs = [] }) {
             </div>
 
             <div className={styles.wrapper}>
-              {selectedSubcategoryId && (
-                <div className={styles.clearFilterWrapper}>
-                  <Link href="/blogs/pages/all-blogs" className={styles.clearFilter}>
-                    {translations.clearFilter}
-                  </Link>
-                </div>
-              )}
-
               <div className={styles.blogGrid}>
                 {filteredBlogs.map((blog) => (
                   <Link
@@ -121,8 +139,8 @@ export default function BlogsPage({ blogs = [] }) {
         </div>
 
         <div className={styles.right}>
-          <PredictionSection />
-          <CricketPrediction />
+          {/* <PredictionSection />
+          <CricketPrediction /> */}
           {/* <MultiBannerSlider /> */}
           <AutoSlider />
           <TopNewsSection />

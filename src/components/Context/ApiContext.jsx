@@ -321,6 +321,34 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+
+    const getAccessToken = async () => {
+        const clientId = 'partners-9bda431041c27cb15ff617d999963880';
+        const clientSecret = 'ad2k79moKjuDn*6Op94eVCtQpw7jzCDoq@KT8SPuPLOnTW9TI1v6OPjn%DqTUx1g';
+        const tokenUrl = 'https://cpservm.com/gateway/token';
+
+        const body = new URLSearchParams({
+            grant_type: 'client_credentials',
+            client_id: clientId,
+            client_secret: clientSecret,
+        });
+
+        try {
+            const response = await axios.post(tokenUrl, body.toString(), {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            });
+
+            const { access_token } = response.data;
+            console.log("Access Token of bet 11 is :", access_token);
+            return access_token;
+        } catch (error) {
+            console.error('Failed to get token:', error.response?.data || error.message);
+            return null;
+        }
+    };
+
     useEffect(() => {
         fetchBlogCategories();
         fetchRecentBlogs();
@@ -332,6 +360,7 @@ export const DataProvider = ({ children }) => {
         liveFootBall();
         upcomingFootBall();
         fetchNews();
+        getAccessToken();
     }, []);
 
     return (

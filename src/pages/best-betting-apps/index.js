@@ -12,6 +12,8 @@ import LoadingScreen from "@/components/Loader/Loader";
 import { useEffect, useState } from "react";
 import TestLive from "@/components/LiveScoreSection/TestLive";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
+import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
+
 
 
 
@@ -44,11 +46,12 @@ export default function BestBettingApps() {
                     </div>
                     <div className={styles.fourthColumn} >
                         <BettingCard />
+                        <JoinTelegramButton />
                         <AutoSlider />
-                        <TopNewsSection />
+                        {/* <TopNewsSection /> */}
                     </div>
                 </div>
-                <div className={styles.mainContent}>
+                {/* <div className={styles.mainContent}>
                     <div className={styles.leftSection}>
 
                     </div>
@@ -59,7 +62,7 @@ export default function BestBettingApps() {
                         <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
 
                     </div>
-                </div>
+                </div> */}
                 <BettingAppsRecentTable />
 
             </div>

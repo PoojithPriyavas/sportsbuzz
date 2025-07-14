@@ -15,7 +15,7 @@ export default function BlogPages() {
             </Head>
             <Header />
             <div className='container'>
-                <LiveScores />
+                {/* <LiveScores /> */}
                 <BlogsPage blogs={blogs} />
             </div>
         </>

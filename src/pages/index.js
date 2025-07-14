@@ -23,6 +23,10 @@ import LoadingScreen from "@/components/Loader/Loader";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 import SportsOdsList from "@/components/SportsOdds/SportsOdsList";
+import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
+import Footer from '@/components/Footer/Footer';
+
+
 
 
 
@@ -85,7 +89,7 @@ export default function Home() {
                 <div className={styles.leftSplit}>
                   <AutoSlider />
                   <TopNewsSection />
-                  <SportsOdsList />
+
 
                   {/* <PredictionSection /> */}
                   {/* <MultiBannerSlider /> */}
@@ -101,16 +105,19 @@ export default function Home() {
             {/* Column 4 - AutoSlider on top and others below */}
             <div className={styles.fourthColumn}>
               <BettingCard />
+              <JoinTelegramButton />
               <UpcomingFootballMatches />
+
               <SportsOdsList />
-              <AutoSlider />
-              <AdsSlider />
-              <CricketPrediction />
-              <SmallAdBox />
+
+              {/* <AdsSlider /> */}
+              {/* <CricketPrediction /> */}
+              {/* <SmallAdBox /> */}
             </div>
           </div>
+          <Footer />
 
-          <GoogleAds />
+          {/* <GoogleAds /> */}
         </div>
       </>
     </>
