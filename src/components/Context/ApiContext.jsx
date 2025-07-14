@@ -224,11 +224,11 @@ export const DataProvider = ({ children }) => {
             url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
             params: {
                 Category: 'soccer',
-                Date: "20250706",
+                Date: formattedDate,
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': '28acac3c58mshd83e0915f78a287p129875jsna833d4039a3e',
+                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
 
             }
         };
@@ -247,17 +247,22 @@ export const DataProvider = ({ children }) => {
     const [upcoming, setUpcoming] = useState([]);
     const upcomingFootBall = async () => {
         const today = new Date();
-        const formattedDate = today.toISOString().split('T')[0].replace(/-/g, '');
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1); // Add 1 day
+
+        const formattedDate = tomorrow.toISOString().split('T')[0].replace(/-/g, ''); // YYYYMMDD format
+
+
         const options = {
             method: 'GET',
             url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
             params: {
                 Category: 'soccer',
-                Date: "20250707",
+                Date: formattedDate,
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': '28acac3c58mshd83e0915f78a287p129875jsna833d4039a3e',
+                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
 
             }
         };
@@ -281,7 +286,7 @@ export const DataProvider = ({ children }) => {
             url: 'https://livescore6.p.rapidapi.com/news/v2/list',
 
             headers: {
-                'X-RapidAPI-Key': '28acac3c58mshd83e0915f78a287p129875jsna833d4039a3e',
+                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
 
             }
         };
@@ -306,7 +311,7 @@ export const DataProvider = ({ children }) => {
                 {
                     params: { id },
                     headers: {
-                        'X-RapidAPI-Key': '28acac3c58mshd83e0915f78a287p129875jsna833d4039a3e',
+                        'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
                     },
                 }
             );
@@ -325,8 +330,8 @@ export const DataProvider = ({ children }) => {
         fetchBestBettingAppsPrevious();
         // fetchMatches();
         // fetchUpcomingMatches();
-        // liveFootBall();
-        // upcomingFootBall();
+        liveFootBall();
+        upcomingFootBall();
         // fetchNews();
     }, []);
 

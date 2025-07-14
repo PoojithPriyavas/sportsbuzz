@@ -22,6 +22,9 @@ import TestLive from "@/components/LiveScoreSection/TestLive";
 import LoadingScreen from "@/components/Loader/Loader";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
+import SportsOdsList from "@/components/SportsOdds/SportsOdsList";
+
+
 
 
 const geistSans = Geist({
@@ -80,10 +83,13 @@ export default function Home() {
               {/* 1-2 Split under BonusTable */}
               <div className={styles.twoSplitRow}>
                 <div className={styles.leftSplit}>
+                  <AutoSlider />
                   <TopNewsSection />
+                  <SportsOdsList />
+
                   {/* <PredictionSection /> */}
                   {/* <MultiBannerSlider /> */}
-                  <AutoSlider />
+
 
                 </div>
                 <div className={styles.centerSplit}>
@@ -96,8 +102,8 @@ export default function Home() {
             <div className={styles.fourthColumn}>
               <BettingCard />
               <UpcomingFootballMatches />
+              <SportsOdsList />
               <AutoSlider />
-
               <AdsSlider />
               <CricketPrediction />
               <SmallAdBox />
