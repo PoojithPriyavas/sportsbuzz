@@ -1,13 +1,63 @@
 import React, { useEffect, useState } from 'react';
 import styles from './BestBettingApps.module.css';
 import Head from 'next/head';
-import CustomAxios from '../utilities/CustomAxios';
 import { useGlobalData } from '../Context/ApiContext';
 
 export default function BettingAppsTable() {
     const [copiedId, setCopiedId] = useState(null);
+    const { sections, translateText, language } = useGlobalData();
+    const [staticLabels, setStaticLabels] = useState({
+        Rank: 'Rank',
+        Site: 'Site',
+        Features: 'Features',
+        'Welcome Bonus': 'Welcome Bonus',
+        'Bet Now': 'Bet Now',
+        'Read Review': 'Read Review',
+        'GET BONUS': 'GET BONUS',
+        'Copied!': 'Copied!'
+    });
 
-    const { sections } = useGlobalData();
+    useEffect(() => {
+        const translateStaticLabels = async () => {
+            if (language === 'en') {
+                setStaticLabels({
+                    Rank: 'Rank',
+                    Site: 'Site',
+                    Features: 'Features',
+                    'Welcome Bonus': 'Welcome Bonus',
+                    'Bet Now': 'Bet Now',
+                    'Read Review': 'Read Review',
+                    'GET BONUS': 'GET BONUS',
+                    'Copied!': 'Copied!'
+                });
+                return;
+            }
+
+            const keys = [
+                'Rank',
+                'Site',
+                'Features',
+                'Welcome Bonus',
+                'Bet Now',
+                'Read Review',
+                'GET BONUS',
+                'Copied!'
+            ];
+
+            const translations = await Promise.all(
+                keys.map(key => translateText(key, 'en', language))
+            );
+
+            const updatedLabels = {};
+            keys.forEach((key, index) => {
+                updatedLabels[key] = translations[index];
+            });
+
+            setStaticLabels(updatedLabels);
+        };
+
+        translateStaticLabels();
+    }, [language, translateText]);
 
     const handleCopy = (code, id) => {
         navigator.clipboard.writeText(code).then(() => {
@@ -20,31 +70,28 @@ export default function BettingAppsTable() {
 
     return (
         <>
-            {/* Use the first section for SEO meta */}
             <Head>
                 <title>{sections[0]?.metatitle}</title>
                 <meta name="description" content={stripHtml(sections[0]?.meta_description)} />
             </Head>
 
-            {sections.map((section) => (
+            {sections.map(section => (
                 <div className={styles.wrapper} key={section.id}>
                     <h1 className={styles.heading}>{section.heading}</h1>
-
-
 
                     {section.best_betting_apps?.length > 0 && (
                         <table className={styles.table}>
                             <thead>
                                 <tr className={styles.headerRow}>
-                                    <th>Rank</th>
-                                    <th>Site</th>
-                                    <th>Features</th>
-                                    <th>Welcome Bonus</th>
-                                    <th>Bet Now</th>
+                                    <th>{staticLabels['Rank']}</th>
+                                    <th>{staticLabels['Site']}</th>
+                                    <th>{staticLabels['Features']}</th>
+                                    <th>{staticLabels['Welcome Bonus']}</th>
+                                    <th>{staticLabels['Bet Now']}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {section.best_betting_apps.map((app) => (
+                                {section.best_betting_apps.map(app => (
                                     <tr className={styles.bodyRow} key={app.id}>
                                         <td style={{ color: "black", fontSize: "25px" }}><strong>#{app.id}</strong></td>
                                         <td className={styles.site}>
@@ -63,11 +110,8 @@ export default function BettingAppsTable() {
                                                 className={styles.codeBtn}
                                                 onClick={() => window.open(app.review_link, '_blank', 'noopener,noreferrer')}
                                             >
-                                                Read Review
+                                                {staticLabels['Read Review']}
                                             </button>
-
-                                            {/* <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
-                                             */}
                                             <div className={styles.stars}>
                                                 {Array.from({ length: 5 }, (_, index) => {
                                                     const ratingValue = index + 1;
@@ -80,7 +124,6 @@ export default function BettingAppsTable() {
                                                     }
                                                 })}
                                             </div>
-
                                         </td>
                                         <td className={styles.actions}>
                                             <a
@@ -89,13 +132,13 @@ export default function BettingAppsTable() {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                             >
-                                                GET BONUS
+                                                {staticLabels['GET BONUS']}
                                             </a>
                                             <button
                                                 className={styles.codeBtn}
                                                 onClick={() => handleCopy(app.referall_code, app.id)}
                                             >
-                                                {copiedId === app.id ? 'Copied!' : app.referall_code}
+                                                {copiedId === app.id ? staticLabels['Copied!'] : app.referall_code}
                                             </button>
                                         </td>
                                     </tr>
@@ -109,14 +152,11 @@ export default function BettingAppsTable() {
                         dangerouslySetInnerHTML={{ __html: section.description }}
                     />
                 </div>
-
-
             ))}
         </>
     );
 }
 
-// Helper to clean meta description
 function stripHtml(html) {
     if (!html) return '';
     return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();

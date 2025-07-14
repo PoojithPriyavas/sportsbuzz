@@ -1,53 +1,91 @@
-import { useState } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
 import styles from './BlogCard.module.css';
 import Link from 'next/link';
-import Image from 'next/image';
 import { FaSearch } from 'react-icons/fa';
+import { useGlobalData } from '../Context/ApiContext';
 
 export default function BlogCard({ blogs = [] }) {
-  // console.log(blogs, "blogs")
-  // const blogsData = [
-  //   { id: 1, title: "Blog title 1", author: "Cod Hatch", date: "Jun 24 2025", slug: "blog-title-2" },
-  //   { id: 2, title: "Blog title 2", author: "Cod Hatch", date: "Jun 23 2025", slug: "blog-title-3" },
-  //   { id: 3, title: "Blog title 3", author: "Cod Hatch", date: "Jun 22 2025", slug: "blog-title-4" },
-  //   { id: 4, title: "Blog title 4", author: "Cod Hatch", date: "Jun 21 2025", slug: "blog-title-5" },
-  // ];
-  const [filterValue, setFilterValue] = useState("all");
+  const { translateText, language } = useGlobalData();
+  const [filterValue, setFilterValue] = useState('all');
+
+  const [translated, setTranslated] = useState({
+    latestBlogs: 'Latest Blogs',
+    all: 'All',
+    latest: 'Latest',
+    searchPlaceholder: 'Search Blogs',
+    readMore: 'Read More',
+  });
+
   const featuredBlog = blogs[0];
   const otherBlogs = blogs.slice(1);
+
+  useEffect(() => {
+    const translateLabels = async () => {
+      try {
+        const [latestBlogs, all, latest, searchPlaceholder, readMore] = await Promise.all([
+          translateText('Latest Blogs', 'en', language),
+          translateText('All', 'en', language),
+          translateText('Latest', 'en', language),
+          translateText('Search Blogs', 'en', language),
+          translateText('Read More', 'en', language),
+        ]);
+
+        setTranslated({
+          latestBlogs,
+          all,
+          latest,
+          searchPlaceholder,
+          readMore,
+        });
+      } catch (err) {
+        console.error('Failed to translate blog labels:', err);
+      }
+    };
+
+    translateLabels();
+  }, [language]);
 
   return (
     <>
       <div className={styles.filterBar}>
-        <h2 style={{ color: 'black' }}>Latest Blogs</h2>
+        <h2 style={{ color: 'black' }}>{translated.latestBlogs}</h2>
         <div className={styles.controls}>
           <select value={filterValue} onChange={(e) => setFilterValue(e.target.value)}>
-            <option value='all'>All</option>
-            <option value='latest'>Latest</option>
+            <option value='all'>{translated.all}</option>
+            <option value='latest'>{translated.latest}</option>
           </select>
 
           <div className={styles.searchWrapper}>
             <FaSearch className={styles.searchIcon} />
-            <input type="text" placeholder="Search Blogs" className={styles.searchInput} />
+            <input
+              type="text"
+              placeholder={translated.searchPlaceholder}
+              className={styles.searchInput}
+            />
           </div>
         </div>
       </div>
+
       <div className={styles.wrapper}>
         {/* Featured Blog */}
-        <Link href="/blog-details/blog-title-1" className={styles.featuredBlog}>
-          <div className={styles.featuredImage}>
-            <img
-              src={featuredBlog?.image_big}
-              alt={featuredBlog?.alt_big || featuredBlog?.title}
-              className={styles.featuredImg}
-            />
-          </div>
-          <div className={styles.featuredContent}>
-            <h4>{featuredBlog?.title}</h4>
-            <p>{featuredBlog?.author} <span>· {featuredBlog?.date}</span></p>
-            <span className={styles.readMore}>Read More</span>
-          </div>
-        </Link>
+        {featuredBlog && (
+          <Link href={`/blog-details/${featuredBlog?.slug || 'blog-title-1'}`} className={styles.featuredBlog}>
+            <div className={styles.featuredImage}>
+              <img
+                src={featuredBlog?.image_big}
+                alt={featuredBlog?.alt_big || featuredBlog?.title}
+                className={styles.featuredImg}
+              />
+            </div>
+            <div className={styles.featuredContent}>
+              <h4>{featuredBlog?.title}</h4>
+              <p>{featuredBlog?.author} <span>· {featuredBlog?.date}</span></p>
+              <span className={styles.readMore}>{translated.readMore}</span>
+            </div>
+          </Link>
+        )}
 
         {/* Blog Grid */}
         <div className={styles.blogGrid}>
@@ -64,13 +102,12 @@ export default function BlogCard({ blogs = [] }) {
               <div className={styles.blogContent}>
                 <h5>{blog?.title}</h5>
                 <p>{blog?.author} <span>{blog?.date}</span></p>
-                <span className={styles.readMore}>Read More</span>
+                <span className={styles.readMore}>{translated.readMore}</span>
               </div>
             </Link>
           ))}
         </div>
       </div>
     </>
-
   );
 }

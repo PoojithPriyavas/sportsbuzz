@@ -279,15 +279,13 @@ export const DataProvider = ({ children }) => {
     const [news, setNews] = useState([]);
 
     const fetchNews = async () => {
-        // const today = new Date();
-        // const formattedDate = today.toISOString().split('T')[0].replace(/-/g, '');
+        console.log("function caalled")
         const options = {
             method: 'GET',
             url: 'https://livescore6.p.rapidapi.com/news/v2/list',
 
             headers: {
                 'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
-
             }
         };
 
@@ -305,6 +303,7 @@ export const DataProvider = ({ children }) => {
     const [selectedNews, setSelectedNews] = useState(null);
 
     const fetchNewsDetails = async (id) => {
+        console.log("news called")
         try {
             const response = await axios.get(
                 `https://livescore6.p.rapidapi.com/news/v2/detail`,
@@ -332,7 +331,7 @@ export const DataProvider = ({ children }) => {
         // fetchUpcomingMatches();
         liveFootBall();
         upcomingFootBall();
-        // fetchNews();
+        fetchNews();
     }, []);
 
     return (

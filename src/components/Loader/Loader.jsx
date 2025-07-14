@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import styles from './Loader.module.css';
 import { usePathname } from 'next/navigation';
@@ -9,24 +10,21 @@ import Link from 'next/link';
 export default function LoadingScreen({ onFinish }) {
   const [phase, setPhase] = useState('loading');
   const [darkMode, setDarkMode] = useState(false);
-  const [language, setLanguage] = useState('English');
   const pathname = usePathname();
-  const { blogCategories = [], translateText, setLanguage: setGlobalLanguage } = useGlobalData();
+
+  const {
+    blogCategories = [],
+    translateText,
+    setLanguage,
+    language,
+  } = useGlobalData();
+
   const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
-
-  console.log(blogCategories, "blog categories")
-  const showCategories = pathname === '/blogs/pages/all-blogs';
-
   const [translatedText, setTranslatedText] = useState({
     home: 'Home',
     apps: 'Best Betting Apps',
     news: 'News',
   });
-
-  const languageMap = {
-    English: 'en',
-    Malayalam: 'ml',
-  };
 
   useEffect(() => {
     const timer1 = setTimeout(() => {
@@ -46,50 +44,43 @@ export default function LoadingScreen({ onFinish }) {
 
   useEffect(() => {
     const updateTranslations = async () => {
-      if (language === 'Malayalam') {
-        const [home, apps, news] = await Promise.all([
-          translateText('Home', 'en', 'ml'),
-          translateText('Best Betting Apps', 'en', 'ml'),
-          translateText('News', 'en', 'ml'),
-        ]);
-        setTranslatedText({ home, apps, news });
+      const [home, apps, news] = await Promise.all([
+        translateText('Home', 'en', language),
+        translateText('Best Betting Apps', 'en', language),
+        translateText('News', 'en', language),
+      ]);
 
-        // Translate blogCategories
-        const translatedCategories = await Promise.all(
-          blogCategories.map(async (cat) => {
-            const translatedCatName = await translateText(cat.name, 'en', 'ml');
-            const translatedSubs = await Promise.all(
-              (cat.subcategories || []).map(async (sub) => ({
-                ...sub,
-                name: await translateText(sub.name, 'en', 'ml'),
-              }))
-            );
-            return {
-              ...cat,
-              name: translatedCatName,
-              subcategories: translatedSubs,
-            };
-          })
-        );
-        // Update state (optional — if `blogCategories` is state, you can store locally)
-        setTranslatedCategories(translatedCategories);
-      } else {
-        setTranslatedText({
-          home: 'Home',
-          apps: 'Best Betting Apps',
-          news: 'News',
-        });
-        setTranslatedCategories(blogCategories); // fallback to original
-      }
+      setTranslatedText({ home, apps, news });
+
+      const translatedCategories = await Promise.all(
+        blogCategories.map(async (cat) => {
+          const translatedCatName = await translateText(cat.name, 'en', language);
+          const translatedSubs = await Promise.all(
+            (cat.subcategories || []).map(async (sub) => ({
+              ...sub,
+              name: await translateText(sub.name, 'en', language),
+            }))
+          );
+          return {
+            ...cat,
+            name: translatedCatName,
+            subcategories: translatedSubs,
+          };
+        })
+      );
+      setTranslatedCategories(translatedCategories);
     };
 
     updateTranslations();
-    setGlobalLanguage(language === 'Malayalam' ? 'ml' : 'en');
   }, [language, translateText, blogCategories]);
 
-
   const toggleDarkMode = () => setDarkMode(!darkMode);
-  const handleLanguageChange = (e) => setLanguage(e.target.value);
+
+  const handleLanguageChange = (e) => {
+    const selected = e.target.value;
+    setLanguage(selected); // 'en' or 'ml'
+    localStorage.setItem('language', selected);
+  };
 
   return (
     <div className={`${styles.loaderWrapper} ${styles[phase]} ${darkMode ? styles.darkMode : ''}`}>
@@ -133,9 +124,13 @@ export default function LoadingScreen({ onFinish }) {
         </div>
 
         <div className={styles.rightSection}>
-          <select className={styles.languageSelector} value={language} onChange={handleLanguageChange}>
-            <option value="English">English</option>
-            <option value="Malayalam">Malayalam</option>
+          <select
+            className={styles.languageSelector}
+            value={language}
+            onChange={handleLanguageChange}
+          >
+            <option value="en">English</option>
+            <option value="ml">Malayalam</option>
           </select>
 
           <button className={styles.darkModeToggle} onClick={toggleDarkMode}>
