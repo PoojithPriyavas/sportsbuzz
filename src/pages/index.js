@@ -115,10 +115,11 @@ export default function Home() {
               {/* <SmallAdBox /> */}
             </div>
           </div>
-          <Footer />
+
 
           {/* <GoogleAds /> */}
         </div>
+        <Footer />
       </>
     </>
   );

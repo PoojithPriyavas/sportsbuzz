@@ -6,10 +6,9 @@ export default function BettingCards() {
     const scrollRef = useRef(null);
     const dropdownRef = useRef(null);
     const [paused, setPaused] = useState(false);
-    const [selectedTournament, setSelectedTournament] = useState('all');
+    const [selectedTournament, setSelectedTournament] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    // Get tournament data and event details from API context
     const { tournament, accessToken, fetchEventsIdData, eventDetails } = useGlobalData();
 
     const getAllTournaments = () => {
@@ -23,26 +22,41 @@ export default function BettingCards() {
 
     const allTournaments = getAllTournaments();
 
-    // Filter tournaments based on selected tournament
-    const filteredTournaments = selectedTournament === 'all'
-        ? allTournaments
-        : allTournaments.filter(tournament => tournament.id === selectedTournament);
+    // Set first tournament as initial selection
+    useEffect(() => {
+        if (!selectedTournament && allTournaments.length > 0) {
+            const firstTournamentId = allTournaments[0].id;
+            setSelectedTournament(firstTournamentId);
+            fetchEventsIdData(accessToken, firstTournamentId);
+        }
+    }, [allTournaments, selectedTournament, accessToken, fetchEventsIdData]);
 
-    // Helper function to get tournament image URL
+    const filteredTournaments = !selectedTournament || selectedTournament === 'all'
+        ? allTournaments
+        : allTournaments.filter(t => t.id === selectedTournament);
+
     const getTournamentImage = (imageName) => {
         if (!imageName) return '/images/tournaments/default-tournament.png';
         return `/images/tournaments/${imageName}`;
     };
 
-    // Transform API response to match card structure
     const transformEventToCard = (event) => {
         const isLive = event.waitingLive || event.period > 0;
         const startDate = new Date(event.startDate * 1000);
 
+        // Default fallback odds
+        const fallbackOdds = [
+            { label: 'W1', value: 2.1 },
+            { label: 'X', value: 3.2 },
+            { label: 'W2', value: 2.8 }
+        ];
+
+        const oddsFromMarket = event.marketData?.odds || fallbackOdds;
+
         return {
             id: event.sportEventId,
-            logo: '🏆', // Default logo, can be customized
-            provider: '22bet', // Based on the link domain
+            logo: '🏆',
+            provider: '22bet',
             isLive: isLive,
             matchType: event.tournamentNameLocalization || 'Tournament',
             matchInfo: `${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`,
@@ -57,27 +71,19 @@ export default function BettingCards() {
                 image: event.imageOpponent2?.[0] || 'defaultlogo.png'
             },
             oddsTitle: 'Match Winner',
-            odds: [
-                { label: 'W1', value: 2.1 }, // Default odds, replace with actual odds from API
-                { label: 'X', value: 3.2 },
-                { label: 'W2', value: 2.8 }
-            ],
+            odds: oddsFromMarket,
             link: event.link
         };
     };
 
-    // Get transformed cards from eventDetails
     const getTransformedCards = () => {
         if (!eventDetails || !Array.isArray(eventDetails)) return [];
-
         return eventDetails.map(event => transformEventToCard(event));
     };
 
     const transformedCards = getTransformedCards();
 
-    // Updated handler for tournament change
     const handleTournamentChange = (tournamentId) => {
-        console.log(tournamentId, "tournament id");
         fetchEventsIdData(accessToken, tournamentId);
         setSelectedTournament(tournamentId);
         setIsDropdownOpen(false);
@@ -85,21 +91,12 @@ export default function BettingCards() {
         setTimeout(() => setPaused(false), 2000);
     };
 
-    // Get selected tournament name for display
     const getSelectedTournamentName = () => {
-        if (selectedTournament === 'all') return 'All Tournaments';
+        if (!selectedTournament || selectedTournament === 'all') return 'All Tournaments';
         const tournament = allTournaments.find(t => t.id === selectedTournament);
         return tournament ? tournament.name : 'Select Tournament';
     };
 
-    // Get selected tournament image for display
-    const getSelectedTournamentImage = () => {
-        if (selectedTournament === 'all') return null;
-        const tournament = allTournaments.find(t => t.id === selectedTournament);
-        return tournament ? tournament.image : null;
-    };
-
-    // Auto-scroll effect
     useEffect(() => {
         const container = scrollRef.current;
         if (!container || paused || transformedCards.length === 0) return;
@@ -122,7 +119,6 @@ export default function BettingCards() {
         return () => clearInterval(interval);
     }, [paused, transformedCards]);
 
-    // Click outside listener to close dropdown
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -140,80 +136,74 @@ export default function BettingCards() {
     const handleResume = () => setTimeout(() => setPaused(false), 5000);
 
     return (
-        <>
-            <div className={styles.bettingContainer}>
-                {/* Header Section */}
-                <div className={styles.headerSection}>
-                    <h2 className={styles.pageTitle}>Betting Odds</h2>
-                    <div className={styles.filterContainer}>
-                        <div className={styles.customDropdown} ref={dropdownRef}>
-                            <div
-                                className={styles.dropdownHeader}
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            >
-                                <div className={styles.selectedOption}>
-                                    {selectedTournament === 'all' ? (
-                                        <>
-                                            <div className={styles.allTeamsIcon}>🏆</div>
-                                            <span>All Tournaments</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span>{getSelectedTournamentName()}</span>
-                                        </>
-                                    )}
-                                </div>
-                                <div className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.open : ''}`}>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <polyline points="6,9 12,15 18,9"></polyline>
-                                    </svg>
-                                </div>
-                            </div>
-
-                            {isDropdownOpen && (
-                                <div className={styles.dropdownOptions}>
-                                    <div
-                                        className={`${styles.dropdownOption} ${selectedTournament === 'all' ? styles.selected : ''}`}
-                                        onClick={() => handleTournamentChange('all')}
-                                    >
+        <div className={styles.bettingContainer}>
+            <div className={styles.headerSection}>
+                <h2 className={styles.pageTitle}>Betting Odds</h2>
+                <div className={styles.filterContainer}>
+                    <div className={styles.customDropdown} ref={dropdownRef}>
+                        <div
+                            className={styles.dropdownHeader}
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        >
+                            <div className={styles.selectedOption}>
+                                {!selectedTournament || selectedTournament === 'all' ? (
+                                    <>
                                         <div className={styles.allTeamsIcon}>🏆</div>
                                         <span>All Tournaments</span>
-                                    </div>
-                                    {allTournaments.map((tournament) => (
-                                        <div
-                                            key={tournament.id}
-                                            className={`${styles.dropdownOption} ${selectedTournament === tournament.id ? styles.selected : ''}`}
-                                            onClick={() => handleTournamentChange(tournament.id)}
-                                        >
-                                            <span>{tournament.name}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                                    </>
+                                ) : (
+                                    <span>{getSelectedTournamentName()}</span>
+                                )}
+                            </div>
+                            <div className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.open : ''}`}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <polyline points="6,9 12,15 18,9"></polyline>
+                                </svg>
+                            </div>
                         </div>
+
+                        {isDropdownOpen && (
+                            <div className={styles.dropdownOptions}>
+                                <div
+                                    className={`${styles.dropdownOption} ${selectedTournament === 'all' ? styles.selected : ''}`}
+                                    onClick={() => handleTournamentChange('all')}
+                                >
+                                    <div className={styles.allTeamsIcon}>🏆</div>
+                                    <span>All Tournaments</span>
+                                </div>
+                                {allTournaments.map((tournament) => (
+                                    <div
+                                        key={tournament.id}
+                                        className={`${styles.dropdownOption} ${selectedTournament === tournament.id ? styles.selected : ''}`}
+                                        onClick={() => handleTournamentChange(tournament.id)}
+                                    >
+                                        <span>{tournament.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
-
-                {/* Cards Container */}
-                <div className={styles.cardsContainer} ref={scrollRef}>
-                    {transformedCards.length > 0 ? (
-                        transformedCards.map((card, idx) => (
-                            <BettingCard
-                                key={card.id || idx}
-                                card={card}
-                                styles={styles}
-                                onSelectOdd={handlePause}
-                                onBetPlaced={handleResume}
-                            />
-                        ))
-                    ) : (
-                        <div className={styles.noDataMessage}>
-                            {eventDetails ? 'No events available' : 'Loading events...'}
-                        </div>
-                    )}
-                </div>
             </div>
-        </>
+
+            <div className={styles.cardsContainer} ref={scrollRef}>
+                {transformedCards.length > 0 ? (
+                    transformedCards.map((card, idx) => (
+                        <BettingCard
+                            key={card.id || idx}
+                            card={card}
+                            styles={styles}
+                            onSelectOdd={handlePause}
+                            onBetPlaced={handleResume}
+                        />
+                    ))
+                ) : (
+                    <div className={styles.noDataMessage}>
+                        {eventDetails ? 'No events available' : 'Loading events...'}
+                    </div>
+                )}
+            </div>
+        </div>
     );
 }
 
@@ -227,7 +217,7 @@ function BettingCard({ card, styles, onSelectOdd, onBetPlaced }) {
     const handleSelect = (odd) => {
         setSelectedOdd(odd);
         setShowBettingSection(true);
-        onSelectOdd(); // ✅ pause auto-slide
+        onSelectOdd();
         if (betAmount) calculateWin(betAmount, odd.value);
     };
 
@@ -246,7 +236,7 @@ function BettingCard({ card, styles, onSelectOdd, onBetPlaced }) {
     const placeBet = () => {
         if (selectedOdd && betAmount > 0) {
             setSuccess(true);
-            onBetPlaced(); // ✅ resume after 5 seconds
+            onBetPlaced();
             setTimeout(() => {
                 setSelectedOdd(null);
                 setBetAmount('');
@@ -268,13 +258,11 @@ function BettingCard({ card, styles, onSelectOdd, onBetPlaced }) {
 
     return (
         <div className={styles.bettingCard}>
-            {/* Provider Header */}
             <div className={styles.providerHeader}>
                 <div className={styles.providerLogo}>{card.logo}</div>
                 <span>Powered by {card.provider}</span>
             </div>
 
-            {/* Match Header */}
             <div className={styles.matchHeader}>
                 {card.isLive && (
                     <div className={styles.liveBadge}>
@@ -285,9 +273,7 @@ function BettingCard({ card, styles, onSelectOdd, onBetPlaced }) {
                 <div className={styles.matchInfo}>{card.matchInfo}</div>
             </div>
 
-            {/* Teams Section */}
             <div className={styles.teamsSection}>
-                {/* Teams Container */}
                 <div className={styles.teamsContainer}>
                     <div className={styles.team}>
                         <div className={styles.teamLogo}>{card.team1.code}</div>
@@ -300,7 +286,6 @@ function BettingCard({ card, styles, onSelectOdd, onBetPlaced }) {
                     </div>
                 </div>
 
-                {/* Odds Section */}
                 <div className={styles.oddsSection}>
                     <div className={styles.oddsTitle}>{card.oddsTitle}</div>
                     <div className={styles.oddsContainer}>
@@ -317,7 +302,6 @@ function BettingCard({ card, styles, onSelectOdd, onBetPlaced }) {
                     </div>
                 </div>
 
-                {/* Betting Section */}
                 {selectedOdd && (
                     <div className={`${styles.bettingSection} ${showBettingSection ? styles.show : ''}`}>
                         <div className={styles.betInputContainer}>
@@ -351,7 +335,6 @@ function BettingCard({ card, styles, onSelectOdd, onBetPlaced }) {
                 )}
             </div>
 
-            {/* Bet History */}
             <div className={styles.betHistory}>
                 {success ? (
                     <span style={{ color: '#22c55e' }}>

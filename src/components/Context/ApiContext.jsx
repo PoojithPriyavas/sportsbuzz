@@ -78,15 +78,28 @@ export const DataProvider = ({ children }) => {
             );
 
             const results = await Promise.all(detailPromises);
-
             const validDetails = results.filter(detail => detail !== null);
 
-            setEventDetails(validDetails);
+            // Fetch corresponding market data for each sportEventId
+            const marketDataPromises = validDetails.map(event =>
+                fetchMarketData(token, event.sportEventId)
+            );
+
+            const marketResults = await Promise.all(marketDataPromises);
+
+            // Merge each event detail with its corresponding market data
+            const mergedDetails = validDetails.map((event, index) => ({
+                ...event,
+                marketData: marketResults[index]
+            }));
+
+            setEventDetails(mergedDetails);
         } catch (error) {
             console.error('Error fetching all event details:', error);
             setEventDetails([]);
         }
     };
+
 
 
 
@@ -120,13 +133,28 @@ export const DataProvider = ({ children }) => {
             if (!response.ok) {
                 throw new Error('Failed to fetch market data');
             }
+
             const data = await response.json();
-            return data;
+
+            // Extract only W1, X, and W2
+            const filteredOdds = data.items
+                .filter(item => {
+                    const label = item.displayMulti?.en;
+                    return label === 'W1' || label === 'X' || label === 'W2';
+                })
+                .map(item => ({
+                    label: item.displayMulti.en,
+                    value: item.oddsMarket
+                }));
+
+            return { odds: filteredOdds };
+
         } catch (err) {
             console.error('fetchMarketData error:', err);
-            return null;
+            return { odds: [] };
         }
     }
+
 
 
     // TRANSLATION API IMPLEMENTATION
