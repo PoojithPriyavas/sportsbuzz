@@ -1,10 +1,3 @@
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #ffffff;
-  color: #333;
-  line-height: 1.6;
-}
-
 /* Container */
 .contact-container {
   max-width: 1200px;

@@ -46,12 +46,14 @@ const ContactUs = () => {
         <div className="contact-container">
             <div className="contact-header">
                 <h1>Contact Us</h1>
-                <p>Have a question or want to partner with us? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+                <p>Have a question or want to partner with us? We&rsquo;d love to hear from you. Send us a message and we&rsquo;ll respond as soon as possible.</p>
+
             </div>
             <div className="contact-section">
                 <div className="contact-form">
                     {success && (
-                        <div className="success-message">✓ Thank you for your message! We'll get back to you within 24 hours.</div>
+                        <div className="success-message">✓ Thank you for your message! We&rsquo;ll get back to you within 24 hours.</div>
+
                     )}
                     <form onSubmit={handleSubmit}>
                         <div className="form-row">
