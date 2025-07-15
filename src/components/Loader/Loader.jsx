@@ -98,7 +98,8 @@ export default function LoadingScreen({ onFinish }) {
             <nav className={styles.nav}>
               <Link href="/" className={`${styles.navItem} ${pathname === '/' ? styles.active : ''}`}>{translatedText.home}</Link>
               <Link href="/best-betting-apps" className={`${styles.navItem} ${pathname === '/best-betting-apps' ? styles.active : ''}`}>{translatedText.apps}</Link>
-              <Link href="/news" className={styles.navItem}>{translatedText.news}</Link>
+              <Link href="/match-schedules" className={`${styles.navItem} ${pathname === '/match-schedules' ? styles.active : ''}`}>Match Schedules</Link>
+              <Link href="/news" className={`${styles.navItem} ${pathname === '/news' ? styles.active : ''}`}>{translatedText.news}</Link>
 
               {translatedCategories.map((cat) => (
                 <div key={cat.id} className={styles.dropdown}>
