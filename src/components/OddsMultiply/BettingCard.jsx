@@ -44,15 +44,6 @@ export default function BettingCards() {
         const isLive = event.waitingLive || event.period > 0;
         const startDate = new Date(event.startDate * 1000);
 
-        // Default fallback odds
-        const fallbackOdds = [
-            { label: 'W1', value: 2.1 },
-            { label: 'X', value: 3.2 },
-            { label: 'W2', value: 2.8 }
-        ];
-
-        const oddsFromMarket = event.marketData?.odds || fallbackOdds;
-
         return {
             id: event.sportEventId,
             logo: '🏆',
@@ -71,7 +62,11 @@ export default function BettingCards() {
                 image: event.imageOpponent2?.[0] || 'defaultlogo.png'
             },
             oddsTitle: 'Match Winner',
-            odds: oddsFromMarket,
+            odds: [
+                { label: 'W1', value: 2.1 },
+                { label: 'X', value: 3.2 },
+                { label: 'W2', value: 2.8 }
+            ],
             link: event.link
         };
     };
