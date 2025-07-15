@@ -78,28 +78,15 @@ export const DataProvider = ({ children }) => {
             );
 
             const results = await Promise.all(detailPromises);
+
             const validDetails = results.filter(detail => detail !== null);
 
-            // Fetch corresponding market data for each sportEventId
-            const marketDataPromises = validDetails.map(event =>
-                fetchMarketData(token, event.sportEventId)
-            );
-
-            const marketResults = await Promise.all(marketDataPromises);
-
-            // Merge each event detail with its corresponding market data
-            const mergedDetails = validDetails.map((event, index) => ({
-                ...event,
-                marketData: marketResults[index]
-            }));
-
-            setEventDetails(mergedDetails);
+            setEventDetails(validDetails);
         } catch (error) {
             console.error('Error fetching all event details:', error);
             setEventDetails([]);
         }
     };
-
 
 
 
@@ -133,28 +120,13 @@ export const DataProvider = ({ children }) => {
             if (!response.ok) {
                 throw new Error('Failed to fetch market data');
             }
-
             const data = await response.json();
-
-            // Extract only W1, X, and W2
-            const filteredOdds = data.items
-                .filter(item => {
-                    const label = item.displayMulti?.en;
-                    return label === 'W1' || label === 'X' || label === 'W2';
-                })
-                .map(item => ({
-                    label: item.displayMulti.en,
-                    value: item.oddsMarket
-                }));
-
-            return { odds: filteredOdds };
-
+            return data;
         } catch (err) {
             console.error('fetchMarketData error:', err);
-            return { odds: [] };
+            return null;
         }
     }
-
 
 
     // TRANSLATION API IMPLEMENTATION
@@ -259,7 +231,7 @@ export const DataProvider = ({ children }) => {
     };
     // CRICKET LIVE SCORE SECTION
 
-    const rapidApiKey = '017dac301bmshe6ef4a628428634p17177bjsnc738cb420a49';
+    const rapidApiKey = '0bc31f4196msh4c1604a075cc2bep1b49bdjsne8aa3c6cb923';
 
     const [apiResponse, setApiResponse] = useState(null);
     const [matchTypes, setMatchTypes] = useState([]);
@@ -374,7 +346,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
+                'X-RapidAPI-Key': '0bc31f4196msh4c1604a075cc2bep1b49bdjsne8aa3c6cb923',
 
             }
         };
@@ -408,7 +380,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
+                'X-RapidAPI-Key': '0bc31f4196msh4c1604a075cc2bep1b49bdjsne8aa3c6cb923',
 
             }
         };
@@ -431,7 +403,7 @@ export const DataProvider = ({ children }) => {
             url: 'https://livescore6.p.rapidapi.com/news/v2/list',
 
             headers: {
-                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
+                'X-RapidAPI-Key': '0bc31f4196msh4c1604a075cc2bep1b49bdjsne8aa3c6cb923',
             }
         };
 
@@ -456,7 +428,7 @@ export const DataProvider = ({ children }) => {
                 {
                     params: { id },
                     headers: {
-                        'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
+                        'X-RapidAPI-Key': '0bc31f4196msh4c1604a075cc2bep1b49bdjsne8aa3c6cb923',
                     },
                 }
             );
