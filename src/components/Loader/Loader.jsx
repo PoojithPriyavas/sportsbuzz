@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useGlobalData } from '../Context/ApiContext';
 import { FaMoon, FaSun, FaChevronDown } from 'react-icons/fa';
 import Link from 'next/link';
+import axios from 'axios';
 
 export default function LoadingScreen({ onFinish }) {
   const [phase, setPhase] = useState('loading');
@@ -18,6 +19,8 @@ export default function LoadingScreen({ onFinish }) {
     setLanguage,
     language,
   } = useGlobalData();
+
+
 
   const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
   const [translatedText, setTranslatedText] = useState({

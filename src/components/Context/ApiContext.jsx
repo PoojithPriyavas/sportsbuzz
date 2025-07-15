@@ -2,6 +2,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import CustomAxios from '../utilities/CustomAxios';
 import axios from 'axios';
+import { fetchTournaments } from '@/pages/api/get-tournaments';
+import { fetchEventsIds } from '@/pages/api/get-events';
+import { fetchSportEventDetails } from '@/pages/api/get-teamnames';
+
+
 const DataContext = createContext();
 
 
@@ -12,7 +17,120 @@ export const DataProvider = ({ children }) => {
     const [sections, setSections] = useState([]);
     const [bestSections, setBestSections] = useState([]);
 
-    // TRANSLATION API IMPLEMENTATION 
+    // TOURNAMENT API IMPLEMENTATION
+
+    const [tournament, setTournament] = useState([]);
+
+    const fetchTournamentsData = async (token) => {
+        try {
+            const data = await fetchTournaments(token);
+            setTournament(data);
+        } catch (err) {
+            console.error('Failed to fetch tournaments:', err);
+        }
+    };
+
+
+
+    // TOKEN ACCESSING PART
+
+    const [accessToken, setAccessToken] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    const fetchToken = async () => {
+        try {
+            const res = await fetch('/api/get-token');
+            const data = await res.json();
+            if (res.ok) {
+                setAccessToken(data.access_token);
+                // console.log(data.access_token, "token")
+                fetchTournamentsData(data.access_token);
+            } else {
+                console.error('Token error:', data.error);
+            }
+        } catch (err) {
+            console.error('Request failed:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    useEffect(() => {
+        fetchToken();
+        const interval = setInterval(() => {
+            console.log('Refreshing token...');
+            fetchToken();
+        }, 60 * 60 * 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+
+
+    // TEAM NAME FETCHING
+
+    const [eventDetails, setEventDetails] = useState([]);
+
+    const fetchEventDetailsForAllIds = async (token, eventIds) => {
+        try {
+            const detailPromises = eventIds.map(eventId =>
+                fetchSportEventDetails({ token, eventId })
+            );
+
+            const results = await Promise.all(detailPromises);
+
+            const validDetails = results.filter(detail => detail !== null);
+
+            setEventDetails(validDetails);
+        } catch (error) {
+            console.error('Error fetching all event details:', error);
+            setEventDetails([]);
+        }
+    };
+
+
+
+
+    // TEAM EVENT FETCHING
+
+
+    const [eventIds, setEventIds] = useState([]);
+
+    const fetchEventsIdData = async (token, id) => {
+        try {
+            const data = await fetchEventsIds({ token, id });
+
+            if (data && data.items) {
+                setEventIds(data.items);
+                await fetchEventDetailsForAllIds(token, data.items);
+            } else {
+                setEventIds([]);
+                console.warn("No event IDs returned");
+            }
+        } catch (err) {
+            console.error('Failed to fetch event IDs:', err);
+        }
+    };
+
+    // FETCH GAME MARKET
+
+    async function fetchMarketData(token, sportEventId) {
+        try {
+            const response = await fetch(`/api/get-ods?sportEventId=${sportEventId}&token=${token}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch market data');
+            }
+            const data = await response.json();
+            return data;
+        } catch (err) {
+            console.error('fetchMarketData error:', err);
+            return null;
+        }
+    }
+
+
+    // TRANSLATION API IMPLEMENTATION
+
 
     const [language, setLanguage] = useState('en');
 
@@ -321,34 +439,6 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-
-    const getAccessToken = async () => {
-        const clientId = 'partners-9bda431041c27cb15ff617d999963880';
-        const clientSecret = 'ad2k79moKjuDn*6Op94eVCtQpw7jzCDoq@KT8SPuPLOnTW9TI1v6OPjn%DqTUx1g';
-        const tokenUrl = 'https://cpservm.com/gateway/token';
-
-        const body = new URLSearchParams({
-            grant_type: 'client_credentials',
-            client_id: clientId,
-            client_secret: clientSecret,
-        });
-
-        try {
-            const response = await axios.post(tokenUrl, body.toString(), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            });
-
-            const { access_token } = response.data;
-            console.log("Access Token of bet 11 is :", access_token);
-            return access_token;
-        } catch (error) {
-            console.error('Failed to get token:', error.response?.data || error.message);
-            return null;
-        }
-    };
-
     useEffect(() => {
         fetchBlogCategories();
         fetchRecentBlogs();
@@ -360,7 +450,6 @@ export const DataProvider = ({ children }) => {
         liveFootBall();
         upcomingFootBall();
         fetchNews();
-        getAccessToken();
     }, []);
 
     return (
@@ -383,6 +472,13 @@ export const DataProvider = ({ children }) => {
                 language,
                 setLanguage,
                 translateText,
+                tournament,
+                accessToken,
+                fetchEventsIdData,
+                eventIds,
+                eventDetails,
+                fetchMarketData,
+
             }}>
             {children}
         </DataContext.Provider>
