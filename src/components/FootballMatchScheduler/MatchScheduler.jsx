@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import styles from './MatchScheduler.module.css';
 
 const matchData = {
-    '2025-07-08': [
+    '2025-07-14': [
         {
             competition: 'FIFA Club World Cup',
             stage: 'Final Stage',
@@ -15,7 +15,7 @@ const matchData = {
             ],
         },
     ],
-    '2025-07-09': [
+    '2025-07-15': [
         {
             competition: "Women's EURO",
             stage: 'Group C',
@@ -24,7 +24,7 @@ const matchData = {
             ],
         },
     ],
-    '2025-07-10': [
+    '2025-07-16': [
         {
             competition: 'Champions League',
             stage: 'Semi Final',
@@ -41,7 +41,7 @@ const matchData = {
             ],
         },
     ],
-    '2025-07-11': [
+    '2025-07-17': [
         {
             competition: 'La Liga',
             stage: 'Regular Season',
@@ -51,7 +51,7 @@ const matchData = {
             ],
         },
     ],
-    '2025-07-12': [
+    '2025-07-18': [
         {
             competition: 'Champions League',
             stage: 'Final',
@@ -61,7 +61,7 @@ const matchData = {
             ],
         },
     ],
-    '2025-07-13': [
+    '2025-07-19': [
         {
             competition: 'Premier League',
             stage: 'Regular Season',
