@@ -1,4 +1,4 @@
-import Header from "@/components/Header/Header";
+import Header from "@/components/Loader/Loader";
 import BlogsPage from "@/components/BlogsSection/BlogPage";
 import LiveScores from "@/components/LiveScoreSection/LiveScoreSection";
 import Head from "next/head";
