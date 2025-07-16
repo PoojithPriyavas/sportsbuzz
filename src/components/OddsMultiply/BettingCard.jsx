@@ -42,7 +42,6 @@ export default function BettingCards() {
     };
 
     const transformEventToCard = (event, marketData) => {
-        console.log("market data :", marketData)
         const isLive = event.waitingLive || event.period > 0;
         const startDate = new Date(event.startDate * 1000);
 
@@ -58,7 +57,6 @@ export default function BettingCards() {
 
         if (marketData && marketData.items && Array.isArray(marketData.items)) {
             const desiredLabels = ['W1', 'X', 'W2'];
-            console.log(marketData, "m data");
             odds = marketData.items
                 .filter(item => desiredLabels.includes(item.displayMulti?.en))
                 .map(item => ({
@@ -66,7 +64,6 @@ export default function BettingCards() {
                     value: item.oddsMarket
                 }));
 
-            console.log(odds, ":filtered odds for W1/X/W2");
         }
 
 

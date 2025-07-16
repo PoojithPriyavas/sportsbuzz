@@ -2,8 +2,8 @@
 
 export async function fetchSportEventDetails({ token, eventId }) {
 
-    console.log("team name evnent called")
-    console.log(eventId, "evt id")
+    // console.log("team name evnent called")
+    // console.log(eventId, "evt id")
 
     const url = 'https://cpservm.com/gateway/marketing/datafeed/loadtree/prematch/api/v1/sporteventDetail';
 

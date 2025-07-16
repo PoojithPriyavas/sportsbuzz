@@ -3,10 +3,13 @@
 import { useEffect, useState } from 'react';
 import styles from './TestLive.module.css';
 import { useGlobalData } from '../Context/ApiContext';
+import { useRouter } from 'next/router';
 
 
 // ✅ Modified date formatter that accepts translated strings
 function formatDate(esd, labels = { today: 'Today', tomorrow: 'Tomorrow' }) {
+
+
     const raw = esd?.toString();
     if (!raw || raw.length !== 14) return '';
 
@@ -39,10 +42,20 @@ function formatDate(esd, labels = { today: 'Today', tomorrow: 'Tomorrow' }) {
 }
 
 export default function TestLive() {
-    const { stages, language, translateText } = useGlobalData();
+    const { stages, language, translateText, fetchFootballDetails, fetchFootBallLineUp } = useGlobalData();
     const [selectedLeague, setSelectedLeague] = useState('All');
     const [translatedStages, setTranslatedStages] = useState([]);
     const [dateLabels, setDateLabels] = useState({ today: 'Today', tomorrow: 'Tomorrow' });
+    const router = useRouter();
+
+    const handleMatchClick = async (eid) => {
+        await Promise.all([
+            fetchFootballDetails(eid),
+            fetchFootBallLineUp(eid)
+        ]);
+        router.push('/football-match-details');
+    };
+
 
     useEffect(() => {
         const translateStageData = async () => {
@@ -57,6 +70,7 @@ export default function TestLive() {
 
             const translated = await Promise.all(
                 stages.Stages.map(async (stage) => {
+                    console.log(stage, "stage")
                     const translatedLeague = await translateText(stage.Cnm || '', 'en', language);
                     const translatedSubLeague = stage.Snm
                         ? await translateText(stage.Snm, 'en', language)
@@ -100,6 +114,7 @@ export default function TestLive() {
         translateStageData();
     }, [stages, language]);
 
+    console.log(translatedStages, "translated stages")
     // Recreate filtered league lists
     const allLeagues = translatedStages.map(stage => stage.translatedLeague).filter(Boolean);
     const uniqueLeagues = Array.from(new Set(allLeagues));
@@ -163,7 +178,12 @@ export default function TestLive() {
                                     : { background: '#3498db' };
 
                             return (
-                                <div key={`${stageIdx}-${eventIdx}`} className={styles.matchCard}>
+                                <div
+                                    key={`${stageIdx}-${eventIdx}`}
+                                    className={styles.matchCard}
+                                    onClick={() => handleMatchClick(event.Eid)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     {/* League info */}
                                     <div className={styles.leagueHeader}>
                                         <div className={styles.leagueName}>{stage.translatedLeague}</div>
@@ -212,6 +232,7 @@ export default function TestLive() {
                                         </div>
                                     </div>
                                 </div>
+
                             );
                         })
                     )}

@@ -20,6 +20,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    gap: 10px;
 }
 
 .stadiumInfo {
@@ -33,6 +34,8 @@
 }
 
 .matchDetails {
+    flex: 0 0 auto;
+    min-width: 200px;
     text-align: center;
 }
 
@@ -42,8 +45,24 @@
 }
 
 .countryInfo {
+    flex: 1;
+    max-width: 30%;
     text-align: right;
 }
+
+.stadiumInfo
+
+/* ,
+.countryInfo */
+    {
+    flex: 1;
+    max-width: 30%;
+    text-align: left;
+}
+/* 
+.noSubs {
+    color: #5d5656;
+} */
 
 .teamsScore {
     display: flex;

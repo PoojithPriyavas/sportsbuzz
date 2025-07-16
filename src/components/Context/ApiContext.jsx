@@ -141,6 +141,32 @@ export const DataProvider = ({ children }) => {
         }
     }
 
+    // FOOTBALL MATCH DETAILS API IMPLEMENTATION
+
+    const [footBallMatchDetails, setFootballMatchDetails] = useState([]);
+
+    const fetchFootballDetails = async (id) => {
+        
+        try {
+            const response = await axios.get(`/api/get-football-match-details?Eid=${id}`);
+            setFootballMatchDetails(response.data);
+        } catch (error) {
+            console.error('Error fetching football match details:', error);
+        }
+    };
+
+    // FOOTBALL LINE UP DETAILS API IMPLEMENTATION
+
+    const [lineUp, setLineUp] = useState([]);
+
+    const fetchFootBallLineUp = async (id) => {
+        try {
+            const response = await axios.get(`/api/get-football-line-up?Eid=${id}`);
+            setLineUp(response.data);
+        } catch (error) {
+            console.error('Error fetching football match details:', error);
+        }
+    };
 
     // TRANSLATION API IMPLEMENTATION
 
@@ -222,7 +248,6 @@ export const DataProvider = ({ children }) => {
     };
 
     const fetchBestBettingAppsPrevious = async () => {
-        console.log("previous sections is called")
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
                 params: {
@@ -244,7 +269,7 @@ export const DataProvider = ({ children }) => {
     };
     // CRICKET LIVE SCORE SECTION
 
-    const rapidApiKey = '0bc31f4196msh4c1604a075cc2bep1b49bdjsne8aa3c6cb923';
+    const rapidApiKey = 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a';
 
     const [apiResponse, setApiResponse] = useState(null);
     const [matchTypes, setMatchTypes] = useState([]);
@@ -359,7 +384,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': '0bc31f4196msh4c1604a075cc2bep1b49bdjsne8aa3c6cb923',
+                'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
 
             }
         };
@@ -393,7 +418,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': '0bc31f4196msh4c1604a075cc2bep1b49bdjsne8aa3c6cb923',
+                'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
 
             }
         };
@@ -410,13 +435,12 @@ export const DataProvider = ({ children }) => {
     const [news, setNews] = useState([]);
 
     const fetchNews = async () => {
-        console.log("function caalled")
         const options = {
             method: 'GET',
             url: 'https://livescore6.p.rapidapi.com/news/v2/list',
 
             headers: {
-                'X-RapidAPI-Key': '0bc31f4196msh4c1604a075cc2bep1b49bdjsne8aa3c6cb923',
+                'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
             }
         };
 
@@ -441,7 +465,7 @@ export const DataProvider = ({ children }) => {
                 {
                     params: { id },
                     headers: {
-                        'X-RapidAPI-Key': '0bc31f4196msh4c1604a075cc2bep1b49bdjsne8aa3c6cb923',
+                        'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
                     },
                 }
             );
@@ -464,6 +488,8 @@ export const DataProvider = ({ children }) => {
         upcomingFootBall();
         fetchNews();
         fetchLocation();
+        // fetchFootballDetails();
+        // fetchFootBallLineUp();
     }, []);
 
     return (
@@ -492,7 +518,11 @@ export const DataProvider = ({ children }) => {
                 eventIds,
                 eventDetails,
                 fetchMarketData,
-                location
+                location,
+                fetchFootballDetails,
+                footBallMatchDetails,
+                fetchFootBallLineUp,
+                lineUp,
 
             }}>
             {children}

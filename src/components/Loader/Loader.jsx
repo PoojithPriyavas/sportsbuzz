@@ -21,7 +21,6 @@ export default function LoadingScreen({ onFinish }) {
     location,
   } = useGlobalData();
 
-  console.log(location, "loc")
 
   const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
   const [translatedText, setTranslatedText] = useState({
@@ -100,7 +99,7 @@ export default function LoadingScreen({ onFinish }) {
               <Link href="/" className={`${styles.navItem} ${pathname === '/' ? styles.active : ''}`}>{translatedText.home}</Link>
               <Link href="/best-betting-apps" className={`${styles.navItem} ${pathname === '/best-betting-apps' ? styles.active : ''}`}>{translatedText.apps}</Link>
               <Link href="/match-schedules" className={`${styles.navItem} ${pathname === '/match-schedules' ? styles.active : ''}`}>Match Schedules</Link>
-              <Link href="/news" className={`${styles.navItem} ${pathname === '/news' ? styles.active : ''}`}>{translatedText.news}</Link>
+              <Link href="/news-page" className={`${styles.navItem} ${pathname === '/news-page' ? styles.active : ''}`}>{translatedText.news}</Link>
 
               {translatedCategories.map((cat) => (
                 <div key={cat.id} className={styles.dropdown}>
