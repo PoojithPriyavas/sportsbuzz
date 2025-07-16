@@ -1,0 +1,221 @@
+.matchCard {
+    /* max-width: 1200px; */
+    /* margin: 0 auto; */
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.matchHeader {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+    position: relative;
+}
+
+.matchInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.stadiumInfo {
+    text-align: left;
+}
+
+.stadiumName {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.matchDetails {
+    text-align: center;
+}
+
+.matchDate {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.countryInfo {
+    text-align: right;
+}
+
+.teamsScore {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+.team {
+    text-align: center;
+}
+
+.teamName {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.teamBadge {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 1.5em;
+}
+
+.vs {
+    font-size: 2em;
+    font-weight: bold;
+    opacity: 0.8;
+}
+
+.lineupsSection {
+    background: #f8f9fa;
+    padding: 30px;
+    border-top: 1px solid #e9ecef;
+}
+
+.matchStats h3 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 1.5em;
+}
+
+.lineupsSection h3 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 1.5em;
+}
+
+.lineupsContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.substitutions {
+    background: #f8f9fa;
+    padding: 30px;
+}
+
+.substitutions h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.3em;
+}
+
+.subsContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.teamSubs {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.teamSubs h4 {
+    margin-bottom: 15px;
+    color: #333;
+    text-align: center;
+}
+
+.subItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #424242;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+
+.subTime {
+    background: #28a745;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.subArrow {
+    margin: 0 10px;
+    color: #666;
+}
+
+.matchStats {
+    background: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #e9ecef;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.statItem {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.statLabel {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.statValue {
+    font-size: 1.2em;
+    color: #667eea;
+}
+
+@media (max-width: 768px) {
+    .lineupsContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .subsContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .matchInfo {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .teamsScore {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .statsGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+}

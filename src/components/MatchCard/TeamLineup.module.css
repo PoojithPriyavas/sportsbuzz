@@ -1,0 +1,139 @@
+.teamLineup {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.teamLineup h4 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    color: #333;
+}
+
+.lineupFormation {
+    text-align: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: inline-block;
+    width: 100%;
+}
+
+.positionGroup {
+    margin-bottom: 25px;
+}
+
+.positionTitle {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.playerLineup {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 10px;
+    background: #fafafa;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.playerLineup:hover {
+    background: #e3f2fd;
+    transform: translateX(5px);
+}
+
+.jerseyNumber {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 0.9em;
+    min-width: 30px;
+    text-align: center;
+    margin-right: 15px;
+}
+
+.playerInfo {
+    flex: 1;
+    font-weight: 500;
+    color: #333;
+}
+
+.subIndicator {
+    background: #28a745;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.substitutesSection {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #e9ecef;
+}
+
+.subsTitle {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    background: #fff3cd;
+    border-radius: 8px;
+    border-left: 4px solid #ffc107;
+}
+
+.substituteList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.substituteItem {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 0.9em;
+}
+
+.substituteItem .jerseyNumber {
+    background: #6c757d;
+    margin-right: 10px;
+    min-width: 25px;
+    font-size: 0.8em;
+}
+
+.substituteItem .playerInfo {
+    flex: 1;
+    color: #666;
+}
+
+.subUsed {
+    background: #dc3545;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7em;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .substituteList {
+        grid-template-columns: 1fr;
+    }
+}
