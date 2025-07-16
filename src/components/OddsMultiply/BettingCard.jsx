@@ -8,6 +8,7 @@ export default function BettingCards() {
     const [paused, setPaused] = useState(false);
     const [selectedTournament, setSelectedTournament] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [transformedCards, setTransformedCards] = useState([]);
 
     const { tournament, accessToken, fetchEventsIdData, eventDetails } = useGlobalData();
 
@@ -40,9 +41,34 @@ export default function BettingCards() {
         return `/images/tournaments/${imageName}`;
     };
 
-    const transformEventToCard = (event) => {
+    const transformEventToCard = (event, marketData) => {
+        console.log("market data :", marketData)
         const isLive = event.waitingLive || event.period > 0;
         const startDate = new Date(event.startDate * 1000);
+
+        // Default odds if market data isn't available
+        const defaultOdds = [
+            { label: 'W1', value: 2.1 },
+            { label: 'X', value: 3.2 },
+            { label: 'W2', value: 2.8 }
+        ];
+
+        // Get odds from market data if available
+        let odds = defaultOdds;
+
+        if (marketData && marketData.items && Array.isArray(marketData.items)) {
+            const desiredLabels = ['W1', 'X', 'W2'];
+            console.log(marketData, "m data");
+            odds = marketData.items
+                .filter(item => desiredLabels.includes(item.displayMulti?.en))
+                .map(item => ({
+                    label: item.displayMulti.en,
+                    value: item.oddsMarket
+                }));
+
+            console.log(odds, ":filtered odds for W1/X/W2");
+        }
+
 
         return {
             id: event.sportEventId,
@@ -62,21 +88,46 @@ export default function BettingCards() {
                 image: event.imageOpponent2?.[0] || 'defaultlogo.png'
             },
             oddsTitle: 'Match Winner',
-            odds: [
-                { label: 'W1', value: 2.1 },
-                { label: 'X', value: 3.2 },
-                { label: 'W2', value: 2.8 }
-            ],
+            odds: odds,
             link: event.link
         };
     };
 
-    const getTransformedCards = () => {
-        if (!eventDetails || !Array.isArray(eventDetails)) return [];
-        return eventDetails.map(event => transformEventToCard(event));
+    async function fetchMarketData(token, sportEventId) {
+        const ref = 151;
+        try {
+            const response = await fetch(`/api/get-odds?ref=${ref}&gameId=${sportEventId}&token=${token}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch market data');
+            }
+            const data = await response.json();
+            return data;
+        } catch (err) {
+            console.error('fetchMarketData error:', err);
+            return null;
+        }
+    }
+
+    const getTransformedCards = async (events) => {
+        if (!events || !Array.isArray(events)) return [];
+
+        const cards = [];
+        for (const event of events) {
+            const marketData = await fetchMarketData(accessToken, event.sportEventId);
+            cards.push(transformEventToCard(event, marketData));
+        }
+        return cards;
     };
 
-    const transformedCards = getTransformedCards();
+    useEffect(() => {
+        if (eventDetails && eventDetails.length > 0) {
+            getTransformedCards(eventDetails).then(cards => {
+                setTransformedCards(cards);
+            });
+        } else {
+            setTransformedCards([]);
+        }
+    }, [eventDetails, accessToken]);
 
     const handleTournamentChange = (tournamentId) => {
         fetchEventsIdData(accessToken, tournamentId);

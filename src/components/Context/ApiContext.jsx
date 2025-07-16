@@ -17,6 +17,19 @@ export const DataProvider = ({ children }) => {
     const [sections, setSections] = useState([]);
     const [bestSections, setBestSections] = useState([]);
 
+    // FETCH LOCATION
+
+    const [location, setLocation] = useState([]);
+
+    const fetchLocation = async () => {
+        try {
+            const res = await CustomAxios.get('/locations');
+            setLocation(res.data || []);
+        } catch (error) {
+            console.error('Failed to fetch blogs:', error);
+        }
+    };
+
     // TOURNAMENT API IMPLEMENTATION
 
     const [tournament, setTournament] = useState([]);
@@ -450,6 +463,7 @@ export const DataProvider = ({ children }) => {
         liveFootBall();
         upcomingFootBall();
         fetchNews();
+        fetchLocation();
     }, []);
 
     return (
@@ -478,6 +492,7 @@ export const DataProvider = ({ children }) => {
                 eventIds,
                 eventDetails,
                 fetchMarketData,
+                location
 
             }}>
             {children}

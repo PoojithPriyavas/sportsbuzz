@@ -18,9 +18,10 @@ export default function LoadingScreen({ onFinish }) {
     translateText,
     setLanguage,
     language,
+    location,
   } = useGlobalData();
 
-
+  console.log(location, "loc")
 
   const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
   const [translatedText, setTranslatedText] = useState({
@@ -81,7 +82,7 @@ export default function LoadingScreen({ onFinish }) {
 
   const handleLanguageChange = (e) => {
     const selected = e.target.value;
-    setLanguage(selected); // 'en' or 'ml'
+    setLanguage(selected);
     localStorage.setItem('language', selected);
   };
 
@@ -128,13 +129,20 @@ export default function LoadingScreen({ onFinish }) {
         </div>
 
         <div className={styles.rightSection}>
+
           <select
             className={styles.languageSelector}
             value={language}
             onChange={handleLanguageChange}
           >
-            <option value="en">English</option>
-            <option value="ml">Malayalam</option>
+            <>
+              <option value='en' >English</option>
+              {location.map((lang) => (
+                <option value={lang.hreflang}>{lang.language}</option>
+              ))
+              }
+            </>
+
           </select>
 
           <button className={styles.darkModeToggle} onClick={toggleDarkMode}>

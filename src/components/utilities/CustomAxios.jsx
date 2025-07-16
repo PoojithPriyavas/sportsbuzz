@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const CustomAxios = axios.create({
-  baseURL: 'https://admin.sportsbuz.com/api', // Base URL for all API calls
+  baseURL: 'https://admin.sportsbuz.com/api', 
   headers: {
     'Content-Type': 'application/json',
   },

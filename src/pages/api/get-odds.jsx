@@ -1,17 +1,14 @@
-// File: src/pages/api/get-ods.jsx
-
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    const { sportEventId, token } = req.query;
-
-    if (!sportEventId || !token) {
-        return res.status(400).json({ message: 'Missing sportEventId or token' });
+    const { gameId, token, ref } = req.query;
+    if (!gameId || !token || !ref) {
+        return res.status(400).json({ message: 'Missing gameId, token, or ref' });
     }
 
-    const url = `https://cpservm.com/gateway/marketing/datafeed/loadlist/prematch/api/v1/getMarketsGame?ref=151&gameId=${sportEventId}`;
+    const url = `https://cpservm.com/gateway/marketing/datafeed/loadlist/prematch/api/v1/getMarketsGame?ref=${ref}&gameId=${gameId}`;
 
     try {
         const response = await fetch(url, {
