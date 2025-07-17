@@ -4,15 +4,42 @@ import React, { useContext, useState, useEffect } from 'react';
 import styles from './LiveScoreSection.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 import Link from 'next/link';
-export default function LiveScores({ apiResponse = [], matchTypes = [], teamImages = [] }) {
 
+export default function LiveScores({ apiResponse = [], matchTypes = [], teamImages = [] }) {
   const [activeType, setActiveType] = useState('');
 
+  // Function to check if a match type has data
+  const hasMatchData = (matchType) => {
+    if (!apiResponse || !matchType) return false;
+
+    const typeMatch = apiResponse.typeMatches?.find(
+      tm => tm.matchType === matchType
+    );
+
+    if (!typeMatch) return false;
+
+    // Check if there are any matches in any series
+    const hasMatches = typeMatch.seriesMatches?.some(series =>
+      series.seriesAdWrapper?.matches && series.seriesAdWrapper.matches.length > 0
+    );
+
+    return hasMatches;
+  };
+
+  // Auto-select filter with data
   useEffect(() => {
     if (matchTypes.length > 0) {
-      setActiveType(matchTypes[0]);
+      // First, try to find a match type with data
+      const typeWithData = matchTypes.find(type => hasMatchData(type));
+
+      if (typeWithData) {
+        setActiveType(typeWithData);
+      } else {
+        // If no match type has data, select the first one
+        setActiveType(matchTypes[0]);
+      }
     }
-  }, [matchTypes]);
+  }, [matchTypes, apiResponse]);
 
   const renderCards = () => {
     if (!apiResponse || !activeType) return null;
@@ -45,8 +72,8 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
         const team2Img = teamImages[team2.imageId];
 
         cards.push(
-          <Link href={`/cricket-match-details/${info.matchId}`}>
-            <div key={`match-${info.matchId}`} className={styles.card}>
+          <Link href={`/cricket-match-details/${info.matchId}`} key={`match-${info.matchId}`}>
+            <div className={styles.card}>
               <div className={styles.status}>
                 <span className={styles.liveDot}></span>
                 <span style={{ color: 'red' }}><strong>Live </strong></span>
@@ -115,8 +142,18 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
             key={type}
             onClick={() => setActiveType(type)}
             className={activeType === type ? styles.active : ''}
+            title={hasMatchData(type) ? `${type} - Has live matches` : `${type} - No live matches`}
           >
             {type}
+            {/* {hasMatchData(type) && (
+              <span style={{
+                marginLeft: '0.5rem',
+                color: '#10b981',
+                fontSize: '0.7rem'
+              }}>
+                ●
+              </span>
+            )} */}
           </span>
         ))}
       </div>
