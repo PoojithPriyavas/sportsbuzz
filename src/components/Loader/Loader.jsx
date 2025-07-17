@@ -12,7 +12,6 @@ import FeaturedButton from '../FeaturedButton/FeaturedButton';
 export default function LoadingScreen({ onFinish }) {
   const [phase, setPhase] = useState('loading');
   const [darkMode, setDarkMode] = useState(false);
-  const [selectedSport, setSelectedSport] = useState('cricket'); // New state for sports dropdown
   const pathname = usePathname();
 
   const {
@@ -21,8 +20,12 @@ export default function LoadingScreen({ onFinish }) {
     setLanguage,
     language,
     location,
-    countryCode
+    countryCode,
+    sport,
+    setSport,
   } = useGlobalData();
+
+  const [selectedSport, setSelectedSport] = useState(countryCode?.location?.sports?.toLowerCase() || 'cricket');
 
   const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
   const [translatedText, setTranslatedText] = useState({
@@ -114,10 +117,16 @@ export default function LoadingScreen({ onFinish }) {
     localStorage.setItem('language', selected);
   };
 
+  useEffect(() => {
+    if (countryCode?.location?.sports) {
+      setSport(countryCode.location.sports.toLowerCase());
+    }
+  }, [countryCode, setSport]);
+
   const handleSportChange = (e) => {
-    setSelectedSport(e.target.value);
-    // You can add additional logic here for handling sport selection
+    setSport(e.target.value);
   };
+
 
   return (
     <div className={`${styles.loaderWrapper} ${styles[phase]} ${darkMode ? styles.darkMode : ''}`}>
@@ -181,7 +190,7 @@ export default function LoadingScreen({ onFinish }) {
           {/* New Sports Dropdown */}
           <select
             className={styles.sportsSelector}
-            value={selectedSport}
+            value={sport}
             onChange={handleSportChange}
           >
             <option value="cricket">{translatedText.cricket}</option>

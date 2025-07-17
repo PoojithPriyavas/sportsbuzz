@@ -16,6 +16,7 @@ export const DataProvider = ({ children }) => {
     const [blogs, setBlogs] = useState([]);
     const [sections, setSections] = useState([]);
     const [bestSections, setBestSections] = useState([]);
+    const [sport, setSport] = useState('cricket');
 
     // GET COUNTRY CODE API IMPLEMENTATION
 
@@ -555,6 +556,8 @@ export const DataProvider = ({ children }) => {
                 countryCode,
                 getCricketDetails,
                 cricketDetails,
+                sport,
+                setSport,
             }}>
             {children}
         </DataContext.Provider>

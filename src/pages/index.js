@@ -27,7 +27,6 @@ import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
 import Footer from '@/components/Footer/Footer';
 
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -46,10 +45,11 @@ export default function Home() {
     apiResponse,
     matchTypes,
     teamImages,
-    upcomingMatches
+    upcomingMatches,
+    sport
   } = useGlobalData();
   const [loading, setLoading] = useState(true);
-
+  // const sport = countryCode?.location?.sports?.toLowerCase() || 'cricket';
   useEffect(() => {
     // Fixed: Timer was setting loading to true instead of false
     const timer1 = setTimeout(() => setLoading(false), 3000);
@@ -72,8 +72,13 @@ export default function Home() {
 
         <div className={`${geistSans.variable} ${geistMono.variable} container`}>
           {/* Top Hero Section */}
-          <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
-          <TestLive />
+          {sport === 'cricket' ? (
+            <>
+              <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+            </>
+          ) : (
+            <TestLive />
+          )}
           <HeroCarousal />
 
           {/* Main Layout: 4 Columns */}
