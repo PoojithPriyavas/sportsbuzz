@@ -43,7 +43,7 @@ function formatDate(esd, labels = { today: 'Today', tomorrow: 'Tomorrow' }) {
 
 export default function TestLive() {
     const { stages, language, translateText, fetchFootballDetails, fetchFootBallLineUp } = useGlobalData();
-    console.log(stages, "stages")
+    // console.log(stages, "stages")
     const [selectedLeague, setSelectedLeague] = useState('All');
     const [translatedStages, setTranslatedStages] = useState([]);
     const [dateLabels, setDateLabels] = useState({ today: 'Today', tomorrow: 'Tomorrow' });
@@ -71,7 +71,7 @@ export default function TestLive() {
 
             const translated = await Promise.all(
                 stages.Stages.map(async (stage) => {
-                    console.log(stage, "stage")
+                    // console.log(stage, "stage")
                     const translatedLeague = await translateText(stage.Cnm || '', 'en', language);
                     const translatedSubLeague = stage.Snm
                         ? await translateText(stage.Snm, 'en', language)
@@ -121,9 +121,9 @@ export default function TestLive() {
     const topLeagues = uniqueLeagues.slice(0, 5);
     const otherLeagues = uniqueLeagues.slice(5);
 
-    console.log(uniqueLeagues, "unique");
-    console.log(topLeagues, "top");
-    console.log(otherLeagues, "other");
+    // console.log(uniqueLeagues, "unique");
+    // console.log(topLeagues, "top");
+    // console.log(otherLeagues, "other");
 
     return (
         <>

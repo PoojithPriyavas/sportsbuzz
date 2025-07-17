@@ -26,7 +26,7 @@ export async function fetchSportEventDetails({ token, eventId }) {
         }
 
         const data = await response.json();
-        console.log(data, "team name value")
+        // console.log(data, "team name value")
         return data;
     } catch (error) {
         console.error(`Error fetching sport event ${eventId}:`, error);

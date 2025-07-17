@@ -3,6 +3,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import styles from './LiveScoreSection.module.css';
 import { useGlobalData } from '../Context/ApiContext';
+import Link from 'next/link';
 export default function LiveScores({ apiResponse = [], matchTypes = [], teamImages = [] }) {
 
   const [activeType, setActiveType] = useState('');
@@ -44,49 +45,51 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
         const team2Img = teamImages[team2.imageId];
 
         cards.push(
-          <div key={`match-${info.matchId}`} className={styles.card}>
-            <div className={styles.status}>
-              <span className={styles.liveDot}></span>
-              <span style={{ color: 'red' }}><strong>Live </strong></span>
-              <strong>{activeType}</strong>
-            </div>
-            <div className={styles.title}>{seriesName} - {info.matchDesc}</div>
-
-            <div className={styles.teams}>
-              <div className={styles.team}>
-                <div className={styles.teamInfo}>
-                  {team1Img && (
-                    <img src={team1Img} alt={team1.teamSName} className={styles.flag} />
-                  )}
-                  <span>{team1.teamName}</span>
-                </div>
-                {score?.team1Score?.inngs1?.runs != null &&
-                  score?.team1Score?.inngs1?.wickets != null &&
-                  score?.team1Score?.inngs1?.overs != null && (
-                    <strong className={styles.score}>
-                      {score.team1Score.inngs1.runs}/{score.team1Score.inngs1.wickets} ({score.team1Score.inngs1.overs})
-                    </strong>
-                  )}
+          <Link href={`/cricket-match-details/${info.matchId}`}>
+            <div key={`match-${info.matchId}`} className={styles.card}>
+              <div className={styles.status}>
+                <span className={styles.liveDot}></span>
+                <span style={{ color: 'red' }}><strong>Live </strong></span>
+                <strong>{activeType}</strong>
               </div>
-              <div className={styles.team}>
-                <div className={styles.teamInfo}>
-                  {team2Img && (
-                    <img src={team2Img} alt={team2.teamSName} className={styles.flag} />
-                  )}
-                  <span>{team2.teamName}</span>
-                </div>
-                {score?.team2Score?.inngs1?.runs != null &&
-                  score?.team2Score?.inngs1?.wickets != null &&
-                  score?.team2Score?.inngs1?.overs != null && (
-                    <strong className={styles.score}>
-                      {score.team2Score.inngs1.runs}/{score.team2Score.inngs1.wickets} ({score.team2Score.inngs1.overs})
-                    </strong>
-                  )}
-              </div>
-            </div>
+              <div className={styles.title}>{seriesName} - {info.matchDesc}</div>
 
-            <div className={styles.note}>{info.status}</div>
-          </div>
+              <div className={styles.teams}>
+                <div className={styles.team}>
+                  <div className={styles.teamInfo}>
+                    {team1Img && (
+                      <img src={team1Img} alt={team1.teamSName} className={styles.flag} />
+                    )}
+                    <span>{team1.teamName}</span>
+                  </div>
+                  {score?.team1Score?.inngs1?.runs != null &&
+                    score?.team1Score?.inngs1?.wickets != null &&
+                    score?.team1Score?.inngs1?.overs != null && (
+                      <strong className={styles.score}>
+                        {score.team1Score.inngs1.runs}/{score.team1Score.inngs1.wickets} ({score.team1Score.inngs1.overs})
+                      </strong>
+                    )}
+                </div>
+                <div className={styles.team}>
+                  <div className={styles.teamInfo}>
+                    {team2Img && (
+                      <img src={team2Img} alt={team2.teamSName} className={styles.flag} />
+                    )}
+                    <span>{team2.teamName}</span>
+                  </div>
+                  {score?.team2Score?.inngs1?.runs != null &&
+                    score?.team2Score?.inngs1?.wickets != null &&
+                    score?.team2Score?.inngs1?.overs != null && (
+                      <strong className={styles.score}>
+                        {score.team2Score.inngs1.runs}/{score.team2Score.inngs1.wickets} ({score.team2Score.inngs1.overs})
+                      </strong>
+                    )}
+                </div>
+              </div>
+
+              <div className={styles.note}>{info.status}</div>
+            </div>
+          </Link>
         );
 
         if (matchCount % 2 === 0) {

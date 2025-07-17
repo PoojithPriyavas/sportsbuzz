@@ -28,9 +28,6 @@ import Footer from '@/components/Footer/Footer';
 
 
 
-
-
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -76,7 +73,7 @@ export default function Home() {
         <div className={`${geistSans.variable} ${geistMono.variable} container`}>
           {/* Top Hero Section */}
           <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
-          {/* <TestLive /> */}
+          <TestLive />
           <HeroCarousal />
 
           {/* Main Layout: 4 Columns */}

@@ -12,8 +12,6 @@
   }
 }
 
-
-
 /* Header Container: Horizontal layout between left & right */
 .headerContainer {
   display: flex;
@@ -30,7 +28,6 @@
   gap: 30px;
 }
 
-
 /* Header Container: Flex between left and right */
 .headerContainer {
   display: flex;
@@ -38,6 +35,8 @@
   justify-content: space-between;
   width: 100%;
   padding: 20px;
+  min-height: 70px;
+  overflow: hidden;
 }
 
 /* Left Section: Logo + Navigation */
@@ -45,6 +44,8 @@
   display: flex;
   align-items: center;
   gap: 30px;
+  flex: 1;
+  min-width: 0;
 }
 
 .loaderWrapper {
@@ -66,13 +67,10 @@
   /* Ensures vertical stacking if needed */
 }
 
-
 /* Dark Mode */
 .darkMode {
   background-color: #1a1a1a;
 }
-
-
 
 /* Logo */
 .logo {
@@ -146,9 +144,12 @@
   gap: 15px;
   opacity: 0;
   transition: opacity 0.5s ease;
+  max-width: calc(100vw - 40px);
+  overflow: hidden;
 }
 
-.languageSelector {
+.languageSelector,
+.sportsSelector {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
@@ -157,15 +158,17 @@
   font-size: 14px;
   cursor: pointer;
   outline: none;
+  transition: all 0.3s ease;
 }
 
-.languageSelector:hover {
+.languageSelector:hover,
+.sportsSelector:hover {
   border-color: rgba(255, 255, 255, 0.5);
 }
 
-.languageSelector option {
+.languageSelector option,
+.sportsSelector option {
   background: #0046aa;
-
   color: white;
 }
 
@@ -273,6 +276,8 @@
 .shrink .rightSection {
   opacity: 1;
   position: static;
+  max-width: none;
+  flex-shrink: 0;
 }
 
 /* Phase: Complete */
@@ -300,6 +305,8 @@
 .complete .rightSection {
   opacity: 1;
   position: static;
+  max-width: none;
+  flex-shrink: 0;
 }
 
 /* Responsive */
@@ -321,9 +328,11 @@
   .rightSection {
     right: 15px;
     gap: 10px;
+    max-width: calc(100vw - 30px);
   }
 
-  .languageSelector {
+  .languageSelector,
+  .sportsSelector {
     padding: 4px 8px;
     font-size: 12px;
   }
@@ -357,5 +366,12 @@
   .rightSection {
     right: 10px;
     gap: 8px;
+    max-width: calc(100vw - 20px);
+  }
+
+  .languageSelector,
+  .sportsSelector {
+    padding: 3px 6px;
+    font-size: 11px;
   }
 }

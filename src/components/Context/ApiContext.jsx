@@ -283,7 +283,7 @@ export const DataProvider = ({ children }) => {
     };
     // CRICKET LIVE SCORE SECTION
 
-    // const rapidApiKey = 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a';
+    const rapidApiKey = 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a';
 
     const [apiResponse, setApiResponse] = useState(null);
     const [matchTypes, setMatchTypes] = useState([]);
@@ -292,7 +292,7 @@ export const DataProvider = ({ children }) => {
     const fetchMatches = async () => {
         try {
             const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live', {
-                headers: { 'X-RapidAPI-Key': process.env.FOOTBALL_RAPID_API_KEY },
+                headers: { 'X-RapidAPI-Key': rapidApiKey },
             });
 
             setApiResponse(res.data);
@@ -304,6 +304,7 @@ export const DataProvider = ({ children }) => {
             res.data.typeMatches?.forEach(type =>
                 type.seriesMatches?.forEach(series => {
                     const matches = series.seriesAdWrapper?.matches || [];
+                    console.log(matches, "matches")
                     matches.forEach(match => {
                         const t1 = match.matchInfo?.team1?.imageId;
                         const t2 = match.matchInfo?.team2?.imageId;
@@ -320,7 +321,7 @@ export const DataProvider = ({ children }) => {
                         const response = await axios.get(
                             ` https://cricbuzz-cricket.p.rapidapi.com/img/v1/i1/c${id}/i.jpg`,
                             {
-                                headers: { 'X-RapidAPI-Key': process.env.FOOTBALL_RAPID_API_KEY },
+                                headers: { 'X-RapidAPI-Key': rapidApiKey },
                                 responseType: 'blob',
                             }
                         );
@@ -336,6 +337,19 @@ export const DataProvider = ({ children }) => {
             console.error('Failed to fetch live matches:', error);
         }
     };
+    // CRICKET MATCH DETAILS SECTION
+
+    const [cricketDetails, setCricketDetails] = useState([]);
+
+    const getCricketDetails = async (id) => {
+        try {
+            const response = await axios.get(`/api/get-cricket-match-details?matchId=${id}`)
+            setCricketDetails(response.data)
+        } catch (error) {
+            console.error('error fetching cricket match details :', error)
+        }
+    }
+
 
     // CRICKET UPCOMING MATCH SECTION 
 
@@ -345,7 +359,7 @@ export const DataProvider = ({ children }) => {
         try {
             const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/upcoming', {
                 headers: {
-                    'X-RapidAPI-Key': process.env.FOOTBALL_RAPID_API_KEY,
+                    'X-RapidAPI-Key': rapidApiKey,
                 },
             });
 
@@ -385,21 +399,20 @@ export const DataProvider = ({ children }) => {
     };
 
     // FOOTBALL LIVE SCORE SECTION
-
     const [stages, setStages] = useState([]);
     const liveFootBall = async () => {
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0].replace(/-/g, '');
         const options = {
             method: 'GET',
-            url: 'https://livescore6.p.rapidapi.com/matches/v2/list-live',
+            url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
             params: {
                 Category: 'soccer',
                 Date: formattedDate,
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': process.env.FOOTBALL_RAPID_API_KEY,
+                'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
 
             }
         };
@@ -433,7 +446,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': process.env.FOOTBALL_RAPID_API_KEY,
+                'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
 
             }
         };
@@ -455,7 +468,7 @@ export const DataProvider = ({ children }) => {
             url: 'https://livescore6.p.rapidapi.com/news/v2/list',
 
             headers: {
-                'X-RapidAPI-Key': process.env.FOOTBALL_RAPID_API_KEY,
+                'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
             }
         };
 
@@ -473,14 +486,14 @@ export const DataProvider = ({ children }) => {
     const [selectedNews, setSelectedNews] = useState(null);
 
     const fetchNewsDetails = async (id) => {
-        console.log("news called")
+        // console.log("news called")
         try {
             const response = await axios.get(
                 `https://livescore6.p.rapidapi.com/news/v2/detail`,
                 {
                     params: { id },
                     headers: {
-                        'X-RapidAPI-Key': process.env.FOOTBALL_RAPID_API_KEY,
+                        'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
                     },
                 }
             );
@@ -497,8 +510,8 @@ export const DataProvider = ({ children }) => {
         fetchBlogs();
         fetchBettingApps();
         fetchBestBettingAppsPrevious();
-        // fetchMatches();
-        // fetchUpcomingMatches();
+        fetchMatches();
+        fetchUpcomingMatches();
         liveFootBall();
         upcomingFootBall();
         fetchNews();
@@ -540,6 +553,8 @@ export const DataProvider = ({ children }) => {
                 fetchFootBallLineUp,
                 lineUp,
                 countryCode,
+                getCricketDetails,
+                cricketDetails,
             }}>
             {children}
         </DataContext.Provider>

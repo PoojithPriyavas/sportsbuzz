@@ -1,9 +1,9 @@
 // src/pages/api/get-football-match-details.jsx
 
-export default async function fetchMatchLineUp(req, res) {
+export default async function fetchCricketDetails(req, res) {
     // console.log("goes to fn")
-    const { Eid } = req.query;
-    const url = `https://livescore6.p.rapidapi.com/matches/v2/get-lineups?Category=soccer&Eid=${Eid}`;
+    const { matchId } = req.query;
+    const url = `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}`;
 
     const options = {
         method: 'GET',

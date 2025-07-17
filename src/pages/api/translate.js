@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  console.log('📥 API Hit:', req.method);
+  // console.log('📥 API Hit:', req.method);
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   const { text, from = 'en', to } = req.body;
 
-  console.log('➡️ Payload received in API:', { text, from, to });
+  // console.log('➡️ Payload received in API:', { text, from, to });
 
   try {
     const response = await fetch(`https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=${from}&to=${to}&textType=html`, {
@@ -21,10 +21,10 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    console.log('✅ Translation response:', data);
+    // console.log('✅ Translation response:', data);
     res.status(200).json(data[0]?.translations[0]?.text || text);
   } catch (error) {
-    console.error('❌ Translation error:', error);
+    // console.error('❌ Translation error:', error);
     res.status(500).json({ error: 'Translation failed' });
   }
 }

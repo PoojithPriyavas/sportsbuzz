@@ -15,16 +15,29 @@ import BettingCard from '@/components/OddsMultiply/BettingCard';
 import MatchScheduler from "@/components/FootballMatchScheduler/MatchScheduler";
 import CricketDashboard from '@/components/CricketDashboard/CricketDashboard';
 import Footer from '@/components/Footer/Footer';
+import { useParams } from "next/navigation";
 
-
-
+import { useGlobalData } from "@/components/Context/ApiContext";
 
 export default function CricketMatchDetails() {
 
+    const { getCricketDetails, cricketDetails } = useGlobalData();
+
     const [loading, setLoading] = useState(true);
 
+    const params = useParams();
+    const matchId = params?.slug;
+    console.log(matchId, "matchid")
+
     useEffect(() => {
-        // Fixed: Timer was setting loading to true instead of false
+        if (!matchId) {
+            console.error("Match ID is missing");
+            return;
+        }
+        getCricketDetails(matchId);
+    }, [matchId]);
+
+    useEffect(() => {
         const timer1 = setTimeout(() => setLoading(false), 3000);
         return () => clearTimeout(timer1);
     }, []);
@@ -43,7 +56,7 @@ export default function CricketMatchDetails() {
                 {/* <TestLive /> */}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
-                        <CricketDashboard />
+                        <CricketDashboard cricketDetails={cricketDetails} />
                     </div>
                     <div className={styles.fourthColumn} >
                         <BettingCard />

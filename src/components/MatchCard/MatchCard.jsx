@@ -7,8 +7,8 @@ import { useGlobalData } from '../Context/ApiContext';
 const MatchCard = () => {
     const { footBallMatchDetails, lineUp } = useGlobalData();
     if (!footBallMatchDetails || !lineUp) return <div>Loading...</div>;
-    console.log(footBallMatchDetails, "football match");
-    console.log(lineUp, "line up");
+    // console.log(footBallMatchDetails, "football match");
+    // console.log(lineUp, "line up");
     // Extract and format match details
     const stadiumName = footBallMatchDetails?.Vnm || 'Unknown Stadium';
     const country = footBallMatchDetails?.VCnm || 'Unknown Country';

@@ -12,6 +12,7 @@ import FeaturedButton from '../FeaturedButton/FeaturedButton';
 export default function LoadingScreen({ onFinish }) {
   const [phase, setPhase] = useState('loading');
   const [darkMode, setDarkMode] = useState(false);
+  const [selectedSport, setSelectedSport] = useState('cricket'); // New state for sports dropdown
   const pathname = usePathname();
 
   const {
@@ -29,13 +30,14 @@ export default function LoadingScreen({ onFinish }) {
     apps: 'Best Betting Apps',
     news: 'News',
     schedule: 'Match Schedules',
+    cricket: 'Cricket',
+    football: 'Football'
   });
 
   // COUNTRY CODE FILTERING 
   const [filteredList, setFilteredList] = useState([]);
 
   useEffect(() => {
-
     if (!location || !countryCode) return;
 
     const matched = location.filter(
@@ -43,12 +45,11 @@ export default function LoadingScreen({ onFinish }) {
     );
     if (matched.length > 0) {
       setFilteredList(matched);
-      console.log(matched, "matched data")
+      // console.log(matched, "matched data")
     } else {
-
       const fallback = location.filter(item => item.country_code === 'IN');
       setFilteredList(fallback);
-      console.log("calling fallback", fallback)
+      // console.log("calling fallback", fallback)
     }
   }, [location, countryCode]);
 
@@ -72,14 +73,16 @@ export default function LoadingScreen({ onFinish }) {
 
   useEffect(() => {
     const updateTranslations = async () => {
-      const [home, apps, news, schedule] = await Promise.all([
+      const [home, apps, news, schedule, cricket, football] = await Promise.all([
         translateText('Home', 'en', language),
         translateText('Best Betting Apps', 'en', language),
         translateText('News', 'en', language),
-        translateText('Match Schedules', 'en', language)
+        translateText('Match Schedules', 'en', language),
+        translateText('Cricket', 'en', language),
+        translateText('Football', 'en', language)
       ]);
 
-      setTranslatedText({ home, apps, news, schedule });
+      setTranslatedText({ home, apps, news, schedule, cricket, football });
 
       const translatedCategories = await Promise.all(
         blogCategories.map(async (cat) => {
@@ -109,6 +112,11 @@ export default function LoadingScreen({ onFinish }) {
     const selected = e.target.value;
     setLanguage(selected);
     localStorage.setItem('language', selected);
+  };
+
+  const handleSportChange = (e) => {
+    setSelectedSport(e.target.value);
+    // You can add additional logic here for handling sport selection
   };
 
   return (
@@ -154,7 +162,6 @@ export default function LoadingScreen({ onFinish }) {
         </div>
 
         <div className={styles.rightSection}>
-
           <select
             className={styles.languageSelector}
             value={language}
@@ -163,16 +170,27 @@ export default function LoadingScreen({ onFinish }) {
             <>
               {/* <option value='en' >English</option> */}
               {filteredList.map((lang) => (
-                <option value={lang.hreflang}>{lang.language}</option>
-              ))
-              }
+                <option key={lang.hreflang} value={lang.hreflang}>{lang.language}</option>
+              ))}
             </>
-
           </select>
 
+
+
+
+          {/* New Sports Dropdown */}
+          <select
+            className={styles.sportsSelector}
+            value={selectedSport}
+            onChange={handleSportChange}
+          >
+            <option value="cricket">{translatedText.cricket}</option>
+            <option value="football">{translatedText.football}</option>
+          </select>
           <button className={styles.darkModeToggle} onClick={toggleDarkMode}>
             {darkMode ? <FaSun /> : <FaMoon />}
           </button>
+
           <FeaturedButton />
         </div>
       </div>
