@@ -15,9 +15,11 @@ export default function HeroCarousal() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await fetch('https://admin.sportsbuz.com/api/banners'); // 🔁 Replace with correct API endpoint
+        const res = await fetch('https://admin.sportsbuz.com/api/banners'); 
         const data = await res.json();
-        const activeBanners = data.filter(b => b.is_active === 'Active' && b.location === 1);
+        console.log(data," banner")
+        const activeBanners = data.filter(b => b.is_active === 'Active');
+        console.log(activeBanners,"active banner")
         setBanners(activeBanners.sort((a, b) => a.order_by - b.order_by));
       } catch (error) {
         console.error('Failed to fetch banners:', error);
