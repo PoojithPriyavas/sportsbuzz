@@ -7,6 +7,7 @@ import { useGlobalData } from '../Context/ApiContext';
 import { FaMoon, FaSun, FaChevronDown } from 'react-icons/fa';
 import Link from 'next/link';
 import axios from 'axios';
+import FeaturedButton from '../FeaturedButton/FeaturedButton';
 
 export default function LoadingScreen({ onFinish }) {
   const [phase, setPhase] = useState('loading');
@@ -19,15 +20,39 @@ export default function LoadingScreen({ onFinish }) {
     setLanguage,
     language,
     location,
+    countryCode
   } = useGlobalData();
-
 
   const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
   const [translatedText, setTranslatedText] = useState({
     home: 'Home',
     apps: 'Best Betting Apps',
     news: 'News',
+    schedule: 'Match Schedules',
   });
+
+  // COUNTRY CODE FILTERING 
+  const [filteredList, setFilteredList] = useState([]);
+
+  useEffect(() => {
+
+    if (!location || !countryCode) return;
+
+    const matched = location.filter(
+      item => item.country_code === countryCode.country_code
+    );
+    if (matched.length > 0) {
+      setFilteredList(matched);
+      console.log(matched, "matched data")
+    } else {
+
+      const fallback = location.filter(item => item.country_code === 'IN');
+      setFilteredList(fallback);
+      console.log("calling fallback", fallback)
+    }
+  }, [location, countryCode]);
+
+  //
 
   useEffect(() => {
     const timer1 = setTimeout(() => {
@@ -47,13 +72,14 @@ export default function LoadingScreen({ onFinish }) {
 
   useEffect(() => {
     const updateTranslations = async () => {
-      const [home, apps, news] = await Promise.all([
+      const [home, apps, news, schedule] = await Promise.all([
         translateText('Home', 'en', language),
         translateText('Best Betting Apps', 'en', language),
         translateText('News', 'en', language),
+        translateText('Match Schedules', 'en', language)
       ]);
 
-      setTranslatedText({ home, apps, news });
+      setTranslatedText({ home, apps, news, schedule });
 
       const translatedCategories = await Promise.all(
         blogCategories.map(async (cat) => {
@@ -98,7 +124,7 @@ export default function LoadingScreen({ onFinish }) {
             <nav className={styles.nav}>
               <Link href="/" className={`${styles.navItem} ${pathname === '/' ? styles.active : ''}`}>{translatedText.home}</Link>
               <Link href="/best-betting-apps" className={`${styles.navItem} ${pathname === '/best-betting-apps' ? styles.active : ''}`}>{translatedText.apps}</Link>
-              <Link href="/match-schedules" className={`${styles.navItem} ${pathname === '/match-schedules' ? styles.active : ''}`}>Match Schedules</Link>
+              <Link href="/match-schedules" className={`${styles.navItem} ${pathname === '/match-schedules' ? styles.active : ''}`}>{translatedText.schedule}</Link>
               <Link href="/news-page" className={`${styles.navItem} ${pathname === '/news-page' ? styles.active : ''}`}>{translatedText.news}</Link>
 
               {translatedCategories.map((cat) => (
@@ -135,8 +161,8 @@ export default function LoadingScreen({ onFinish }) {
             onChange={handleLanguageChange}
           >
             <>
-              <option value='en' >English</option>
-              {location.map((lang) => (
+              {/* <option value='en' >English</option> */}
+              {filteredList.map((lang) => (
                 <option value={lang.hreflang}>{lang.language}</option>
               ))
               }
@@ -147,6 +173,7 @@ export default function LoadingScreen({ onFinish }) {
           <button className={styles.darkModeToggle} onClick={toggleDarkMode}>
             {darkMode ? <FaSun /> : <FaMoon />}
           </button>
+          <FeaturedButton />
         </div>
       </div>
     </div>

@@ -75,7 +75,8 @@ export default function Home() {
 
         <div className={`${geistSans.variable} ${geistMono.variable} container`}>
           {/* Top Hero Section */}
-          <TestLive />
+          <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+          {/* <TestLive /> */}
           <HeroCarousal />
 
           {/* Main Layout: 4 Columns */}
