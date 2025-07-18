@@ -112,6 +112,7 @@ export default function Home() {
               <BettingCard />
               <JoinTelegramButton />
               <UpcomingFootballMatches />
+              <UpcomingMatches upcomingMatches={upcomingMatches} />
 
               <SportsOdsList />
 
