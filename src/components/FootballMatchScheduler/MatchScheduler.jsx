@@ -7,106 +7,153 @@ import { useGlobalData } from '../Context/ApiContext';
 
 export default function MatchScheduler() {
     const [selectedDate, setSelectedDate] = useState('');
-    const [selectedDateNumeric, setSelectedDateNumeric] = useState(''); // New state for numeric format
+    const [selectedDateNumeric, setSelectedDateNumeric] = useState('');
     const [activeLeague, setActiveLeague] = useState('');
     const [dates, setDates] = useState([]);
     const { matchSchedule, fetchMatchSchedules, currentTimezone } = useGlobalData();
-    console.log(currentTimezone, "current time zone")
-
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     // Initialize dates and fetch initial data
     useEffect(() => {
-        const today = new Date();
-        const newDates = [];
+        const initializeDates = () => {
+            try {
+                const today = new Date();
+                const newDates = [];
 
-        for (let i = -1; i < 13; i++) {
-            const date = new Date(today);
-            date.setDate(today.getDate() + i);
+                for (let i = -1; i < 13; i++) {
+                    const date = new Date(today);
+                    date.setDate(today.getDate() + i);
 
-            const isoDate = date.toISOString().split('T')[0];
-            const numericDate = [
-                date.getFullYear(),
-                String(date.getMonth() + 1).padStart(2, '0'),
-                String(date.getDate()).padStart(2, '0')
-            ].join('');
+                    const isoDate = date.toISOString().split('T')[0];
+                    const numericDate = [
+                        date.getFullYear(),
+                        String(date.getMonth() + 1).padStart(2, '0'),
+                        String(date.getDate()).padStart(2, '0')
+                    ].join('');
 
-            newDates.push({
-                dateObj: date,
-                isoDate: isoDate,
-                numericDate: numericDate
-            });
+                    newDates.push({
+                        dateObj: date,
+                        isoDate: isoDate,
+                        numericDate: numericDate
+                    });
+                }
+
+                setDates(newDates);
+                
+                const todayIsoDate = today.toISOString().split('T')[0];
+                const todayNumericDate = [
+                    today.getFullYear(),
+                    String(today.getMonth() + 1).padStart(2, '0'),
+                    String(today.getDate()).padStart(2, '0')
+                ].join('');
+
+                setSelectedDate(todayIsoDate);
+                setSelectedDateNumeric(todayNumericDate);
+                return todayNumericDate;
+            } catch (err) {
+                setError('Failed to initialize dates');
+                console.error('Date initialization error:', err);
+                return null;
+            }
+        };
+
+        const fetchInitialData = async (date) => {
+            if (!date) return;
+            setIsLoading(true);
+            try {
+                await fetchMatchSchedules(date, currentTimezone);
+            } catch (err) {
+                setError('Failed to fetch initial match data');
+                console.error('Initial fetch error:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        const numericDate = initializeDates();
+        if (numericDate) {
+            fetchInitialData(numericDate);
         }
-
-        setDates(newDates);
-        const todayIsoDate = today.toISOString().split('T')[0];
-        const todayNumericDate = [
-            today.getFullYear(),
-            String(today.getMonth() + 1).padStart(2, '0'),
-            String(today.getDate()).padStart(2, '0')
-        ].join('');
-
-        setSelectedDate(todayIsoDate);
-        setSelectedDateNumeric(todayNumericDate);
-
-        // Fetch data for today initially in YYYYMMDD format
-        fetchMatchSchedules(todayNumericDate, currentTimezone);
-    }, [fetchMatchSchedules]);
+    }, [fetchMatchSchedules, currentTimezone]);
 
     // Handle date selection
-    const handleDateSelect = useCallback((isoDate, numericDate) => {
+    const handleDateSelect = useCallback(async (isoDate, numericDate) => {
+        setIsLoading(true);
         setSelectedDate(isoDate);
         setSelectedDateNumeric(numericDate);
-        fetchMatchSchedules(numericDate, currentTimezone); // Pass numeric format to API
-    }, [fetchMatchSchedules]);
+        try {
+            await fetchMatchSchedules(numericDate, currentTimezone);
+        } catch (err) {
+            setError(`Failed to fetch matches for ${isoDate}`);
+            console.error('Date selection fetch error:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [fetchMatchSchedules, currentTimezone]);
 
-    // Transform API data
+    // Transform API data with better error handling
     const transformMatchData = useCallback(() => {
         if (!matchSchedule?.Stages || !dates.length) return {};
 
         const transformedData = {};
 
-        matchSchedule.Stages.forEach(stage => {
-            if (!stage.Events) return;
+        try {
+            matchSchedule.Stages.forEach(stage => {
+                if (!stage?.Events) return;
 
-            stage.Events.forEach(event => {
-                if (!event.Esd) return;
+                stage.Events.forEach(event => {
+                    if (!event?.Esd) return;
 
-                const eventDateStr = event.Esd.toString().substring(0, 8);
-                const dateInfo = dates.find(d => d.numericDate === eventDateStr);
-                if (!dateInfo) return;
+                    // Get date string in YYYYMMDD format
+                    const eventDateStr = event.Esd.toString().substring(0, 8);
+                    
+                    // Find matching date
+                    const dateInfo = dates.find(d => d.numericDate === eventDateStr);
+                    if (!dateInfo) {
+                        console.warn('No date found for event:', eventDateStr, event);
+                        return;
+                    }
 
-                const dateStr = dateInfo.isoDate;
+                    const dateStr = dateInfo.isoDate;
 
-                if (!transformedData[dateStr]) {
-                    transformedData[dateStr] = [];
-                }
+                    if (!transformedData[dateStr]) {
+                        transformedData[dateStr] = [];
+                    }
 
-                const competitionName = stage.CompN || stage.Cnm;
-                if (!competitionName) return;
+                    // Get competition name with fallbacks
+                    const competitionName = stage.CompN || stage.Cnm || stage.Snm || 'Unknown Competition';
+                    
+                    let competition = transformedData[dateStr].find(comp => comp.competition === competitionName);
 
-                let competition = transformedData[dateStr].find(comp => comp.competition === competitionName);
+                    if (!competition) {
+                        competition = {
+                            competition: competitionName,
+                            stage: stage.Snm || '',
+                            matches: []
+                        };
+                        transformedData[dateStr].push(competition);
+                    }
 
-                if (!competition) {
-                    competition = {
-                        competition: competitionName,
-                        stage: stage.Snm || '',
-                        matches: []
-                    };
-                    transformedData[dateStr].push(competition);
-                }
+                    // Handle team data safely
+                    const homeTeam = event.T1?.[0] || { Nm: 'Home Team', Abr: 'HOM' };
+                    const awayTeam = event.T2?.[0] || { Nm: 'Away Team', Abr: 'AWY' };
 
-                if (!event.T1?.[0] || !event.T2?.[0]) return;
-
-                competition.matches.push({
-                    home: event.T1[0].Abr || event.T1[0].Nm.substring(0, 3).toUpperCase(),
-                    away: event.T2[0].Abr || event.T2[0].Nm.substring(0, 3).toUpperCase(),
-                    homeScore: event.Tr1 ?? null,
-                    awayScore: event.Tr2 ?? null,
-                    status: event.Eps === 'NS' ? 'upcoming' : 'FT',
-                    time: event.Esd.toString().substring(8, 10) + ':' + event.Esd.toString().substring(10, 12)
+                    competition.matches.push({
+                        home: homeTeam.Abr || homeTeam.Nm.substring(0, 3).toUpperCase(),
+                        away: awayTeam.Abr || awayTeam.Nm.substring(0, 3).toUpperCase(),
+                        homeScore: event.Tr1 ?? '-',
+                        awayScore: event.Tr2 ?? '-',
+                        status: event.Eps === 'NS' ? 'upcoming' : 'FT',
+                        time: event.Esd.toString().substring(8, 10) + ':' + 
+                              event.Esd.toString().substring(10, 12)
+                    });
                 });
             });
-        });
+        } catch (err) {
+            setError('Failed to transform match data');
+            console.error('Data transformation error:', err);
+        }
 
         return transformedData;
     }, [matchSchedule, dates]);
@@ -115,29 +162,49 @@ export default function MatchScheduler() {
 
     const displayMatches = useCallback((date) => {
         if (!date) return [];
-        let matches = matchData[date] || [];
-        if (activeLeague && activeLeague !== 'All Leagues') {
-            matches = matches.filter((comp) => comp.competition === activeLeague);
+        try {
+            let matches = matchData[date] || [];
+            if (activeLeague && activeLeague !== 'All Leagues') {
+                matches = matches.filter((comp) => comp.competition === activeLeague);
+            }
+            return matches;
+        } catch (err) {
+            console.error('Display matches error:', err);
+            return [];
         }
-        return matches;
     }, [matchData, activeLeague]);
 
-    // Get unique leagues
+    // Get unique leagues with fallback
     const getUniqueLeagues = useCallback(() => {
-        if (!matchSchedule?.Stages) return ['All Leagues'];
+        try {
+            if (!matchSchedule?.Stages) return ['All Leagues'];
 
-        const leagues = new Set(['All Leagues']);
-        matchSchedule.Stages.forEach(stage => {
-            const leagueName = stage.CompN || stage.Cnm;
-            if (leagueName) {
-                leagues.add(leagueName);
-            }
-        });
-        return Array.from(leagues);
+            const leagues = new Set(['All Leagues']);
+            matchSchedule.Stages.forEach(stage => {
+                const leagueName = stage.CompN || stage.Cnm || stage.Snm;
+                if (leagueName) {
+                    leagues.add(leagueName);
+                }
+            });
+            return Array.from(leagues);
+        } catch (err) {
+            console.error('League extraction error:', err);
+            return ['All Leagues'];
+        }
     }, [matchSchedule]);
 
+    if (error) {
+        return (
+            <div className={styles.errorContainer}>
+                <h2>Error Loading Matches</h2>
+                <p>{error}</p>
+                <button onClick={() => setError(null)}>Try Again</button>
+            </div>
+        );
+    }
+
     return (
-        <div>
+        <div className={styles.container}>
             <div className={styles.header}>
                 <h1>Match Schedule</h1>
                 <p>Select a date to view matches</p>
@@ -180,44 +247,53 @@ export default function MatchScheduler() {
                 ))}
             </div>
 
-            <div className={`${styles.matchesContainer} ${selectedDate ? styles.visible : ''}`}>
-                {displayMatches(selectedDate).length === 0 ? (
-                    <div className={styles.noMatches}>
-                        <div className={styles.noMatchesIcon}>⚽</div>
-                        <p>No matches found for the selected date and league</p>
-                    </div>
-                ) : (
-                    displayMatches(selectedDate).map((competition, i) => (
-                        <div key={i} className={styles.competitionSection}>
-                            <div className={styles.competitionHeader}>
-                                <div className={styles.competitionTitle}>{competition.competition}</div>
-                                <div className={styles.competitionStage}>{competition.stage}</div>
-                            </div>
-                            <div className={styles.matchesGrid}>
-                                {competition.matches.map((match, j) => (
-                                    <div key={j} className={styles.matchRow}>
-                                        <div className={`${styles.team} ${styles.home}`}>
-                                            <div className={styles.teamFlag}>{match.home}</div>
-                                            <div className={styles.teamName}>{match.home}</div>
-                                        </div>
-                                        <div className={styles.matchScore}>
-                                            {match.status === 'upcoming' ? (
-                                                <span className={styles.upcomingTime}>{match.time}</span>
-                                            ) : (
-                                                `${match.homeScore ?? '-'} - ${match.awayScore ?? '-'}`
-                                            )}
-                                        </div>
-                                        <div className={`${styles.team} ${styles.away}`}>
-                                            <div className={styles.teamFlag}>{match.away}</div>
-                                            <div className={styles.teamName}>{match.away}</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+            {isLoading ? (
+                <div className={styles.loading}>
+                    <div className={styles.spinner}></div>
+                    <p>Loading matches...</p>
+                </div>
+            ) : (
+                <div className={`${styles.matchesContainer} ${selectedDate ? styles.visible : ''}`}>
+                    {displayMatches(selectedDate).length === 0 ? (
+                        <div className={styles.noMatches}>
+                            <div className={styles.noMatchesIcon}>⚽</div>
+                            <p>No matches found for the selected date and league</p>
                         </div>
-                    ))
-                )}
-            </div>
+                    ) : (
+                        displayMatches(selectedDate).map((competition, i) => (
+                            <div key={i} className={styles.competitionSection}>
+                                <div className={styles.competitionHeader}>
+                                    <div className={styles.competitionTitle}>{competition.competition}</div>
+                                    {competition.stage && (
+                                        <div className={styles.competitionStage}>{competition.stage}</div>
+                                    )}
+                                </div>
+                                <div className={styles.matchesGrid}>
+                                    {competition.matches.map((match, j) => (
+                                        <div key={j} className={styles.matchRow}>
+                                            <div className={`${styles.team} ${styles.home}`}>
+                                                <div className={styles.teamFlag}>{match.home}</div>
+                                                <div className={styles.teamName}>{match.home}</div>
+                                            </div>
+                                            <div className={styles.matchScore}>
+                                                {match.status === 'upcoming' ? (
+                                                    <span className={styles.upcomingTime}>{match.time}</span>
+                                                ) : (
+                                                    `${match.homeScore} - ${match.awayScore}`
+                                                )}
+                                            </div>
+                                            <div className={`${styles.team} ${styles.away}`}>
+                                                <div className={styles.teamFlag}>{match.away}</div>
+                                                <div className={styles.teamName}>{match.away}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            )}
         </div>
     );
 }

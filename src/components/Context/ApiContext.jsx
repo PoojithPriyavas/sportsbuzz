@@ -319,7 +319,7 @@ export const DataProvider = ({ children }) => {
     };
     // CRICKET LIVE SCORE SECTION
 
-    const rapidApiKey = 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a';
+    const rapidApiKey = '3e503799a6mshf59ff3fbd1947d4p1620bcjsnb891b5234602';
 
     const [apiResponse, setApiResponse] = useState(null);
     const [matchTypes, setMatchTypes] = useState([]);
@@ -448,7 +448,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
+                'X-RapidAPI-Key': '3e503799a6mshf59ff3fbd1947d4p1620bcjsnb891b5234602',
 
             }
         };
@@ -482,7 +482,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
+                'X-RapidAPI-Key': '3e503799a6mshf59ff3fbd1947d4p1620bcjsnb891b5234602',
 
             }
         };
@@ -504,7 +504,7 @@ export const DataProvider = ({ children }) => {
             url: 'https://livescore6.p.rapidapi.com/news/v2/list',
 
             headers: {
-                'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
+                'X-RapidAPI-Key': '3e503799a6mshf59ff3fbd1947d4p1620bcjsnb891b5234602',
             }
         };
 
@@ -529,7 +529,7 @@ export const DataProvider = ({ children }) => {
                 {
                     params: { id },
                     headers: {
-                        'X-RapidAPI-Key': 'af76f0be9amshbf82db5ed9b2c61p1a04a1jsn334da8a4238a',
+                        'X-RapidAPI-Key': '3e503799a6mshf59ff3fbd1947d4p1620bcjsnb891b5234602',
                     },
                 }
             );
