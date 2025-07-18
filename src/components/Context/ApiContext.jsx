@@ -5,6 +5,7 @@ import axios from 'axios';
 import { fetchTournaments } from '@/pages/api/get-tournaments';
 import { fetchEventsIds } from '@/pages/api/get-events';
 import { fetchSportEventDetails } from '@/pages/api/get-teamnames';
+import { countryTimezones } from '../utilities/CountryTimezones';
 
 
 const DataContext = createContext();
@@ -18,6 +19,16 @@ export const DataProvider = ({ children }) => {
     const [bestSections, setBestSections] = useState([]);
     const [sport, setSport] = useState('cricket');
 
+
+    //  TIME ZONE IMPLEMENTATION
+
+    const [currentTimezone, setCurrentTimezone] = useState('+0.00');
+
+    const getTimezoneByCountryCode = (code) => {
+        const country = countryTimezones.find(item => item[0] === code);
+        return country ? country[1] : '+0.00';
+    };
+
     // GET COUNTRY CODE API IMPLEMENTATION
 
     const [countryCode, setCountryCode] = useState([]);
@@ -26,6 +37,7 @@ export const DataProvider = ({ children }) => {
         try {
             const res = await CustomAxios.get('/get-country-code');
             setCountryCode(res.data || []);
+            setCurrentTimezone(getTimezoneByCountryCode(res.data.country_code));
         } catch (error) {
             console.error('Failed to fetch blogs:', error);
         }
@@ -187,7 +199,20 @@ export const DataProvider = ({ children }) => {
 
     const [matchSchedule, setMatchSchedule] = useState([]);
 
-    
+    async function fetchMatchSchedules(Date, Timezone) {
+        console.log("calls fetch match", Date)
+        try {
+            const response = await fetch(`/api/get-match-schedule-by-date?Date=${Date}&Timezone=${Timezone}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch market data');
+            }
+            const data = await response.json();
+            return data;
+        } catch (err) {
+            console.error('fetchMarketData error:', err);
+            return null;
+        }
+    }
 
     // TRANSLATION API IMPLEMENTATION
 
@@ -515,6 +540,7 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+
     useEffect(() => {
         fetchBlogCategories();
         fetchRecentBlogs();
@@ -530,6 +556,7 @@ export const DataProvider = ({ children }) => {
         // fetchFootballDetails();
         // fetchFootBallLineUp();
         getCountryCode();
+        getTimezoneByCountryCode();
     }, []);
 
     return (
@@ -568,6 +595,10 @@ export const DataProvider = ({ children }) => {
                 cricketDetails,
                 sport,
                 setSport,
+                matchSchedule,
+                setMatchSchedule,
+                fetchMatchSchedules,
+                currentTimezone,
             }}>
             {children}
         </DataContext.Provider>

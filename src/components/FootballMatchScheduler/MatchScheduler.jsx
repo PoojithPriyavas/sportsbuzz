@@ -1,91 +1,140 @@
 // MatchScheduler.jsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import styles from './MatchScheduler.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 
 export default function MatchScheduler() {
-    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedDate, setSelectedDate] = useState('');
+    const [selectedDateNumeric, setSelectedDateNumeric] = useState(''); // New state for numeric format
     const [activeLeague, setActiveLeague] = useState('');
     const [dates, setDates] = useState([]);
-    const { matchSchedule } = useGlobalData();
+    const { matchSchedule, fetchMatchSchedules, currentTimezone } = useGlobalData();
+    console.log(currentTimezone, "current time zone")
 
+
+    // Initialize dates and fetch initial data
     useEffect(() => {
         const today = new Date();
         const newDates = [];
+
         for (let i = -1; i < 13; i++) {
             const date = new Date(today);
             date.setDate(today.getDate() + i);
-            newDates.push(date);
-        }
-        setDates(newDates);
-        setSelectedDate(today.toISOString().split('T')[0]);
-    }, []);
 
-    // Transform API data into the format we need
-    const transformMatchData = () => {
-        if (!matchSchedule?.Stages) return {};
-        
+            const isoDate = date.toISOString().split('T')[0];
+            const numericDate = [
+                date.getFullYear(),
+                String(date.getMonth() + 1).padStart(2, '0'),
+                String(date.getDate()).padStart(2, '0')
+            ].join('');
+
+            newDates.push({
+                dateObj: date,
+                isoDate: isoDate,
+                numericDate: numericDate
+            });
+        }
+
+        setDates(newDates);
+        const todayIsoDate = today.toISOString().split('T')[0];
+        const todayNumericDate = [
+            today.getFullYear(),
+            String(today.getMonth() + 1).padStart(2, '0'),
+            String(today.getDate()).padStart(2, '0')
+        ].join('');
+
+        setSelectedDate(todayIsoDate);
+        setSelectedDateNumeric(todayNumericDate);
+
+        // Fetch data for today initially in YYYYMMDD format
+        fetchMatchSchedules(todayNumericDate, currentTimezone);
+    }, [fetchMatchSchedules]);
+
+    // Handle date selection
+    const handleDateSelect = useCallback((isoDate, numericDate) => {
+        setSelectedDate(isoDate);
+        setSelectedDateNumeric(numericDate);
+        fetchMatchSchedules(numericDate, currentTimezone); // Pass numeric format to API
+    }, [fetchMatchSchedules]);
+
+    // Transform API data
+    const transformMatchData = useCallback(() => {
+        if (!matchSchedule?.Stages || !dates.length) return {};
+
         const transformedData = {};
-        
+
         matchSchedule.Stages.forEach(stage => {
+            if (!stage.Events) return;
+
             stage.Events.forEach(event => {
-                // Convert timestamp to YYYY-MM-DD format
-                const eventDate = new Date(event.Esd.toString().replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'));
-                const dateStr = eventDate.toISOString().split('T')[0];
-                
+                if (!event.Esd) return;
+
+                const eventDateStr = event.Esd.toString().substring(0, 8);
+                const dateInfo = dates.find(d => d.numericDate === eventDateStr);
+                if (!dateInfo) return;
+
+                const dateStr = dateInfo.isoDate;
+
                 if (!transformedData[dateStr]) {
                     transformedData[dateStr] = [];
                 }
-                
-                // Find if competition already exists for this date
-                let competition = transformedData[dateStr].find(comp => comp.competition === stage.CompN || comp.competition === stage.Cnm);
-                
+
+                const competitionName = stage.CompN || stage.Cnm;
+                if (!competitionName) return;
+
+                let competition = transformedData[dateStr].find(comp => comp.competition === competitionName);
+
                 if (!competition) {
                     competition = {
-                        competition: stage.CompN || stage.Cnm,
-                        stage: stage.Snm,
+                        competition: competitionName,
+                        stage: stage.Snm || '',
                         matches: []
                     };
                     transformedData[dateStr].push(competition);
                 }
-                
-                // Add match to competition
+
+                if (!event.T1?.[0] || !event.T2?.[0]) return;
+
                 competition.matches.push({
                     home: event.T1[0].Abr || event.T1[0].Nm.substring(0, 3).toUpperCase(),
                     away: event.T2[0].Abr || event.T2[0].Nm.substring(0, 3).toUpperCase(),
-                    homeScore: null, // API doesn't provide scores in the sample
-                    awayScore: null, // API doesn't provide scores in the sample
-                    status: event.Eps === 'NS' ? 'upcoming' : 'FT', // Simplified status
-                    time: event.Esd.toString().substring(8, 10) + ':' + event.Esd.toString().substring(10, 12) // Extract time from timestamp
+                    homeScore: event.Tr1 ?? null,
+                    awayScore: event.Tr2 ?? null,
+                    status: event.Eps === 'NS' ? 'upcoming' : 'FT',
+                    time: event.Esd.toString().substring(8, 10) + ':' + event.Esd.toString().substring(10, 12)
                 });
             });
         });
-        
+
         return transformedData;
-    };
+    }, [matchSchedule, dates]);
 
     const matchData = transformMatchData();
 
-    const displayMatches = (date) => {
+    const displayMatches = useCallback((date) => {
+        if (!date) return [];
         let matches = matchData[date] || [];
-        if (activeLeague) {
+        if (activeLeague && activeLeague !== 'All Leagues') {
             matches = matches.filter((comp) => comp.competition === activeLeague);
         }
         return matches;
-    };
+    }, [matchData, activeLeague]);
 
-    // Get unique leagues for filter
-    const getUniqueLeagues = () => {
+    // Get unique leagues
+    const getUniqueLeagues = useCallback(() => {
         if (!matchSchedule?.Stages) return ['All Leagues'];
-        
+
         const leagues = new Set(['All Leagues']);
         matchSchedule.Stages.forEach(stage => {
-            leagues.add(stage.CompN || stage.Cnm);
+            const leagueName = stage.CompN || stage.Cnm;
+            if (leagueName) {
+                leagues.add(leagueName);
+            }
         });
         return Array.from(leagues);
-    };
+    }, [matchSchedule]);
 
     return (
         <div>
@@ -96,23 +145,26 @@ export default function MatchScheduler() {
 
             <div className={styles.dateSliderContainer}>
                 <div className={styles.dateSlider}>
-                    {dates.map((date, idx) => {
-                        const dateStr = date.toISOString().split('T')[0];
-                        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-                        const dayNum = date.getDate();
-                        const monthName = date.toLocaleDateString('en-US', { month: 'short' });
-                        return (
-                            <div
-                                key={idx}
-                                className={`${styles.dateCard} ${selectedDate === dateStr ? styles.active : ''}`}
-                                onClick={() => setSelectedDate(dateStr)}
-                            >
-                                <div className={styles.day}>{dayName}</div>
-                                <div className={styles.date}>{dayNum}</div>
-                                <div className={styles.month}>{monthName}</div>
-                            </div>
-                        );
-                    })}
+                    {dates.length > 0 ? (
+                        dates.map((date, idx) => {
+                            const dayName = date.dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+                            const dayNum = date.dateObj.getDate();
+                            const monthName = date.dateObj.toLocaleDateString('en-US', { month: 'short' });
+                            return (
+                                <div
+                                    key={idx}
+                                    className={`${styles.dateCard} ${selectedDate === date.isoDate ? styles.active : ''}`}
+                                    onClick={() => handleDateSelect(date.isoDate, date.numericDate)}
+                                >
+                                    <div className={styles.day}>{dayName}</div>
+                                    <div className={styles.date}>{dayNum}</div>
+                                    <div className={styles.month}>{monthName}</div>
+                                </div>
+                            );
+                        })
+                    ) : (
+                        <div>Loading dates...</div>
+                    )}
                 </div>
             </div>
 
@@ -149,7 +201,11 @@ export default function MatchScheduler() {
                                             <div className={styles.teamName}>{match.home}</div>
                                         </div>
                                         <div className={styles.matchScore}>
-                                            {match.status === 'upcoming' ? 'VS' : `${match.homeScore} - ${match.awayScore}`}
+                                            {match.status === 'upcoming' ? (
+                                                <span className={styles.upcomingTime}>{match.time}</span>
+                                            ) : (
+                                                `${match.homeScore ?? '-'} - ${match.awayScore ?? '-'}`
+                                            )}
                                         </div>
                                         <div className={`${styles.team} ${styles.away}`}>
                                             <div className={styles.teamFlag}>{match.away}</div>
