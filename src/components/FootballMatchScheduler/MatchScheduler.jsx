@@ -7,16 +7,18 @@ import { useGlobalData } from '../Context/ApiContext';
 
 export default function MatchScheduler() {
     const [selectedDate, setSelectedDate] = useState('');
-    const [selectedDateNumeric, setSelectedDateNumeric] = useState(''); // New state for numeric format
+    const [selectedDateNumeric, setSelectedDateNumeric] = useState('');
     const [activeLeague, setActiveLeague] = useState('');
     const [dates, setDates] = useState([]);
-    const [isInitialized, setIsInitialized] = useState(false); // Add initialization flag
-    const { matchSchedule, fetchMatchSchedules, currentTimezone } = useGlobalData();
-    console.log(matchSchedule, "match schedule")
+    const [isInitialized, setIsInitialized] = useState(false);
+    const { matchSchedule, fetchMatchSchedules, currentTimezone, countryCode } = useGlobalData();
 
-    // Initialize dates only once
+    // Initialize dates and fetch initial data
     useEffect(() => {
-        if (isInitialized) return; // Prevent re-initialization
+        // Wait for timezone to be properly set (not the default value)
+        if (isInitialized || currentTimezone === '+0.00' || !countryCode.country_code) {
+            return;
+        }
         
         const today = new Date();
         const newDates = [];
@@ -51,15 +53,15 @@ export default function MatchScheduler() {
         setSelectedDateNumeric(todayNumericDate);
         setIsInitialized(true);
 
-        // Fetch data for today initially in YYYYMMDD format
+        // Now fetch data with the correct timezone
         fetchMatchSchedules(todayNumericDate, currentTimezone);
-    }, [isInitialized, fetchMatchSchedules, currentTimezone]); // Only depend on isInitialized
+    }, [currentTimezone, countryCode.country_code, isInitialized, fetchMatchSchedules]);
 
     // Handle date selection
     const handleDateSelect = useCallback((isoDate, numericDate) => {
         setSelectedDate(isoDate);
         setSelectedDateNumeric(numericDate);
-        fetchMatchSchedules(numericDate, currentTimezone); // Pass numeric format to API
+        fetchMatchSchedules(numericDate, currentTimezone);
     }, [fetchMatchSchedules, currentTimezone]);
 
     // Transform API data
@@ -124,8 +126,6 @@ export default function MatchScheduler() {
         }
         return matches;
     }, [matchData, activeLeague]);
-
-    console.log(matchSchedule,"matchschedulessssssssss")
     
     // Get unique leagues
     const getUniqueLeagues = useCallback(() => {
@@ -140,6 +140,16 @@ export default function MatchScheduler() {
         });
         return Array.from(leagues);
     }, [matchSchedule]);
+
+    // Show loading state until timezone is properly set
+    if (currentTimezone === '+0.00' || !countryCode.country_code) {
+        return (
+            <div className={styles.header}>
+                <h1>Match Schedule</h1>
+                <p>Loading timezone...</p>
+            </div>
+        );
+    }
 
     return (
         <div>

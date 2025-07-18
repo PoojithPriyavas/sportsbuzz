@@ -26,6 +26,7 @@ export const DataProvider = ({ children }) => {
 
     const getTimezoneByCountryCode = (code) => {
         const country = countryTimezones.find(item => item[0] === code);
+        console.log(country, "countrydfdfgdfgd")
         return country ? country[1] : '+0.00';
     };
 
@@ -257,7 +258,7 @@ export const DataProvider = ({ children }) => {
             console.warn('No country code available for fetching blogs');
             return;
         }
-        
+
         try {
             const res = await CustomAxios.get('/get-blogs', {
                 params: {
@@ -277,7 +278,7 @@ export const DataProvider = ({ children }) => {
             console.warn('No country code available for fetching betting apps');
             return;
         }
-        
+
         try {
             console.log('Fetching betting apps for country code:', countryCodeParam);
             const response = await CustomAxios.get('/best-betting-headings', {
@@ -303,7 +304,7 @@ export const DataProvider = ({ children }) => {
             console.warn('No country code available for fetching previous betting apps');
             return;
         }
-        
+
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
                 params: {
@@ -473,9 +474,9 @@ export const DataProvider = ({ children }) => {
     const upcomingFootBall = async () => {
         const today = new Date();
         const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1); // Add 1 day
+        tomorrow.setDate(today.getDate() + 1); 
 
-        const formattedDate = tomorrow.toISOString().split('T')[0].replace(/-/g, ''); // YYYYMMDD format
+        const formattedDate = tomorrow.toISOString().split('T')[0].replace(/-/g, ''); 
 
         const options = {
             method: 'GET',
@@ -540,7 +541,6 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-    // INITIAL USEEFFECT - for data that doesn't depend on country code
     useEffect(() => {
         fetchBlogCategories();
         fetchRecentBlogs();
@@ -550,10 +550,9 @@ export const DataProvider = ({ children }) => {
         upcomingFootBall();
         fetchNews();
         fetchLocation();
-        getCountryCode(); // This will set the country code
+        getCountryCode(); 
     }, []);
 
-    // COUNTRY CODE DEPENDENT USEEFFECT - for data that depends on country code
     useEffect(() => {
         if (countryCode.country_code) {
             console.log('Country code available, fetching dependent data:', countryCode.country_code);
@@ -561,7 +560,7 @@ export const DataProvider = ({ children }) => {
             fetchBettingApps(countryCode.country_code);
             fetchBestBettingAppsPrevious(countryCode.country_code);
         }
-    }, [countryCode.country_code]); // This runs when country code changes
+    }, [countryCode.country_code]); 
 
     return (
         <DataContext.Provider
