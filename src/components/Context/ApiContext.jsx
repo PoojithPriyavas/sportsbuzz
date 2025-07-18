@@ -31,15 +31,15 @@ export const DataProvider = ({ children }) => {
 
     // GET COUNTRY CODE API IMPLEMENTATION
 
-    const [countryCode, setCountryCode] = useState([]);
+    const [countryCode, setCountryCode] = useState({});
 
     const getCountryCode = async () => {
         try {
             const res = await CustomAxios.get('/get-country-code');
-            setCountryCode(res.data || []);
+            setCountryCode(res.data || {});
             setCurrentTimezone(getTimezoneByCountryCode(res.data.country_code));
         } catch (error) {
-            console.error('Failed to fetch blogs:', error);
+            console.error('Failed to fetch country code:', error);
         }
     };
     console.log(countryCode, "country code")
@@ -53,7 +53,7 @@ export const DataProvider = ({ children }) => {
             const res = await CustomAxios.get('/locations');
             setLocation(res.data || []);
         } catch (error) {
-            console.error('Failed to fetch blogs:', error);
+            console.error('Failed to fetch locations:', error);
         }
     };
 
@@ -69,8 +69,6 @@ export const DataProvider = ({ children }) => {
             console.error('Failed to fetch tournaments:', err);
         }
     };
-
-
 
     // TOKEN ACCESSING PART
 
@@ -95,7 +93,6 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-
     useEffect(() => {
         fetchToken();
         const interval = setInterval(() => {
@@ -104,8 +101,6 @@ export const DataProvider = ({ children }) => {
         }, 60 * 60 * 1000);
         return () => clearInterval(interval);
     }, []);
-
-
 
     // TEAM NAME FETCHING
 
@@ -128,11 +123,7 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-
-
-
     // TEAM EVENT FETCHING
-
 
     const [eventIds, setEventIds] = useState([]);
 
@@ -173,7 +164,6 @@ export const DataProvider = ({ children }) => {
     const [footBallMatchDetails, setFootballMatchDetails] = useState([]);
 
     const fetchFootballDetails = async (id) => {
-
         try {
             const response = await axios.get(`/api/get-football-match-details?Eid=${id}`);
             setFootballMatchDetails(response.data);
@@ -191,7 +181,7 @@ export const DataProvider = ({ children }) => {
             const response = await axios.get(`/api/get-football-line-up?Eid=${id}`);
             setLineUp(response.data);
         } catch (error) {
-            console.error('Error fetching football match details:', error);
+            console.error('Error fetching football line up:', error);
         }
     };
 
@@ -204,18 +194,18 @@ export const DataProvider = ({ children }) => {
         try {
             const response = await fetch(`/api/get-match-schedule-by-date?Date=${Date}&Timezone=${Timezone}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch market data');
+                throw new Error('Failed to fetch match schedule');
             }
             const data = await response.json();
+            setMatchSchedule(data)
             return data;
         } catch (err) {
-            console.error('fetchMarketData error:', err);
+            console.error('fetchMatchSchedules error:', err);
             return null;
         }
     }
 
     // TRANSLATION API IMPLEMENTATION
-
 
     const [language, setLanguage] = useState('en');
 
@@ -242,7 +232,6 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-
     // BLOG SECTION
 
     const fetchBlogCategories = async () => {
@@ -254,22 +243,25 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-
     const fetchRecentBlogs = async () => {
         try {
             const response = await CustomAxios.get('/recent-posts');
             setrecentBlogs(response.data);
         } catch (error) {
-            console.error('Error fetching blog categories:', error);
+            console.error('Error fetching recent blogs:', error);
         }
     };
 
-
-    const fetchBlogs = async () => {
+    const fetchBlogs = async (countryCodeParam = countryCode.country_code) => {
+        if (!countryCodeParam) {
+            console.warn('No country code available for fetching blogs');
+            return;
+        }
+        
         try {
             const res = await CustomAxios.get('/get-blogs', {
                 params: {
-                    country_code: countryCode.country_code
+                    country_code: countryCodeParam
                 }
             });
             setBlogs(res.data.results || []);
@@ -280,10 +272,19 @@ export const DataProvider = ({ children }) => {
 
     // BETTING TABLE DATA - API IMPLEMENTATIONS
 
-    const fetchBettingApps = async () => {
+    const fetchBettingApps = async (countryCodeParam = countryCode.country_code) => {
+        if (!countryCodeParam) {
+            console.warn('No country code available for fetching betting apps');
+            return;
+        }
+        
         try {
+            console.log('Fetching betting apps for country code:', countryCodeParam);
             const response = await CustomAxios.get('/best-betting-headings', {
-                params: { country_code: countryCode.country_code, filter_by: 'current_month' },
+                params: {
+                    country_code: countryCodeParam,
+                    filter_by: 'current_month'
+                },
             });
 
             const data = response.data;
@@ -297,11 +298,16 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-    const fetchBestBettingAppsPrevious = async () => {
+    const fetchBestBettingAppsPrevious = async (countryCodeParam = countryCode.country_code) => {
+        if (!countryCodeParam) {
+            console.warn('No country code available for fetching previous betting apps');
+            return;
+        }
+        
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
                 params: {
-                    country_code: 'IN',
+                    country_code: countryCodeParam,
                     filter_by: 'previous_month'
                 },
             });
@@ -314,12 +320,13 @@ export const DataProvider = ({ children }) => {
                 console.warn('Expected an array, but received:', data);
             }
         } catch (error) {
-            console.error('Error fetching best betting headings:', error);
+            console.error('Error fetching best betting headings (previous):', error);
         }
     };
+
     // CRICKET LIVE SCORE SECTION
 
-    const rapidApiKey = '3e503799a6mshf59ff3fbd1947d4p1620bcjsnb891b5234602';
+    const rapidApiKey = '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf';
 
     const [apiResponse, setApiResponse] = useState(null);
     const [matchTypes, setMatchTypes] = useState([]);
@@ -355,7 +362,7 @@ export const DataProvider = ({ children }) => {
                 Array.from(imageIds).map(async id => {
                     try {
                         const response = await axios.get(
-                            ` https://cricbuzz-cricket.p.rapidapi.com/img/v1/i1/c${id}/i.jpg`,
+                            `https://cricbuzz-cricket.p.rapidapi.com/img/v1/i1/c${id}/i.jpg`,
                             {
                                 headers: { 'X-RapidAPI-Key': rapidApiKey },
                                 responseType: 'blob',
@@ -373,6 +380,7 @@ export const DataProvider = ({ children }) => {
             console.error('Failed to fetch live matches:', error);
         }
     };
+
     // CRICKET MATCH DETAILS SECTION
 
     const [cricketDetails, setCricketDetails] = useState([]);
@@ -385,7 +393,6 @@ export const DataProvider = ({ children }) => {
             console.error('error fetching cricket match details :', error)
         }
     }
-
 
     // CRICKET UPCOMING MATCH SECTION 
 
@@ -448,8 +455,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': '3e503799a6mshf59ff3fbd1947d4p1620bcjsnb891b5234602',
-
+                'X-RapidAPI-Key': '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf',
             }
         };
 
@@ -461,7 +467,6 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-
     // FOOTBALL UPCOMING MATCHES SECTION
 
     const [upcoming, setUpcoming] = useState([]);
@@ -472,7 +477,6 @@ export const DataProvider = ({ children }) => {
 
         const formattedDate = tomorrow.toISOString().split('T')[0].replace(/-/g, ''); // YYYYMMDD format
 
-
         const options = {
             method: 'GET',
             url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
@@ -482,8 +486,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': '3e503799a6mshf59ff3fbd1947d4p1620bcjsnb891b5234602',
-
+                'X-RapidAPI-Key': '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf',
             }
         };
 
@@ -491,7 +494,7 @@ export const DataProvider = ({ children }) => {
             const response = await axios.request(options);
             setUpcoming(response.data)
         } catch (error) {
-            console.error('Error fetching football matches:', error);
+            console.error('Error fetching upcoming football matches:', error);
         }
     };
 
@@ -502,9 +505,8 @@ export const DataProvider = ({ children }) => {
         const options = {
             method: 'GET',
             url: 'https://livescore6.p.rapidapi.com/news/v2/list',
-
             headers: {
-                'X-RapidAPI-Key': '3e503799a6mshf59ff3fbd1947d4p1620bcjsnb891b5234602',
+                'X-RapidAPI-Key': '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf',
             }
         };
 
@@ -512,24 +514,22 @@ export const DataProvider = ({ children }) => {
             const response = await axios.request(options);
             setNews(response.data?.homepageArticles[0])
         } catch (error) {
-            console.error('Error fetching football matches:', error);
+            console.error('Error fetching news:', error);
         }
     };
-
 
     //// NEWS DETAIL SECTION 
 
     const [selectedNews, setSelectedNews] = useState(null);
 
     const fetchNewsDetails = async (id) => {
-        // console.log("news called")
         try {
             const response = await axios.get(
                 `https://livescore6.p.rapidapi.com/news/v2/detail`,
                 {
                     params: { id },
                     headers: {
-                        'X-RapidAPI-Key': '3e503799a6mshf59ff3fbd1947d4p1620bcjsnb891b5234602',
+                        'X-RapidAPI-Key': '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf',
                     },
                 }
             );
@@ -540,24 +540,28 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-
+    // INITIAL USEEFFECT - for data that doesn't depend on country code
     useEffect(() => {
         fetchBlogCategories();
         fetchRecentBlogs();
-        fetchBlogs();
-        fetchBettingApps();
-        fetchBestBettingAppsPrevious();
         fetchMatches();
         fetchUpcomingMatches();
         liveFootBall();
         upcomingFootBall();
         fetchNews();
         fetchLocation();
-        // fetchFootballDetails();
-        // fetchFootBallLineUp();
-        getCountryCode();
-        getTimezoneByCountryCode();
+        getCountryCode(); // This will set the country code
     }, []);
+
+    // COUNTRY CODE DEPENDENT USEEFFECT - for data that depends on country code
+    useEffect(() => {
+        if (countryCode.country_code) {
+            console.log('Country code available, fetching dependent data:', countryCode.country_code);
+            fetchBlogs(countryCode.country_code);
+            fetchBettingApps(countryCode.country_code);
+            fetchBestBettingAppsPrevious(countryCode.country_code);
+        }
+    }, [countryCode.country_code]); // This runs when country code changes
 
     return (
         <DataContext.Provider
