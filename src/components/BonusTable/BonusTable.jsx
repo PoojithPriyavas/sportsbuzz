@@ -50,7 +50,7 @@ export default function BonusTable({ sections }) {
       setTimeout(() => setCopiedId(null), 2000);
     });
   };
-
+console.log(translatedSections,"trans")
   if (translatedSections.length === 0) return null;
 
   return (

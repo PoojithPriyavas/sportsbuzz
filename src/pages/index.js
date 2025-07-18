@@ -62,6 +62,8 @@ export default function Home() {
   //   return <LoadingScreen onFinish={() => setLoading(false)} />;
   // }
 
+      console.log("enters this condition", countryCode?.location?.betting_apps.trim() === 'Active')
+   
   return (
     <>
       <Head>
@@ -86,7 +88,7 @@ export default function Home() {
           <div className={styles.fourColumnRow}>
             {/* Left 3 columns combined */}
             <div className={styles.leftThreeColumns}>
-              {countryCode.location?.betting_apps == 'Active' && (
+              {countryCode?.location?.betting_apps === 'Active' && (
                 <BonusTable sections={sections} />
               )}
               {/* 1-2 Split under BonusTable */}
