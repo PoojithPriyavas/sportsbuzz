@@ -92,7 +92,16 @@ export default function Home() {
               {/* 1-2 Split under BonusTable */}
               <div className={styles.twoSplitRow}>
                 <div className={styles.leftSplit}>
-                  <AutoSlider />
+
+                  {sport === 'cricket' ? (
+                    <>
+                      <UpcomingMatches upcomingMatches={upcomingMatches} />
+                    </>
+                  ) : (
+                    <UpcomingFootballMatches />
+                  )}
+                  <SportsOdsList />
+
                   <TopNewsSection />
 
 
@@ -109,10 +118,19 @@ export default function Home() {
 
             {/* Column 4 - AutoSlider on top and others below */}
             <div className={styles.fourthColumn}>
+
               <BettingCard />
               <JoinTelegramButton />
-              <UpcomingFootballMatches />
-              <UpcomingMatches upcomingMatches={upcomingMatches} />
+              <AutoSlider />
+              {sport === 'cricket' ? (
+                <>
+                  <UpcomingMatches upcomingMatches={upcomingMatches} />
+                </>
+              ) : (
+                <UpcomingFootballMatches />
+              )}
+
+
 
               <SportsOdsList />
 
