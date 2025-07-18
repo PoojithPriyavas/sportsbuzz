@@ -25,8 +25,21 @@ export default function LoadingScreen({ onFinish }) {
     setSport,
   } = useGlobalData();
 
-  const [selectedSport, setSelectedSport] = useState(countryCode?.location?.sports?.toLowerCase() || 'cricket');
-  // console.log(countryCode.location?.betting_apps == 'Active' ? true : false, 'country code condition' , countryCode)
+  // Helper function to get initial sport from localStorage or country settings
+  const getInitialSport = () => {
+    // First check localStorage
+    if (typeof window !== 'undefined') {
+      const savedSport = localStorage.getItem('selectedSport');
+      if (savedSport) {
+        return savedSport;
+      }
+    }
+
+    // Fallback to country settings or default
+    return countryCode?.location?.sports?.toLowerCase() || 'cricket';
+  };
+
+  const [selectedSport, setSelectedSport] = useState(getInitialSport());
 
   const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
   const [translatedText, setTranslatedText] = useState({
@@ -40,7 +53,7 @@ export default function LoadingScreen({ onFinish }) {
 
   // COUNTRY CODE BASED LANGUAGE FILTERING 
 
-  const [filteredList, setFilteredList] = useState([]);
+  // const [filteredList, setFilteredList] = useState([]);
 
   // useEffect(() => {
   //   if (!location || !countryCode) return;
@@ -48,15 +61,47 @@ export default function LoadingScreen({ onFinish }) {
   //   const matched = location.filter(
   //     item => item.country_code === countryCode.country_code
   //   );
+
+  //   const otherLanguages = location.filter(
+  //     item => item.country_code !== countryCode.country_code
+  //   );
+
   //   if (matched.length > 0) {
-  //     setFilteredList(matched);
-  //     // console.log(matched, "matched data")
+  //     const combinedList = [...matched, ...otherLanguages];
+  //     setFilteredList(combinedList);
+
+  //     if (language !== matched[0].hreflang) {
+  //       setLanguage(matched[0].hreflang);
+  //     }
+
   //   } else {
   //     const fallback = location.filter(item => item.country_code === 'IN');
-  //     setFilteredList(fallback);
-  //     // console.log("calling fallback", fallback)
+  //     const otherLanguagesForFallback = location.filter(item => item.country_code !== 'IN');
+
+  //     const combinedFallback = [...fallback, ...otherLanguagesForFallback];
+  //     setFilteredList(combinedFallback);
+
+  //     if (fallback.length > 0 && language !== fallback[0].hreflang) {
+  //       setLanguage(fallback[0].hreflang);
+  //     }
+
   //   }
   // }, [location, countryCode]);
+
+  //
+
+  // Add this useEffect to load saved language on component mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedLanguage = localStorage.getItem('language');
+      if (savedLanguage && savedLanguage !== language) {
+        setLanguage(savedLanguage);
+      }
+    }
+  }, []); // Run only once on mount
+
+  // Update the COUNTRY CODE BASED LANGUAGE FILTERING section
+  const [filteredList, setFilteredList] = useState([]);
 
   useEffect(() => {
     if (!location || !countryCode) return;
@@ -71,9 +116,21 @@ export default function LoadingScreen({ onFinish }) {
 
     if (matched.length > 0) {
       const combinedList = [...matched, ...otherLanguages];
-      setFilteredList(combinedList);
 
-      if (language !== matched[0].hreflang) {
+      // Remove duplicates based on hreflang
+      const uniqueList = combinedList.filter((item, index, self) =>
+        index === self.findIndex(t => t.hreflang === item.hreflang)
+      );
+
+      setFilteredList(uniqueList);
+
+      // Check if saved language exists, otherwise use matched language
+      const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
+      if (savedLanguage && uniqueList.some(lang => lang.hreflang === savedLanguage)) {
+        if (language !== savedLanguage) {
+          setLanguage(savedLanguage);
+        }
+      } else if (language !== matched[0].hreflang) {
         setLanguage(matched[0].hreflang);
       }
 
@@ -82,16 +139,26 @@ export default function LoadingScreen({ onFinish }) {
       const otherLanguagesForFallback = location.filter(item => item.country_code !== 'IN');
 
       const combinedFallback = [...fallback, ...otherLanguagesForFallback];
-      setFilteredList(combinedFallback);
 
-      if (fallback.length > 0 && language !== fallback[0].hreflang) {
+      // Remove duplicates based on hreflang
+      const uniqueFallback = combinedFallback.filter((item, index, self) =>
+        index === self.findIndex(t => t.hreflang === item.hreflang)
+      );
+
+      setFilteredList(uniqueFallback);
+
+      // Check if saved language exists, otherwise use fallback language
+      const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
+      if (savedLanguage && uniqueFallback.some(lang => lang.hreflang === savedLanguage)) {
+        if (language !== savedLanguage) {
+          setLanguage(savedLanguage);
+        }
+      } else if (fallback.length > 0 && language !== fallback[0].hreflang) {
         setLanguage(fallback[0].hreflang);
       }
-
     }
-  }, [location, countryCode]);
+  }, [location, countryCode]); // Removed 'language' from dependencies to avoid infinite loop
 
-  //
 
   useEffect(() => {
     const timer1 = setTimeout(() => {
@@ -152,16 +219,23 @@ export default function LoadingScreen({ onFinish }) {
     localStorage.setItem('language', selected);
   };
 
+  // Initialize sport from localStorage or country settings
   useEffect(() => {
-    if (countryCode?.location?.sports) {
-      setSport(countryCode.location.sports.toLowerCase());
-    }
+    const initialSport = getInitialSport();
+    setSport(initialSport);
+    setSelectedSport(initialSport);
   }, [countryCode, setSport]);
 
   const handleSportChange = (e) => {
-    setSport(e.target.value);
-  };
+    const selectedSport = e.target.value;
+    setSport(selectedSport);
+    setSelectedSport(selectedSport);
 
+    // Save to localStorage for persistence
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedSport', selectedSport);
+    }
+  };
 
   return (
     <div className={`${styles.loaderWrapper} ${styles[phase]} ${darkMode ? styles.darkMode : ''}`}>
@@ -208,23 +282,30 @@ export default function LoadingScreen({ onFinish }) {
         </div>
 
         <div className={styles.rightSection}>
-          <select
+          {/* <select
             className={styles.languageSelector}
             value={language}
             onChange={handleLanguageChange}
           >
             <>
-              {/* <option value='en' >English</option> */}
               {filteredList.map((lang) => (
                 <option key={lang.hreflang} value={lang.hreflang}>{lang.language}</option>
               ))}
             </>
+          </select> */}
+          <select
+            className={styles.languageSelector}
+            value={language}
+            onChange={handleLanguageChange}
+          >
+            {filteredList.map((lang) => (
+              <option key={lang.hreflang} value={lang.hreflang}>
+                {lang.language}
+              </option>
+            ))}
           </select>
 
-
-
-
-          {/* New Sports Dropdown */}
+          {/* Sports Dropdown with persistence */}
           <select
             className={styles.sportsSelector}
             value={sport}

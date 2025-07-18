@@ -5,13 +5,46 @@ import { useEffect, useState, useCallback } from 'react';
 import styles from './MatchScheduler.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 
+// Spinner Loader Component
+const Spinner = ({ size = 'medium', text = 'Loading...' }) => {
+    const sizeClasses = {
+        small: styles.spinnerSmall,
+        medium: styles.spinnerMedium,
+        large: styles.spinnerLarge
+    };
+
+    return (
+        <div className={styles.spinnerContainer}>
+            <div className={`${styles.spinner} ${sizeClasses[size]}`}>
+                <div className={styles.spinnerCircle}></div>
+            </div>
+            {text && <p className={styles.spinnerText}>{text}</p>}
+        </div>
+    );
+};
+
 export default function MatchScheduler() {
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedDateNumeric, setSelectedDateNumeric] = useState('');
     const [activeLeague, setActiveLeague] = useState('');
     const [dates, setDates] = useState([]);
     const [isInitialized, setIsInitialized] = useState(false);
+    const [isLoadingMatches, setIsLoadingMatches] = useState(false);
     const { matchSchedule, fetchMatchSchedules, currentTimezone, countryCode } = useGlobalData();
+
+    // Helper function to get date from localStorage or default to today
+    const getInitialDate = useCallback(() => {
+        if (typeof window !== 'undefined') {
+            const savedDate = localStorage.getItem('matchScheduler_selectedDate');
+            if (savedDate) {
+                const parsedDate = new Date(savedDate);
+                if (!isNaN(parsedDate.getTime())) {
+                    return parsedDate;
+                }
+            }
+        }
+        return new Date();
+    }, []);
 
     // Initialize dates and fetch initial data
     useEffect(() => {
@@ -20,11 +53,13 @@ export default function MatchScheduler() {
             return;
         }
         
+        // Always use today's date for generating the date range
         const today = new Date();
+        const initialSelectedDate = getInitialDate(); // This can be different from today
         const newDates = [];
 
         for (let i = -1; i < 13; i++) {
-            const date = new Date(today);
+            const date = new Date(today); // Always use today as reference
             date.setDate(today.getDate() + i);
 
             const isoDate = date.toISOString().split('T')[0];
@@ -42,26 +77,40 @@ export default function MatchScheduler() {
         }
 
         setDates(newDates);
-        const todayIsoDate = today.toISOString().split('T')[0];
-        const todayNumericDate = [
-            today.getFullYear(),
-            String(today.getMonth() + 1).padStart(2, '0'),
-            String(today.getDate()).padStart(2, '0')
+        
+        // Set the selected date from localStorage (or today if no saved date)
+        const initialIsoDate = initialSelectedDate.toISOString().split('T')[0];
+        const initialNumericDate = [
+            initialSelectedDate.getFullYear(),
+            String(initialSelectedDate.getMonth() + 1).padStart(2, '0'),
+            String(initialSelectedDate.getDate()).padStart(2, '0')
         ].join('');
 
-        setSelectedDate(todayIsoDate);
-        setSelectedDateNumeric(todayNumericDate);
+        setSelectedDate(initialIsoDate);
+        setSelectedDateNumeric(initialNumericDate);
         setIsInitialized(true);
 
-        // Now fetch data with the correct timezone
-        fetchMatchSchedules(todayNumericDate, currentTimezone);
-    }, [currentTimezone, countryCode.country_code, isInitialized, fetchMatchSchedules]);
+        // Show loading spinner and fetch data
+        setIsLoadingMatches(true);
+        fetchMatchSchedules(initialNumericDate, currentTimezone).finally(() => {
+            setIsLoadingMatches(false);
+        });
+    }, [currentTimezone, countryCode.country_code, isInitialized, fetchMatchSchedules, getInitialDate]);
 
-    // Handle date selection
+    // Handle date selection with localStorage persistence
     const handleDateSelect = useCallback((isoDate, numericDate) => {
         setSelectedDate(isoDate);
         setSelectedDateNumeric(numericDate);
-        fetchMatchSchedules(numericDate, currentTimezone);
+        
+        // Save to localStorage
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('matchScheduler_selectedDate', isoDate);
+        }
+        
+        setIsLoadingMatches(true);
+        fetchMatchSchedules(numericDate, currentTimezone).finally(() => {
+            setIsLoadingMatches(false);
+        });
     }, [fetchMatchSchedules, currentTimezone]);
 
     // Transform API data
@@ -146,7 +195,7 @@ export default function MatchScheduler() {
         return (
             <div className={styles.header}>
                 <h1>Match Schedule</h1>
-                <p>Loading timezone...</p>
+                <Spinner size="large" text="Loading timezone..." />
             </div>
         );
     }
@@ -196,7 +245,9 @@ export default function MatchScheduler() {
             </div>
 
             <div className={`${styles.matchesContainer} ${selectedDate ? styles.visible : ''}`}>
-                {displayMatches(selectedDate).length === 0 ? (
+                {isLoadingMatches ? (
+                    <Spinner size="large" text="Loading matches..." />
+                ) : displayMatches(selectedDate).length === 0 ? (
                     <div className={styles.noMatches}>
                         <div className={styles.noMatchesIcon}>⚽</div>
                         <p>No matches found for the selected date and league</p>

@@ -14,10 +14,11 @@ import TestLive from "@/components/LiveScoreSection/TestLive";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 import MatchScheduler from "@/components/FootballMatchScheduler/MatchScheduler";
 import FooterTwo from "@/components/Footer/Footer";
-
+import { useGlobalData } from "@/components/Context/ApiContext";
 
 export default function MatchSchedulerScreen() {
 
+    const { sport, apiResponse, teamImages, matchTypes } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -36,8 +37,13 @@ export default function MatchSchedulerScreen() {
             <LoadingScreen onFinish={() => setLoading(false)} />
 
             <div className='container'>
-                {/* <LiveScores /> */}
-                <TestLive />
+                {sport === 'cricket' ? (
+                    <>
+                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+                    </>
+                ) : (
+                    <TestLive />
+                )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
                         <MatchScheduler />
@@ -63,7 +69,7 @@ export default function MatchSchedulerScreen() {
                 <BettingAppsRecentTable />
 
             </div>
-             <FooterTwo />
+            <FooterTwo />
         </>
     )
 }

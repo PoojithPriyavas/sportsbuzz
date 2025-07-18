@@ -280,3 +280,138 @@
         font-size: 1rem;
     }
 }
+
+/* Spinner Container */
+.spinnerContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    min-height: 200px;
+}
+
+/* Spinner Base */
+.spinner {
+    display: inline-block;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.spinnerCircle {
+    display: block;
+    border-radius: 50%;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    animation: spin 1s linear infinite;
+}
+
+/* Spinner Sizes */
+.spinnerSmall .spinnerCircle {
+    width: 24px;
+    height: 24px;
+}
+
+.spinnerMedium .spinnerCircle {
+    width: 40px;
+    height: 40px;
+}
+
+.spinnerLarge .spinnerCircle {
+    width: 60px;
+    height: 60px;
+}
+
+/* Spinner Animation */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Spinner Text */
+.spinnerText {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+    text-align: center;
+}
+
+/* Alternative spinner styles for better visual appeal */
+.spinner.pulsing .spinnerCircle {
+    border: 3px solid rgba(52, 152, 219, 0.2);
+    border-top: 3px solid #3498db;
+    animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Gradient spinner variant */
+.spinner.gradient .spinnerCircle {
+    border: 3px solid transparent;
+    border-top: 3px solid #3498db;
+    border-right: 3px solid #e74c3c;
+    border-bottom: 3px solid #f39c12;
+    border-left: 3px solid #2ecc71;
+    animation: spin 1s linear infinite;
+}
+
+/* Loading overlay for matches container */
+.matchesContainer.loading {
+    position: relative;
+    min-height: 300px;
+    pointer-events: none;
+}
+
+.matchesContainer.loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1;
+}
+
+.matchesContainer.loading .spinnerContainer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .spinnerContainer {
+        padding: 1rem;
+        min-height: 150px;
+    }
+
+    .spinnerLarge .spinnerCircle {
+        width: 48px;
+        height: 48px;
+    }
+
+    .spinnerText {
+        font-size: 0.8rem;
+    }
+}
