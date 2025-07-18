@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
-
+import CustomAxios from '../utilities/CustomAxios';
 
 const ContactUsPage = () => {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         email: '',
-        phone: '',
+        telegram: '',
         company: '',
         jobTitle: '',
-        country: '',
+        category: '',
         subject: '',
         message: '',
         howDidYouHear: '',
@@ -42,8 +42,6 @@ const ContactUsPage = () => {
         'Other'
     ];
 
-
-
     const validate = () => {
         const newErrors = {};
 
@@ -56,10 +54,8 @@ const ContactUsPage = () => {
             newErrors.email = 'Please enter a valid email address';
         }
 
-        if (!formData.phone.trim()) {
-            newErrors.phone = 'Phone number is required';
-        } else if (!/^[\+]?[\d\s\-\(\)]{10,}$/.test(formData.phone)) {
-            newErrors.phone = 'Please enter a valid phone number';
+        if (!formData.telegram.trim()) {
+            newErrors.telegram = 'Telegram ID is required';
         }
 
         if (!formData.subject) newErrors.subject = 'Please select a subject';
@@ -95,27 +91,67 @@ const ContactUsPage = () => {
 
         setIsSubmitting(true);
 
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            // Create FormData object for multipart/form-data
+            const formDataToSend = new FormData();
+            
+            // Combine first name and last name into a single name field
+            const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
+            formDataToSend.append('name', fullName);
+            
+            formDataToSend.append('email', formData.email);
+            formDataToSend.append('contact_number', formData.telegram);
+            // formDataToSend.append('company', formData.company);
+            // formDataToSend.append('job_title', formData.jobTitle);
+            formDataToSend.append('category', formData.category);
+            formDataToSend.append('subject', formData.subject);
+            formDataToSend.append('message', formData.message);
+            // formDataToSend.append('how_did_you_hear', formData.howDidYouHear);
+            // formDataToSend.append('newsletter', formData.newsletter);
+
+            const response = await CustomAxios.post('/contact-forms/', formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            // If we get here, the request was successful
             setSuccess(true);
             setFormData({
                 firstName: '',
                 lastName: '',
                 email: '',
-                phone: '',
+                telegram: '',
                 company: '',
                 jobTitle: '',
-                country: '',
+                category: '',
                 subject: '',
                 message: '',
                 howDidYouHear: '',
                 newsletter: false
             });
-            setIsSubmitting(false);
 
             // Hide success message after 5 seconds
             setTimeout(() => setSuccess(false), 5000);
-        }, 1000);
+
+        } catch (error) {
+            console.error('Form submission failed:', error);
+
+            if (error.response && error.response.data) {
+                // Handle specific field errors if returned by API
+                if (error.response.data.errors) {
+                    setErrors(error.response.data.errors);
+                } else {
+                    // Show generic error
+                    setErrors({ submit: 'Failed to send message. Please try again.' });
+                }
+            } else {
+                // Network error or other issues
+                setErrors({ submit: 'Network error. Please check your connection and try again.' });
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const styles = {
@@ -207,7 +243,8 @@ const ContactUsPage = () => {
             transition: 'all 0.3s ease',
             backgroundColor: '#fff',
             fontFamily: 'inherit',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            color: 'black'
         },
         inputFocus: {
             borderColor: '#3498db',
@@ -228,7 +265,8 @@ const ContactUsPage = () => {
             fontFamily: 'inherit',
             resize: 'vertical',
             minHeight: '120px',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            color: 'black'
         },
         select: {
             width: '100%',
@@ -245,7 +283,8 @@ const ContactUsPage = () => {
             backgroundPosition: 'right 12px center',
             backgroundSize: '16px',
             paddingRight: '40px',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            color: 'black'
         },
         checkboxContainer: {
             display: 'flex',
@@ -408,7 +447,6 @@ const ContactUsPage = () => {
             <div style={styles.container}>
                 <div style={styles.hero}> </div>
 
-
                 <div style={styles.mainContent}>
                     <div style={styles.formContainer}>
                         <h2 style={styles.formTitle}>Send us a message</h2>
@@ -419,7 +457,13 @@ const ContactUsPage = () => {
                             </div>
                         )}
 
-                        <div>
+                        {errors.submit && (
+                            <div style={styles.errorMessage}>
+                                ⚠️ {errors.submit}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit}>
                             <div style={styles.formGrid}>
                                 <div style={styles.formGroup}>
                                     <label style={styles.label}>
@@ -488,42 +532,40 @@ const ContactUsPage = () => {
 
                                 <div style={styles.formGroup}>
                                     <label style={styles.label}>
-                                        Phone Number <span style={styles.required}>*</span>
+                                        Telegram ID <span style={styles.required}>*</span>
                                     </label>
                                     <input
-                                        type="tel"
-                                        name="phone"
-                                        value={formData.phone}
+                                        type="text"
+                                        name="telegram"
+                                        value={formData.telegram}
                                         onChange={handleChange}
-                                        onFocus={() => setFocusedField('phone')}
+                                        onFocus={() => setFocusedField('telegram')}
                                         onBlur={() => setFocusedField('')}
-                                        style={getInputStyle('phone')}
-                                        placeholder="Enter your phone number"
+                                        style={getInputStyle('telegram')}
+                                        placeholder="Enter your Telegram ID (e.g., @username)"
                                     />
-                                    {errors.phone && (
+                                    {errors.telegram && (
                                         <div style={styles.errorMessage}>
-                                            ⚠️ {errors.phone}
+                                            ⚠️ {errors.telegram}
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-
-
                             <div style={styles.formGrid}>
                                 <div style={styles.formGroup}>
                                     <label style={styles.label}>Category</label>
                                     <select
-                                        name="categories"
-                                        value={formData.country}
+                                        name="category"
+                                        value={formData.category}
                                         onChange={handleChange}
-                                        onFocus={() => setFocusedField('categories')}
+                                        onFocus={() => setFocusedField('category')}
                                         onBlur={() => setFocusedField('')}
-                                        style={getSelectStyle('categories')}
+                                        style={getSelectStyle('category')}
                                     >
                                         <option value="">Select your category</option>
-                                        {categories.map(country => (
-                                            <option key={country} value={country}>{country}</option>
+                                        {categories.map(category => (
+                                            <option key={category} value={category} style={{ color: '#6c757d' }}>{category}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -551,10 +593,7 @@ const ContactUsPage = () => {
                                         </div>
                                     )}
                                 </div>
-
                             </div>
-
-
 
                             <div style={styles.formGroupFull}>
                                 <label style={styles.label}>
@@ -577,11 +616,8 @@ const ContactUsPage = () => {
                                 )}
                             </div>
 
-
-
                             <button
-                                type="button"
-                                onClick={handleSubmit}
+                                type="submit"
                                 disabled={isSubmitting}
                                 style={getButtonStyle()}
                                 onMouseEnter={() => setHoveredButton(true)}
@@ -589,8 +625,7 @@ const ContactUsPage = () => {
                             >
                                 {isSubmitting ? 'Sending...' : 'Send Message'}
                             </button>
-
-                        </div>
+                        </form>
                     </div>
 
                     <div style={styles.contactInfo}>
@@ -606,9 +641,6 @@ const ContactUsPage = () => {
                                 </div>
                             </div>
                         </div>
-
-
-
 
                         <div style={styles.contactItem}>
                             <div style={styles.contactIcon}>🕐</div>
@@ -630,7 +662,3 @@ const ContactUsPage = () => {
 };
 
 export default ContactUsPage;
-
-
-
-

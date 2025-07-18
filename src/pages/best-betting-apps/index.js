@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import TestLive from "@/components/LiveScoreSection/TestLive";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
-
+import FooterTwo from "@/components/Footer/Footer";
 
 
 
@@ -66,6 +66,7 @@ export default function BestBettingApps() {
                 <BettingAppsRecentTable />
 
             </div>
+            <FooterTwo />
         </>
     )
 }

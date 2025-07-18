@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import TestLive from "@/components/LiveScoreSection/TestLive";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 import MatchScheduler from "@/components/FootballMatchScheduler/MatchScheduler";
-
+import FooterTwo from "@/components/Footer/Footer";
 
 
 export default function MatchSchedulerScreen() {
@@ -63,6 +63,7 @@ export default function MatchSchedulerScreen() {
                 <BettingAppsRecentTable />
 
             </div>
+             <FooterTwo />
         </>
     )
 }

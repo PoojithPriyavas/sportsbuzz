@@ -183,6 +183,12 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+    // FETCH MATCH SCHEDULE BY DATE
+
+    const [matchSchedule, setMatchSchedule] = useState([]);
+
+    
+
     // TRANSLATION API IMPLEMENTATION
 
 
@@ -236,7 +242,11 @@ export const DataProvider = ({ children }) => {
 
     const fetchBlogs = async () => {
         try {
-            const res = await CustomAxios.get('/get-blogs');
+            const res = await CustomAxios.get('/get-blogs', {
+                params: {
+                    country_code: countryCode.country_code
+                }
+            });
             setBlogs(res.data.results || []);
         } catch (error) {
             console.error('Failed to fetch blogs:', error);
@@ -248,7 +258,7 @@ export const DataProvider = ({ children }) => {
     const fetchBettingApps = async () => {
         try {
             const response = await CustomAxios.get('/best-betting-headings', {
-                params: { country_code: 'IN', filter_by: 'current_month' },
+                params: { country_code: countryCode.country_code, filter_by: 'current_month' },
             });
 
             const data = response.data;

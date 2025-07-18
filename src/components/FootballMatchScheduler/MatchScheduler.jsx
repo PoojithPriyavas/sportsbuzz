@@ -3,80 +3,13 @@
 
 import { useEffect, useState } from 'react';
 import styles from './MatchScheduler.module.css';
-
-const matchData = {
-    '2025-07-14': [
-        {
-            competition: 'FIFA Club World Cup',
-            stage: 'Final Stage',
-            matches: [
-                { home: 'FLU', away: 'POL', homeScore: 0, awayScore: 0, status: 'FT', time: "90'" },
-                { home: 'CHE', away: 'SWE', homeScore: 2, awayScore: 3, status: 'FT', time: "90'" },
-            ],
-        },
-    ],
-    '2025-07-15': [
-        {
-            competition: "Women's EURO",
-            stage: 'Group C',
-            matches: [
-                { home: 'ENG', away: 'NED', homeScore: 4, awayScore: 0, status: 'FT', time: "90'" },
-            ],
-        },
-    ],
-    '2025-07-16': [
-        {
-            competition: 'Champions League',
-            stage: 'Semi Final',
-            matches: [
-                { home: 'BAR', away: 'MAN', homeScore: 2, awayScore: 1, status: 'FT', time: "90'" },
-                { home: 'LIV', away: 'PSG', homeScore: 3, awayScore: 2, status: 'FT', time: "90'" },
-            ],
-        },
-        {
-            competition: 'Premier League',
-            stage: 'Regular Season',
-            matches: [
-                { home: 'ARS', away: 'CHE', homeScore: 1, awayScore: 0, status: 'FT', time: "90'" },
-            ],
-        },
-    ],
-    '2025-07-17': [
-        {
-            competition: 'La Liga',
-            stage: 'Regular Season',
-            matches: [
-                { home: 'MAD', away: 'BAR', homeScore: 2, awayScore: 3, status: 'FT', time: "90'" },
-                { home: 'ATM', away: 'SEV', homeScore: 1, awayScore: 1, status: 'FT', time: "90'" },
-            ],
-        },
-    ],
-    '2025-07-18': [
-        {
-            competition: 'Champions League',
-            stage: 'Final',
-            matches: [
-                { home: 'BAR', away: 'LIV', homeScore: null, awayScore: null, status: 'upcoming', time: '20:00' },
-                { home: 'MAN', away: 'PSG', homeScore: null, awayScore: null, status: 'upcoming', time: '22:30' },
-            ],
-        },
-    ],
-    '2025-07-19': [
-        {
-            competition: 'Premier League',
-            stage: 'Regular Season',
-            matches: [
-                { home: 'ARS', away: 'MAN', homeScore: null, awayScore: null, status: 'upcoming', time: '15:00' },
-                { home: 'CHE', away: 'LIV', homeScore: null, awayScore: null, status: 'upcoming', time: '17:30' },
-            ],
-        },
-    ],
-};
+import { useGlobalData } from '../Context/ApiContext';
 
 export default function MatchScheduler() {
     const [selectedDate, setSelectedDate] = useState(null);
     const [activeLeague, setActiveLeague] = useState('');
     const [dates, setDates] = useState([]);
+    const { matchSchedule } = useGlobalData();
 
     useEffect(() => {
         const today = new Date();
@@ -90,12 +23,68 @@ export default function MatchScheduler() {
         setSelectedDate(today.toISOString().split('T')[0]);
     }, []);
 
+    // Transform API data into the format we need
+    const transformMatchData = () => {
+        if (!matchSchedule?.Stages) return {};
+        
+        const transformedData = {};
+        
+        matchSchedule.Stages.forEach(stage => {
+            stage.Events.forEach(event => {
+                // Convert timestamp to YYYY-MM-DD format
+                const eventDate = new Date(event.Esd.toString().replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'));
+                const dateStr = eventDate.toISOString().split('T')[0];
+                
+                if (!transformedData[dateStr]) {
+                    transformedData[dateStr] = [];
+                }
+                
+                // Find if competition already exists for this date
+                let competition = transformedData[dateStr].find(comp => comp.competition === stage.CompN || comp.competition === stage.Cnm);
+                
+                if (!competition) {
+                    competition = {
+                        competition: stage.CompN || stage.Cnm,
+                        stage: stage.Snm,
+                        matches: []
+                    };
+                    transformedData[dateStr].push(competition);
+                }
+                
+                // Add match to competition
+                competition.matches.push({
+                    home: event.T1[0].Abr || event.T1[0].Nm.substring(0, 3).toUpperCase(),
+                    away: event.T2[0].Abr || event.T2[0].Nm.substring(0, 3).toUpperCase(),
+                    homeScore: null, // API doesn't provide scores in the sample
+                    awayScore: null, // API doesn't provide scores in the sample
+                    status: event.Eps === 'NS' ? 'upcoming' : 'FT', // Simplified status
+                    time: event.Esd.toString().substring(8, 10) + ':' + event.Esd.toString().substring(10, 12) // Extract time from timestamp
+                });
+            });
+        });
+        
+        return transformedData;
+    };
+
+    const matchData = transformMatchData();
+
     const displayMatches = (date) => {
         let matches = matchData[date] || [];
         if (activeLeague) {
             matches = matches.filter((comp) => comp.competition === activeLeague);
         }
         return matches;
+    };
+
+    // Get unique leagues for filter
+    const getUniqueLeagues = () => {
+        if (!matchSchedule?.Stages) return ['All Leagues'];
+        
+        const leagues = new Set(['All Leagues']);
+        matchSchedule.Stages.forEach(stage => {
+            leagues.add(stage.CompN || stage.Cnm);
+        });
+        return Array.from(leagues);
     };
 
     return (
@@ -128,7 +117,7 @@ export default function MatchScheduler() {
             </div>
 
             <div className={styles.leagueFilter}>
-                {['All Leagues', 'FIFA Club World Cup', "Women's EURO", 'Champions League', 'Premier League', 'La Liga'].map((league) => (
+                {getUniqueLeagues().map((league) => (
                     <div
                         key={league}
                         className={`${styles.leagueChip} ${activeLeague === league || (league === 'All Leagues' && activeLeague === '') ? styles.active : ''}`}
@@ -166,7 +155,6 @@ export default function MatchScheduler() {
                                             <div className={styles.teamFlag}>{match.away}</div>
                                             <div className={styles.teamName}>{match.away}</div>
                                         </div>
-                                        {/* <div className={styles.matchTime}>{match.time}</div> */}
                                     </div>
                                 ))}
                             </div>

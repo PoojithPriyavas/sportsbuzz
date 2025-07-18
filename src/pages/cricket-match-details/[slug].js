@@ -16,6 +16,7 @@ import MatchScheduler from "@/components/FootballMatchScheduler/MatchScheduler";
 import CricketDashboard from '@/components/CricketDashboard/CricketDashboard';
 import Footer from '@/components/Footer/Footer';
 import { useParams } from "next/navigation";
+import FooterTwo from "@/components/Footer/Footer";
 
 import { useGlobalData } from "@/components/Context/ApiContext";
 
@@ -79,6 +80,7 @@ export default function CricketMatchDetails() {
 
 
             </div>
+             <FooterTwo />
             <Footer />
         </>
     )

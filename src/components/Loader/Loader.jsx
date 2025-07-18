@@ -26,6 +26,7 @@ export default function LoadingScreen({ onFinish }) {
   } = useGlobalData();
 
   const [selectedSport, setSelectedSport] = useState(countryCode?.location?.sports?.toLowerCase() || 'cricket');
+  // console.log(countryCode.location?.betting_apps == 'Active' ? true : false, 'country code condition' , countryCode)
 
   const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
   const [translatedText, setTranslatedText] = useState({
@@ -37,8 +38,25 @@ export default function LoadingScreen({ onFinish }) {
     football: 'Football'
   });
 
-  // COUNTRY CODE FILTERING 
+  // COUNTRY CODE BASED LANGUAGE FILTERING 
+
   const [filteredList, setFilteredList] = useState([]);
+
+  // useEffect(() => {
+  //   if (!location || !countryCode) return;
+
+  //   const matched = location.filter(
+  //     item => item.country_code === countryCode.country_code
+  //   );
+  //   if (matched.length > 0) {
+  //     setFilteredList(matched);
+  //     // console.log(matched, "matched data")
+  //   } else {
+  //     const fallback = location.filter(item => item.country_code === 'IN');
+  //     setFilteredList(fallback);
+  //     // console.log("calling fallback", fallback)
+  //   }
+  // }, [location, countryCode]);
 
   useEffect(() => {
     if (!location || !countryCode) return;
@@ -46,13 +64,30 @@ export default function LoadingScreen({ onFinish }) {
     const matched = location.filter(
       item => item.country_code === countryCode.country_code
     );
+
+    const otherLanguages = location.filter(
+      item => item.country_code !== countryCode.country_code
+    );
+
     if (matched.length > 0) {
-      setFilteredList(matched);
-      // console.log(matched, "matched data")
+      const combinedList = [...matched, ...otherLanguages];
+      setFilteredList(combinedList);
+
+      if (language !== matched[0].hreflang) {
+        setLanguage(matched[0].hreflang);
+      }
+
     } else {
       const fallback = location.filter(item => item.country_code === 'IN');
-      setFilteredList(fallback);
-      // console.log("calling fallback", fallback)
+      const otherLanguagesForFallback = location.filter(item => item.country_code !== 'IN');
+
+      const combinedFallback = [...fallback, ...otherLanguagesForFallback];
+      setFilteredList(combinedFallback);
+
+      if (fallback.length > 0 && language !== fallback[0].hreflang) {
+        setLanguage(fallback[0].hreflang);
+      }
+
     }
   }, [location, countryCode]);
 
@@ -140,7 +175,9 @@ export default function LoadingScreen({ onFinish }) {
             <span className={styles.separator}>|</span>
             <nav className={styles.nav}>
               <Link href="/" className={`${styles.navItem} ${pathname === '/' ? styles.active : ''}`}>{translatedText.home}</Link>
-              <Link href="/best-betting-apps" className={`${styles.navItem} ${pathname === '/best-betting-apps' ? styles.active : ''}`}>{translatedText.apps}</Link>
+              {countryCode.location?.betting_apps == 'Active' && (
+                <Link href="/best-betting-apps" className={`${styles.navItem} ${pathname === '/best-betting-apps' ? styles.active : ''}`}>{translatedText.apps}</Link>
+              )}
               <Link href="/match-schedules" className={`${styles.navItem} ${pathname === '/match-schedules' ? styles.active : ''}`}>{translatedText.schedule}</Link>
               <Link href="/news-page" className={`${styles.navItem} ${pathname === '/news-page' ? styles.active : ''}`}>{translatedText.news}</Link>
 
@@ -196,9 +233,9 @@ export default function LoadingScreen({ onFinish }) {
             <option value="cricket">{translatedText.cricket}</option>
             <option value="football">{translatedText.football}</option>
           </select>
-          <button className={styles.darkModeToggle} onClick={toggleDarkMode}>
+          {/* <button className={styles.darkModeToggle} onClick={toggleDarkMode}>
             {darkMode ? <FaSun /> : <FaMoon />}
-          </button>
+          </button> */}
 
           <FeaturedButton />
         </div>

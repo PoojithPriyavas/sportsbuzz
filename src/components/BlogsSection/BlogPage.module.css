@@ -355,3 +355,132 @@
     justify-content: center;
   }
 }
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 40px;
+  padding: 20px 0;
+  border-top: 1px solid #e5e5e5;
+}
+
+.pageNumbers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.paginationButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 40px;
+  height: 40px;
+}
+
+.paginationButton:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.paginationButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.paginationButton.active {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #fff;
+}
+
+.paginationButton.active:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.paginationButton.prevNext {
+  gap: 6px;
+  padding: 8px 16px;
+  font-weight: 500;
+}
+
+.paginationIcon {
+  font-size: 12px;
+}
+
+.ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* Responsive pagination */
+@media (max-width: 768px) {
+  .pagination {
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 30px;
+  }
+
+  .paginationButton {
+    padding: 6px 8px;
+    font-size: 13px;
+    min-width: 36px;
+    height: 36px;
+  }
+
+  .paginationButton.prevNext {
+    padding: 6px 12px;
+  }
+
+  .pageNumbers {
+    order: 1;
+    width: 100%;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .paginationButton.prevNext {
+    order: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination {
+    gap: 4px;
+  }
+
+  .paginationButton {
+    padding: 4px 6px;
+    font-size: 12px;
+    min-width: 32px;
+    height: 32px;
+  }
+
+  .paginationButton.prevNext {
+    padding: 4px 8px;
+  }
+
+  .paginationIcon {
+    font-size: 10px;
+  }
+}

@@ -46,7 +46,8 @@ export default function Home() {
     matchTypes,
     teamImages,
     upcomingMatches,
-    sport
+    sport,
+    countryCode
   } = useGlobalData();
   const [loading, setLoading] = useState(true);
   // const sport = countryCode?.location?.sports?.toLowerCase() || 'cricket';
@@ -85,8 +86,9 @@ export default function Home() {
           <div className={styles.fourColumnRow}>
             {/* Left 3 columns combined */}
             <div className={styles.leftThreeColumns}>
-              <BonusTable sections={sections} />
-
+              {countryCode.location?.betting_apps == 'Active' && (
+                <BonusTable sections={sections} />
+              )}
               {/* 1-2 Split under BonusTable */}
               <div className={styles.twoSplitRow}>
                 <div className={styles.leftSplit}>
