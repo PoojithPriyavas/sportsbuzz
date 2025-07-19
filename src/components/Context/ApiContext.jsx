@@ -17,7 +17,7 @@ export const DataProvider = ({ children }) => {
     const [blogs, setBlogs] = useState([]);
     const [sections, setSections] = useState([]);
     const [bestSections, setBestSections] = useState([]);
-    const [sport, setSport] = useState('cricket');
+    // const [sport, setSport] = useState('cricket');
 
 
     //  TIME ZONE IMPLEMENTATION
@@ -57,6 +57,28 @@ export const DataProvider = ({ children }) => {
             console.error('Failed to fetch locations:', error);
         }
     };
+
+
+    //SPORT CHANGE CONDITION
+
+    const [sport, setSport] = useState(() => {
+        // Get from localStorage if available
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('selectedSport') || 'cricket';
+        }
+        return 'cricket';
+    });
+
+    // Add this effect to update sport when country code changes
+    useEffect(() => {
+        if (countryCode?.location?.sports) {
+            const apiSport = countryCode.location.sports.toLowerCase();
+            if (apiSport !== sport) {
+                setSport(apiSport);
+                localStorage.setItem('selectedSport', apiSport);
+            }
+        }
+    }, [countryCode]);
 
     // SETTINGS-API IMPLEMENTATION
     const [settings, setSettings] = useState([]);
@@ -264,24 +286,22 @@ export const DataProvider = ({ children }) => {
             console.error('Error fetching recent blogs:', error);
         }
     };
-
-    const fetchBlogs = async (countryCodeParam = countryCode.country_code) => {
-        if (!countryCodeParam) {
-            console.warn('No country code available for fetching blogs');
-            return;
-        }
-
+    // ApiContext.js or ApiProvider.js
+    const fetchBlogs = async ({ countryCodeParam = countryCode?.country_code, search = '' }) => {
         try {
-            const res = await CustomAxios.get('/get-blogs', {
+            const response = await CustomAxios.get('/get-blogs', {
                 params: {
-                    country_code: countryCodeParam
-                }
+                    country_code: countryCodeParam,
+                    search,
+                },
             });
-            setBlogs(res.data.results || []);
+            setBlogs(response.data.results || []);
         } catch (error) {
             console.error('Failed to fetch blogs:', error);
         }
     };
+
+
 
     // BETTING TABLE DATA - API IMPLEMENTATIONS
 
@@ -339,7 +359,7 @@ export const DataProvider = ({ children }) => {
 
     // CRICKET LIVE SCORE SECTION
 
-    const rapidApiKey = '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf';
+    const rapidApiKey = '0319133012msh43bb1120be949f2p114aa7jsnb0b6684e193f';
 
     const [apiResponse, setApiResponse] = useState(null);
     const [matchTypes, setMatchTypes] = useState([]);
@@ -468,7 +488,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf',
+                'X-RapidAPI-Key': '0319133012msh43bb1120be949f2p114aa7jsnb0b6684e193f',
             }
         };
 
@@ -499,7 +519,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf',
+                'X-RapidAPI-Key': '0319133012msh43bb1120be949f2p114aa7jsnb0b6684e193f',
             }
         };
 
@@ -519,7 +539,7 @@ export const DataProvider = ({ children }) => {
             method: 'GET',
             url: 'https://livescore6.p.rapidapi.com/news/v2/list',
             headers: {
-                'X-RapidAPI-Key': '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf',
+                'X-RapidAPI-Key': '0319133012msh43bb1120be949f2p114aa7jsnb0b6684e193f',
             }
         };
 
@@ -542,7 +562,7 @@ export const DataProvider = ({ children }) => {
                 {
                     params: { id },
                     headers: {
-                        'X-RapidAPI-Key': '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf',
+                        'X-RapidAPI-Key': '0319133012msh43bb1120be949f2p114aa7jsnb0b6684e193f',
                     },
                 }
             );
@@ -580,6 +600,7 @@ export const DataProvider = ({ children }) => {
             value={{
                 blogCategories,
                 recentBlogs,
+                fetchBlogs,
                 blogs,
                 sections,
                 bestSections,

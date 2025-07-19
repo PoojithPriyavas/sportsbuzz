@@ -9,7 +9,7 @@ const FeaturedButton = () => {
 
     // Find the featured category
     const featuredCategory = blogCategories?.find(category => category.featured === true);
-    const href = featuredCategory ? `/blogs/pages/all-blogs?subcategory=${featuredCategory.id}` : '#';
+    const href = featuredCategory ? `/blogs/pages/all-blogs?category=${featuredCategory.id}` : '#';
 
     const handleClick = (e) => {
         console.log('Featured content clicked with POWER!');

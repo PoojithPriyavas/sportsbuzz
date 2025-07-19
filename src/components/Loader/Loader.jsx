@@ -25,22 +25,6 @@ export default function LoadingScreen({ onFinish }) {
     setSport,
   } = useGlobalData();
 
-  // Helper function to get initial sport from localStorage or country settings
-  const getInitialSport = () => {
-    // First check localStorage
-    if (typeof window !== 'undefined') {
-      const savedSport = localStorage.getItem('selectedSport');
-      if (savedSport) {
-        return savedSport;
-      }
-    }
-
-    // Fallback to country settings or default
-    return countryCode?.location?.sports?.toLowerCase() || 'cricket';
-  };
-
-  const [selectedSport, setSelectedSport] = useState(getInitialSport());
-
   const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
   const [translatedText, setTranslatedText] = useState({
     home: 'Home',
@@ -48,49 +32,13 @@ export default function LoadingScreen({ onFinish }) {
     news: 'News',
     schedule: 'Match Schedules',
     cricket: 'Cricket',
-    football: 'Football'
+    football: 'Football',
+    contact: 'Contact'
   });
 
-  // COUNTRY CODE BASED LANGUAGE FILTERING 
+  const [filteredList, setFilteredList] = useState([]);
 
-  // const [filteredList, setFilteredList] = useState([]);
-
-  // useEffect(() => {
-  //   if (!location || !countryCode) return;
-
-  //   const matched = location.filter(
-  //     item => item.country_code === countryCode.country_code
-  //   );
-
-  //   const otherLanguages = location.filter(
-  //     item => item.country_code !== countryCode.country_code
-  //   );
-
-  //   if (matched.length > 0) {
-  //     const combinedList = [...matched, ...otherLanguages];
-  //     setFilteredList(combinedList);
-
-  //     if (language !== matched[0].hreflang) {
-  //       setLanguage(matched[0].hreflang);
-  //     }
-
-  //   } else {
-  //     const fallback = location.filter(item => item.country_code === 'IN');
-  //     const otherLanguagesForFallback = location.filter(item => item.country_code !== 'IN');
-
-  //     const combinedFallback = [...fallback, ...otherLanguagesForFallback];
-  //     setFilteredList(combinedFallback);
-
-  //     if (fallback.length > 0 && language !== fallback[0].hreflang) {
-  //       setLanguage(fallback[0].hreflang);
-  //     }
-
-  //   }
-  // }, [location, countryCode]);
-
-  //
-
-  // Add this useEffect to load saved language on component mount
+  // Load saved language on component mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedLanguage = localStorage.getItem('language');
@@ -98,11 +46,9 @@ export default function LoadingScreen({ onFinish }) {
         setLanguage(savedLanguage);
       }
     }
-  }, []); // Run only once on mount
+  }, []);
 
-  // Update the COUNTRY CODE BASED LANGUAGE FILTERING section
-  const [filteredList, setFilteredList] = useState([]);
-
+  // Filter languages based on country code
   useEffect(() => {
     if (!location || !countryCode) return;
 
@@ -114,57 +60,27 @@ export default function LoadingScreen({ onFinish }) {
       item => item.country_code !== countryCode.country_code
     );
 
-    if (matched.length > 0) {
-      const combinedList = [...matched, ...otherLanguages];
+    const combinedList = matched.length > 0
+      ? [...matched, ...otherLanguages]
+      : [...location.filter(item => item.country_code === 'IN'), ...otherLanguages];
 
-      // Remove duplicates based on hreflang
-      const uniqueList = combinedList.filter((item, index, self) =>
-        index === self.findIndex(t => t.hreflang === item.hreflang)
-      );
+    // Remove duplicates based on hreflang
+    const uniqueList = combinedList.filter((item, index, self) =>
+      index === self.findIndex(t => t.hreflang === item.hreflang)
+    );
 
-      setFilteredList(uniqueList);
+    setFilteredList(uniqueList);
 
-      // Check if saved language exists, otherwise use matched language
-      const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
-      if (savedLanguage && uniqueList.some(lang => lang.hreflang === savedLanguage)) {
-        if (language !== savedLanguage) {
-          setLanguage(savedLanguage);
-        }
-      } else if (language !== matched[0].hreflang) {
-        setLanguage(matched[0].hreflang);
-      }
-
-    } else {
-      const fallback = location.filter(item => item.country_code === 'IN');
-      const otherLanguagesForFallback = location.filter(item => item.country_code !== 'IN');
-
-      const combinedFallback = [...fallback, ...otherLanguagesForFallback];
-
-      // Remove duplicates based on hreflang
-      const uniqueFallback = combinedFallback.filter((item, index, self) =>
-        index === self.findIndex(t => t.hreflang === item.hreflang)
-      );
-
-      setFilteredList(uniqueFallback);
-
-      // Check if saved language exists, otherwise use fallback language
-      const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
-      if (savedLanguage && uniqueFallback.some(lang => lang.hreflang === savedLanguage)) {
-        if (language !== savedLanguage) {
-          setLanguage(savedLanguage);
-        }
-      } else if (fallback.length > 0 && language !== fallback[0].hreflang) {
-        setLanguage(fallback[0].hreflang);
-      }
+    // Set language if not already set
+    const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
+    if (!savedLanguage && matched.length > 0 && language !== matched[0].hreflang) {
+      setLanguage(matched[0].hreflang);
     }
-  }, [location, countryCode]); // Removed 'language' from dependencies to avoid infinite loop
+  }, [location, countryCode]);
 
-
+  // Loading animation effects
   useEffect(() => {
-    const timer1 = setTimeout(() => {
-      setPhase('shrink');
-    }, 1000);
-
+    const timer1 = setTimeout(() => setPhase('shrink'), 1000);
     const timer2 = setTimeout(() => {
       setPhase('complete');
       onFinish();
@@ -176,43 +92,49 @@ export default function LoadingScreen({ onFinish }) {
     };
   }, [onFinish]);
 
+  // Update translations when language changes
   useEffect(() => {
     const updateTranslations = async () => {
-      const [home, apps, news, schedule, cricket, football, contact] = await Promise.all([
-        translateText('Home', 'en', language),
-        translateText('Best Betting Apps', 'en', language),
-        translateText('News', 'en', language),
-        translateText('Match Schedules', 'en', language),
-        translateText('Cricket', 'en', language),
-        translateText('Football', 'en', language),
-        translateText('contact', 'en', language),
-      ]);
+      try {
+        const [home, apps, news, schedule, cricket, football, contact] = await Promise.all([
+          translateText('Home', 'en', language),
+          translateText('Best Betting Apps', 'en', language),
+          translateText('News', 'en', language),
+          translateText('Match Schedules', 'en', language),
+          translateText('Cricket', 'en', language),
+          translateText('Football', 'en', language),
+          translateText('contact', 'en', language),
+        ]);
 
-      setTranslatedText({ home, apps, news, schedule, cricket, football, contact });
+        setTranslatedText(prev => ({
+          ...prev,
+          home, apps, news, schedule, cricket, football, contact
+        }));
 
-      const translatedCategories = await Promise.all(
-        blogCategories.map(async (cat) => {
-          const translatedCatName = await translateText(cat.name, 'en', language);
-          const translatedSubs = await Promise.all(
-            (cat.subcategories || []).map(async (sub) => ({
-              ...sub,
-              name: await translateText(sub.name, 'en', language),
-            }))
-          );
-          return {
-            ...cat,
-            name: translatedCatName,
-            subcategories: translatedSubs,
-          };
-        })
-      );
-      setTranslatedCategories(translatedCategories);
+        const translatedCategories = await Promise.all(
+          blogCategories.map(async (cat) => {
+            const translatedCatName = await translateText(cat.name, 'en', language);
+            const translatedSubs = await Promise.all(
+              (cat.subcategories || []).map(async (sub) => ({
+                ...sub,
+                name: await translateText(sub.name, 'en', language),
+              }))
+            );
+            return {
+              ...cat,
+              name: translatedCatName,
+              subcategories: translatedSubs,
+            };
+          })
+        );
+        setTranslatedCategories(translatedCategories);
+      } catch (error) {
+        console.error('Translation error:', error);
+      }
     };
 
     updateTranslations();
   }, [language, translateText, blogCategories]);
-
-  const toggleDarkMode = () => setDarkMode(!darkMode);
 
   const handleLanguageChange = (e) => {
     const selected = e.target.value;
@@ -220,23 +142,15 @@ export default function LoadingScreen({ onFinish }) {
     localStorage.setItem('language', selected);
   };
 
-  // Initialize sport from localStorage or country settings
-  useEffect(() => {
-    const initialSport = getInitialSport();
-    setSport(initialSport);
-    setSelectedSport(initialSport);
-  }, [countryCode, setSport]);
-
   const handleSportChange = (e) => {
-    const selectedSport = e.target.value;
-    setSport(selectedSport);
-    setSelectedSport(selectedSport);
-
-    // Save to localStorage for persistence
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('selectedSport', selectedSport);
-    }
+    const newSport = e.target.value;
+    setSport(newSport);
+    localStorage.setItem('selectedSport', newSport);
   };
+
+  const capitalizeFirstLetter = (text) =>
+    text?.charAt(0).toUpperCase() + text?.slice(1).toLowerCase();
+
 
   return (
     <div className={`${styles.loaderWrapper} ${styles[phase]} ${darkMode ? styles.darkMode : ''}`}>
@@ -249,18 +163,28 @@ export default function LoadingScreen({ onFinish }) {
           <div className={styles.navSection}>
             <span className={styles.separator}>|</span>
             <nav className={styles.nav}>
-              <Link href="/" className={`${styles.navItem} ${pathname === '/' ? styles.active : ''}`}>{translatedText.home}</Link>
-              {countryCode.location?.betting_apps == 'Active' && (
-                <Link href="/best-betting-apps" className={`${styles.navItem} ${pathname === '/best-betting-apps' ? styles.active : ''}`}>{translatedText.apps}</Link>
+              <Link href="/" className={`${styles.navItem} ${pathname === '/' ? styles.active : ''}`}>
+                {translatedText.home}
+              </Link>
+
+              {countryCode?.location?.betting_apps === 'Active' && (
+                <Link href="/best-betting-apps" className={`${styles.navItem} ${pathname === '/best-betting-apps' ? styles.active : ''}`}>
+                  {translatedText.apps}
+                </Link>
               )}
-              <Link href="/match-schedules" className={`${styles.navItem} ${pathname === '/match-schedules' ? styles.active : ''}`}>{translatedText.schedule}</Link>
-              {/* <Link href="/news-page" className={`${styles.navItem} ${pathname === '/news-page' ? styles.active : ''}`}>{translatedText.news}</Link> */}
-              <Link href="/contact" className={`${styles.navItem} ${pathname === '/contact' ? styles.active : ''}`}>{translatedText.contact}</Link>
+
+              <Link href="/match-schedules" className={`${styles.navItem} ${pathname === '/match-schedules' ? styles.active : ''}`}>
+                {translatedText.schedule}
+              </Link>
+
+              <Link href="/contact" className={`${styles.navItem} ${pathname === '/contact' ? styles.active : ''}`}>
+                {translatedText.contact}
+              </Link>
 
               {translatedCategories.map((cat) => (
                 <div key={cat.id} className={styles.dropdown}>
                   <span className={styles.navItem}>
-                    {cat.name} <FaChevronDown />
+                    {capitalizeFirstLetter(cat.name)} <FaChevronDown />
                   </span>
                   {cat.subcategories?.length > 0 && (
                     <ul className={styles.submenu}>
@@ -278,7 +202,6 @@ export default function LoadingScreen({ onFinish }) {
                   )}
                 </div>
               ))}
-
             </nav>
           </div>
         </div>
@@ -296,7 +219,6 @@ export default function LoadingScreen({ onFinish }) {
             ))}
           </select>
 
-          {/* Sports Dropdown with persistence */}
           <select
             className={styles.sportsSelector}
             value={sport}
@@ -305,9 +227,6 @@ export default function LoadingScreen({ onFinish }) {
             <option value="cricket">{translatedText.cricket}</option>
             <option value="football">{translatedText.football}</option>
           </select>
-          {/* <button className={styles.darkModeToggle} onClick={toggleDarkMode}>
-            {darkMode ? <FaSun /> : <FaMoon />}
-          </button> */}
 
           <FeaturedButton />
         </div>

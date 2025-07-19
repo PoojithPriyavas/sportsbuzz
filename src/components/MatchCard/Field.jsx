@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './Field.module.css';
 
 const Field = ({ teamA, teamB }) => {
+    console.log(teamA,"consol")
     const handlePlayerClick = (playerName, position) => {
         alert(`Player: ${playerName}\nPosition: ${position}`);
     };

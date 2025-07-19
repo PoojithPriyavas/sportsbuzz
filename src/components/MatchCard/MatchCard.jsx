@@ -113,7 +113,7 @@ const MatchCard = () => {
 
   const processTeamData = (teamData, teamNumber) => {
     const players = teamData.Ps || [];
-    const formation = teamData.Fo?.join('-') || '4-3-3';
+    const formation = teamData.Fo?.join('-') ;
     const substitutions = lineUp.Subs?.[teamNumber] || [];
 
     const getPlayerName = (player) => {
