@@ -124,13 +124,13 @@ export default function Home() {
               <BettingCard />
               <JoinTelegramButton />
               <AutoSlider />
-              {/* {sport === 'cricket' ? (
+              {sport === 'cricket' ? (
                 <>
                   <UpcomingMatches upcomingMatches={upcomingMatches} />
                 </>
               ) : (
                 <UpcomingFootballMatches />
-              )} */}
+              )}
 
 
 

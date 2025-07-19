@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import styles from './UpComingFootBall.module.css';
 import { useGlobalData } from '../Context/ApiContext';
+import { useRouter } from 'next/router';
 
 // Utility to format match date
 function formatDate(esd) {
@@ -51,13 +52,13 @@ function getTime(esd) {
 }
 
 export default function UpcomingFootballMatches() {
-    const { upcoming } = useGlobalData();
+    const { upcoming, fetchFootBallLineUp, fetchFootballDetails } = useGlobalData();
     const [selectedLeague, setSelectedLeague] = useState('All');
-
+    console.log(upcoming, "up ckaskjdjsd")
     // Prepare league names
     const allLeagues = upcoming?.Stages?.map(stage => stage?.Cnm).filter(Boolean) || [];
     const uniqueLeagues = Array.from(new Set(allLeagues));
-
+    const router = useRouter();
     // Group matches by league
     const groupedMatches = {};
     upcoming?.Stages
@@ -74,6 +75,14 @@ export default function UpcomingFootballMatches() {
                 groupedMatches[leagueKey].matches.push(event);
             });
         });
+
+    const handleMatchClick = async (eid) => {
+        await Promise.all([
+            fetchFootballDetails(eid),
+            fetchFootBallLineUp(eid)
+        ]);
+        router.push(`/football-match-details/${eid}`);
+    };
 
     return (
         <div className={styles["football-matches-container"]}>
@@ -95,7 +104,7 @@ export default function UpcomingFootballMatches() {
                             const isLive = status === 'LIVE';
 
                             return (
-                                <div key={index} className={styles["football-match-item"]}>
+                                <div key={index} style={{ cursor: 'pointer' }} className={styles["football-match-item"]} onClick={() => handleMatchClick(event.Eid)}>
                                     {/* League Info */}
                                     {index === 0 && (
                                         <div className={styles["football-league-section"]}>
