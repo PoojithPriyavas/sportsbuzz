@@ -7,18 +7,25 @@ import MultiBannerSlider from '../Multibanner/MultiBannerSlider';
 import PredictionSection from '../Prediction/Prediction';
 import AdsSlider from '../AdSlider/AdSlider';
 import UpcomingMatches from '../UpComing/UpComingMatches';
+import BettingCard from '../OddsMultiply/BettingCard';
+import UpcomingFootballMatches from '../UpComing/UpComingFootball';
+import JoinTelegramButton from '../JoinTelegram/JoinTelegramButton';
+
+
 
 export default function BlogDetailsPage() {
     return (
         <div className={styles.container}>
             <div className={styles.left}>
+
                 <BlogDetailContent />
                 <BlogSlider />
             </div>
             <div className={styles.right}>
-                <AdsSlider />
-                <UpcomingMatches />
-                <MultiBannerSlider />
+                <JoinTelegramButton />
+                <BettingCard />
+                <UpcomingFootballMatches />
+
             </div>
         </div>
     );

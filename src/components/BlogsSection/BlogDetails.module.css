@@ -4,6 +4,8 @@
   padding: 1rem;
 }
 
+
+
 .left {
   width: 80%;
 }
@@ -17,4 +19,29 @@
 
 .blogContent {
   color: black;
+  padding: 1rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.thumbnail {
+  width: 100%;
+  margin-bottom: 6rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.thumbnailImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Keeps the original aspect ratio */
+  aspect-ratio: auto;
+  /* Optional: can also set aspect-ratio: 16 / 9; if needed */
+  object-fit: contain;
+  /* Ensures image fits inside without cropping */
 }

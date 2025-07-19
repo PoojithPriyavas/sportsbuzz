@@ -22,7 +22,7 @@ export default function BlogDetailContent() {
         translateText(blog.title),
         translateText(blog.meta_title),
         translateText(blog.meta_desc),
-        translateText(blog.text_editor, 'en', language, 'html'), // HTML type
+        translateText(blog.text_editor, 'en', language, 'html'),
       ]);
 
       const translatedTags = await Promise.all(
@@ -73,6 +73,7 @@ export default function BlogDetailContent() {
             />
           </div>
         )}
+
 
         <div
           className={styles.description}

@@ -1,9 +1,11 @@
 import React from "react";
 import BlogDetailsPage from "@/components/BlogsSection/BlogDetails";
-import Header from "@/components/Header/Header";
+import Header from "@/components/Loader/Loader";
 import LiveScores from "@/components/LiveScoreSection/LiveScoreSection";
 import Head from "next/head";
 import FooterTwo from "@/components/Footer/Footer";
+
+
 export default function blogDetailsMain() {
     return (
         <>
@@ -15,7 +17,7 @@ export default function blogDetailsMain() {
             <div className="container">
                 <BlogDetailsPage />
             </div>
-             <FooterTwo />
+            <FooterTwo />
         </>
     )
 }
