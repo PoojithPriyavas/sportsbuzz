@@ -178,16 +178,17 @@ export default function LoadingScreen({ onFinish }) {
 
   useEffect(() => {
     const updateTranslations = async () => {
-      const [home, apps, news, schedule, cricket, football] = await Promise.all([
+      const [home, apps, news, schedule, cricket, football, contact] = await Promise.all([
         translateText('Home', 'en', language),
         translateText('Best Betting Apps', 'en', language),
         translateText('News', 'en', language),
         translateText('Match Schedules', 'en', language),
         translateText('Cricket', 'en', language),
-        translateText('Football', 'en', language)
+        translateText('Football', 'en', language),
+        translateText('contact', 'en', language),
       ]);
 
-      setTranslatedText({ home, apps, news, schedule, cricket, football });
+      setTranslatedText({ home, apps, news, schedule, cricket, football, contact });
 
       const translatedCategories = await Promise.all(
         blogCategories.map(async (cat) => {
@@ -253,7 +254,8 @@ export default function LoadingScreen({ onFinish }) {
                 <Link href="/best-betting-apps" className={`${styles.navItem} ${pathname === '/best-betting-apps' ? styles.active : ''}`}>{translatedText.apps}</Link>
               )}
               <Link href="/match-schedules" className={`${styles.navItem} ${pathname === '/match-schedules' ? styles.active : ''}`}>{translatedText.schedule}</Link>
-              <Link href="/news-page" className={`${styles.navItem} ${pathname === '/news-page' ? styles.active : ''}`}>{translatedText.news}</Link>
+              {/* <Link href="/news-page" className={`${styles.navItem} ${pathname === '/news-page' ? styles.active : ''}`}>{translatedText.news}</Link> */}
+              <Link href="/contact" className={`${styles.navItem} ${pathname === '/contact' ? styles.active : ''}`}>{translatedText.contact}</Link>
 
               {translatedCategories.map((cat) => (
                 <div key={cat.id} className={styles.dropdown}>
@@ -282,17 +284,6 @@ export default function LoadingScreen({ onFinish }) {
         </div>
 
         <div className={styles.rightSection}>
-          {/* <select
-            className={styles.languageSelector}
-            value={language}
-            onChange={handleLanguageChange}
-          >
-            <>
-              {filteredList.map((lang) => (
-                <option key={lang.hreflang} value={lang.hreflang}>{lang.language}</option>
-              ))}
-            </>
-          </select> */}
           <select
             className={styles.languageSelector}
             value={language}

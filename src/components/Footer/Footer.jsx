@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import styles from './Footer.module.css';
 import {
     FaFacebookF,
@@ -7,14 +9,84 @@ import {
     FaInstagram,
     FaTelegram,
     FaLinkedin,
-    FaPhone,
     FaEnvelope,
+    FaMapMarkerAlt,  
     FaClock,
-    FaMapMarkerAlt,
-    FaFootballBall
 } from 'react-icons/fa';
+import { useGlobalData } from '../Context/ApiContext';
 
 const FooterTwo = () => {
+    const { translateText, language, settings } = useGlobalData();
+
+    const contact = settings?.[0] || {};
+
+    const [translatedText, setTranslatedText] = useState({
+        quickLinks: 'Quick Links',
+        sports: 'Sports',
+        blogCategories: 'Blog Categories',
+        contactInfo: 'Contact Info',
+        home: 'Home',
+        liveScores: 'Live Scores',
+        bestApps: 'Best Betting Apps',
+        contactUs: 'Contact Us',
+        cricket: 'Cricket',
+        football: 'Football',
+        featured: 'Featured',
+        matchAnalysis: 'Match Analysis',
+        bettingTips: 'Betting Tips',
+        playerStats: 'Player Stats',
+        news: 'Sports News',
+        email: contact.email || 'info@sportsbuz.com',
+        availability: '24/7 Sports Updates',
+        copyright: '© 2025 SportsBuz. All rights reserved.',
+        disclaimer: 'Bet responsibly. 18+ only. Gambling can be addictive.',
+        terms: 'Terms of Use',
+        privacy: 'Privacy Policy',
+    });
+
+    useEffect(() => {
+        const translateFooter = async () => {
+            const keys = {
+                quickLinks: 'Quick Links',
+                sports: 'Sports',
+                blogCategories: 'Blog Categories',
+                contactInfo: 'Contact Info',
+                home: 'Home',
+                liveScores: 'Live Scores',
+                bestApps: 'Best Betting Apps',
+                contactUs: 'Contact Us',
+                cricket: 'Cricket',
+                football: 'Football',
+                featured: 'Featured',
+                matchAnalysis: 'Match Analysis',
+                bettingTips: 'Betting Tips',
+                playerStats: 'Player Stats',
+                news: 'Sports News',
+                availability: '24/7 Sports Updates',
+                disclaimer: 'Bet responsibly. 18+ only. Gambling can be addictive.',
+                terms: 'Terms of Use',
+                privacy: 'Privacy Policy',
+            };
+
+            const translated = await Promise.all(
+                Object.values(keys).map((text) => translateText(text, 'en', language))
+            );
+
+            const translatedObj = {};
+            Object.keys(keys).forEach((key, index) => {
+                translatedObj[key] = translated[index];
+            });
+
+            setTranslatedText((prev) => ({
+                ...prev,
+                ...translatedObj,
+                email: contact.email || prev.email,
+            }));
+        };
+
+        translateFooter();
+    }, [language, translateText, contact.email]);
+
     return (
         <footer className={styles.footer}>
             <div className={styles.container}>
@@ -22,79 +94,86 @@ const FooterTwo = () => {
                 <div className={styles.top}>
                     {/* Column 1 - Logo and description */}
                     <div className={styles.col}>
-                        {/* <div className={styles.logo}>
-                            <FaFootballBall className={styles.logoIcon} />
-                            <span className={styles.logoText}>SportsBuz</span>
-                        </div> */}
                         <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logo} />
-
                         <p className={styles.description}>
-                            Your ultimate destination for live cricket & football scores, match predictions, betting tips, and comprehensive sports analysis. Stay updated with the latest sports news and insights.
+                            Your ultimate destination for live cricket & football scores, match predictions,
+                            betting tips, and comprehensive sports analysis. Stay updated with the latest sports
+                            news and insights.
                         </p>
                         <div className={styles.socialIcons}>
-                            <a href="#" className={styles.socialLink}><FaFacebookF /></a>
-                            <a href="#" className={styles.socialLink}><FaTwitter /></a>
-                            <a href="#" className={styles.socialLink}><FaYoutube /></a>
-                            <a href="#" className={styles.socialLink}><FaInstagram /></a>
-                            <a href="#" className={styles.socialLink}><FaTelegram /></a>
-                            <a href="#" className={styles.socialLink}><FaLinkedin /></a>
+                            {contact.facebook_link && (
+                                <a href={contact.facebook_link} target="_blank" rel="noopener noreferrer" className={styles.socialLink}><FaFacebookF /></a>
+                            )}
+                            {contact.twitter_link && (
+                                <a href={contact.twitter_link} target="_blank" rel="noopener noreferrer" className={styles.socialLink}><FaTwitter /></a>
+                            )}
+                            {contact.youtube_link && (
+                                <a href={contact.youtube_link} target="_blank" rel="noopener noreferrer" className={styles.socialLink}><FaYoutube /></a>
+                            )}
+                            {contact.instagram_link && (
+                                <a href={contact.instagram_link} target="_blank" rel="noopener noreferrer" className={styles.socialLink}><FaInstagram /></a>
+                            )}
+                            {contact.telegram_link && (
+                                <a href={contact.telegram_link} target="_blank" rel="noopener noreferrer" className={styles.socialLink}><FaTelegram /></a>
+                            )}
+                            {contact.linkedin_link && (
+                                <a href={contact.linkedin_link} target="_blank" rel="noopener noreferrer" className={styles.socialLink}><FaLinkedin /></a>
+                            )}
                         </div>
                     </div>
 
                     {/* Column 2 - Quick Links */}
                     <div className={styles.col}>
-                        <h3 className={styles.title}>Quick Links</h3>
+                        <h3 className={styles.title}>{translatedText.quickLinks}</h3>
                         <ul className={styles.linkList}>
-                            <li><a href="/">Home</a></li>
-                            <li><a href="/live-scores">Live Scores</a></li>
-                            {/* <li><a href="/predictions">Match Predictions</a></li> */}
-                            <li><a href="/betting-apps">Best Betting Apps</a></li>
-                            <li><a href="/contact">Contact Us</a></li>
+                            <li><a href="/">{translatedText.home}</a></li>
+                            <li><a href="/live-scores">{translatedText.liveScores}</a></li>
+                            <li><a href="/best-betting-apps">{translatedText.bestApps}</a></li>
+                            <li><a href="/contact">{translatedText.contactUs}</a></li>
                         </ul>
                     </div>
 
                     {/* Column 3 - Sports Categories */}
                     <div className={styles.col}>
-                        <h3 className={styles.title}>Sports</h3>
+                        <h3 className={styles.title}>{translatedText.sports}</h3>
                         <ul className={styles.linkList}>
-                            <li><a href="/cricket">Cricket</a></li>
-                            <li><a href="/football">Football</a></li>
-
+                            <li><a href="/cricket">{translatedText.cricket}</a></li>
+                            <li><a href="/football">{translatedText.football}</a></li>
                         </ul>
                     </div>
 
                     {/* Column 4 - Blog Categories */}
                     <div className={styles.col}>
-                        <h3 className={styles.title}>Blog Categories</h3>
+                        <h3 className={styles.title}>{translatedText.blogCategories}</h3>
                         <ul className={styles.linkList}>
-                            <li><a href="/blogs/featured">Featured</a></li>
-                            <li><a href="/blogs/match-analysis">Match Analysis</a></li>
-                            <li><a href="/blogs/betting-tips">Betting Tips</a></li>
-                            <li><a href="/blogs/player-stats">Player Stats</a></li>
-                            <li><a href="/blogs/news">Sports News</a></li>
+                            <li><a href="/blogs/featured">{translatedText.featured}</a></li>
+                            <li><a href="/blogs/match-analysis">{translatedText.matchAnalysis}</a></li>
+                            <li><a href="/blogs/betting-tips">{translatedText.bettingTips}</a></li>
+                            <li><a href="/blogs/player-stats">{translatedText.playerStats}</a></li>
+                            <li><a href="/blogs/news">{translatedText.news}</a></li>
                         </ul>
                     </div>
 
                     {/* Column 5 - Contact Info */}
                     <div className={styles.col}>
-                        <h3 className={styles.title}>Contact Info</h3>
+                        <h3 className={styles.title}>{translatedText.contactInfo}</h3>
                         <div className={styles.contactInfo}>
-                            <div className={styles.contactItem}>
-                                <FaEnvelope className={styles.contactIcon} />
-                                <span>info@sportsbuz.com</span>
-                            </div>
-                            {/* <div className={styles.contactItem}>
-                                <FaPhone className={styles.contactIcon} />
-                                <span>+1 (555) 123-4567</span>
-                            </div> */}
+                            {contact.email && (
+                                <div className={styles.contactItem}>
+                                    <FaEnvelope className={styles.contactIcon} />
+                                    <span>{contact.email}</span>
+                                </div>
+                            )}
                             <div className={styles.contactItem}>
                                 <FaClock className={styles.contactIcon} />
-                                <span>24/7 Sports Updates</span>
+                                <span>{translatedText.availability}</span>
                             </div>
-                            {/* <div className={styles.contactItem}>
-                                <FaMapMarkerAlt className={styles.contactIcon} />
-                                <span>Global Sports Coverage</span>
-                            </div> */}
+                            {contact.address && (
+                                <div className={styles.contactItem}>
+                                    <FaMapMarkerAlt className={styles.contactIcon} />
+                                    <span>{contact.address}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -102,17 +181,16 @@ const FooterTwo = () => {
                 {/* Bottom Section */}
                 <div className={styles.bottom}>
                     <div className={styles.bottomLeft}>
-                        <p>&copy; 2025 SportsBuz. All rights reserved.</p>
+                        <p>{translatedText?.copyright}</p>
                     </div>
                     <div className={styles.bottomCenter}>
                         <span className={styles.disclaimer}>
-                            Bet responsibly. 18+ only. Gambling can be addictive.
+                            {translatedText?.disclaimer}
                         </span>
                     </div>
                     <div className={styles.bottomRight}>
-                        <a href="/terms">Terms of Use</a>
-                        <a href="/privacy">Privacy Policy</a>
-                        {/* <a href="/disclaimer">Disclaimer</a> */}
+                        <a href="/terms">{translatedText.terms}</a>
+                        <a href="/privacy">{translatedText.privacy}</a>
                     </div>
                 </div>
             </div>

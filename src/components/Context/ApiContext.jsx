@@ -58,6 +58,18 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+    // SETTINGS-API IMPLEMENTATION
+    const [settings, setSettings] = useState([]);
+
+    const fetchSettings = async () => {
+        try {
+            const response = await CustomAxios.get('/settings');
+            setSettings(response.data);
+        } catch (error) {
+            console.error('Error fetching blog categories:', error);
+        }
+    };
+
     // TOURNAMENT API IMPLEMENTATION
 
     const [tournament, setTournament] = useState([]);
@@ -474,9 +486,9 @@ export const DataProvider = ({ children }) => {
     const upcomingFootBall = async () => {
         const today = new Date();
         const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1); 
+        tomorrow.setDate(today.getDate() + 1);
 
-        const formattedDate = tomorrow.toISOString().split('T')[0].replace(/-/g, ''); 
+        const formattedDate = tomorrow.toISOString().split('T')[0].replace(/-/g, '');
 
         const options = {
             method: 'GET',
@@ -550,7 +562,8 @@ export const DataProvider = ({ children }) => {
         upcomingFootBall();
         fetchNews();
         fetchLocation();
-        getCountryCode(); 
+        getCountryCode();
+        fetchSettings();
     }, []);
 
     useEffect(() => {
@@ -560,7 +573,7 @@ export const DataProvider = ({ children }) => {
             fetchBettingApps(countryCode.country_code);
             fetchBestBettingAppsPrevious(countryCode.country_code);
         }
-    }, [countryCode.country_code]); 
+    }, [countryCode.country_code]);
 
     return (
         <DataContext.Provider
@@ -602,6 +615,7 @@ export const DataProvider = ({ children }) => {
                 setMatchSchedule,
                 fetchMatchSchedules,
                 currentTimezone,
+                settings,
             }}>
             {children}
         </DataContext.Provider>

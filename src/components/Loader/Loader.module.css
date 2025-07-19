@@ -19,6 +19,9 @@
   justify-content: space-between;
   width: 100%;
   padding: 0 20px;
+  /* Add higher z-index to header container */
+  position: relative;
+  z-index: 10000;
 }
 
 /* Left Side */
@@ -36,7 +39,9 @@
   width: 100%;
   padding: 20px;
   min-height: 70px;
-  overflow: hidden;
+  overflow: visible; /* Changed from hidden to visible */
+  position: relative;
+  z-index: 10000; /* Ensure header is above other content */
 }
 
 /* Left Section: Logo + Navigation */
@@ -54,16 +59,8 @@
   left: 0;
   width: 100%;
   height: 100vh;
-  /* background-color: #0046aa; */
-  /* background-color: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); */
-
   background-color: linear-gradient(135deg, #16213e 0%, #045fc6 50%, #16213e 100%);
   background: linear-gradient(135deg, #16213e 0%, #045fc6 50%, #16213e 100%);
-
-
-
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -94,6 +91,8 @@
   align-items: center;
   opacity: 0;
   transition: opacity 0.5s ease;
+  position: relative; /* Add positioning context */
+  z-index: 10001; /* Higher than header */
 }
 
 .separator {
@@ -119,6 +118,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
+  position: relative; /* Add positioning for active state */
 }
 
 .navItem:hover {
@@ -151,7 +151,8 @@
   opacity: 0;
   transition: opacity 0.5s ease;
   max-width: calc(100vw - 40px);
-  overflow: hidden;
+  overflow: visible; 
+  z-index: 10001;
 }
 
 .languageSelector,
@@ -165,6 +166,8 @@
   cursor: pointer;
   outline: none;
   transition: all 0.3s ease;
+  position: relative; /* Add positioning context */
+  z-index: 10002; /* Higher z-index for dropdowns */
 }
 
 .languageSelector:hover,
@@ -193,47 +196,61 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* Dropdown */
+/* Dropdown - MAIN FIX HERE */
 .dropdown {
   position: relative;
+  z-index: 10002; /* Ensure dropdown container has high z-index */
 }
 
 .submenu {
   position: absolute;
   top: 100%;
   left: 0;
-  background: white;
-  color: #333;
+  background: #0046aa;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 4px;
   padding: 8px 0;
   min-width: 160px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
+  z-index: 10003; /* HIGHEST z-index for submenu */
   list-style: none;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.3s ease;
+  transform: translateY(-5px) translateZ(0); /* Reduced transform, added translateZ for GPU */
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease; /* Separate transitions */
+  /* Remove blur and improve rendering */
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform-style: preserve-3d;
+  /* Ensure crisp rendering */
+  image-rendering: crisp-edges;
+  text-rendering: optimizeLegibility;
 }
 
 .dropdown:hover .submenu {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateY(0) translateZ(0); /* Match the translateZ */
 }
 
 .submenuItem {
   padding: 8px 16px;
   display: block;
-  color: #333;
+  color: white;
   text-decoration: none;
-  font-size: 13px;
+  font-size: 14px;
   white-space: nowrap;
   transition: background-color 0.2s ease;
+  /* Ensure crisp text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .submenuItem:hover {
-  background-color: #f0f0f0;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .loaderGif {
@@ -260,6 +277,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
+  overflow: visible; /* Ensure dropdowns can overflow */
 }
 
 .shrink .loaderGif {
@@ -284,6 +302,7 @@
   position: static;
   max-width: none;
   flex-shrink: 0;
+  overflow: visible; /* Allow overflow for dropdowns */
 }
 
 /* Phase: Complete */
@@ -292,6 +311,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
+  overflow: visible; /* Ensure dropdowns can overflow */
 }
 
 .complete .loaderGif {
@@ -313,6 +333,15 @@
   position: static;
   max-width: none;
   flex-shrink: 0;
+  overflow: visible; /* Allow overflow for dropdowns */
+}
+
+/* Additional fix: Ensure any content below header has lower z-index */
+.main-content,
+.content-wrapper,
+.page-content {
+  position: relative;
+  z-index: 1; /* Much lower than header */
 }
 
 /* Responsive */
@@ -335,6 +364,7 @@
     right: 15px;
     gap: 10px;
     max-width: calc(100vw - 30px);
+    overflow: visible; /* Allow overflow for dropdowns */
   }
 
   .languageSelector,
@@ -373,6 +403,7 @@
     right: 10px;
     gap: 8px;
     max-width: calc(100vw - 20px);
+    overflow: visible;
   }
 
   .languageSelector,

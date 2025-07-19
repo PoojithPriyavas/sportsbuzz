@@ -6,6 +6,8 @@ import { useGlobalData } from '../Context/ApiContext';
 export default function BettingAppsTable() {
     const [copiedId, setCopiedId] = useState(null);
     const { sections, translateText, language } = useGlobalData();
+
+    const [translatedSections, setTranslatedSections] = useState([]);
     const [staticLabels, setStaticLabels] = useState({
         Rank: 'Rank',
         Site: 'Site',
@@ -17,6 +19,7 @@ export default function BettingAppsTable() {
         'Copied!': 'Copied!'
     });
 
+    // Translate static UI labels
     useEffect(() => {
         const translateStaticLabels = async () => {
             if (language === 'en') {
@@ -33,16 +36,7 @@ export default function BettingAppsTable() {
                 return;
             }
 
-            const keys = [
-                'Rank',
-                'Site',
-                'Features',
-                'Welcome Bonus',
-                'Bet Now',
-                'Read Review',
-                'GET BONUS',
-                'Copied!'
-            ];
+            const keys = Object.keys(staticLabels);
 
             const translations = await Promise.all(
                 keys.map(key => translateText(key, 'en', language))
@@ -59,6 +53,48 @@ export default function BettingAppsTable() {
         translateStaticLabels();
     }, [language, translateText]);
 
+    // Translate dynamic content from sections
+    useEffect(() => {
+        const translateSections = async () => {
+            const translated = await Promise.all(
+                sections.map(async (section) => {
+                    const translatedHeading = await translateText(section.heading || '', 'en', language);
+                    const translatedDescription = await translateText(section.description || '', 'en', language, true); // HTML
+
+                    const translatedApps = await Promise.all(
+                        (section.best_betting_apps || [])
+                            .sort((a, b) => a.order_by - b.order_by) // <-- Sort apps here
+                            .map(async (app) => {
+                                const translatedFeatures = await translateText(app.features || '', 'en', language, true); // HTML
+                                const translatedBonus = await translateText(app.welcome_bonus || '', 'en', language, true); // HTML
+
+                                return {
+                                    ...app,
+                                    features: translatedFeatures,
+                                    welcome_bonus: translatedBonus,
+                                };
+                            })
+                    );
+
+                    return {
+                        ...section,
+                        heading: translatedHeading,
+                        description: translatedDescription,
+                        best_betting_apps: translatedApps,
+                    };
+                })
+            );
+
+            setTranslatedSections(translated);
+        };
+
+        if (sections.length > 0) {
+            translateSections();
+        }
+    }, [sections, language, translateText]);
+
+
+
     const handleCopy = (code, id) => {
         navigator.clipboard.writeText(code).then(() => {
             setCopiedId(id);
@@ -66,16 +102,16 @@ export default function BettingAppsTable() {
         });
     };
 
-    if (sections.length === 0) return null;
+    if (translatedSections.length === 0) return null;
 
     return (
         <>
             <Head>
-                <title>{sections[0]?.metatitle}</title>
-                <meta name="description" content={stripHtml(sections[0]?.meta_description)} />
+                <title>{translatedSections[0]?.metatitle}</title>
+                <meta name="description" content={stripHtml(translatedSections[0]?.meta_description)} />
             </Head>
 
-            {sections.map(section => (
+            {translatedSections.map(section => (
                 <div className={styles.wrapper} key={section.id}>
                     <h1 className={styles.heading}>{section.heading}</h1>
 
@@ -93,7 +129,7 @@ export default function BettingAppsTable() {
                             <tbody>
                                 {section.best_betting_apps.map(app => (
                                     <tr className={styles.bodyRow} key={app.id}>
-                                        <td style={{ color: "black", fontSize: "25px" }}><strong>#{app.id}</strong></td>
+                                        <td style={{ color: "black", fontSize: "25px" }}><strong>#{app.order_by}</strong></td>
                                         <td className={styles.site}>
                                             <img src={`https://admin.sportsbuz.com${app.image}`} alt="Betting App" />
                                         </td>

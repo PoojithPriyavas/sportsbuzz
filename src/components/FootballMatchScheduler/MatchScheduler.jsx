@@ -1,4 +1,3 @@
-// MatchScheduler.jsx
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -30,9 +29,48 @@ export default function MatchScheduler() {
     const [dates, setDates] = useState([]);
     const [isInitialized, setIsInitialized] = useState(false);
     const [isLoadingMatches, setIsLoadingMatches] = useState(false);
-    const { matchSchedule, fetchMatchSchedules, currentTimezone, countryCode } = useGlobalData();
+    const { matchSchedule, fetchMatchSchedules, currentTimezone, countryCode, translateText, language } = useGlobalData();
 
-    // Helper function to get date from localStorage or default to today
+    const [translatedText, setTranslatedText] = useState({
+        matchSchedule: 'Match Schedule',
+        selectDate: 'Select a date to view matches',
+        loadingTimezone: 'Loading timezone...',
+        loadingMatches: 'Loading matches...',
+        noMatches: 'No matches found for the selected date and league',
+        allLeagues: 'All Leagues'
+    });
+
+    useEffect(() => {
+        const translateLabels = async () => {
+            const [
+                matchSchedule,
+                selectDate,
+                loadingTimezone,
+                loadingMatches,
+                noMatches,
+                allLeagues
+            ] = await Promise.all([
+                translateText('Match Schedule', 'en', language),
+                translateText('Select a date to view matches', 'en', language),
+                translateText('Loading timezone...', 'en', language),
+                translateText('Loading matches...', 'en', language),
+                translateText('No matches found for the selected date and league', 'en', language),
+                translateText('All Leagues', 'en', language)
+            ]);
+
+            setTranslatedText({
+                matchSchedule,
+                selectDate,
+                loadingTimezone,
+                loadingMatches,
+                noMatches,
+                allLeagues
+            });
+        };
+
+        translateLabels();
+    }, [language, translateText]);
+
     const getInitialDate = useCallback(() => {
         if (typeof window !== 'undefined') {
             const savedDate = localStorage.getItem('matchScheduler_selectedDate');
@@ -46,20 +84,17 @@ export default function MatchScheduler() {
         return new Date();
     }, []);
 
-    // Initialize dates and fetch initial data
     useEffect(() => {
-        // Wait for timezone to be properly set (not the default value)
         if (isInitialized || currentTimezone === '+0.00' || !countryCode.country_code) {
             return;
         }
-        
-        // Always use today's date for generating the date range
+
         const today = new Date();
-        const initialSelectedDate = getInitialDate(); // This can be different from today
+        const initialSelectedDate = getInitialDate();
         const newDates = [];
 
         for (let i = -1; i < 13; i++) {
-            const date = new Date(today); // Always use today as reference
+            const date = new Date(today);
             date.setDate(today.getDate() + i);
 
             const isoDate = date.toISOString().split('T')[0];
@@ -69,16 +104,11 @@ export default function MatchScheduler() {
                 String(date.getDate()).padStart(2, '0')
             ].join('');
 
-            newDates.push({
-                dateObj: date,
-                isoDate: isoDate,
-                numericDate: numericDate
-            });
+            newDates.push({ dateObj: date, isoDate, numericDate });
         }
 
         setDates(newDates);
-        
-        // Set the selected date from localStorage (or today if no saved date)
+
         const initialIsoDate = initialSelectedDate.toISOString().split('T')[0];
         const initialNumericDate = [
             initialSelectedDate.getFullYear(),
@@ -90,30 +120,25 @@ export default function MatchScheduler() {
         setSelectedDateNumeric(initialNumericDate);
         setIsInitialized(true);
 
-        // Show loading spinner and fetch data
         setIsLoadingMatches(true);
         fetchMatchSchedules(initialNumericDate, currentTimezone).finally(() => {
             setIsLoadingMatches(false);
         });
     }, [currentTimezone, countryCode.country_code, isInitialized, fetchMatchSchedules, getInitialDate]);
 
-    // Handle date selection with localStorage persistence
     const handleDateSelect = useCallback((isoDate, numericDate) => {
         setSelectedDate(isoDate);
         setSelectedDateNumeric(numericDate);
-        
-        // Save to localStorage
         if (typeof window !== 'undefined') {
             localStorage.setItem('matchScheduler_selectedDate', isoDate);
         }
-        
+
         setIsLoadingMatches(true);
         fetchMatchSchedules(numericDate, currentTimezone).finally(() => {
             setIsLoadingMatches(false);
         });
     }, [fetchMatchSchedules, currentTimezone]);
 
-    // Transform API data
     const transformMatchData = useCallback(() => {
         if (!matchSchedule?.Stages || !dates.length) return {};
 
@@ -170,32 +195,27 @@ export default function MatchScheduler() {
     const displayMatches = useCallback((date) => {
         if (!date) return [];
         let matches = matchData[date] || [];
-        if (activeLeague && activeLeague !== 'All Leagues') {
+        if (activeLeague && activeLeague !== translatedText.allLeagues) {
             matches = matches.filter((comp) => comp.competition === activeLeague);
         }
         return matches;
-    }, [matchData, activeLeague]);
-    
-    // Get unique leagues
-    const getUniqueLeagues = useCallback(() => {
-        if (!matchSchedule?.Stages) return ['All Leagues'];
+    }, [matchData, activeLeague, translatedText.allLeagues]);
 
-        const leagues = new Set(['All Leagues']);
+    const getUniqueLeagues = useCallback(() => {
+        if (!matchSchedule?.Stages) return [translatedText.allLeagues];
+        const leagues = new Set([translatedText.allLeagues]);
         matchSchedule.Stages.forEach(stage => {
             const leagueName = stage.CompN || stage.Cnm;
-            if (leagueName) {
-                leagues.add(leagueName);
-            }
+            if (leagueName) leagues.add(leagueName);
         });
         return Array.from(leagues);
-    }, [matchSchedule]);
+    }, [matchSchedule, translatedText.allLeagues]);
 
-    // Show loading state until timezone is properly set
     if (currentTimezone === '+0.00' || !countryCode.country_code) {
         return (
             <div className={styles.header}>
-                <h1>Match Schedule</h1>
-                <Spinner size="large" text="Loading timezone..." />
+                <h1>{translatedText.matchSchedule}</h1>
+                <Spinner size="large" text={translatedText.loadingTimezone} />
             </div>
         );
     }
@@ -203,8 +223,8 @@ export default function MatchScheduler() {
     return (
         <div>
             <div className={styles.header}>
-                <h1>Match Schedule</h1>
-                <p>Select a date to view matches</p>
+                <h1>{translatedText.matchSchedule}</h1>
+                <p>{translatedText.selectDate}</p>
             </div>
 
             <div className={styles.dateSliderContainer}>
@@ -236,8 +256,8 @@ export default function MatchScheduler() {
                 {getUniqueLeagues().map((league) => (
                     <div
                         key={league}
-                        className={`${styles.leagueChip} ${activeLeague === league || (league === 'All Leagues' && activeLeague === '') ? styles.active : ''}`}
-                        onClick={() => setActiveLeague(league === 'All Leagues' ? '' : league)}
+                        className={`${styles.leagueChip} ${activeLeague === league || (league === translatedText.allLeagues && activeLeague === '') ? styles.active : ''}`}
+                        onClick={() => setActiveLeague(league === translatedText.allLeagues ? '' : league)}
                     >
                         {league}
                     </div>
@@ -246,11 +266,11 @@ export default function MatchScheduler() {
 
             <div className={`${styles.matchesContainer} ${selectedDate ? styles.visible : ''}`}>
                 {isLoadingMatches ? (
-                    <Spinner size="large" text="Loading matches..." />
+                    <Spinner size="large" text={translatedText.loadingMatches} />
                 ) : displayMatches(selectedDate).length === 0 ? (
                     <div className={styles.noMatches}>
                         <div className={styles.noMatchesIcon}>⚽</div>
-                        <p>No matches found for the selected date and league</p>
+                        <p>{translatedText.noMatches}</p>
                     </div>
                 ) : (
                     displayMatches(selectedDate).map((competition, i) => (

@@ -50,7 +50,7 @@ export default function BonusTable({ sections }) {
       setTimeout(() => setCopiedId(null), 2000);
     });
   };
-console.log(translatedSections,"trans")
+  console.log(translatedSections, "trans")
   if (translatedSections.length === 0) return null;
 
   return (
@@ -80,54 +80,56 @@ console.log(translatedSections,"trans")
                 </tr>
               </thead>
               <tbody>
-                {section.best_betting_apps.map((app) => (
-                  <tr className={styles.bodyRow} key={app.id}>
-                    <td style={{ color: 'black' }}>
-                      <strong>#{app.id}</strong>
-                    </td>
-                    <td className={styles.site}>
-                      <img
-                        src={`https://admin.sportsbuz.com${app.image}`}
-                        alt="Betting App"
+                {[...section.best_betting_apps] // clone to avoid mutating original
+                  .sort((a, b) => a.order_by - b.order_by) // sort by order_by ascending
+                  .map((app) => (
+                    <tr className={styles.bodyRow} key={app.id}>
+                      <td style={{ color: 'black' }}>
+                        <strong>#{app.order_by}</strong>
+                      </td>
+                      <td className={styles.site}>
+                        <img
+                          src={`https://admin.sportsbuz.com${app.image}`}
+                          alt="Betting App"
+                        />
+                      </td>
+                      <td
+                        className={styles.features}
+                        dangerouslySetInnerHTML={{ __html: app.features }}
                       />
-                    </td>
-                    <td
-                      className={styles.features}
-                      dangerouslySetInnerHTML={{ __html: app.features }}
-                    />
-                    <td className={styles.bonus}>
-                      <div
-                        className={styles.amount}
-                        dangerouslySetInnerHTML={{ __html: app.welcome_bonus }}
-                      />
-                      <button
-                        className={styles.codeBtn}
-                        onClick={() =>
-                          window.open(app.review_link, '_blank', 'noopener,noreferrer')
-                        }
-                      >
-                        Read Review
-                      </button>
-                      <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
-                    </td>
-                    <td className={styles.actions}>
-                      <a
-                        className={styles.getBtn}
-                        href={app.referal_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        GET BONUS
-                      </a>
-                      <button
-                        className={styles.codeBtn}
-                        onClick={() => handleCopy(app.referall_code, app.id)}
-                      >
-                        {copiedId === app.id ? 'Copied!' : app.referall_code}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      <td className={styles.bonus}>
+                        <div
+                          className={styles.amount}
+                          dangerouslySetInnerHTML={{ __html: app.welcome_bonus }}
+                        />
+                        <button
+                          className={styles.codeBtn}
+                          onClick={() =>
+                            window.open(app.review_link, '_blank', 'noopener,noreferrer')
+                          }
+                        >
+                          Read Review
+                        </button>
+                        <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
+                      </td>
+                      <td className={styles.actions}>
+                        <a
+                          className={styles.getBtn}
+                          href={app.referal_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          GET BONUS
+                        </a>
+                        <button
+                          className={styles.codeBtn}
+                          onClick={() => handleCopy(app.referall_code, app.id)}
+                        >
+                          {copiedId === app.id ? 'Copied!' : app.referall_code}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           )}
