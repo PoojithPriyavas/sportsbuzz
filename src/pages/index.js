@@ -62,8 +62,8 @@ export default function Home() {
   //   return <LoadingScreen onFinish={() => setLoading(false)} />;
   // }
 
-      console.log("enters this condition", countryCode?.location?.betting_apps.trim() === 'Active')
-   
+  console.log("enters this condition", countryCode?.location?.betting_apps.trim() === 'Active')
+
   return (
     <>
       <Head>
@@ -124,17 +124,17 @@ export default function Home() {
               <BettingCard />
               <JoinTelegramButton />
               <AutoSlider />
-              {sport === 'cricket' ? (
+              {/* {sport === 'cricket' ? (
                 <>
                   <UpcomingMatches upcomingMatches={upcomingMatches} />
                 </>
               ) : (
                 <UpcomingFootballMatches />
-              )}
+              )} */}
 
 
 
-              <SportsOdsList />
+              {/* <SportsOdsList /> */}
 
               {/* <AdsSlider /> */}
               {/* <CricketPrediction /> */}

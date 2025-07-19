@@ -21,7 +21,7 @@ export default function UpcomingMatches({ upcomingMatches = [] }) {
     return (
         <div className={styles.section}>
             <div className={styles.header}>
-                <h4 style={{ color: '#000' }}>Cricket Schedules</h4>
+                <h4 className={styles.cricketMatchesTitle}>Cricket Schedules</h4>
                 <div className={styles.filterContainer}>
                     <button
                         className={styles.filterButton}

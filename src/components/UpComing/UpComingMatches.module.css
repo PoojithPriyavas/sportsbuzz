@@ -2,6 +2,13 @@
     border-radius: 10px;
 }
 
+.cricketMatchesTitle {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: #1f2937;
+}
+
 .header {
     display: flex;
     justify-content: space-between;

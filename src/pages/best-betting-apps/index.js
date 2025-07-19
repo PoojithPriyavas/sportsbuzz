@@ -14,13 +14,23 @@ import TestLive from "@/components/LiveScoreSection/TestLive";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
 import FooterTwo from "@/components/Footer/Footer";
-
-
-
+import { useGlobalData } from "@/components/Context/ApiContext";
+import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 
 export default function BestBettingApps() {
 
     const [loading, setLoading] = useState(true);
+    const {
+        blogCategories,
+        blogs,
+        sections,
+        apiResponse,
+        matchTypes,
+        teamImages,
+        upcomingMatches,
+        sport,
+        countryCode
+    } = useGlobalData();
 
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false
@@ -48,6 +58,13 @@ export default function BestBettingApps() {
                         <BettingCard />
                         <JoinTelegramButton />
                         <AutoSlider />
+                        {sport === 'cricket' ? (
+                            <>
+                                <UpcomingMatches upcomingMatches={upcomingMatches} />
+                            </>
+                        ) : (
+                            <UpcomingFootballMatches />
+                        )}
                         {/* <TopNewsSection /> */}
                     </div>
                 </div>

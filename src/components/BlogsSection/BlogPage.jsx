@@ -12,8 +12,16 @@ import TopNewsSection from '../NewsSection/TopNews';
 import MultiBannerSlider from '../Multibanner/MultiBannerSlider';
 import CricketPrediction from '../Betting/CricketPrediction';
 import PredictionSection from '../Prediction/Prediction';
-import GoogleAds from '../googleAds/GoogleAds';
+// import GoogleAds from '../googleAds/GoogleAds';
 import AutoSlider from '../AutoSlider/AutoSlider';
+import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
+import SportsOdsList from "@/components/SportsOdds/SportsOdsList";
+import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
+import UpcomingMatches from "@/components/UpComing/UpComingMatches";
+import BettingCard from '@/components/OddsMultiply/BettingCard';
+
+
+
 
 export default function BlogsPage({ blogs = [] }) {
   const [filterValue, setFilterValue] = useState("all");
@@ -100,9 +108,9 @@ export default function BlogsPage({ blogs = [] }) {
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     // Scroll to top of blog section
-    document.querySelector(`.${styles.blogGrid}`)?.scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'start' 
+    document.querySelector(`.${styles.blogGrid}`)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
     });
   };
 
@@ -122,7 +130,7 @@ export default function BlogsPage({ blogs = [] }) {
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     if (totalPages <= maxVisiblePages) {
       // Show all pages if total pages is less than or equal to max visible pages
       for (let i = 1; i <= totalPages; i++) {
@@ -155,7 +163,7 @@ export default function BlogsPage({ blogs = [] }) {
         pages.push(totalPages);
       }
     }
-    
+
     return pages;
   };
 
@@ -243,9 +251,8 @@ export default function BlogsPage({ blogs = [] }) {
                         <button
                           key={page}
                           onClick={() => handlePageChange(page)}
-                          className={`${styles.paginationButton} ${
-                            currentPage === page ? styles.active : ''
-                          }`}
+                          className={`${styles.paginationButton} ${currentPage === page ? styles.active : ''
+                            }`}
                         >
                           {page}
                         </button>
@@ -268,15 +275,19 @@ export default function BlogsPage({ blogs = [] }) {
         </div>
 
         <div className={styles.right}>
-          {/* <PredictionSection />
-          <CricketPrediction /> */}
-          {/* <MultiBannerSlider /> */}
+          <JoinTelegramButton />
           <AutoSlider />
-          <TopNewsSection />
+          <BettingCard />
+          <UpcomingFootballMatches />
+
+          <UpcomingMatches />
+
+
+
         </div>
       </div>
 
-      <GoogleAds />
+      {/* <GoogleAds /> */}
     </>
   );
 }

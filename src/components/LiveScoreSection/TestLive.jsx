@@ -41,13 +41,18 @@ function formatDate(esd, labels = { today: 'Today', tomorrow: 'Tomorrow' }) {
     }
 }
 
+
+
 export default function TestLive() {
     const { stages, language, translateText, fetchFootballDetails, fetchFootBallLineUp } = useGlobalData();
-    // console.log(stages, "stages")
     const [selectedLeague, setSelectedLeague] = useState('All');
     const [translatedStages, setTranslatedStages] = useState([]);
     const [dateLabels, setDateLabels] = useState({ today: 'Today', tomorrow: 'Tomorrow' });
+    const [isTranslating, setIsTranslating] = useState(false);
     const router = useRouter();
+
+    // Keep track of what's been translated
+    const [translationProgress, setTranslationProgress] = useState({});
 
     const handleMatchClick = async (eid) => {
         await Promise.all([
@@ -57,63 +62,96 @@ export default function TestLive() {
         router.push('/football-match-details');
     };
 
-
     useEffect(() => {
         const translateStageData = async () => {
             if (!stages?.Stages) return;
 
-            // Translate "Today" and "Tomorrow"
+            setIsTranslating(true);
+
+            // First translate just the date labels for immediate display
             const [today, tomorrow] = await Promise.all([
                 translateText('Today', 'en', language),
                 translateText('Tomorrow', 'en', language),
             ]);
             setDateLabels({ today, tomorrow });
 
-            const translated = await Promise.all(
-                stages.Stages.map(async (stage) => {
-                    // console.log(stage, "stage")
-                    const translatedLeague = await translateText(stage.Cnm || '', 'en', language);
-                    const translatedSubLeague = stage.Snm
-                        ? await translateText(stage.Snm, 'en', language)
-                        : '';
+            // Then process stages incrementally
+            for (const stage of stages.Stages) {
+                const stageKey = `${stage.Sid}_${stage.Cid}`;
 
-                    const translatedEvents = await Promise.all(
-                        (stage.Events || []).map(async (event) => {
-                            const team1 = event.T1?.[0];
-                            const team2 = event.T2?.[0];
-                            const translatedTeam1 = team1?.Nm
-                                ? await translateText(team1.Nm, 'en', language)
-                                : '';
-                            const translatedTeam2 = team2?.Nm
-                                ? await translateText(team2.Nm, 'en', language)
-                                : '';
-                            const translatedStatus = event.Eps
-                                ? await translateText(event.Eps, 'en', language)
-                                : '';
+                // Skip if already translated
+                if (translationProgress[stageKey]) continue;
 
-                            return {
-                                ...event,
-                                translatedTeam1,
-                                translatedTeam2,
-                                translatedStatus,
-                            };
-                        })
-                    );
+                const translatedLeague = await translateText(stage.Cnm || '', 'en', language);
+                const translatedSubLeague = stage.Snm
+                    ? await translateText(stage.Snm, 'en', language)
+                    : '';
 
-                    return {
-                        ...stage,
-                        translatedLeague,
-                        translatedSubLeague,
-                        translatedEvents,
-                    };
-                })
-            );
+                // Update with just this stage's league info first
+                setTranslatedStages(prev => {
+                    const existingIndex = prev.findIndex(s => s.Sid === stage.Sid);
+                    if (existingIndex >= 0) {
+                        const updated = [...prev];
+                        updated[existingIndex] = {
+                            ...updated[existingIndex],
+                            translatedLeague,
+                            translatedSubLeague
+                        };
+                        return updated;
+                    }
+                    return [
+                        ...prev,
+                        {
+                            ...stage,
+                            translatedLeague,
+                            translatedSubLeague,
+                            translatedEvents: [] // Events will be added later
+                        }
+                    ];
+                });
 
-            setTranslatedStages(translated);
+                // Then translate events one by one
+                const translatedEvents = [];
+                for (const event of stage.Events || []) {
+                    const team1 = event.T1?.[0];
+                    const team2 = event.T2?.[0];
+
+                    const [translatedTeam1, translatedTeam2, translatedStatus] = await Promise.all([
+                        team1?.Nm ? translateText(team1.Nm, 'en', language) : '',
+                        team2?.Nm ? translateText(team2.Nm, 'en', language) : '',
+                        event.Eps ? translateText(event.Eps, 'en', language) : ''
+                    ]);
+
+                    translatedEvents.push({
+                        ...event,
+                        translatedTeam1,
+                        translatedTeam2,
+                        translatedStatus,
+                    });
+
+                    // Update with newly translated event
+                    setTranslatedStages(prev => prev.map(s =>
+                        s.Sid === stage.Sid
+                            ? { ...s, translatedEvents: [...translatedEvents] }
+                            : s
+                    ));
+                }
+
+                // Mark this stage as fully translated
+                setTranslationProgress(prev => ({
+                    ...prev,
+                    [stageKey]: true
+                }));
+            }
+
+            setIsTranslating(false);
         };
 
         translateStageData();
     }, [stages, language]);
+
+    // ... rest of your component
+
 
     // Recreate filtered league lists
     const allLeagues = translatedStages.map(stage => stage.translatedLeague).filter(Boolean);
@@ -121,9 +159,7 @@ export default function TestLive() {
     const topLeagues = uniqueLeagues.slice(0, 5);
     const otherLeagues = uniqueLeagues.slice(5);
 
-    // console.log(uniqueLeagues, "unique");
-    // console.log(topLeagues, "top");
-    // console.log(otherLeagues, "other");
+
 
     return (
         <>

@@ -1,190 +1,211 @@
 .featuredButton {
     position: relative;
-    background: linear-gradient(45deg, #4ecdc4, #45b7d1, #96ceb4, #3498db);
-    background-size: 400% 400%;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 25%, #ff8e53 50%, #ff6b6b 75%, #ff4757 100%);
+    background-size: 200% 200%;
     border: none;
-    border-radius: 5px;
-    padding: 9px 35px;
-    font-size: 18px;
-    font-weight: bold;
-    color: white;
+    border-radius: 12px;
+    padding: 5px 30px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffffff;
     cursor: pointer;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    animation: gradientShift 3s ease infinite;
+    letter-spacing: 1.5px;
+    box-shadow:
+        0 8px 30px rgba(255, 107, 107, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: energyPulse 2s ease-in-out infinite;
     overflow: hidden;
+    /* font-family: 'Arial Black', sans-serif; */
+    position: relative;
+    z-index: 1;
 }
 
 .featuredButton:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+
+    background-size: 150% 150%;
+    box-shadow:
+        0 15px 40px rgba(255, 107, 107, 0.6),
+        0 0 0 2px rgba(255, 255, 255, 0.2);
+    animation-duration: 0.8s;
 }
 
 .featuredButton:active {
-    transform: translateY(0) scale(1);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    box-shadow:
+        0 8px 25px rgba(255, 107, 107, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 
 .featuredButton::before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transform: rotate(45deg);
-    animation: shine 2s linear infinite;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: powerStrike 2.5s ease-in-out infinite;
+    z-index: 2;
 }
 
 .featuredButton::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, #4ecdc4, #45b7d1, #96ceb4, #3498db);
-    background-size: 400% 400%;
-    border-radius: 25px;
-    z-index: -1;
-    animation: gradientShift 3s ease infinite;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53, #ff4757);
+    background-size: 200% 200%;
+    border-radius: 15px;
+    z-index: -2;
+    animation: energyPulse 2s ease-in-out infinite;
+    filter: blur(8px);
+    opacity: 0.6;
 }
 
 .buttonContent {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    gap: 12px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.starIcon {
-    font-size: 20px;
-    animation: starPulse 1.5s ease-in-out infinite;
+.powerIcon {
+    font-size: 18px;
+    animation: powerCharge 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
 }
 
-.pulseRing {
+.lightningBolt {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
+    width: 3px;
     height: 100%;
-    border: 3px solid rgba(255, 255, 255, 0.6);
-    border-radius: 10px;
-    transform: translate(-50%, -50%);
-    animation: pulseRing 2s infinite;
+    background: linear-gradient(to bottom, transparent, #ffed4e, transparent);
+    animation: lightningStrike 3s ease-in-out infinite;
+    opacity: 0;
 }
 
-.glowEffect {
+.lightningBolt.left {
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.lightningBolt.right {
+    right: 20%;
+    animation-delay: 1s;
+}
+
+.energyField {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-    border-radius: 25px;
-    animation: glowPulse 2s ease-in-out infinite alternate;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background: linear-gradient(45deg, #ff6b6b, #ff8e53, #ff4757, #ee5a52) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: subtract;
+    animation: fieldRotate 4s linear infinite;
+    opacity: 0.7;
 }
 
-.particle {
+.shockwave {
     position: absolute;
-    width: 6px;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.8);
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border: 2px solid rgba(255, 237, 78, 0.8);
     border-radius: 50%;
-    animation: float 4s linear infinite;
-    opacity: 0;
+    transform: translate(-50%, -50%);
+    animation: shockwaveExpand 2s ease-out infinite;
 }
 
-.particle:nth-child(1) {
+.shockwave:nth-child(2) {
+    animation-delay: 0.6s;
+}
+
+.shockwave:nth-child(3) {
+    animation-delay: 1.2s;
+}
+
+.energyParticle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #ffed4e;
+    border-radius: 50%;
+    animation: particleBurst 2s ease-out infinite;
+    opacity: 0;
+    box-shadow: 0 0 6px #ffed4e;
+}
+
+.energyParticle:nth-child(1) {
+    top: 20%;
     left: 10%;
     animation-delay: 0s;
 }
 
-.particle:nth-child(2) {
-    left: 30%;
-    animation-delay: 0.5s;
+.energyParticle:nth-child(2) {
+    top: 30%;
+    right: 15%;
+    animation-delay: 0.3s;
 }
 
-.particle:nth-child(3) {
+.energyParticle:nth-child(3) {
+    bottom: 25%;
+    left: 20%;
+    animation-delay: 0.6s;
+}
+
+.energyParticle:nth-child(4) {
+    bottom: 20%;
+    right: 10%;
+    animation-delay: 0.9s;
+}
+
+.energyParticle:nth-child(5) {
+    top: 50%;
+    left: 5%;
+    animation-delay: 1.2s;
+}
+
+.powerCore {
+    position: absolute;
+    top: 50%;
     left: 50%;
-    animation-delay: 1s;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #ffed4e, #ff8e53);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: coreBlast 1.8s ease-in-out infinite;
+    box-shadow: 0 0 15px #ffed4e;
 }
 
-.particle:nth-child(4) {
-    left: 70%;
-    animation-delay: 1.5s;
-}
+@keyframes energyPulse {
 
-.particle:nth-child(5) {
-    left: 90%;
-    animation-delay: 2s;
-}
-
-@keyframes gradientShift {
-    0% {
+    0%,
+    100% {
         background-position: 0% 50%;
+        filter: brightness(1);
     }
 
     50% {
         background-position: 100% 50%;
-    }
-
-    100% {
-        background-position: 0% 50%;
+        filter: brightness(1.2);
     }
 }
 
-@keyframes shine {
+@keyframes powerStrike {
     0% {
-        transform: rotate(45deg) translateX(-200%);
-    }
-
-    100% {
-        transform: rotate(45deg) translateX(200%);
-    }
-}
-
-@keyframes starPulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.2);
-    }
-}
-
-@keyframes pulseRing {
-    0% {
-        transform: translate(-50%, -50%) scale(0.8);
-        opacity: 1;
-    }
-
-    100% {
-        transform: translate(-50%, -50%) scale(1.2);
-        opacity: 0;
-    }
-}
-
-@keyframes glowPulse {
-    0% {
-        opacity: 0.5;
-    }
-
-    100% {
-        opacity: 0.8;
-    }
-}
-
-@keyframes float {
-    0% {
-        transform: translateY(100px);
+        left: -100%;
         opacity: 0;
     }
 
@@ -197,26 +218,154 @@
     }
 
     100% {
-        transform: translateY(-100px);
+        left: 100%;
         opacity: 0;
     }
 }
 
-@keyframes ripple {
+@keyframes powerCharge {
+
+    0%,
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+    }
+
+    50% {
+        transform: scale(1.3);
+        filter: drop-shadow(0 0 15px rgba(255, 237, 78, 1));
+    }
+}
+
+@keyframes lightningStrike {
+
+    0%,
+    90%,
+    100% {
+        opacity: 0;
+        transform: scaleY(0);
+    }
+
+    5%,
+    15% {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+
+    10% {
+        opacity: 0.7;
+        transform: scaleY(0.8);
+    }
+}
+
+@keyframes fieldRotate {
+    from {
+        transform: rotate(0deg);
+    }
+
     to {
-        transform: scale(4);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes shockwaveExpand {
+    0% {
+        width: 10px;
+        height: 10px;
+        opacity: 1;
+    }
+
+    100% {
+        width: 120px;
+        height: 120px;
         opacity: 0;
     }
 }
 
-@media (max-width: 768px) {
-    .buttonContainer {
-        justify-content: center;
-        padding-right: 20px;
+@keyframes particleBurst {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 0;
     }
 
+    20% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    100% {
+        transform: translate(var(--random-x, 30px), var(--random-y, -30px)) scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes coreBlast {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+}
+
+.featuredButton:hover .powerIcon {
+    animation-duration: 0.5s;
+    transform: scale(1.2);
+}
+
+.featuredButton:hover .lightningBolt {
+    animation-duration: 1s;
+    opacity: 0.8;
+}
+
+.featuredButton:hover .energyField {
+    animation-duration: 2s;
+    opacity: 1;
+}
+
+.featuredButton:hover .shockwave {
+    animation-duration: 1s;
+}
+
+.featuredButton:hover .powerCore {
+    animation-duration: 0.8s;
+    box-shadow: 0 0 25px #ffed4e;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
     .featuredButton {
-        padding: 15px 25px;
+        padding: 16px 30px;
+        font-size: 15px;
+        letter-spacing: 1.2px;
+    }
+
+    .buttonContent {
+        gap: 10px;
+    }
+
+    .powerIcon {
         font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .featuredButton {
+        padding: 14px 26px;
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+
+    .buttonContent {
+        gap: 8px;
+    }
+
+    .powerIcon {
+        font-size: 15px;
     }
 }
