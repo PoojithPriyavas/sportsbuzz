@@ -6,6 +6,7 @@ import { fetchTournaments } from '@/pages/api/get-tournaments';
 import { fetchEventsIds } from '@/pages/api/get-events';
 import { fetchSportEventDetails } from '@/pages/api/get-teamnames';
 import { countryTimezones } from '../utilities/CountryTimezones';
+import { useCallback } from 'react';
 
 
 const DataContext = createContext();
@@ -286,23 +287,41 @@ export const DataProvider = ({ children }) => {
             console.error('Error fetching recent blogs:', error);
         }
     };
-    // ApiContext.js or ApiProvider.js
-    const fetchBlogs = async ({ countryCodeParam = countryCode?.country_code, searchText = '' }) => {
-        try {
-            const params = { country_code: countryCodeParam };
-            const searchStr = String(searchText || '').trim();
 
-            if (searchStr) {
-                params.search = searchStr;
+    const fetchBlogs = useCallback(async ({
+        countryCodeParam = countryCode?.country_code,
+        search = '',
+        category = null,
+        subcategory = null
+    } = {}) => { // Add default empty object
+        try {
+            const params = {
+                country_code: countryCodeParam,
+            };
+
+            if (search) {
+                params.search = search;
             }
 
-            const response = await CustomAxios.get('/get-blogs', { params });
+            if (category) {
+                params.category_id = category;
+            }
+
+            if (subcategory) {
+                params.subcategory_id = subcategory;
+            }
+
+            console.log('Fetching blogs with params:', params); // Debug log
+
+            const response = await CustomAxios.get('/get-blogs', {
+                params,
+            });
+
             setBlogs(response.data.results || []);
         } catch (error) {
             console.error('Failed to fetch blogs:', error);
         }
-    };
-
+    }, [countryCode?.country_code]);
 
 
 
@@ -592,11 +611,11 @@ export const DataProvider = ({ children }) => {
     useEffect(() => {
         if (countryCode.country_code) {
             console.log('Country code available, fetching dependent data:', countryCode.country_code);
-            fetchBlogs(countryCode.country_code);
+            fetchBlogs({ countryCodeParam: countryCode.country_code }); // Pass as object
             fetchBettingApps(countryCode.country_code);
             fetchBestBettingAppsPrevious(countryCode.country_code);
         }
-    }, [countryCode.country_code]);
+    }, [countryCode.country_code, fetchBlogs]);
 
     return (
         <DataContext.Provider
