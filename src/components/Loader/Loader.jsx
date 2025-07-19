@@ -168,7 +168,7 @@ export default function LoadingScreen({ onFinish }) {
               </Link>
 
               {countryCode?.location?.betting_apps === 'Active' && (
-                <Link href="/best-betting-apps" className={`${styles.navItem} ${pathname === '/best-betting-apps' ? styles.active : ''}`}>
+                <Link href="/best-betting-apps/current" className={`${styles.navItem} ${pathname === '/best-betting-apps/current' ? styles.active : ''}`}>
                   {translatedText.apps}
                 </Link>
               )}

@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import styles from './BestBettingRecentApps.module.css';
 import Head from 'next/head';
 import { useGlobalData } from '../Context/ApiContext';
+import Link from 'next/link';
 
-export default function BettingAppsTable() {
+export default function BestBettingRecentApps() {
     const [copiedId, setCopiedId] = useState(null);
     const { bestSections } = useGlobalData();
 
@@ -28,21 +29,19 @@ export default function BettingAppsTable() {
             <div className={styles.cardGrid}>
                 {bestSections.map((section) => {
                     const imageUrl = `https://admin.sportsbuz.com${section.best_betting_apps[0]?.image}`;
-                    {/* console.log("Image URL:", imageUrl);  */}
+                    const linkPath = `/best-betting-apps/recent/${encodeURIComponent(section.id)}`;
 
                     return (
-                        <div className={styles.card} key={section.id}>
+                        <Link href={linkPath} key={section.id} className={styles.card}>
                             <img
                                 className={styles.cardImage}
                                 src={imageUrl}
                                 alt={section.heading}
                             />
-
                             <h1 className={styles.heading}>{section.heading}</h1>
-                        </div>
+                        </Link>
                     );
                 })}
-
             </div>
         </>
     );
