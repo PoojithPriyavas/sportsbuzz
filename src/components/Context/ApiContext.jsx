@@ -287,19 +287,22 @@ export const DataProvider = ({ children }) => {
         }
     };
     // ApiContext.js or ApiProvider.js
-    const fetchBlogs = async ({ countryCodeParam = countryCode?.country_code, search = '' }) => {
+    const fetchBlogs = async ({ countryCodeParam = countryCode?.country_code, searchText = '' }) => {
         try {
-            const response = await CustomAxios.get('/get-blogs', {
-                params: {
-                    country_code: countryCodeParam,
-                    search,
-                },
-            });
+            const params = { country_code: countryCodeParam };
+            const searchStr = String(searchText || '').trim();
+
+            if (searchStr) {
+                params.search = searchStr;
+            }
+
+            const response = await CustomAxios.get('/get-blogs', { params });
             setBlogs(response.data.results || []);
         } catch (error) {
             console.error('Failed to fetch blogs:', error);
         }
     };
+
 
 
 

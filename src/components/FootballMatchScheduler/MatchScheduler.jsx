@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import styles from './MatchScheduler.module.css';
 import { useGlobalData } from '../Context/ApiContext';
+import { useRouter } from 'next/navigation';
 
 // Spinner Loader Component
 const Spinner = ({ size = 'medium', text = 'Loading...' }) => {
@@ -29,7 +30,19 @@ export default function MatchScheduler() {
     const [dates, setDates] = useState([]);
     const [isInitialized, setIsInitialized] = useState(false);
     const [isLoadingMatches, setIsLoadingMatches] = useState(false);
-    const { matchSchedule, fetchMatchSchedules, currentTimezone, countryCode, translateText, language } = useGlobalData();
+
+    const {
+        matchSchedule,
+        fetchMatchSchedules,
+        currentTimezone,
+        countryCode,
+        translateText,
+        language,
+        fetchFootballDetails,
+        fetchFootBallLineUp
+    } = useGlobalData();
+
+    const router = useRouter();
 
     const [translatedText, setTranslatedText] = useState({
         matchSchedule: 'Match Schedule',
@@ -177,6 +190,7 @@ export default function MatchScheduler() {
                 if (!event.T1?.[0] || !event.T2?.[0]) return;
 
                 competition.matches.push({
+                    eid: event.Eid,
                     home: event.T1[0].Abr || event.T1[0].Nm.substring(0, 3).toUpperCase(),
                     away: event.T2[0].Abr || event.T2[0].Nm.substring(0, 3).toUpperCase(),
                     homeScore: event.Tr1 ?? null,
@@ -210,6 +224,14 @@ export default function MatchScheduler() {
         });
         return Array.from(leagues);
     }, [matchSchedule, translatedText.allLeagues]);
+
+    const handleMatchClick = async (eid) => {
+        await Promise.all([
+            fetchFootballDetails(eid),
+            fetchFootBallLineUp(eid)
+        ]);
+        router.push(`/football-match-details/${eid}`);
+    };
 
     if (currentTimezone === '+0.00' || !countryCode.country_code) {
         return (
@@ -281,7 +303,14 @@ export default function MatchScheduler() {
                             </div>
                             <div className={styles.matchesGrid}>
                                 {competition.matches.map((match, j) => (
-                                    <div key={j} className={styles.matchRow}>
+                                    <div
+                                        key={j}
+                                        className={styles.matchRow}
+                                        onClick={() => handleMatchClick(match.eid)}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyPress={(e) => e.key === 'Enter' && handleMatchClick(match.eid)}
+                                    >
                                         <div className={`${styles.team} ${styles.home}`}>
                                             <div className={styles.teamFlag}>{match.home}</div>
                                             <div className={styles.teamName}>{match.home}</div>

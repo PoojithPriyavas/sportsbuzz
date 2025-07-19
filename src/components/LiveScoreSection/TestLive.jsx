@@ -59,7 +59,7 @@ export default function TestLive() {
             fetchFootballDetails(eid),
             fetchFootBallLineUp(eid)
         ]);
-        router.push('/football-match-details');
+        router.push(`/football-match-details/${eid}`);
     };
 
     useEffect(() => {
