@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
 import CustomAxios from '../utilities/CustomAxios';
+import { useGlobalData } from '../Context/ApiContext';
 
 const ContactUsPage = () => {
     const [formData, setFormData] = useState({
@@ -20,7 +21,8 @@ const ContactUsPage = () => {
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const { settings } = useGlobalData();
+    const contact = settings?.[0] || {};
     const categories = [
         'United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Spain', 'Italy',
         'Australia', 'Japan', 'China', 'India', 'Brazil', 'Mexico', 'Netherlands', 'Sweden',
@@ -94,11 +96,11 @@ const ContactUsPage = () => {
         try {
             // Create FormData object for multipart/form-data
             const formDataToSend = new FormData();
-            
+
             // Combine first name and last name into a single name field
             const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
             formDataToSend.append('name', fullName);
-            
+
             formDataToSend.append('email', formData.email);
             formDataToSend.append('contact_number', formData.telegram);
             // formDataToSend.append('company', formData.company);
@@ -636,7 +638,7 @@ const ContactUsPage = () => {
                             <div style={styles.contactDetails}>
                                 <div style={styles.contactTitle}>Email</div>
                                 <div style={styles.contactText}>
-                                    contact@company.com<br />
+                                    {contact.email}<br />
                                     Response within 24 hours
                                 </div>
                             </div>

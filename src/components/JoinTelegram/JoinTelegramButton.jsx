@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import styles from './JoinTelegramButton.module.css';
+import { useGlobalData } from '../Context/ApiContext';
 
 const JoinTelegramButton = () => {
     const createRipple = (event) => {
@@ -22,11 +23,12 @@ const JoinTelegramButton = () => {
             ripple.remove();
         }, 600);
     };
-
+    const { settings } = useGlobalData();
+    const contact = settings?.[0] || {};
     return (
         <div className={styles.wrapper}>
             <a
-                href="https://t.me/yourchannel"
+                href={contact.telegram_link}
                 className={styles.telegramBtn}
                 onClick={createRipple}
             >

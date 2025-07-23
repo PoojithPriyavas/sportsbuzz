@@ -25,6 +25,7 @@ import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 import SportsOdsList from "@/components/SportsOdds/SportsOdsList";
 import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
 import Footer from '@/components/Footer/Footer';
+import TestHeader from "@/components/Header/TestHeader";
 
 
 const geistSans = Geist({
@@ -71,10 +72,10 @@ export default function Home() {
         <meta name="description" content="Your site description here" />
       </Head>
       <>
-        <LoadingScreen onFinish={() => setLoading(false)} />
+        {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
+        <TestHeader />
 
-        <div className={`${geistSans.variable} ${geistMono.variable} container`}>
-          {/* Top Hero Section */}
+        {/* <div className={`${geistSans.variable} ${geistMono.variable} container`}>
           {sport === 'cricket' ? (
             <>
               <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
@@ -84,14 +85,11 @@ export default function Home() {
           )}
           <HeroCarousal />
 
-          {/* Main Layout: 4 Columns */}
           <div className={styles.fourColumnRow}>
-            {/* Left 3 columns combined */}
             <div className={styles.leftThreeColumns}>
               {countryCode?.location?.betting_apps === 'Active' && (
                 <BonusTable sections={sections} />
               )}
-              {/* 1-2 Split under BonusTable */}
               <div className={styles.twoSplitRow}>
                 <div className={styles.leftSplit}>
 
@@ -107,9 +105,6 @@ export default function Home() {
                   <TopNewsSection />
 
 
-                  {/* <PredictionSection /> */}
-                  {/* <MultiBannerSlider /> */}
-
 
                 </div>
                 <div className={styles.centerSplit}>
@@ -118,7 +113,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Column 4 - AutoSlider on top and others below */}
             <div className={styles.fourthColumn}>
 
               <BettingCard />
@@ -134,18 +128,12 @@ export default function Home() {
 
 
 
-              {/* <SportsOdsList /> */}
-
-              {/* <AdsSlider /> */}
-              {/* <CricketPrediction /> */}
-              {/* <SmallAdBox /> */}
             </div>
           </div>
 
 
-          {/* <GoogleAds /> */}
-        </div>
-        <Footer />
+        </div> */}
+        {/* <Footer /> */}
       </>
     </>
   );

@@ -183,9 +183,13 @@ export default function LoadingScreen({ onFinish }) {
 
               {translatedCategories.map((cat) => (
                 <div key={cat.id} className={styles.dropdown}>
-                  <span className={styles.navItem}>
+                  <Link
+                    href={`/blogs/pages/all-blogs?category=${cat.id}`}
+                    className={styles.navItem}
+                  >
                     {capitalizeFirstLetter(cat.name)} <FaChevronDown />
-                  </span>
+                  </Link>
+
                   {cat.subcategories?.length > 0 && (
                     <ul className={styles.submenu}>
                       {cat.subcategories.map((sub) => (
@@ -202,6 +206,7 @@ export default function LoadingScreen({ onFinish }) {
                   )}
                 </div>
               ))}
+
             </nav>
           </div>
         </div>

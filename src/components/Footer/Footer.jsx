@@ -10,8 +10,10 @@ import {
     FaTelegram,
     FaLinkedin,
     FaEnvelope,
-    FaMapMarkerAlt,  
+    FaMapMarkerAlt,
     FaClock,
+    FaPhoneAlt,
+    FaWhatsapp
 } from 'react-icons/fa';
 import { useGlobalData } from '../Context/ApiContext';
 
@@ -26,7 +28,8 @@ const FooterTwo = () => {
         blogCategories: 'Blog Categories',
         contactInfo: 'Contact Info',
         home: 'Home',
-        liveScores: 'Live Scores',
+        // liveScores: 'Live Scores',
+        blogs: 'Blogs',
         bestApps: 'Best Betting Apps',
         contactUs: 'Contact Us',
         cricket: 'Cricket',
@@ -52,7 +55,8 @@ const FooterTwo = () => {
                 blogCategories: 'Blog Categories',
                 contactInfo: 'Contact Info',
                 home: 'Home',
-                liveScores: 'Live Scores',
+                // liveScores: 'Live Scores',
+                blogs: 'Blogs',
                 bestApps: 'Best Betting Apps',
                 contactUs: 'Contact Us',
                 cricket: 'Cricket',
@@ -127,8 +131,9 @@ const FooterTwo = () => {
                         <h3 className={styles.title}>{translatedText.quickLinks}</h3>
                         <ul className={styles.linkList}>
                             <li><a href="/">{translatedText.home}</a></li>
-                            <li><a href="/live-scores">{translatedText.liveScores}</a></li>
+                            {/* <li><a href="/live-scores">{translatedText.liveScores}</a></li> */}
                             <li><a href="/best-betting-apps">{translatedText.bestApps}</a></li>
+                            <li><a href="/blogs/pages/all-blogs">{translatedText.blogs}</a></li>
                             <li><a href="/contact">{translatedText.contactUs}</a></li>
                         </ul>
                     </div>
@@ -164,10 +169,38 @@ const FooterTwo = () => {
                                     <span>{contact.email}</span>
                                 </div>
                             )}
+
+                            {contact.whatsapp_number && (
+                                <div className={styles.contactItem}>
+                                    <FaPhoneAlt className={styles.contactIcon} />
+                                    <a
+                                        href={`tel:${contact.whatsapp_number}`}
+                                        className={styles.contactLink}
+                                    >
+                                        {contact.whatsapp_number}
+                                    </a>
+                                </div>
+                            )}
+
+                            {contact.whatsapp_number && (
+                                <div className={styles.contactItem}>
+                                    <FaWhatsapp className={styles.contactIcon} />
+                                    <a
+                                        href={`https://wa.me/${contact.whatsapp_number.replace(/[^\d]/g, '')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={styles.contactLink}
+                                    >
+                                        {contact.whatsapp_number}
+                                    </a>
+                                </div>
+                            )}
+
                             <div className={styles.contactItem}>
                                 <FaClock className={styles.contactIcon} />
                                 <span>{translatedText.availability}</span>
                             </div>
+
                             {contact.address && (
                                 <div className={styles.contactItem}>
                                     <FaMapMarkerAlt className={styles.contactIcon} />
