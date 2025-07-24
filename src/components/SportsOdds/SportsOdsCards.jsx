@@ -30,7 +30,6 @@ export default function BettingCards() {
         potentialProfit: 'Potential Profit'
     });
 
-    const { tournament, accessToken, fetchEventsIdData, eventDetails, } = useGlobalData();
     const { oneXTournament, oneXAccessToken, fetchOneXEventsIdData, oneXEventDetails, translateText, language } = useGlobalData();
     useEffect(() => {
         const translateLabels = async () => {

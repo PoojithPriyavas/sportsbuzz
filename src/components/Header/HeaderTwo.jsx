@@ -5,19 +5,7 @@ import { useGlobalData } from '../Context/ApiContext';
 import { FaMoon, FaSun, FaChevronDown, FaBars, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
 import axios from 'axios';
-import LiveScores from '../LiveScoreSection/LiveScoreSection';
-import BonusTable from '../BonusTable/BonusTable';
-import AutoSlider from '../AutoSlider/AutoSlider';
-import TopNewsSection from '../NewsSection/TopNews';
-import BlogSection from '../BlogsSection/BlogsSection';
-import HeroCarousal from '../HeroCarousal/Carousal';
-import TestLive from '../LiveScoreSection/TestLive';
-import BettingCard from '../OddsMultiply/BettingCard';
-import UpcomingFootballMatches from '../UpComing/UpComingFootball';
-import UpcomingMatches from '../UpComing/UpComingMatches';
-import SportsOddsList from '../SportsOdds/SportsOdsList';
-import JoinTelegramButton from '../JoinTelegram/JoinTelegramButton';
-import FooterTwo from '../Footer/Footer';
+
 import FeaturedButton from '../FeaturedButton/FeaturedButton';
 
 const HeaderTwo = ({ animationStage }) => {
@@ -27,6 +15,7 @@ const HeaderTwo = ({ animationStage }) => {
     const [headerFixed, setHeaderFixed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [expandedCategory, setExpandedCategory] = useState(null);
 
     // GSAP refs
     const loadingContainerRef = useRef(null);
@@ -125,6 +114,7 @@ const HeaderTwo = ({ animationStage }) => {
             document.body.style.overflow = 'unset';
         };
     }, [mobileMenuOpen]);
+
     const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
     const [translatedText, setTranslatedText] = useState({
         home: 'Home',
@@ -176,6 +166,7 @@ const HeaderTwo = ({ animationStage }) => {
             setLanguage(matched[0].hreflang);
         }
     }, [location, countryCode]);
+
     useEffect(() => {
         const updateTranslations = async () => {
             try {
@@ -250,6 +241,147 @@ const HeaderTwo = ({ animationStage }) => {
         }
     };
 
+    const toggleCategory = (categoryId) => {
+        setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
+    };
+
+    const renderMobileMenu = () => (
+        <>
+            {/* Mobile Overlay */}
+            <div 
+                className={`${styles.mobileOverlay} ${mobileMenuOpen ? styles.open : ''}`}
+                onClick={() => setMobileMenuOpen(false)}
+            />
+
+            {/* Mobile Sidebar */}
+            <div 
+                ref={sidebarRef}
+                className={`${styles.mobileSidebar} ${mobileMenuOpen ? styles.open : ''}`}
+            >
+                {/* Mobile Header */}
+                <div className={styles.mobileHeader}>
+                    <div className={styles.logoContent}>
+                        <div className={styles.logoIcon}>
+                            <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
+                        </div>
+                    </div>
+                    <button 
+                        className={styles.mobileCloseButton}
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <FaTimes />
+                    </button>
+                </div>
+
+                {/* Mobile Navigation Links */}
+                <div className={styles.mobileNavLinks}>
+                    <Link 
+                        href="/" 
+                        className={`${styles.mobileNavItem} ${pathname === '/' ? styles.active : ''}`}
+                        onClick={handleNavItemClick}
+                    >
+                        {translatedText.home}
+                    </Link>
+
+                    {countryCode?.location?.betting_apps === 'Active' && (
+                        <Link 
+                            href="/best-betting-apps/current" 
+                            className={`${styles.mobileNavItem} ${pathname === '/best-betting-apps/current' ? styles.active : ''}`}
+                            onClick={handleNavItemClick}
+                        >
+                            {translatedText.apps}
+                        </Link>
+                    )}
+
+                    <Link 
+                        href="/match-schedules" 
+                        className={`${styles.mobileNavItem} ${pathname === '/match-schedules' ? styles.active : ''}`}
+                        onClick={handleNavItemClick}
+                    >
+                        {translatedText.schedule}
+                    </Link>
+
+                    {/* Mobile Dropdown Categories */}
+                    {translatedCategories.map((cat) => (
+                        <div key={cat.id} className={styles.mobileDropdown}>
+                            <div 
+                                className={styles.mobileDropdownHeader}
+                                onClick={() => toggleCategory(cat.id)}
+                            >
+                                <Link
+                                    href={`/blogs/pages/all-blogs?category=${cat.id}`}
+                                    onClick={handleNavItemClick}
+                                >
+                                    {capitalizeFirstLetter(cat.name)}
+                                </Link>
+                                {cat.subcategories?.length > 0 && (
+                                    <FaChevronDown 
+                                        style={{ 
+                                            transform: expandedCategory === cat.id ? 'rotate(180deg)' : 'rotate(0deg)',
+                                            transition: 'transform 0.2s ease'
+                                        }} 
+                                    />
+                                )}
+                            </div>
+
+                            {cat.subcategories?.length > 0 && (
+                                <div className={`${styles.mobileSubmenu} ${expandedCategory === cat.id ? styles.open : ''}`}>
+                                    {cat.subcategories.map((sub) => (
+                                        <Link
+                                            key={sub.id}
+                                            href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}
+                                            className={styles.mobileSubmenuItem}
+                                            onClick={handleNavItemClick}
+                                        >
+                                            {sub.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    <Link 
+                        href="/contact" 
+                        className={`${styles.mobileNavItem} ${pathname === '/contact' ? styles.active : ''}`}
+                        onClick={handleNavItemClick}
+                    >
+                        {translatedText.contact}
+                    </Link>
+                </div>
+
+                {/* Mobile Selectors */}
+                <div className={styles.mobileSelectors}>
+                    <div className={styles.mobileSelectorGroup}>
+                        <label className={styles.mobileSelectorLabel}>Language</label>
+                        <select
+                            className={styles.mobileSelector}
+                            value={language}
+                            onChange={handleLanguageChange}
+                        >
+                            {filteredList.map((lang) => (
+                                <option key={lang.hreflang} value={lang.hreflang}>
+                                    {lang.language}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className={styles.mobileSelectorGroup}>
+                        <label className={styles.mobileSelectorLabel}>Sport</label>
+                        <select
+                            className={styles.mobileSelector}
+                            value={sport}
+                            onChange={handleSportChange}
+                        >
+                            <option value="cricket">{translatedText.cricket}</option>
+                            <option value="football">{translatedText.football}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
 
     return (
         <div className={`${styles.loadingContainer} ${styles[animationStage]}`}>
@@ -275,7 +407,26 @@ const HeaderTwo = ({ animationStage }) => {
 
             {/* Header Navigation (Final Stage) */}
             <div className={`${styles.navigation} ${styles[animationStage]}`}>
+                {/* Mobile Top Row - Only visible on mobile/tablet */}
+                <div className={styles.mobileTopRow}>
+                    {/* <div className={styles.logoContent}>
+                        <div className={styles.logoIcon}>
+                            <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
+                        </div>
+                    </div> */}
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <FeaturedButton />
+                        <button 
+                            className={styles.mobileMenuButton}
+                            onClick={toggleMobileMenu}
+                        >
+                            <FaBars />
+                        </button>
+                    </div>
+                </div>
 
+                {/* Desktop Navigation */}
                 <div className={styles.leftSection}>
                     <div className={styles.divider}></div>
                     {/* Navigation Links */}
@@ -293,8 +444,6 @@ const HeaderTwo = ({ animationStage }) => {
                         <Link href="/match-schedules" className={`${styles.navItem} ${pathname === '/match-schedules' ? styles.active : ''}`}>
                             {translatedText.schedule}
                         </Link>
-
-
 
                         {translatedCategories.map((cat) => (
                             <div key={cat.id} className={styles.dropdown}>
@@ -322,12 +471,11 @@ const HeaderTwo = ({ animationStage }) => {
                             </div>
                         ))}
 
-
                         <FeaturedButton />
                     </div>
                 </div>
 
-                {/* Sign In Button (Right Side) */}
+                {/* Desktop Right Section */}
                 <div className={styles.rightSection}>
                     <select
                         className={styles.languageSelector}
@@ -349,13 +497,15 @@ const HeaderTwo = ({ animationStage }) => {
                         <option value="cricket">{translatedText.cricket}</option>
                         <option value="football">{translatedText.football}</option>
                     </select>
+                    
                     <Link href="/contact" className={`${styles.navItem} ${pathname === '/contact' ? styles.active : ''}`}>
                         {translatedText.contact}
                     </Link>
                 </div>
-
-                {/* <button className={styles.signInButton}>Sign In</button> */}
             </div>
+
+            {/* Render Mobile Menu */}
+            {renderMobileMenu()}
         </div>
     );
 };
