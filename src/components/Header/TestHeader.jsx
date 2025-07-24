@@ -54,6 +54,14 @@ function TestHeader({ onFinish }) {
         upcomingMatches
     } = useGlobalData();
 
+    // Function to parse URL path for country code and language
+    const parseUrlPath = (pathname) => {
+        const parts = pathname.split('/').filter(part => part !== '');
+        const countryCode = parts.length > 0 ? parts[0].toUpperCase() : '';
+        const language = parts.length > 1 ? parts[1].toLowerCase() : '';
+        return { countryCode, language };
+    };
+
     // Check if mobile on mount and resize
     useEffect(() => {
         const checkMobile = () => {
@@ -65,6 +73,34 @@ function TestHeader({ onFinish }) {
         
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    // Handle URL-based country code and language
+    useEffect(() => {
+        if (!location || location.length === 0) return;
+
+        const { countryCode: urlCountryCode, language: urlLanguage } = parseUrlPath(pathname);
+        
+        // Set language from URL if available and valid
+        if (urlLanguage) {
+            const isValidLanguage = location.some(loc => loc.hreflang === urlLanguage);
+            if (isValidLanguage && language !== urlLanguage) {
+                setLanguage(urlLanguage);
+                localStorage.setItem('language', urlLanguage);
+            }
+        }
+        
+        // Set sport based on URL country code if available
+        if (urlCountryCode) {
+            const matchedLocation = location.find(loc => loc.country_code === urlCountryCode);
+            if (matchedLocation?.sports) {
+                const apiSport = matchedLocation.sports.toLowerCase();
+                if (apiSport !== sport) {
+                    setSport(apiSport);
+                    localStorage.setItem('selectedSport', apiSport);
+                }
+            }
+        }
+    }, [pathname, location, language, sport]);
 
     // Close mobile menu when clicking outside
     useEffect(() => {
@@ -303,10 +339,6 @@ function TestHeader({ onFinish }) {
                         <div className={styles.logoIcon}>
                             <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                         </div>
-
-                        {/* <div className={styles.logoText}>
-
-                        </div> */}
                     </div>
                 </div>
 
@@ -574,7 +606,6 @@ function TestHeader({ onFinish }) {
                     <FooterTwo />
                 </>
             )}
-
         </>
     );
 }

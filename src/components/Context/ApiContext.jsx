@@ -7,6 +7,8 @@ import { fetchEventsIds } from '@/pages/api/get-events';
 import { fetchSportEventDetails } from '@/pages/api/get-teamnames';
 import { countryTimezones } from '../utilities/CountryTimezones';
 import { useCallback } from 'react';
+import { parseUrlPath } from '../utilities/ParseUrl';
+import { usePathname } from 'next/navigation';
 
 
 const DataContext = createContext();
@@ -20,7 +22,7 @@ export const DataProvider = ({ children }) => {
     const [bestSections, setBestSections] = useState([]);
     // const [sport, setSport] = useState('cricket');
 
-
+    const pathname = usePathname();
     //  TIME ZONE IMPLEMENTATION
 
     const [currentTimezone, setCurrentTimezone] = useState('+0.00');
@@ -37,9 +39,13 @@ export const DataProvider = ({ children }) => {
 
     const getCountryCode = async () => {
         try {
-            const res = await CustomAxios.get('/get-country-code');
-            setCountryCode(res.data || {});
-            setCurrentTimezone(getTimezoneByCountryCode(res.data.country_code));
+            const { countryCode: urlCountryCode } = parseUrlPath(pathname);
+
+            if (!urlCountryCode) {
+                const res = await CustomAxios.get('/get-country-code');
+                setCountryCode(res.data || {});
+                setCurrentTimezone(getTimezoneByCountryCode(res.data.country_code));
+            }
         } catch (error) {
             console.error('Failed to fetch country code:', error);
         }
@@ -58,6 +64,64 @@ export const DataProvider = ({ children }) => {
             console.error('Failed to fetch locations:', error);
         }
     };
+
+
+    // TRANSLATION API IMPLEMENTATION
+
+    const [language, setLanguage] = useState('en');
+
+    const translateText = async (text, from = 'en', toLang = language) => {
+        const langMap = {
+            English: 'en',
+            Malayalam: 'ml',
+        };
+        const to = langMap[toLang] || toLang;
+        const fromCode = langMap[from] || from;
+
+        if (fromCode === to) return text;
+
+        try {
+            const response = await axios.post('/api/translate', {
+                text,
+                from: fromCode,
+                to,
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Translation error:', error);
+            return text;
+        }
+    };
+
+
+    // LANGUAGE BASED ON THE URL
+
+    useEffect(() => {
+        const { countryCode: urlCountryCode, language: urlLanguage } = parseUrlPath(pathname);
+
+        // Only proceed if we have values from URL
+        if (urlCountryCode || urlLanguage) {
+            // Set language from URL if available and valid
+            if (urlLanguage) {
+                const isValidLanguage = location.some(loc => loc.hreflang === urlLanguage);
+                if (isValidLanguage) {
+                    setLanguage(urlLanguage);
+                    localStorage.setItem('language', urlLanguage);
+                }
+            }
+
+            // Set country code from URL if available
+            if (urlCountryCode) {
+                const matchedLocation = location.find(loc => loc.country_code === urlCountryCode);
+                if (matchedLocation) {
+                    setCountryCode({
+                        country_code: urlCountryCode,
+                        location: matchedLocation
+                    });
+                }
+            }
+        }
+    }, [pathname, location]);
 
 
     //SPORT CHANGE CONDITION
@@ -241,32 +305,7 @@ export const DataProvider = ({ children }) => {
         }
     }
 
-    // TRANSLATION API IMPLEMENTATION
 
-    const [language, setLanguage] = useState('en');
-
-    const translateText = async (text, from = 'en', toLang = language) => {
-        const langMap = {
-            English: 'en',
-            Malayalam: 'ml',
-        };
-        const to = langMap[toLang] || toLang;
-        const fromCode = langMap[from] || from;
-
-        if (fromCode === to) return text;
-
-        try {
-            const response = await axios.post('/api/translate', {
-                text,
-                from: fromCode,
-                to,
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Translation error:', error);
-            return text;
-        }
-    };
 
     // BLOG SECTION
 
