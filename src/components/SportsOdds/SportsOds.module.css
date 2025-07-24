@@ -53,6 +53,7 @@
     color: white;
     font-size: 0.75rem;
     opacity: 0.9;
+    text-align: end;
 }
 
 .body {
@@ -77,13 +78,34 @@
     font-size: 0.75rem;
 }
 
-.teamsOdds {
+.teamsRow {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
     min-height: 2.5rem;
 }
 
+.teamLeft,
+.teamRight {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 calc(50% - 0.5rem);
+    min-width: 0;
+    /* Allow flex items to shrink below their content size */
+}
+
+.teamLeft {
+    justify-content: flex-start;
+    flex-direction: row;
+}
+
+.teamRight {
+    justify-content: flex-end;
+    flex-direction: row;
+}
 
 .abbrCircle,
 .abbrCircleRight {
@@ -97,22 +119,30 @@
     font-size: 0.75rem;
     font-weight: bold;
     color: white;
+    flex-shrink: 0;
 }
 
 .teamName {
     color: #1f2937;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 500;
     line-height: 1rem;
+    /* white-space: nowrap; */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+    max-width: calc(100% - 2.5rem);
 }
 
-.odds {
+.oddsRow {
     display: flex;
-    gap: 0.25rem;
-    margin: 0 1rem;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 
-.oddsPrimary {
+.oddButton {
     background: linear-gradient(to bottom, #3b82f6, #2563eb);
     color: white;
     padding: 0.5rem 0.75rem;
@@ -121,33 +151,126 @@
     font-size: 0.875rem;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    min-width: 3.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.125rem;
 }
 
-.oddsPrimary:hover {
+.oddButton:hover {
     transform: scale(1.05);
     background: linear-gradient(to bottom, #60a5fa, #3b82f6);
 }
 
-.oddsNeutral {
-    background: linear-gradient(to bottom, #f3f4f6, #e5e7eb);
-    color: #374151;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.5rem;
-    font-weight: bold;
-    font-size: 0.875rem;
-    border: 1px solid #d1d5db;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    transition: all 0.2s;
+.oddButton.selected {
+    background: linear-gradient(to bottom, #059669, #047857);
+    box-shadow: 0 0 0 2px #10b981;
 }
 
-.oddsNeutral:hover {
-    transform: scale(1.05);
+.oddButton:nth-child(2) {
+    background: linear-gradient(to bottom, #f3f4f6, #e5e7eb);
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.oddButton:nth-child(2):hover {
     background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
 }
 
-.oddsLabel {
+.oddLabel {
     font-size: 0.75rem;
-    opacity: 0.8;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.oddValue {
+    font-size: 0.875rem;
+    font-weight: bold;
+}
+
+.bettingSection {
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 0.75rem;
+    border: 1px solid #e2e8f0;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.bettingSection.show {
+    opacity: 1;
+    max-height: 200px;
+}
+
+.betInputContainer {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.betInput {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    color: #000;
+    background-color: transparent;
+}
+
+.betInput:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.placeBetBtn {
+    background: linear-gradient(to bottom, #059669, #047857);
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.placeBetBtn:hover:not(:disabled) {
+    background: linear-gradient(to bottom, #10b981, #059669);
+}
+
+.placeBetBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.potentialWin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: #ecfdf5;
+    border-radius: 0.375rem;
+    border: 1px solid #d1fae5;
+}
+
+.potentialWinLabel {
+    font-size: 0.75rem;
+    color: #047857;
+    font-weight: 500;
+}
+
+.potentialWinAmount {
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: #047857;
 }
 
 .live {
@@ -171,6 +294,19 @@
     color: #6b7280;
 }
 
+.betHistory {
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #6b7280;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 @keyframes pulse {
     0% {
         opacity: 0.6;
@@ -188,27 +324,266 @@
     }
 }
 
-.teamsRow {
+.bettingContainer {
+    width: 100%;
+    /* max-width: 300px; */
+    margin: 10 auto;
+    /* padding: 0 20px; */
+}
+
+.headerSection {
     display: flex;
     justify-content: space-between;
-    /* Ensures left & right items go to ends */
     align-items: center;
-    margin-bottom: 0.75rem;
-    gap: 1rem;
+    margin-bottom: 24px;
+    padding: 0 4px;
 }
 
-.teamLeft,
-.teamRight {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    white-space: nowrap;
+.pageTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    /* background: linear-gradient(135deg, #3b82f6, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; */
+    background-clip: text;
+    position: relative;
 }
 
+/* .pageTitle::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-radius: 2px;
+} */
 
-.oddsRow {
+.filterContainer {
     display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Custom Dropdown Styles */
+.customDropdown {
+    position: relative;
+    min-width: 200px;
+}
+
+.dropdownHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border: 2px solid rgba(59, 130, 246, 0.15);
+    border-radius: 10px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    font-size: 15px;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.dropdownHeader:hover {
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.02);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.selectedOption {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.teamImage {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(59, 130, 246, 0.1);
+    transition: all 0.3s ease;
+}
+
+.allTeamsIcon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 0.25rem;
-    margin-bottom: 0.75rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.dropdownArrow {
+    transition: transform 0.3s ease;
+    color: #64748b;
+}
+
+.dropdownArrow.open {
+    transform: rotate(180deg);
+}
+
+.dropdownOptions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 2px solid rgba(59, 130, 246, 0.15);
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+}
+
+/* Custom scrollbar for dropdown options */
+.dropdownOptions::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dropdownOptions::-webkit-scrollbar-track {
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: 10px;
+    margin: 4px 0;
+}
+
+.dropdownOptions::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(37, 99, 235, 0.4));
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.dropdownOptions::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(37, 99, 235, 0.6));
+}
+
+.dropdownOption {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    color: #1e293b;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.dropdownOption:last-child {
+    border-bottom: none;
+}
+
+.dropdownOption:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.06), rgba(37, 99, 235, 0.06));
+    color: #3b82f6;
+}
+
+.dropdownOption:hover .teamImage {
+    border-color: #3b82f6;
+    transform: scale(1.05);
+}
+
+.dropdownOption:hover .allTeamsIcon {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
+    transform: scale(1.05);
+}
+
+.dropdownOption.selected {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
+    color: #3b82f6;
+    font-weight: 600;
+    position: relative;
+}
+
+.dropdownOption.selected::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-radius: 0 2px 2px 0;
+}
+
+.dropdownOption.selected .teamImage {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.dropdownOption.selected .allTeamsIcon {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.3));
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Animation for dropdown opening */
+.dropdownOptions {
+    animation: dropdownSlideIn 0.3s ease-out;
+}
+
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .customDropdown {
+        min-width: 160px;
+    }
+
+    .dropdownHeader {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .teamImage {
+        width: 20px;
+        height: 20px;
+    }
+
+    .allTeamsIcon {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+    }
+
+    .dropdownOption {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+}
+
+/* Focus styles for accessibility */
+.dropdownHeader:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dropdownOption:focus {
+    outline: none;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.08));
 }

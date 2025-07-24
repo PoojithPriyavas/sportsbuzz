@@ -34,9 +34,9 @@ const SportsOddsList = () => {
   return (
     <div className={styles.container}>
       <div className={styles.cardsWrapper}>
-        {matches.map((match, index) => (
-          <SportsOdsCard key={index} {...match} />
-        ))}
+        {/* {matches.map((match, index) => ( */}
+          <SportsOdsCard  />
+        {/* ))} */}
       </div>
     </div>
   );

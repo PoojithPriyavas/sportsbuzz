@@ -26,6 +26,7 @@ import SportsOdsList from "@/components/SportsOdds/SportsOdsList";
 import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
 import Footer from '@/components/Footer/Footer';
 import TestHeader from "@/components/Header/TestHeader";
+import HeaderTwo from "@/components/Header/HeaderTwo";
 
 
 const geistSans = Geist({
@@ -62,6 +63,23 @@ export default function Home() {
   // if (loading) {
   //   return <LoadingScreen onFinish={() => setLoading(false)} />;
   // }
+  const [animationStage, setAnimationStage] = useState('loading');
+  const [showOtherDivs, setShowOtherDivs] = useState(false);
+
+  useEffect(() => {
+    const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
+    const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
+    const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
+    const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); // Show welcome after transition completes
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      clearTimeout(timer4);
+    };
+  }, []);
+
 
   console.log("enters this condition", countryCode?.location?.betting_apps.trim() === 'Active')
 
@@ -73,67 +91,66 @@ export default function Home() {
       </Head>
       <>
         {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
-        <TestHeader />
+        {/* <TestHeader /> */}
+        <HeaderTwo animationStage={animationStage} />
+        {showOtherDivs &&
+          <div className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} container`}>
+            {sport === 'cricket' ? (
+              <>
+                <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+              </>
+            ) : (
+              <TestLive />
+            )}
+            <HeroCarousal />
 
-        {/* <div className={`${geistSans.variable} ${geistMono.variable} container`}>
-          {sport === 'cricket' ? (
-            <>
-              <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
-            </>
-          ) : (
-            <TestLive />
-          )}
-          <HeroCarousal />
+            <div className={styles.fourColumnRow}>
+              <div className={styles.leftThreeColumns}>
+                {countryCode?.location?.betting_apps === 'Active' && (
+                  <BonusTable sections={sections} />
+                )}
+                <div className={styles.twoSplitRow}>
+                  <div className={styles.leftSplit}>
 
-          <div className={styles.fourColumnRow}>
-            <div className={styles.leftThreeColumns}>
-              {countryCode?.location?.betting_apps === 'Active' && (
-                <BonusTable sections={sections} />
-              )}
-              <div className={styles.twoSplitRow}>
-                <div className={styles.leftSplit}>
+                    {sport === 'cricket' ? (
+                      <>
+                        <UpcomingMatches upcomingMatches={upcomingMatches} />
+                      </>
+                    ) : (
+                      <UpcomingFootballMatches />
+                    )}
+                    <SportsOdsList />
 
-                  {sport === 'cricket' ? (
-                    <>
-                      <UpcomingMatches upcomingMatches={upcomingMatches} />
-                    </>
-                  ) : (
-                    <UpcomingFootballMatches />
-                  )}
-                  <SportsOdsList />
+                    <TopNewsSection />
 
-                  <TopNewsSection />
-
-
-
+                  </div>
+                  <div className={styles.centerSplit}>
+                    <BlogSection blogs={blogs} />
+                  </div>
                 </div>
-                <div className={styles.centerSplit}>
-                  <BlogSection blogs={blogs} />
-                </div>
+              </div>
+
+              <div className={styles.fourthColumn}>
+
+                <BettingCard />
+                <JoinTelegramButton />
+                <AutoSlider />
+                {sport === 'cricket' ? (
+                  <>
+                    <UpcomingMatches upcomingMatches={upcomingMatches} />
+                  </>
+                ) : (
+                  <UpcomingFootballMatches />
+                )}
+
+
+
               </div>
             </div>
 
-            <div className={styles.fourthColumn}>
 
-              <BettingCard />
-              <JoinTelegramButton />
-              <AutoSlider />
-              {sport === 'cricket' ? (
-                <>
-                  <UpcomingMatches upcomingMatches={upcomingMatches} />
-                </>
-              ) : (
-                <UpcomingFootballMatches />
-              )}
-
-
-
-            </div>
-          </div>
-
-
-        </div> */}
-        {/* <Footer /> */}
+          </div>}
+        {showOtherDivs && <Footer />}
       </>
     </>
   );

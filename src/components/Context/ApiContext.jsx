@@ -3,8 +3,11 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import CustomAxios from '../utilities/CustomAxios';
 import axios from 'axios';
 import { fetchTournaments } from '@/pages/api/get-tournaments';
+import { fetchOneXTournaments } from '@/pages/api/get-onex-tournaments';
 import { fetchEventsIds } from '@/pages/api/get-events';
+import { fetchOneXEventsIds } from '@/pages/api/get-onex-events';
 import { fetchSportEventDetails } from '@/pages/api/get-teamnames';
+import { fetchOneXSportEventDetails } from '@/pages/api/get-onex-teamnames';
 import { countryTimezones } from '../utilities/CountryTimezones';
 import { useCallback } from 'react';
 import { parseUrlPath } from '../utilities/ParseUrl';
@@ -157,6 +160,8 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+    //-------------------22-BET SECTION-------------------//
+
     // TOURNAMENT API IMPLEMENTATION
 
     const [tournament, setTournament] = useState([]);
@@ -258,6 +263,115 @@ export const DataProvider = ({ children }) => {
             return null;
         }
     }
+
+    //-------------------END--->22-BET SECTION-------------------//
+
+    //-------------------ONE-X BET SECTION----------------------//
+
+    // TOURNAMENT API IMPLEMENTATION
+    const [oneXTournament, setOneXTournament] = useState([]);
+
+    const fetchOneXTournamentsData = async (token) => {
+        console.log("calls trnmnt")
+        try {
+            const data = await fetchOneXTournaments(token);
+            setOneXTournament(data);
+        } catch (err) {
+            console.error('Failed to fetch tournaments:', err);
+        }
+    };
+
+    // TOKEN ACCESSING PART
+
+    const [oneXAccessToken, setOneXAccessToken] = useState(null);
+    const [oneXLoading, setOneXLoading] = useState(true);
+
+    const fetchOneXToken = async () => {
+        try {
+            const res = await fetch('/api/get-token-onex');
+            const data = await res.json();
+            if (res.ok) {
+                setOneXAccessToken(data.access_token);
+                // console.log(data.access_token, "token")
+                fetchOneXTournamentsData(data.access_token);
+            } else {
+                console.error('Token error:', data.error);
+            }
+        } catch (err) {
+            console.error('Request failed:', err);
+        } finally {
+            setOneXLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchOneXToken();
+        const interval = setInterval(() => {
+            console.log('Refreshing one-x token...');
+            fetchOneXToken();
+        }, 60 * 60 * 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // TEAM NAME FETCHING
+
+    const [oneXEventDetails, setOneXEventDetails] = useState([]);
+
+    const fetchOneXEventDetailsForAllIds = async (token, eventIds) => {
+        try {
+            const detailPromises = eventIds.map(eventId =>
+                fetchOneXSportEventDetails({ token, eventId })
+            );
+
+            const results = await Promise.all(detailPromises);
+
+            const validDetails = results.filter(detail => detail !== null);
+
+            setOneXEventDetails(validDetails);
+        } catch (error) {
+            console.error('Error fetching all event details:', error);
+            setOneXEventDetails([]);
+        }
+    };
+
+    // TEAM EVENT FETCHING
+
+    const [oneXEventIds, setOneXEventIds] = useState([]);
+
+    const fetchOneXEventsIdData = async (token, id) => {
+        console.log("calls id ")
+        try {
+            const data = await fetchOneXEventsIds({ token, id });
+
+            if (data && data.items) {
+                setOneXEventIds(data.items);
+                await fetchOneXEventDetailsForAllIds(token, data.items);
+            } else {
+                setOneXEventIds([]);
+                console.warn("No event IDs returned");
+            }
+        } catch (err) {
+            console.error('Failed to fetch event IDs:', err);
+        }
+    };
+
+    // FETCH GAME MARKET
+
+    async function fetchOneXMarketData(token, sportEventId) {
+        try {
+            const response = await fetch(`/api/get-onex-odds?sportEventId=${sportEventId}&token=${token}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch market data');
+            }
+            const data = await response.json();
+            return data;
+        } catch (err) {
+            console.error('fetchMarketData error:', err);
+            return null;
+        }
+    }
+
+    //-------------------END--->ONE-X BET SECTION----------------------//
 
     // FOOTBALL MATCH DETAILS API IMPLEMENTATION
 
@@ -678,11 +792,17 @@ export const DataProvider = ({ children }) => {
                 setLanguage,
                 translateText,
                 tournament,
+                oneXTournament,
                 accessToken,
+                oneXAccessToken,
                 fetchEventsIdData,
+                fetchOneXEventsIdData,
                 eventIds,
+                oneXEventIds,
                 eventDetails,
+                oneXEventDetails,
                 fetchMarketData,
+                fetchOneXMarketData,
                 location,
                 fetchFootballDetails,
                 footBallMatchDetails,

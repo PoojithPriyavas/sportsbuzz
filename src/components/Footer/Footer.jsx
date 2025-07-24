@@ -18,9 +18,19 @@ import {
 import { useGlobalData } from '../Context/ApiContext';
 
 const FooterTwo = () => {
-    const { translateText, language, settings } = useGlobalData();
+    const { translateText, language, settings, sport, setSport } = useGlobalData();
 
     const contact = settings?.[0] || {};
+    const handleSportChange = (newSport) => {
+        setSport(newSport);
+        localStorage.setItem('selectedSport', newSport);
+        if (isMobile) {
+            setMobileMenuOpen(false);
+        }
+
+        // Navigate to the new sport page
+        router.push(`/${newSport}`);
+    };
 
     const [translatedText, setTranslatedText] = useState({
         quickLinks: 'Quick Links',
@@ -141,21 +151,34 @@ const FooterTwo = () => {
                     {/* Column 3 - Sports Categories */}
                     <div className={styles.col}>
                         <h3 className={styles.title}>{translatedText.sports}</h3>
-                        <ul className={styles.linkList}>
+                        {/* <ul className={styles.linkList}>
                             <li><a href="/cricket">{translatedText.cricket}</a></li>
                             <li><a href="/football">{translatedText.football}</a></li>
+                        </ul> */}
+                        <ul className={styles.linkList}>
+                            <li>
+                                <button className={styles.buttonLi} onClick={() => handleSportChange('cricket')}>
+                                    {translatedText.cricket}
+                                </button>
+                            </li>
+                            <li>
+                                <button className={styles.buttonLi}  onClick={() => handleSportChange('football')}>
+                                    {translatedText.football}
+                                </button>
+                            </li>
                         </ul>
+
                     </div>
 
                     {/* Column 4 - Blog Categories */}
                     <div className={styles.col}>
                         <h3 className={styles.title}>{translatedText.blogCategories}</h3>
                         <ul className={styles.linkList}>
-                            <li><a href="/blogs/featured">{translatedText.featured}</a></li>
-                            <li><a href="/blogs/match-analysis">{translatedText.matchAnalysis}</a></li>
-                            <li><a href="/blogs/betting-tips">{translatedText.bettingTips}</a></li>
+                            <li><a href="/blogs/pages/all-blogs?category=1">{translatedText.cricket}</a></li>
+                            <li><a href="/blogs/pages/all-blogs?category=2">{translatedText.football}</a></li>
+                            {/* <li><a href="/blogs/betting-tips">{translatedText.bettingTips}</a></li>
                             <li><a href="/blogs/player-stats">{translatedText.playerStats}</a></li>
-                            <li><a href="/blogs/news">{translatedText.news}</a></li>
+                            <li><a href="/blogs/news">{translatedText.news}</a></li> */}
                         </ul>
                     </div>
 
