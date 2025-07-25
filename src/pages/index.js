@@ -50,15 +50,17 @@ export default function Home() {
     sport,
     countryCode
   } = useGlobalData();
-  
+
   const [loading, setLoading] = useState(true);
   const [animationStage, setAnimationStage] = useState('loading');
   const [showOtherDivs, setShowOtherDivs] = useState(false);
+  const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
+
 
   useEffect(() => {
     // Check if animation has been played before
     const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
-    
+
     if (!hasPlayedAnimation) {
       // First time - play the full animation sequence
       const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
@@ -86,6 +88,14 @@ export default function Home() {
     return () => clearTimeout(timer1);
   }, []);
 
+  useEffect(() => {
+    if (showOtherDivs) {
+      const timeout = setTimeout(() => setHasAnimatedIn(true), 50); // slight delay triggers transition
+      return () => clearTimeout(timeout);
+    }
+  }, [showOtherDivs]);
+
+
   console.log("enters this condition", countryCode?.location?.betting_apps?.trim() === 'Active');
 
   return (
@@ -97,7 +107,7 @@ export default function Home() {
       <>
         <HeaderTwo animationStage={animationStage} />
         {showOtherDivs && (
-          <div className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} container`}>
+          <div className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} container`}>
             {sport === 'cricket' ? (
               <>
                 <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />

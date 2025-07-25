@@ -3,7 +3,7 @@
   width: 100%;
   padding: 0 0rem;
   margin: 0 auto;
-  max-width: 1400px;
+  /* max-width: 1400px; */
   box-sizing: border-box;
 }
 
@@ -109,4 +109,15 @@
   .fourthColumn {
     gap: 0.5rem;
   }
+}
+
+.fadeUpEnter {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fadeUpEnterActive {
+  opacity: 1;
+  transform: translateY(0);
 }
