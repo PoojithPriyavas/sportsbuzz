@@ -16,6 +16,10 @@ const HeaderTwo = ({ animationStage }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState(null);
+    
+    // New state to track if animation should play
+    const [shouldPlayAnimation, setShouldPlayAnimation] = useState(false);
+    const [currentAnimationStage, setCurrentAnimationStage] = useState('header');
 
     // GSAP refs
     const loadingContainerRef = useRef(null);
@@ -39,6 +43,36 @@ const HeaderTwo = ({ animationStage }) => {
         teamImages,
         upcomingMatches
     } = useGlobalData();
+
+    // Check if animation should play on component mount
+    useEffect(() => {
+        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
+        
+        if (!hasPlayedAnimation) {
+            // First time - play the full animation
+            setShouldPlayAnimation(true);
+            setCurrentAnimationStage('loading');
+            
+            // Animation sequence
+            setTimeout(() => {
+                setCurrentAnimationStage('logoReveal');
+            }, 1000);
+            
+            setTimeout(() => {
+                setCurrentAnimationStage('transition');
+            }, 2500);
+            
+            setTimeout(() => {
+                setCurrentAnimationStage('header');
+                // Mark animation as played
+                localStorage.setItem('headerAnimationPlayed', 'true');
+            }, 4000);
+        } else {
+            // Animation already played - go directly to header
+            setShouldPlayAnimation(false);
+            setCurrentAnimationStage('header');
+        }
+    }, []);
 
     // Function to parse URL path for country code and language
     const parseUrlPath = (pathname) => {
@@ -245,6 +279,12 @@ const HeaderTwo = ({ animationStage }) => {
         setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
     };
 
+    // Function to reset animation (you can call this if needed)
+    const resetAnimation = () => {
+        localStorage.removeItem('headerAnimationPlayed');
+        window.location.reload();
+    };
+
     const renderMobileMenu = () => (
         <>
             {/* Mobile Overlay */}
@@ -379,24 +419,45 @@ const HeaderTwo = ({ animationStage }) => {
                         </select>
                     </div>
                 </div>
+
+                {/* Debug button to reset animation (remove in production) */}
+                {process.env.NODE_ENV === 'development' && (
+                    <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.2)', marginTop: '1rem' }}>
+                        <button 
+                            onClick={resetAnimation}
+                            style={{
+                                background: 'rgba(255,255,255,0.1)',
+                                border: '1px solid rgba(255,255,255,0.3)',
+                                color: 'white',
+                                padding: '0.5rem 1rem',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Reset Animation (Dev Only)
+                        </button>
+                    </div>
+                )}
             </div>
         </>
     );
 
     return (
-        <div className={`${styles.loadingContainer} ${styles[animationStage]}`}>
-            {/* Loading Animation in Center */}
-            <div className={`${styles.loadingAnimation} ${styles[animationStage]}`}>
-                <div className={styles.loadingIcon}>
-                    {/* Main Loading Icon */}
-                    <div className={styles.mainIcon}>
-                        <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInner} />
+        <div className={`${styles.loadingContainer} ${styles[currentAnimationStage]}`}>
+            {/* Loading Animation in Center - Only show if animation should play */}
+            {shouldPlayAnimation && (
+                <div className={`${styles.loadingAnimation} ${styles[currentAnimationStage]}`}>
+                    <div className={styles.loadingIcon}>
+                        {/* Main Loading Icon */}
+                        <div className={styles.mainIcon}>
+                            <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInner} />
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
-            {/* SportsBuzz Logo (Bottom Left during loading) */}
-            <div className={`${styles.logo} ${styles[animationStage]}`}>
+            {/* SportsBuzz Logo (Bottom Left during loading or header position) */}
+            <div className={`${styles.logo} ${styles[currentAnimationStage]}`}>
                 <div className={styles.logoContent}>
                     {/* Logo Icon */}
                     <div className={styles.logoIcon}>
@@ -406,15 +467,9 @@ const HeaderTwo = ({ animationStage }) => {
             </div>
 
             {/* Header Navigation (Final Stage) */}
-            <div className={`${styles.navigation} ${styles[animationStage]}`}>
+            <div className={`${styles.navigation} ${styles[currentAnimationStage]}`}>
                 {/* Mobile Top Row - Only visible on mobile/tablet */}
                 <div className={styles.mobileTopRow}>
-                    {/* <div className={styles.logoContent}>
-                        <div className={styles.logoIcon}>
-                            <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
-                        </div>
-                    </div> */}
-                    
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <FeaturedButton />
                         <button 

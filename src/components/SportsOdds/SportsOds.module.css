@@ -587,3 +587,260 @@
     outline: none;
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(37, 99, 235, 0.08));
 }
+
+/* Skeleton Loader Styles - Add these to your SportsOds.module.css */
+
+.skeletonContainer {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-direction: column;
+}
+
+.skeletonContainer::-webkit-scrollbar {
+    display: none;
+}
+
+.skeletonCard {
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    min-width: 320px;
+    max-width: 320px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    flex-shrink: 0;
+}
+
+.skeletonHeader {
+    background: linear-gradient(to right, #3b82f6, #2563eb);
+    padding: 0.5rem 1rem;
+}
+
+.skeletonHeaderContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.skeletonPoweredBy {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.skeletonLogoCircle {
+    width: 1.25rem;
+    height: 1.25rem;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeletonPoweredText {
+    width: 120px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeletonDate {
+    width: 80px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeletonBody {
+    padding: 1rem;
+}
+
+.skeletonLeagueRow {
+    margin-bottom: 0.75rem;
+}
+
+.skeletonLeagueTitle {
+    width: 60%;
+    height: 20px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeletonTeamsRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.skeletonTeamLeft,
+.skeletonTeamRight {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.skeletonTeamRight {
+    justify-content: flex-end;
+}
+
+.skeletonTeamCircle {
+    width: 2rem;
+    height: 2rem;
+    background: #f3f4f6;
+    border-radius: 50%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+.skeletonTeamName {
+    height: 16px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    animation: shimmer 1.5s ease-in-out infinite;
+    flex: 1;
+    max-width: 100px;
+}
+
+.skeletonOddsRow {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.skeletonOddButton {
+    width: 3.5rem;
+    height: 3rem;
+    background: #f3f4f6;
+    border-radius: 0.5rem;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeletonFooter {
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.skeletonFooterText {
+    width: 70%;
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Loading Message Styles */
+.loadingMessage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    min-height: 200px;
+    background: #f8fafc;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    margin: 1rem 0;
+    max-width: 400px;
+    margin: 1rem auto;
+}
+
+.loadingSpinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f4f6;
+    border-top: 3px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+.loadingText {
+    color: #374151;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.loadingSubtext {
+    color: #6b7280;
+    font-size: 0.875rem;
+    max-width: 300px;
+    line-height: 1.4;
+}
+
+/* Animations */
+@keyframes shimmer {
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive adjustments for skeleton */
+@media (max-width: 768px) {
+    .skeletonContainer {
+        padding: 0.5rem 0;
+        gap: 0.5rem;
+    }
+
+    .skeletonCard {
+        min-width: 280px;
+        max-width: 280px;
+    }
+
+    .skeletonBody {
+        padding: 0.75rem;
+    }
+
+    .loadingMessage {
+        margin: 0.5rem auto;
+        padding: 1.5rem;
+        max-width: 90%;
+    }
+
+    .loadingSpinner {
+        width: 32px;
+        height: 32px;
+        border-width: 2px;
+    }
+
+    .loadingText {
+        font-size: 0.9rem;
+    }
+
+    .loadingSubtext {
+        font-size: 0.8rem;
+    }
+}

@@ -28,7 +28,6 @@ import Footer from '@/components/Footer/Footer';
 import TestHeader from "@/components/Header/TestHeader";
 import HeaderTwo from "@/components/Header/HeaderTwo";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -51,37 +50,43 @@ export default function Home() {
     sport,
     countryCode
   } = useGlobalData();
+  
   const [loading, setLoading] = useState(true);
-  // const sport = countryCode?.location?.sports?.toLowerCase() || 'cricket';
-  useEffect(() => {
-    // Fixed: Timer was setting loading to true instead of false
-    const timer1 = setTimeout(() => setLoading(false), 3000);
-    return () => clearTimeout(timer1);
-  }, []);
-
-  // // Show loading screen while loading
-  // if (loading) {
-  //   return <LoadingScreen onFinish={() => setLoading(false)} />;
-  // }
   const [animationStage, setAnimationStage] = useState('loading');
   const [showOtherDivs, setShowOtherDivs] = useState(false);
 
   useEffect(() => {
-    const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
-    const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
-    const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
-    const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); // Show welcome after transition completes
+    // Check if animation has been played before
+    const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
+    
+    if (!hasPlayedAnimation) {
+      // First time - play the full animation sequence
+      const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
+      const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
+      const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
+      const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); // Show content after transition completes
 
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      clearTimeout(timer4);
-    };
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+        clearTimeout(timer4);
+      };
+    } else {
+      // Animation already played - go directly to header and show content immediately
+      setAnimationStage('header');
+      setShowOtherDivs(true);
+      setLoading(false);
+    }
   }, []);
 
+  // Original loading timer (keeping for compatibility)
+  useEffect(() => {
+    const timer1 = setTimeout(() => setLoading(false), 3000);
+    return () => clearTimeout(timer1);
+  }, []);
 
-  console.log("enters this condition", countryCode?.location?.betting_apps.trim() === 'Active')
+  console.log("enters this condition", countryCode?.location?.betting_apps?.trim() === 'Active');
 
   return (
     <>
@@ -90,10 +95,8 @@ export default function Home() {
         <meta name="description" content="Your site description here" />
       </Head>
       <>
-        {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
-        {/* <TestHeader /> */}
         <HeaderTwo animationStage={animationStage} />
-        {showOtherDivs &&
+        {showOtherDivs && (
           <div className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} container`}>
             {sport === 'cricket' ? (
               <>
@@ -111,7 +114,6 @@ export default function Home() {
                 )}
                 <div className={styles.twoSplitRow}>
                   <div className={styles.leftSplit}>
-
                     {sport === 'cricket' ? (
                       <>
                         <UpcomingMatches upcomingMatches={upcomingMatches} />
@@ -120,9 +122,7 @@ export default function Home() {
                       <UpcomingFootballMatches />
                     )}
                     <SportsOdsList />
-
                     <TopNewsSection />
-
                   </div>
                   <div className={styles.centerSplit}>
                     <BlogSection blogs={blogs} />
@@ -131,7 +131,6 @@ export default function Home() {
               </div>
 
               <div className={styles.fourthColumn}>
-
                 <BettingCard />
                 <JoinTelegramButton />
                 <AutoSlider />
@@ -142,14 +141,10 @@ export default function Home() {
                 ) : (
                   <UpcomingFootballMatches />
                 )}
-
-
-
               </div>
             </div>
-
-
-          </div>}
+          </div>
+        )}
         {showOtherDivs && <Footer />}
       </>
     </>

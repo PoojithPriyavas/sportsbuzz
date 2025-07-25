@@ -4,6 +4,71 @@ import styles from './SportsOds.module.css';
 import { useState, useRef, useEffect } from 'react';
 import { useGlobalData } from '../Context/ApiContext';
 
+// Skeleton Loader Component
+const SkeletonLoader = ({ styles }) => {
+    return (
+        <div className={styles.skeletonContainer}>
+            {[1, 2, 3, 4].map((index) => (
+                <div key={index} className={styles.skeletonCard}>
+                    {/* Header Skeleton */}
+                    <div className={styles.skeletonHeader}>
+                        <div className={styles.skeletonHeaderContent}>
+                            <div className={styles.skeletonPoweredBy}>
+                                <div className={styles.skeletonLogoCircle}></div>
+                                <div className={styles.skeletonPoweredText}></div>
+                            </div>
+                            <div className={styles.skeletonDate}></div>
+                        </div>
+                    </div>
+
+                    {/* Body Skeleton */}
+                    <div className={styles.skeletonBody}>
+                        {/* League Row */}
+                        <div className={styles.skeletonLeagueRow}>
+                            <div className={styles.skeletonLeagueTitle}></div>
+                        </div>
+
+                        {/* Teams Row */}
+                        <div className={styles.skeletonTeamsRow}>
+                            <div className={styles.skeletonTeamLeft}>
+                                <div className={styles.skeletonTeamCircle}></div>
+                                <div className={styles.skeletonTeamName}></div>
+                            </div>
+                            <div className={styles.skeletonTeamRight}>
+                                <div className={styles.skeletonTeamName}></div>
+                                <div className={styles.skeletonTeamCircle}></div>
+                            </div>
+                        </div>
+
+                        {/* Odds Row */}
+                        <div className={styles.skeletonOddsRow}>
+                            <div className={styles.skeletonOddButton}></div>
+                            <div className={styles.skeletonOddButton}></div>
+                            <div className={styles.skeletonOddButton}></div>
+                        </div>
+                    </div>
+
+                    {/* Footer Skeleton */}
+                    <div className={styles.skeletonFooter}>
+                        <div className={styles.skeletonFooterText}></div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+// Loading Message Component
+const LoadingMessage = ({ message, subMessage, styles }) => {
+    return (
+        <div className={styles.loadingMessage}>
+            <div className={styles.loadingSpinner}></div>
+            <div className={styles.loadingText}>{message}</div>
+            <div className={styles.loadingSubtext}>{subMessage}</div>
+        </div>
+    );
+};
+
 export default function BettingCards() {
     const scrollRef = useRef(null);
     const dropdownRef = useRef(null);
@@ -11,10 +76,12 @@ export default function BettingCards() {
     const [selectedTournament, setSelectedTournament] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [transformedCards, setTransformedCards] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [translatedText, setTranslatedText] = useState({
         bettingOdds: 'Betting Odds',
         allTournaments: 'All Tournaments',
         loading: 'Loading events...',
+        loadingSubtext: 'Please wait while we fetch the latest betting odds',
         noEvents: 'No events available',
         matchWinner: 'Match Winner',
         live: 'Live',
@@ -31,16 +98,18 @@ export default function BettingCards() {
     });
 
     const { oneXTournament, oneXAccessToken, fetchOneXEventsIdData, oneXEventDetails, translateText, language } = useGlobalData();
+
     useEffect(() => {
         const translateLabels = async () => {
             const [
-                bettingOdds, allTournaments, loading, noEvents, matchWinner, live,
+                bettingOdds, allTournaments, loading, loadingSubtext, noEvents, matchWinner, live,
                 vs, enterStake, placeBet, potentialWinnings, selectOdds, betSuccess,
                 team1Win, draw, team2Win, potentialProfit
             ] = await Promise.all([
                 translateText('Betting Odds', 'en', language),
                 translateText('All Tournaments', 'en', language),
                 translateText('Loading events...', 'en', language),
+                translateText('Please wait while we fetch the latest betting odds', 'en', language),
                 translateText('No events available', 'en', language),
                 translateText('Match Winner', 'en', language),
                 translateText('Live', 'en', language),
@@ -57,7 +126,7 @@ export default function BettingCards() {
             ]);
 
             setTranslatedText({
-                bettingOdds, allTournaments, loading, noEvents, matchWinner, live,
+                bettingOdds, allTournaments, loading, loadingSubtext, noEvents, matchWinner, live,
                 vs, enterStake, placeBet, potentialWinnings, selectOdds, betSuccess,
                 team1Win, draw, team2Win, potentialProfit
             });
@@ -77,7 +146,6 @@ export default function BettingCards() {
 
     const allTournaments = getAllTournaments();
 
-    // Add the missing getSelectedTournamentName function
     const getSelectedTournamentName = () => {
         if (!selectedTournament || selectedTournament === 'all') {
             return translatedText.allTournaments;
@@ -90,6 +158,7 @@ export default function BettingCards() {
         if (!selectedTournament && allTournaments.length > 0) {
             const firstTournamentId = allTournaments[0].id;
             setSelectedTournament(firstTournamentId);
+            setIsLoading(true);
             fetchOneXEventsIdData(oneXAccessToken, firstTournamentId);
         }
     }, [allTournaments, selectedTournament, oneXAccessToken, fetchOneXEventsIdData]);
@@ -108,13 +177,19 @@ export default function BettingCards() {
 
     useEffect(() => {
         if (oneXEventDetails?.length > 0) {
-            getTransformedCards(oneXEventDetails).then(setTransformedCards);
+            setIsLoading(true);
+            getTransformedCards(oneXEventDetails).then((cards) => {
+                setTransformedCards(cards);
+                setIsLoading(false);
+            });
         } else {
             setTransformedCards([]);
+            setIsLoading(false);
         }
     }, [oneXEventDetails, oneXAccessToken]);
 
     const handleTournamentChange = (tournamentId) => {
+        setIsLoading(true);
         fetchOneXEventsIdData(oneXAccessToken, tournamentId);
         setSelectedTournament(tournamentId);
         setIsDropdownOpen(false);
@@ -124,7 +199,7 @@ export default function BettingCards() {
 
     useEffect(() => {
         const container = scrollRef.current;
-        if (!container || paused || transformedCards.length === 0) return;
+        if (!container || paused || transformedCards.length === 0 || isLoading) return;
 
         let scrollAmount = 0;
         const cardWidth = 340;
@@ -134,7 +209,7 @@ export default function BettingCards() {
         }, 4000);
 
         return () => clearInterval(interval);
-    }, [paused, transformedCards]);
+    }, [paused, transformedCards, isLoading]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -196,7 +271,9 @@ export default function BettingCards() {
             </div>
 
             <div className={styles.cardsContainer} ref={scrollRef}>
-                {transformedCards.length > 0 ? (
+                {isLoading ? (
+                    <SkeletonLoader styles={styles} />
+                ) : transformedCards.length > 0 ? (
                     transformedCards.slice(0, 4).map((card, idx) => (
                         <SportsOddsCard
                             key={card.id || idx}
@@ -208,15 +285,18 @@ export default function BettingCards() {
                         />
                     ))
                 ) : (
-                    <div className={styles.noDataMessage}>
-                        {oneXEventDetails ? translatedText.noEvents : translatedText.loading}
-                    </div>
+                    <LoadingMessage 
+                        message={translatedText.noEvents}
+                        subMessage="Try selecting a different tournament"
+                        styles={styles}
+                    />
                 )}
             </div>
         </div>
     );
 }
 
+// ... rest of your existing functions (transformEventToCard, fetchMarketData, SportsOddsCard)
 function transformEventToCard(event, marketData) {
     const isLive = event.waitingLive || event.period > 0;
     const startDate = new Date(event.startDate * 1000);
@@ -270,16 +350,7 @@ async function fetchMarketData(token, sportEventId) {
     }
 }
 
-
-
-
-
-
-const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced,
-    // league, date, time, venue,
-    // team1, team2, team1Abbr, team2Abbr,
-    // w1Odds, xOdds, w2Odds
-}) => {
+const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced }) => {
     const [selectedOdd, setSelectedOdd] = useState(null);
     const [betAmount, setBetAmount] = useState('');
     const [win, setWin] = useState('0.00');
@@ -327,6 +398,7 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
             default: return type;
         }
     };
+
     return (
         <div className={styles.card}>
             {/* Header */}
@@ -346,9 +418,7 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
             <div className={styles.body}>
                 <div className={styles.leagueRow}>
                     <h2 className={styles.league}>{card.matchType}</h2>
-                    {/* <span className={styles.venue}>{venue}</span> */}
                 </div>
-
 
                 <div className={styles.teamsRow}>
                     <div className={styles.teamLeft}>
@@ -356,17 +426,13 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                         <span className={styles.teamName}>{card.team1.name}</span>
                     </div>
 
-                    <div className={styles.teamRight} >
+                    <div className={styles.teamRight}>
                         <span className={styles.teamName} style={{ textAlign: "end" }}>{card.team2.name}</span>
                         <div className={styles.abbrCircleRight}>{card.team2.code}</div>
                     </div>
                 </div>
 
-                {/* Odds Centered Below */}
-                {/* <div className={styles.oddsTitle}>{translatedText.matchWinner}</div> */}
-
                 <div className={styles.oddsRow}>
-
                     {card.odds.map((odd, idx) => (
                         <div
                             key={idx}
@@ -377,21 +443,8 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                             <div className={styles.oddValue}>{odd.value}</div>
                         </div>
                     ))}
-
-
-                    {/* <button className={styles.oddsPrimary}>
-                        <div className={styles.oddsLabel}>W1</div>
-                        <div>{w1Odds}</div>
-                    </button>
-                    <button className={styles.oddsNeutral}>
-                        <div className={styles.oddsLabel}>X</div>
-                        <div>{xOdds}</div>
-                    </button>
-                    <button className={styles.oddsPrimary}>
-                        <div className={styles.oddsLabel}>W2</div>
-                        <div>{w2Odds}</div>
-                    </button> */}
                 </div>
+
                 {selectedOdd && (
                     <div className={`${styles.bettingSection} ${showBettingSection ? styles.show : ''}`}>
                         <div className={styles.betInputContainer}>
@@ -445,5 +498,3 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
         </div>
     );
 };
-
-// export default SportsOddsCard;
