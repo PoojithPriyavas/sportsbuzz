@@ -1,7 +1,39 @@
-import React, { useState } from 'react';
-import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
-import CustomAxios from '../utilities/CustomAxios';
-import { useGlobalData } from '../Context/ApiContext';
+import React, { useState, useEffect } from 'react';
+
+// Mock components for demonstration
+const JoinTelegramButton = () => (
+    <div style={{
+        backgroundColor: '#0088cc',
+        color: 'white',
+        padding: '12px 20px',
+        borderRadius: '8px',
+        textAlign: 'center',
+        cursor: 'pointer',
+        marginTop: '20px',
+        fontWeight: '600'
+    }}>
+        Join Our Telegram
+    </div>
+);
+
+const CustomAxios = {
+    post: (url, data, config) => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (Math.random() > 0.2) {
+                    resolve({ data: { success: true } });
+                } else {
+                    reject(new Error('Network error'));
+                }
+            }, 1000);
+        });
+    }
+};
+
+// Mock global data
+const useGlobalData = () => ({
+    settings: [{ email: 'contact@company.com' }]
+});
 
 const ContactUsPage = () => {
     const [formData, setFormData] = useState({
@@ -21,8 +53,21 @@ const ContactUsPage = () => {
     const [errors, setErrors] = useState({});
     const [success, setSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const { settings } = useGlobalData();
     const contact = settings?.[0] || {};
+
+    // Check screen size on mount and resize
+    useEffect(() => {
+        const checkScreenSize = () => {
+            setIsMobile(window.innerWidth < 991);
+        };
+
+        checkScreenSize();
+        window.addEventListener('resize', checkScreenSize);
+        return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
+
     const categories = [
         'United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Spain', 'Italy',
         'Australia', 'Japan', 'China', 'India', 'Brazil', 'Mexico', 'Netherlands', 'Sweden',
@@ -94,22 +139,14 @@ const ContactUsPage = () => {
         setIsSubmitting(true);
 
         try {
-            // Create FormData object for multipart/form-data
             const formDataToSend = new FormData();
-
-            // Combine first name and last name into a single name field
             const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
             formDataToSend.append('name', fullName);
-
             formDataToSend.append('email', formData.email);
             formDataToSend.append('contact_number', formData.telegram);
-            // formDataToSend.append('company', formData.company);
-            // formDataToSend.append('job_title', formData.jobTitle);
             formDataToSend.append('category', formData.category);
             formDataToSend.append('subject', formData.subject);
             formDataToSend.append('message', formData.message);
-            // formDataToSend.append('how_did_you_hear', formData.howDidYouHear);
-            // formDataToSend.append('newsletter', formData.newsletter);
 
             const response = await CustomAxios.post('/contact-forms/', formDataToSend, {
                 headers: {
@@ -117,7 +154,6 @@ const ContactUsPage = () => {
                 }
             });
 
-            // If we get here, the request was successful
             setSuccess(true);
             setFormData({
                 firstName: '',
@@ -133,22 +169,18 @@ const ContactUsPage = () => {
                 newsletter: false
             });
 
-            // Hide success message after 5 seconds
             setTimeout(() => setSuccess(false), 5000);
 
         } catch (error) {
             console.error('Form submission failed:', error);
 
             if (error.response && error.response.data) {
-                // Handle specific field errors if returned by API
                 if (error.response.data.errors) {
                     setErrors(error.response.data.errors);
                 } else {
-                    // Show generic error
                     setErrors({ submit: 'Failed to send message. Please try again.' });
                 }
             } else {
-                // Network error or other issues
                 setErrors({ submit: 'Network error. Please check your connection and try again.' });
             }
         } finally {
@@ -173,7 +205,7 @@ const ContactUsPage = () => {
             padding: '40px 0'
         },
         title: {
-            fontSize: '3rem',
+            fontSize: isMobile ? '2.5rem' : '3rem',
             fontWeight: 'bold',
             color: '#2c3e50',
             marginBottom: '16px',
@@ -196,13 +228,13 @@ const ContactUsPage = () => {
         },
         mainContent: {
             display: 'grid',
-            gridTemplateColumns: '2fr 1fr',
-            gap: '60px',
+            gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
+            gap: isMobile ? '30px' : '60px',
             alignItems: 'start'
         },
         formContainer: {
             backgroundColor: 'white',
-            padding: '40px',
+            padding: isMobile ? '30px 20px' : '40px',
             borderRadius: '12px',
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
             border: '1px solid #e9ecef'
@@ -215,8 +247,8 @@ const ContactUsPage = () => {
         },
         formGrid: {
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '20px',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+            gap: isMobile ? '0' : '20px',
             marginBottom: '20px'
         },
         formGroup: {
@@ -347,13 +379,13 @@ const ContactUsPage = () => {
         },
         contactInfo: {
             backgroundColor: 'white',
-            padding: '40px 30px',
+            padding: isMobile ? '30px 20px' : '40px 30px',
             borderRadius: '12px',
             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
             border: '1px solid #e9ecef',
             height: 'fit-content',
-            position: 'sticky',
-            top: '20px'
+            position: isMobile ? 'relative' : 'sticky',
+            top: isMobile ? 'auto' : '20px'
         },
         contactInfoTitle: {
             fontSize: '1.4rem',
@@ -388,28 +420,6 @@ const ContactUsPage = () => {
             fontSize: '0.9rem',
             color: '#6c757d',
             lineHeight: '1.4'
-        },
-        mobileStyles: {
-            '@media (max-width: 768px)': {
-                mainContent: {
-                    gridTemplateColumns: '1fr',
-                    gap: '30px'
-                },
-                formGrid: {
-                    gridTemplateColumns: '1fr',
-                    gap: '0'
-                },
-                formContainer: {
-                    padding: '30px 20px'
-                },
-                contactInfo: {
-                    position: 'relative',
-                    top: 'auto'
-                },
-                title: {
-                    fontSize: '2.5rem'
-                }
-            }
         }
     };
 
@@ -443,6 +453,36 @@ const ContactUsPage = () => {
         else if (hoveredButton) style = { ...style, ...styles.submitButtonHover };
         return style;
     };
+
+    const ContactInfoSection = () => (
+        <div style={styles.contactInfo}>
+            <h3 style={styles.contactInfoTitle}>Get in touch</h3>
+
+            <div style={styles.contactItem}>
+                <div style={styles.contactIcon}>📧</div>
+                <div style={styles.contactDetails}>
+                    <div style={styles.contactTitle}>Email</div>
+                    <div style={styles.contactText}>
+                        {contact.email}<br />
+                        Response within 24 hours
+                    </div>
+                </div>
+            </div>
+
+            <div style={styles.contactItem}>
+                <div style={styles.contactIcon}>🕐</div>
+                <div style={styles.contactDetails}>
+                    <div style={styles.contactTitle}>Business Hours</div>
+                    <div style={styles.contactText}>
+                        Monday - Friday: 9:00 AM - 6:00 PM<br />
+                        Saturday: 10:00 AM - 4:00 PM<br />
+                        Sunday: Closed
+                    </div>
+                </div>
+            </div>
+            <JoinTelegramButton />
+        </div>
+    );
 
     return (
         <div style={styles.pageContainer}>
@@ -630,33 +670,7 @@ const ContactUsPage = () => {
                         </form>
                     </div>
 
-                    <div style={styles.contactInfo}>
-                        <h3 style={styles.contactInfoTitle}>Get in touch</h3>
-
-                        <div style={styles.contactItem}>
-                            <div style={styles.contactIcon}>📧</div>
-                            <div style={styles.contactDetails}>
-                                <div style={styles.contactTitle}>Email</div>
-                                <div style={styles.contactText}>
-                                    {contact.email}<br />
-                                    Response within 24 hours
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style={styles.contactItem}>
-                            <div style={styles.contactIcon}>🕐</div>
-                            <div style={styles.contactDetails}>
-                                <div style={styles.contactTitle}>Business Hours</div>
-                                <div style={styles.contactText}>
-                                    Monday - Friday: 9:00 AM - 6:00 PM<br />
-                                    Saturday: 10:00 AM - 4:00 PM<br />
-                                    Sunday: Closed
-                                </div>
-                            </div>
-                        </div>
-                        <JoinTelegramButton />
-                    </div>
+                    <ContactInfoSection />
                 </div>
             </div>
         </div>

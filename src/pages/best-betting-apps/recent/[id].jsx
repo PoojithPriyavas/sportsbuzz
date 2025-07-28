@@ -17,6 +17,7 @@ import FooterTwo from "@/components/Footer/Footer";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 import RecentAppsDetails from "@/components/BestBettingRecentApps/RecetDetail";
+import HeaderTwo from "@/components/Header/HeaderTwo";
 
 export default function BestBettingApps() {
 
@@ -38,7 +39,48 @@ export default function BestBettingApps() {
         const timer1 = setTimeout(() => setLoading(false), 3000);
         return () => clearTimeout(timer1);
     }, []);
+    const [animationStage, setAnimationStage] = useState('loading');
+    const [showOtherDivs, setShowOtherDivs] = useState(false);
+    const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
+
+    useEffect(() => {
+        // Check if animation has been played before
+        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
+
+        if (!hasPlayedAnimation) {
+            // First time - play the full animation sequence
+            const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
+            const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
+            const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
+            const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); // Show content after transition completes
+
+            return () => {
+                clearTimeout(timer1);
+                clearTimeout(timer2);
+                clearTimeout(timer3);
+                clearTimeout(timer4);
+            };
+        } else {
+            // Animation already played - go directly to header and show content immediately
+            setAnimationStage('header');
+            setShowOtherDivs(true);
+            setLoading(false);
+        }
+    }, []);
+
+    // Original loading timer (keeping for compatibility)
+    useEffect(() => {
+        const timer1 = setTimeout(() => setLoading(false), 3000);
+        return () => clearTimeout(timer1);
+    }, []);
+
+    useEffect(() => {
+        if (showOtherDivs) {
+            const timeout = setTimeout(() => setHasAnimatedIn(true), 50); // slight delay triggers transition
+            return () => clearTimeout(timeout);
+        }
+    }, [showOtherDivs]);
     return (
         <>
             <Head>
@@ -46,19 +88,32 @@ export default function BestBettingApps() {
                 <meta name="description" content="Your site description here" />
             </Head>
             {/* <Header /> */}
-            <LoadingScreen onFinish={() => setLoading(false)} />
+            {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
+            <HeaderTwo animationStage={animationStage} />
 
             <div className='container'>
                 {/* <LiveScores /> */}
-                <TestLive />
+                {sport === 'cricket' ? (
+                    <>
+                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+                    </>
+                ) : (
+                    <TestLive />
+                )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
                         <RecentAppsDetails />
                     </div>
                     <div className={styles.fourthColumn} >
-                        <BettingCard />
-                        <JoinTelegramButton />
-                        <AutoSlider />
+                        <div className={styles.fourthColumnTwoColumns}>
+                            <div className={styles.fourthColumnLeft}>
+                                <BettingCard />
+                                <JoinTelegramButton />
+                            </div>
+                            <div className={styles.fourthColumnRight}>
+                                <AutoSlider />
+                            </div>
+                        </div>
                         {sport === 'cricket' ? (
                             <>
                                 <UpcomingMatches upcomingMatches={upcomingMatches} />
