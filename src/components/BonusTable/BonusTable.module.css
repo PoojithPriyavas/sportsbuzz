@@ -496,7 +496,7 @@
 /* Medium Tablets */
 @media (max-width: 768px) {
   .wrapper {
-    padding: 0 10px;
+    /* padding: 0 10px; */
   }
   
   /* Hide desktop table, show mobile cards */
@@ -518,7 +518,7 @@
 /* Small Mobile Phones */
 @media (max-width: 480px) {
   .wrapper {
-    padding: 0 5px;
+    /* padding: 0 5px; */
   }
   
   .mobileCard {
