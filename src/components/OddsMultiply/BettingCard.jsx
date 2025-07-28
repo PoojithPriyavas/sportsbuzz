@@ -9,6 +9,7 @@ export default function BettingCards() {
     const [selectedTournament, setSelectedTournament] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [transformedCards, setTransformedCards] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [translatedText, setTranslatedText] = useState({
         bettingOdds: 'Betting Odds',
         allTournaments: 'All Tournaments',
@@ -76,7 +77,6 @@ export default function BettingCards() {
 
     const allTournaments = getAllTournaments();
 
-    // Add the missing getSelectedTournamentName function
     const getSelectedTournamentName = () => {
         if (!selectedTournament || selectedTournament === 'all') {
             return translatedText.allTournaments;
@@ -106,15 +106,22 @@ export default function BettingCards() {
     };
 
     useEffect(() => {
-        if (eventDetails?.length > 0) {
-            getTransformedCards(eventDetails).then(setTransformedCards);
+        if (eventDetails) {
+            setIsLoading(true);
+            getTransformedCards(eventDetails).then(cards => {
+                setTransformedCards(cards);
+                setIsLoading(false);
+            });
         } else {
             setTransformedCards([]);
         }
     }, [eventDetails, accessToken]);
 
     const handleTournamentChange = (tournamentId) => {
-        fetchEventsIdData(accessToken, tournamentId);
+        setIsLoading(true);
+        fetchEventsIdData(accessToken, tournamentId).then(() => {
+            setIsLoading(false);
+        });
         setSelectedTournament(tournamentId);
         setIsDropdownOpen(false);
         setPaused(true);
@@ -145,6 +152,48 @@ export default function BettingCards() {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    function SkeletonCard() {
+        return (
+            <div className={styles.skeletonCard}>
+                <div className={`${styles.skeleton} ${styles.skeletonProvider}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonMatchHeader}`}></div>
+                
+                <div className={styles.teamsSection}>
+                    <div className={styles.teamsContainer}>
+                        <div className={styles.skeletonTeam}>
+                            <div className={`${styles.skeleton} ${styles.skeletonTeamLogo}`}></div>
+                            <div className={`${styles.skeleton} ${styles.skeletonTeamName}`}></div>
+                        </div>
+                        <div className={`${styles.skeleton} ${styles.skeletonVS}`}></div>
+                        <div className={styles.skeletonTeam}>
+                            <div className={`${styles.skeleton} ${styles.skeletonTeamLogo}`}></div>
+                            <div className={`${styles.skeleton} ${styles.skeletonTeamName}`}></div>
+                        </div>
+                    </div>
+
+                    <div className={styles.oddsSection}>
+                        <div className={`${styles.skeleton} ${styles.skeletonOddsTitle}`}></div>
+                        <div className={styles.oddsContainer}>
+                            <div className={`${styles.skeleton} ${styles.skeletonOddButton}`}></div>
+                            <div className={`${styles.skeleton} ${styles.skeletonOddButton}`}></div>
+                            <div className={`${styles.skeleton} ${styles.skeletonOddButton}`}></div>
+                        </div>
+                    </div>
+
+                    <div className={`${styles.bettingSection} ${styles.show}`}>
+                        <div className={styles.betInputContainer}>
+                            <div className={`${styles.skeleton} ${styles.skeletonBetInput}`}></div>
+                            <div className={`${styles.skeleton} ${styles.skeletonBetButton}`}></div>
+                        </div>
+                        <div className={`${styles.skeleton} ${styles.skeletonPotentialWin}`}></div>
+                    </div>
+                </div>
+
+                <div className={`${styles.skeleton} ${styles.skeletonBetHistory}`}></div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.bettingContainer}>
@@ -195,7 +244,14 @@ export default function BettingCards() {
             </div>
 
             <div className={styles.cardsContainer} ref={scrollRef}>
-                {transformedCards.length > 0 ? (
+                {isLoading ? (
+                    // Show skeleton cards while loading
+                    <>
+                        <SkeletonCard />
+                        <SkeletonCard />
+                        <SkeletonCard />
+                    </>
+                ) : transformedCards.length > 0 ? (
                     transformedCards.map((card, idx) => (
                         <BettingCard
                             key={card.id || idx}

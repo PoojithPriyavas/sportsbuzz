@@ -679,6 +679,57 @@
     color: white;
 }
 
+/* Mobile Selector Dropdown Styles */
+.mobileSelectors .mobileDropdown {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0;
+}
+
+.mobileSelectors .mobileDropdown:last-child {
+    border-bottom: none;
+}
+
+.mobileSelectors .mobileDropdownHeader {
+    padding: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mobileSelectors .mobileDropdownHeader:hover {
+    color: #67e8f9;
+    padding-left: 0.5rem;
+}
+
+.mobileSelectors .mobileSubmenu {
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem;
+}
+
+.mobileSelectors .mobileSubmenu.open {
+    padding: 0.5rem 1.5rem;
+}
+
+.mobileSelectors .mobileSubmenuItem {
+    cursor: pointer;
+    padding: 0.75rem 0;
+    padding-left: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+
+.mobileSelectors .mobileSubmenuItem:hover {
+    color: #67e8f9;
+    padding-left: 1.5rem;
+}
+
+.mobileSelectors .mobileSubmenuItem.active {
+    color: #67e8f9;
+    font-weight: 600;
+}
+
 .mobileTopRow {
     display: none;
 }
@@ -720,10 +771,10 @@
 }
 
 /* Tablet and Mobile Responsive Design */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
     .loadingContainer.header {
         padding: 0 1rem;
-        height: 4rem;
+        height: 5rem;
         justify-content: space-between;
     }
 
@@ -759,7 +810,7 @@
     }
 
     .logoIcon {
-        width: 100px;
+        width: 175px;
     }
 
     /* Ensure featured button stays visible */
@@ -772,11 +823,11 @@
 @media (max-width: 640px) {
     .loadingContainer.header {
         padding: 0 0.75rem;
-        height: 3.5rem;
+        height: 5.5rem;
     }
 
     .logoIcon {
-        width: 80px;
+        width: 135px;
     }
 
     .logoIconInner {
@@ -797,11 +848,11 @@
 @media (max-width: 480px) {
     .loadingContainer.header {
         padding: 0 0.5rem;
-        height: 3rem;
+        height: 5rem;
     }
 
     .logoIcon {
-        width: 70px;
+        width: 100px;
     }
 
     .logoIconInner {

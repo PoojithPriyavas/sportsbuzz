@@ -15,6 +15,7 @@
   margin-top: 2rem;
   width: 100%;
   min-height: 500px;
+  overflow: hidden;
   /* Ensure minimum height */
 }
 
@@ -25,6 +26,8 @@
   flex-direction: column;
   gap: 1.5rem;
   min-width: 0;
+  scroll-behavior: smooth;
+  overflow-x: auto;
   /* Prevent flex item from overflowing */
 }
 
@@ -52,6 +55,7 @@
   flex-direction: column;
   gap: 1rem;
   min-width: 0;
+  overflow: auto;
 }
 
 /* Column 4: AutoSlider + BettingCard, etc. */
@@ -62,6 +66,20 @@
   gap: 1.5rem;
   min-width: 250px;
   /* Minimum width for sidebar */
+}
+
+/* Base styles for fourthColumnTwoColumns - Default: column layout */
+.fourthColumnTwoColumns {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.fourthColumnLeft,
+.fourthColumnRight {
+  flex: 1;
+  min-height: 0; /* Prevents flex items from growing infinitely */
 }
 
 /* Responsive Design */
@@ -80,6 +98,33 @@
   }
 }
 
+/* Fixed media query with proper constraints */
+@media (max-width: 1199px) and (min-width: 769px) {
+  .fourthColumnTwoColumns {
+    display: flex;
+    flex-direction: row; /* Change to row layout */
+    gap: 1rem;
+    width: 100%;
+    align-items: flex-start; /* Align items to top */
+  }
+  
+  .fourthColumnLeft {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0; /* Prevent flex shrinking issues */
+    /* No height constraints - let content determine height */
+  }
+  
+  .fourthColumnRight {
+    flex: 1;
+    min-width: 0; /* Prevent flex shrinking issues */
+    aspect-ratio: 2/3; /* Set 2:3 aspect ratio for AutoSlider */
+    overflow: hidden; /* Hide any overflow */
+  }
+}
+
 @media (max-width: 768px) {
   .twoSplitRow {
     flex-direction: column;
@@ -92,6 +137,16 @@
 
   .container {
     padding: 0 0.5rem;
+  }
+  
+  /* Reset to column layout on mobile */
+  .fourthColumnTwoColumns {
+    flex-direction: column;
+  }
+  
+  .fourthColumnLeft,
+  .fourthColumnRight {
+    /* Remove height constraints on mobile - let content flow naturally */
   }
 }
 

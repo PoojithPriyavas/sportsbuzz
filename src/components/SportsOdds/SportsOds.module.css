@@ -609,7 +609,8 @@
     border-radius: 0.75rem;
     overflow: hidden;
     min-width: 320px;
-    max-width: 320px;
+    /* max-width: 320px; */
+    max-width: 100%;
     border: 1px solid #e5e7eb;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     flex-shrink: 0;
@@ -817,7 +818,8 @@
 
     .skeletonCard {
         min-width: 280px;
-        max-width: 280px;
+        /* max-width: 280px; */
+        max-width: 100%;
     }
 
     .skeletonBody {

@@ -17,6 +17,10 @@ const HeaderTwo = ({ animationStage }) => {
     const [isMobile, setIsMobile] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState(null);
     
+    // New state for mobile dropdown selectors
+    const [expandedLanguageSelector, setExpandedLanguageSelector] = useState(false);
+    const [expandedSportsSelector, setExpandedSportsSelector] = useState(false);
+    
     // New state to track if animation should play
     const [shouldPlayAnimation, setShouldPlayAnimation] = useState(false);
     const [currentAnimationStage, setCurrentAnimationStage] = useState('header');
@@ -157,7 +161,9 @@ const HeaderTwo = ({ animationStage }) => {
         schedule: 'Match Schedules',
         cricket: 'Cricket',
         football: 'Football',
-        contact: 'Contact Us'
+        contact: 'Contact Us',
+        language: 'Language',
+        sport: 'Sport'
     });
     const [filteredList, setFilteredList] = useState([]);
 
@@ -204,7 +210,7 @@ const HeaderTwo = ({ animationStage }) => {
     useEffect(() => {
         const updateTranslations = async () => {
             try {
-                const [home, apps, news, schedule, cricket, football, contact] = await Promise.all([
+                const [home, apps, news, schedule, cricket, football, contact, languageText, sportText] = await Promise.all([
                     translateText('Home', 'en', language),
                     translateText('Best Betting Apps', 'en', language),
                     translateText('News', 'en', language),
@@ -212,11 +218,15 @@ const HeaderTwo = ({ animationStage }) => {
                     translateText('Cricket', 'en', language),
                     translateText('Football', 'en', language),
                     translateText('Contact', 'en', language),
+                    translateText('Language', 'en', language),
+                    translateText('Sport', 'en', language),
                 ]);
 
                 setTranslatedText(prev => ({
                     ...prev,
-                    home, apps, news, schedule, cricket, football, contact
+                    home, apps, news, schedule, cricket, football, contact,
+                    language: languageText,
+                    sport: sportText
                 }));
 
                 const translatedCategories = await Promise.all(
@@ -244,19 +254,19 @@ const HeaderTwo = ({ animationStage }) => {
         updateTranslations();
     }, [language, translateText, blogCategories]);
 
-    const handleLanguageChange = (e) => {
-        const selected = e.target.value;
-        setLanguage(selected);
-        localStorage.setItem('language', selected);
+    const handleLanguageChange = (selectedLanguage) => {
+        setLanguage(selectedLanguage);
+        localStorage.setItem('language', selectedLanguage);
+        setExpandedLanguageSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);
         }
     };
 
-    const handleSportChange = (e) => {
-        const newSport = e.target.value;
-        setSport(newSport);
-        localStorage.setItem('selectedSport', newSport);
+    const handleSportChange = (selectedSport) => {
+        setSport(selectedSport);
+        localStorage.setItem('selectedSport', selectedSport);
+        setExpandedSportsSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);
         }
@@ -277,6 +287,27 @@ const HeaderTwo = ({ animationStage }) => {
 
     const toggleCategory = (categoryId) => {
         setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
+    };
+
+    const toggleLanguageSelector = () => {
+        setExpandedLanguageSelector(!expandedLanguageSelector);
+        setExpandedSportsSelector(false); // Close sports selector when opening language
+    };
+
+    const toggleSportsSelector = () => {
+        setExpandedSportsSelector(!expandedSportsSelector);
+        setExpandedLanguageSelector(false); // Close language selector when opening sports
+    };
+
+    // Function to get current language display name
+    const getCurrentLanguageDisplay = () => {
+        const currentLang = filteredList.find(lang => lang.hreflang === language);
+        return currentLang ? currentLang.language : 'Language';
+    };
+
+    // Function to get current sport display name
+    const getCurrentSportDisplay = () => {
+        return sport === 'cricket' ? translatedText.cricket : translatedText.football;
     };
 
     // Function to reset animation (you can call this if needed)
@@ -390,38 +421,68 @@ const HeaderTwo = ({ animationStage }) => {
                     </Link>
                 </div>
 
-                {/* Mobile Selectors */}
+                {/* Mobile Dropdown-style Selectors */}
                 <div className={styles.mobileSelectors}>
-                    <div className={styles.mobileSelectorGroup}>
-                        <label className={styles.mobileSelectorLabel}>Language</label>
-                        <select
-                            className={styles.mobileSelector}
-                            value={language}
-                            onChange={handleLanguageChange}
+                    {/* Language Dropdown */}
+                    <div className={styles.mobileDropdown}>
+                        <div 
+                            className={styles.mobileDropdownHeader}
+                            onClick={toggleLanguageSelector}
                         >
+                            <span>{translatedText.language}: {getCurrentLanguageDisplay()}</span>
+                            <FaChevronDown 
+                                style={{ 
+                                    transform: expandedLanguageSelector ? 'rotate(180deg)' : 'rotate(0deg)',
+                                    transition: 'transform 0.2s ease'
+                                }} 
+                            />
+                        </div>
+                        <div className={`${styles.mobileSubmenu} ${expandedLanguageSelector ? styles.open : ''}`}>
                             {filteredList.map((lang) => (
-                                <option key={lang.hreflang} value={lang.hreflang}>
+                                <div
+                                    key={lang.hreflang}
+                                    className={`${styles.mobileSubmenuItem} ${language === lang.hreflang ? styles.active : ''}`}
+                                    onClick={() => handleLanguageChange(lang.hreflang)}
+                                >
                                     {lang.language}
-                                </option>
+                                </div>
                             ))}
-                        </select>
+                        </div>
                     </div>
 
-                    <div className={styles.mobileSelectorGroup}>
-                        <label className={styles.mobileSelectorLabel}>Sport</label>
-                        <select
-                            className={styles.mobileSelector}
-                            value={sport}
-                            onChange={handleSportChange}
+                    {/* Sports Dropdown */}
+                    <div className={styles.mobileDropdown}>
+                        <div 
+                            className={styles.mobileDropdownHeader}
+                            onClick={toggleSportsSelector}
                         >
-                            <option value="cricket">{translatedText.cricket}</option>
-                            <option value="football">{translatedText.football}</option>
-                        </select>
+                            <span>{translatedText.sport}: {getCurrentSportDisplay()}</span>
+                            <FaChevronDown 
+                                style={{ 
+                                    transform: expandedSportsSelector ? 'rotate(180deg)' : 'rotate(0deg)',
+                                    transition: 'transform 0.2s ease'
+                                }} 
+                            />
+                        </div>
+                        <div className={`${styles.mobileSubmenu} ${expandedSportsSelector ? styles.open : ''}`}>
+                            <div
+                                className={`${styles.mobileSubmenuItem} ${sport === 'cricket' ? styles.active : ''}`}
+                                onClick={() => handleSportChange('cricket')}
+                            >
+                                {translatedText.cricket}
+                            </div>
+                            <div
+                                className={`${styles.mobileSubmenuItem} ${sport === 'football' ? styles.active : ''}`}
+                                onClick={() => handleSportChange('football')}
+                            >
+                                {translatedText.football}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* Debug button to reset animation (remove in production) */}
-                {process.env.NODE_ENV === 'development' && (
+                {/* {process.env.NODE_ENV === 'development' && (
                     <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.2)', marginTop: '1rem' }}>
                         <button 
                             onClick={resetAnimation}
@@ -437,7 +498,7 @@ const HeaderTwo = ({ animationStage }) => {
                             Reset Animation (Dev Only)
                         </button>
                     </div>
-                )}
+                )} */}
             </div>
         </>
     );
@@ -535,7 +596,7 @@ const HeaderTwo = ({ animationStage }) => {
                     <select
                         className={styles.languageSelector}
                         value={language}
-                        onChange={handleLanguageChange}
+                        onChange={(e) => handleLanguageChange(e.target.value)}
                     >
                         {filteredList.map((lang) => (
                             <option key={lang.hreflang} value={lang.hreflang}>
@@ -547,7 +608,7 @@ const HeaderTwo = ({ animationStage }) => {
                     <select
                         className={styles.sportsSelector}
                         value={sport}
-                        onChange={handleSportChange}
+                        onChange={(e) => handleSportChange(e.target.value)}
                     >
                         <option value="cricket">{translatedText.cricket}</option>
                         <option value="football">{translatedText.football}</option>

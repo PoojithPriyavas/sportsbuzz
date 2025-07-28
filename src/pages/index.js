@@ -141,9 +141,15 @@ export default function Home() {
               </div>
 
               <div className={styles.fourthColumn}>
-                <BettingCard />
-                <JoinTelegramButton />
-                <AutoSlider />
+                <div className={styles.fourthColumnTwoColumns}>
+                  <div className={styles.fourthColumnLeft}>
+                    <BettingCard />
+                    <JoinTelegramButton />
+                  </div>
+                  <div className={styles.fourthColumnRight}>
+                    <AutoSlider />
+                  </div>
+                </div>
                 {sport === 'cricket' ? (
                   <>
                     <UpcomingMatches upcomingMatches={upcomingMatches} />

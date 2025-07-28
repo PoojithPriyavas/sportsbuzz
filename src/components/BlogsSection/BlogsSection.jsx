@@ -60,7 +60,7 @@ export default function BlogSection({ blogs = [] }) {
       </div>
 
       <div className={styles.blogGrid}>
-        {otherBlogs.map((blog) => (
+        {otherBlogs.slice(0,4).map((blog) => (
           <Link
             href={`/blog-details/${blog.slug}`}
             key={blog.id}
