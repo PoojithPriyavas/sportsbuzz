@@ -7,7 +7,19 @@ import { useGlobalData } from '../Context/ApiContext';
 export default function BonusTable({ sections }) {
   const [copiedId, setCopiedId] = useState(null);
   const [translatedSections, setTranslatedSections] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
   const { translateText, language } = useGlobalData();
+
+  // Check if mobile view
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Translate content when sections or language changes
   useEffect(() => {
@@ -50,8 +62,140 @@ export default function BonusTable({ sections }) {
       setTimeout(() => setCopiedId(null), 2000);
     });
   };
-  console.log(translatedSections, "trans")
+
   if (translatedSections.length === 0) return null;
+
+  // Mobile Card View
+  const renderMobileCards = (apps) => (
+    <div className={styles.mobileContainer}>
+      {[...apps]
+        .sort((a, b) => a.order_by - b.order_by)
+        .map((app) => (
+          <div className={styles.mobileCard} key={app.id}>
+            <div className={styles.mobileHeader}>
+              <div className={styles.mobileRank}>#{app.order_by}</div>
+              <img
+                src={`https://admin.sportsbuz.com${app.image}`}
+                alt="Betting App"
+                className={styles.mobileLogo}
+              />
+              <div className={styles.mobileStars}>
+                {'⭐'.repeat(app.rating)}
+              </div>
+            </div>
+            
+            <div className={styles.mobileContent}>
+              <div className={styles.mobileSection}>
+                <h4>Features:</h4>
+                <div dangerouslySetInnerHTML={{ __html: app.features }} />
+              </div>
+              
+              <div className={styles.mobileSection}>
+                <h4>Welcome Bonus:</h4>
+                <div 
+                  className={styles.mobileBonusAmount}
+                  dangerouslySetInnerHTML={{ __html: app.welcome_bonus }}
+                />
+              </div>
+            </div>
+            
+            <div className={styles.mobileActions}>
+              <a
+                className={styles.mobileGetBtn}
+                href={app.referal_link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GET BONUS
+              </a>
+              <button
+                className={styles.mobileCodeBtn}
+                onClick={() => handleCopy(app.referall_code, app.id)}
+              >
+                {copiedId === app.id ? 'Copied!' : app.referall_code}
+              </button>
+              <button
+                className={styles.mobileReviewBtn}
+                onClick={() =>
+                  window.open(app.review_link, '_blank', 'noopener,noreferrer')
+                }
+              >
+                Read Review
+              </button>
+            </div>
+          </div>
+        ))}
+    </div>
+  );
+
+  // Desktop Table View
+  const renderDesktopTable = (apps) => (
+    <div className={styles.tableContainer}>
+      <table className={styles.table}>
+        <thead>
+          <tr className={styles.headerRow}>
+            <th>Rank</th>
+            <th>Site</th>
+            <th>Features</th>
+            <th>Welcome Bonus</th>
+            <th>Bet Now</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[...apps]
+            .sort((a, b) => a.order_by - b.order_by)
+            .map((app) => (
+              <tr className={styles.bodyRow} key={app.id}>
+                <td className={styles.rankCell}>
+                  <div className={styles.rankBadge}>#{app.order_by}</div>
+                </td>
+                <td className={styles.site}>
+                  <img
+                    src={`https://admin.sportsbuz.com${app.image}`}
+                    alt="Betting App"
+                  />
+                </td>
+                <td
+                  className={styles.features}
+                  dangerouslySetInnerHTML={{ __html: app.features }}
+                />
+                <td className={styles.bonus}>
+                  <div
+                    className={styles.amount}
+                    dangerouslySetInnerHTML={{ __html: app.welcome_bonus }}
+                  />
+                  <button
+                    className={styles.codeBtn}
+                    onClick={() =>
+                      window.open(app.review_link, '_blank', 'noopener,noreferrer')
+                    }
+                  >
+                    Read Review
+                  </button>
+                  <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
+                </td>
+                <td className={styles.actions}>
+                  <a
+                    className={styles.getBtn}
+                    href={app.referal_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    GET BONUS
+                  </a>
+                  <button
+                    className={styles.codeBtn}
+                    onClick={() => handleCopy(app.referall_code, app.id)}
+                  >
+                    {copiedId === app.id ? 'Copied!' : app.referall_code}
+                  </button>
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
+  );
 
   return (
     <>
@@ -69,69 +213,12 @@ export default function BonusTable({ sections }) {
           {/* <h2 className={styles.heading}>{section.heading}</h2> */}
 
           {section.best_betting_apps?.length > 0 && (
-            <table className={styles.table}>
-              <thead>
-                <tr className={styles.headerRow}>
-                  <th>Rank</th>
-                  <th>Site</th>
-                  <th>Features</th>
-                  <th>Welcome Bonus</th>
-                  <th>Bet Now</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[...section.best_betting_apps] // clone to avoid mutating original
-                  .sort((a, b) => a.order_by - b.order_by) // sort by order_by ascending
-                  .map((app) => (
-                    <tr className={styles.bodyRow} key={app.id}>
-                      <td style={{ color: 'black' }}>
-                        <strong>#{app.order_by}</strong>
-                      </td>
-                      <td className={styles.site}>
-                        <img
-                          src={`https://admin.sportsbuz.com${app.image}`}
-                          alt="Betting App"
-                        />
-                      </td>
-                      <td
-                        className={styles.features}
-                        dangerouslySetInnerHTML={{ __html: app.features }}
-                      />
-                      <td className={styles.bonus}>
-                        <div
-                          className={styles.amount}
-                          dangerouslySetInnerHTML={{ __html: app.welcome_bonus }}
-                        />
-                        <button
-                          className={styles.codeBtn}
-                          onClick={() =>
-                            window.open(app.review_link, '_blank', 'noopener,noreferrer')
-                          }
-                        >
-                          Read Review
-                        </button>
-                        <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
-                      </td>
-                      <td className={styles.actions}>
-                        <a
-                          className={styles.getBtn}
-                          href={app.referal_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          GET BONUS
-                        </a>
-                        <button
-                          className={styles.codeBtn}
-                          onClick={() => handleCopy(app.referall_code, app.id)}
-                        >
-                          {copiedId === app.id ? 'Copied!' : app.referall_code}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+            <>
+              {isMobile 
+                ? renderMobileCards(section.best_betting_apps)
+                : renderDesktopTable(section.best_betting_apps)
+              }
+            </>
           )}
         </div>
       ))}

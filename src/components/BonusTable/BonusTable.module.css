@@ -1,12 +1,30 @@
-/* Enhanced Betting Apps Table Styling */
+/* Enhanced Betting Apps Table Styling - Fully Responsive */
 
+/* Base wrapper styles */
+.wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+/* Table Container for horizontal scroll fallback */
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 15px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+}
+
+/* Desktop Table Styles */
 .table {
   width: 100%;
+  min-width: 800px;
   border-collapse: collapse;
   background: white;
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
   border: none;
   margin-bottom: 0px;
   position: relative;
@@ -19,7 +37,6 @@
   left: 0;
   right: 0;
   height: 4px;
-  /* background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffd93d); */
   border-radius: 15px 15px 0 0;
 }
 
@@ -39,29 +56,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   position: relative;
-}
-
-.rankHeader {
-  min-width: 100px;
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #333 !important;
-  font-weight: 800;
-}
-
-.siteHeader {
-  min-width: 150px;
-}
-
-.featuresHeader {
-  min-width: 200px;
-}
-
-.bonusHeader {
-  min-width: 180px;
-}
-
-.actionHeader {
-  min-width: 200px;
+  white-space: nowrap;
 }
 
 /* Body Row Styling */
@@ -97,6 +92,9 @@
   min-width: 60px;
   position: relative;
   overflow: hidden;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #333;
+  font-size: 18px;
 }
 
 .rankBadge::before {
@@ -114,14 +112,12 @@
   left: 100%;
 }
 
-/* Site Cell Styling (both new and old class names) */
-.siteCell,
+/* Site Cell Styling */
 .site {
   text-align: center;
   padding: 15px !important;
 }
 
-.siteImage,
 .site img {
   max-width: 80px;
   width: auto;
@@ -131,34 +127,30 @@
   object-fit: contain;
 }
 
-.siteImage:hover,
 .site img:hover {
   transform: scale(1.05);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Features Cell Styling (both new and old class names) */
-.featuresCell,
+/* Features Cell Styling */
 .features {
   font-size: 14px;
   line-height: 1.6;
+  max-width: 250px;
 }
 
-.featuresCell ul,
 .features ul {
   margin: 0;
   padding-left: 20px;
   list-style-type: none;
 }
 
-.featuresCell li,
 .features li {
   color: #333;
   padding: 4px 0;
   position: relative;
 }
 
-.featuresCell li::before,
 .features li::before {
   content: '✓';
   position: absolute;
@@ -167,17 +159,15 @@
   font-weight: bold;
 }
 
-/* Bonus Cell Styling (both new and old class names) */
-.bonusCell,
+/* Bonus Cell Styling */
 .bonus {
   text-align: center;
-  /* background: linear-gradient(135deg, #fff5f5, #ffe5e5); */
   border-radius: 10px;
   margin: 5px;
   padding: 15px !important;
+  max-width: 200px;
 }
 
-.bonusAmount,
 .bonus .amount {
   font-size: 18px;
   font-weight: bold;
@@ -186,7 +176,6 @@
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.reviewBtn,
 .codeBtn {
   padding: 8px 16px;
   margin: 8px 0;
@@ -194,26 +183,21 @@
   border-radius: 25px;
   cursor: pointer;
   font-size: 12px;
-
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
+  display: block;
+  width: 100%;
 }
 
-.reviewBtn:hover,
 .codeBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
-/* .stars {
-  margin-top: 10px;
-  font-size: 16px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-} */
 .stars {
   margin-top: 5px;
   font-size: 18px;
@@ -223,44 +207,20 @@
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.stars span {
-  position: relative;
-  color: #ccc;
-}
-
-/* Full star */
-.full {
-  color: #ffc107;
-  /* gold */
-}
-
-/* Empty star */
-.empty {
-  color: #ccc;
-}
-
-/* Half star using overlay trick */
-.half {
-  background: linear-gradient(to right, #ffc107 50%, #ccc 50%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Actions Cell Styling (both new and old class names) */
-.actionsCell,
+/* Actions Cell Styling */
 .actions {
   text-align: center;
   padding: 15px !important;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 180px;
 }
 
-.getBonusBtn,
 .getBtn {
   display: inline-block;
   padding: 12px 20px;
-  margin: 5px;
+  margin: 5px 0;
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -273,20 +233,19 @@
   color: white;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  text-align: center;
 }
 
-.getBonusBtn:hover,
 .getBtn:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
   background: linear-gradient(135deg, #ff5252, #e53935);
 }
 
-.copyCodeBtn,
 .actions .codeBtn {
   display: inline-block;
   padding: 10px 18px;
-  margin: 5px;
+  margin: 5px 0;
   border: 2px dotted #4ecdc4;
   background: linear-gradient(135deg, #e8fffe, #b8f5f1);
   color: #00695c;
@@ -299,7 +258,6 @@
   transition: all 0.3s ease;
 }
 
-.copyCodeBtn:hover,
 .actions .codeBtn:hover {
   background: linear-gradient(135deg, #4ecdc4, #44b3a8);
   color: white;
@@ -307,14 +265,140 @@
   box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
 }
 
-/* .copyCodeBtn,
-.actions .codeBtn {
-  display: inline-block;
-  padding: 10px 18px;
-  margin: 5px;
-  border: 2px dotted #0066da;
-  background: linear-gradient(135deg, #e3f0ff, #c3dbff);
-  color: #0049a7;
+/* Mobile Card Layout */
+.mobileContainer {
+  display: none;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.mobileCard {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.mobileCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.mobileHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f8f9fa;
+}
+
+.mobileRank {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #333;
+  font-weight: bold;
+  padding: 8px 12px;
+  border-radius: 50px;
+  font-size: 16px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.mobileLogo {
+  max-width: 60px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.mobileStars {
+  font-size: 16px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.mobileContent {
+  margin-bottom: 20px;
+}
+
+.mobileSection {
+  margin-bottom: 15px;
+}
+
+.mobileSection h4 {
+  color: #333;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mobileSection ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: none;
+}
+
+.mobileSection li {
+  color: #555;
+  padding: 2px 0;
+  position: relative;
+  font-size: 13px;
+}
+
+.mobileSection li::before {
+  content: '✓';
+  position: absolute;
+  left: -20px;
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.mobileBonusAmount {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000;
+  text-align: center;
+  padding: 10px;
+  background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.mobileActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mobileGetBtn {
+  display: block;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.mobileGetBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.mobileCodeBtn {
+  padding: 12px 18px;
+  border: 2px dotted #4ecdc4;
+  background: linear-gradient(135deg, #e8fffe, #b8f5f1);
+  color: #00695c;
   border-radius: 10px;
   cursor: pointer;
   font-size: 13px;
@@ -324,15 +408,30 @@
   transition: all 0.3s ease;
 }
 
-.copyCodeBtn:hover,
-.actions .codeBtn:hover {
-  background: linear-gradient(135deg, #0066da, #0049a7);
-  color: #fff;
+.mobileCodeBtn:hover {
+  background: linear-gradient(135deg, #4ecdc4, #44b3a8);
+  color: white;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 102, 218, 0.3);
-  border-style: solid;
-} */
+}
 
+.mobileReviewBtn {
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.mobileReviewBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
 
 /* Heading Styling */
 .heading {
@@ -363,82 +462,135 @@
   color: #333 !important;
 }
 
-/* Description Styling */
-.description {
-  color: #555;
-  line-height: 1.8;
-  font-size: 16px;
-  margin-top: 30px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-  border-radius: 10px;
-  border-left: 4px solid #4ecdc4;
-}
+/* Responsive Breakpoints */
 
-.description * {
-  color: #555 !important;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
+/* Large Tablets */
+@media (max-width: 1024px) {
   .table {
-    font-size: 12px;
+    min-width: 700px;
   }
-
+  
   .table thead tr th {
-    padding: 12px 8px;
+    padding: 15px 10px;
     font-size: 14px;
   }
-
+  
   .table tbody tr td {
-    padding: 15px 8px;
+    padding: 15px 10px;
   }
-
-  .rankBadge {
-    font-size: 16px !important;
-    padding: 6px 10px;
+  
+  .features {
+    max-width: 200px;
+    font-size: 13px;
   }
-
-  .siteImage,
-  .site img {
-    max-width: 60px;
+  
+  .bonus {
+    max-width: 160px;
   }
-
-  .getBonusBtn,
-  .copyCodeBtn {
-    padding: 8px 12px;
-    font-size: 12px;
-    margin: 2px;
+  
+  .actions {
+    min-width: 140px;
   }
+}
 
-  .bonusAmount {
-    font-size: 14px;
+/* Medium Tablets */
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 0 10px;
   }
-
+  
+  /* Hide desktop table, show mobile cards */
+  .tableContainer {
+    display: none;
+  }
+  
+  .mobileContainer {
+    display: flex;
+    flex-direction: column;
+  }
+  
   .heading {
     font-size: 24px;
+    margin-bottom: 20px;
   }
 }
 
+/* Small Mobile Phones */
 @media (max-width: 480px) {
-  .table {
-    font-size: 11px;
+  .wrapper {
+    padding: 0 5px;
   }
-
-  .rankBadge {
-    font-size: 14px !important;
+  
+  .mobileCard {
+    padding: 15px;
+    margin: 0 5px;
   }
-
-  .siteImage,
-  .site img {
+  
+  .mobileHeader {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .mobileRank {
+    font-size: 14px;
+    padding: 6px 10px;
+    min-width: 40px;
+  }
+  
+  .mobileLogo {
     max-width: 50px;
   }
+  
+  .mobileStars {
+    font-size: 14px;
+  }
+  
+  .mobileSection h4 {
+    font-size: 13px;
+  }
+  
+  .mobileSection li {
+    font-size: 12px;
+  }
+  
+  .mobileBonusAmount {
+    font-size: 14px;
+    padding: 8px;
+  }
+  
+  .mobileGetBtn,
+  .mobileCodeBtn,
+  .mobileReviewBtn {
+    padding: 12px 16px;
+    font-size: 12px;
+  }
+  
+  .heading {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+}
 
-  .getBonusBtn,
-  .copyCodeBtn {
-    padding: 6px 10px;
+/* Very Small Screens */
+@media (max-width: 360px) {
+  .mobileCard {
+    padding: 12px;
+    margin: 0 2px;
+  }
+  
+  .mobileHeader {
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .mobileActions {
+    gap: 8px;
+  }
+  
+  .mobileGetBtn,
+  .mobileCodeBtn,
+  .mobileReviewBtn {
+    padding: 10px 14px;
     font-size: 11px;
-    display: block;
-    margin: 3px 0;
   }
 }
