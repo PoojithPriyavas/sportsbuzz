@@ -7,9 +7,11 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import styles from './Carousal.module.css';
+import { useMediaQuery } from 'react-responsive';
 
 export default function HeroCarousal() {
   const [banners, setBanners] = useState([]);
+  const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
   // Fetch banner data
   useEffect(() => {
@@ -41,7 +43,12 @@ export default function HeroCarousal() {
         {banners.map((banner, index) => (
           <SwiperSlide key={banner.id}>
             <a href={banner.url} target="_blank" rel="noopener noreferrer">
-              <img src={banner.image} className={styles.slideImage} alt={`Banner ${index + 1}`} />
+              <img 
+                src={isMobile ? banner.mobile_image : banner.image} 
+                className={styles.slideImage} 
+                alt={`Banner ${index + 1}`} 
+                style={{ aspectRatio: isMobile ? '3/1' : 'auto' }}
+              />
             </a>
           </SwiperSlide>
         ))}

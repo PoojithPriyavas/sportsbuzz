@@ -83,26 +83,27 @@
   /* Prevents flex items from growing infinitely */
 }
 
-/* NEW: Fix for screens above 1200px */
+/* FIXED: For screens above 1200px */
 @media (min-width: 1200px) {
   .fourthColumnTwoColumns {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     width: 100%;
-    height: fit-content; /* Ensure container fits content */
+    height: auto; /* Let content determine height */
   }
 
   .fourthColumnRight {
-    flex: none; /* Remove flex growth */
-    max-height: 400px; /* Set maximum height for AutoSlider */
+    flex: 0 0 auto; /* Don't grow or shrink, size based on content */
+    width: 100%;
+    aspect-ratio: 2/3; /* Maintain 2:3 aspect ratio */
     overflow: hidden;
-    aspect-ratio: 2/3; /* Maintain aspect ratio */
+    /* Remove max-height constraint that was cutting the height */
   }
 
   .fourthColumnLeft {
-    flex: none; /* Remove flex growth */
-    height: auto; /* Let content determine height */
+    flex: 0 0 auto; /* Don't grow or shrink, size based on content */
+    width: 100%;
   }
 }
 

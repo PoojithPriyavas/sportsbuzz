@@ -295,9 +295,11 @@
     font-weight: 600;
 }
 
+/* 
 .dropdown {
     position: relative;
     z-index: 10002;
+    isolation: isolate;
     flex-shrink: 0;
 }
 
@@ -312,7 +314,7 @@
     padding: 8px 0;
     min-width: 160px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 10003;
+    z-index: 10;
     list-style: none;
     opacity: 0;
     visibility: hidden;
@@ -351,6 +353,109 @@
 
 .submenuItem:hover {
     background-color: rgba(255, 255, 255, 0.1);
+} */
+
+/* Make submenu interactive when visible */
+.dropdown:hover .submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) translateZ(0);
+    pointer-events: auto;
+    /* Enable interactions when visible */
+}
+
+/* Alternative positioning for fixed approach - use this if you switch to fixed positioning */
+.dropdown:hover .submenu.fixed-positioned {
+    position: fixed;
+    top: calc(100% + 10px);
+    /* Adjust based on your header height */
+    left: 0;
+}
+
+.submenuItem {
+    padding: 8px 16px;
+    display: block;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    position: relative;
+    /* Ensure proper stacking context */
+    z-index: 1;
+    /* Ensure items stack properly within submenu */
+}
+
+.submenuItem:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown {
+    position: relative;
+    z-index: 999999;
+    /* Increased dropdown z-index */
+    flex-shrink: 0;
+}
+
+.submenu {
+    position: fixed;
+    /* Changed from absolute to fixed to break out of stacking context */
+    top: auto;
+    /* Will be set dynamically with JavaScript if needed */
+    left: auto;
+    /* Will be set dynamically with JavaScript if needed */
+    background: #0046aa;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 8px 0;
+    min-width: 160px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 2147483647;
+    /* Maximum possible z-index value */
+    list-style: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px) translateZ(0);
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform-style: preserve-3d;
+    image-rendering: crisp-edges;
+    text-rendering: optimizeLegibility;
+    pointer-events: none;
+    /* Prevent interference when hidden */
+}
+
+/* Alternative approach - keep as absolute but ensure proper positioning */
+.submenu.absolute-positioned {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 2147483647;
+}
+
+/* Ensure submenu appears above everything including fixed header */
+.loadingContainer.fixedHeader .submenu,
+.loadingContainer .submenu {
+    z-index: 2147483647 !important;
+    /* Use !important to override any conflicting styles */
+}
+
+/* Additional override for any parent containers */
+.loadingContainer,
+.navigation,
+.leftSection,
+.navLinks {
+    position: relative;
+    z-index: auto;
+    /* Reset z-index to not interfere */
+    overflow: visible !important;
+    /* Ensure submenu isn't clipped */
 }
 
 .languageSelector,
