@@ -13,12 +13,13 @@ import JoinTelegramButton from '../JoinTelegram/JoinTelegramButton';
 
 
 
-export default function BlogDetailsPage() {
+export default function BlogDetailsPage({ blog }) {
     return (
         <div className={styles.container}>
             <div className={styles.left}>
 
-                <BlogDetailContent />
+                <BlogDetailContent blog={blog} />
+
                 <BlogSlider />
             </div>
             <div className={styles.right}>
