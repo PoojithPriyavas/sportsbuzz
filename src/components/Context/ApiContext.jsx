@@ -41,7 +41,7 @@ export const DataProvider = ({ children }) => {
     const [countryCode, setCountryCode] = useState({});
 
     const getCountryCode = async () => {
-        
+
         try {
             const { countryCode: urlCountryCode } = parseUrlPath(pathname);
 
@@ -779,6 +779,7 @@ export const DataProvider = ({ children }) => {
                 fetchBlogs,
                 blogs,
                 sections,
+                setSections,
                 bestSections,
                 apiResponse,
                 matchTypes,

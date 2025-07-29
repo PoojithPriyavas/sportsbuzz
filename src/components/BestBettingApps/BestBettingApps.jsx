@@ -3,9 +3,9 @@ import styles from './BestBettingApps.module.css';
 import Head from 'next/head';
 import { useGlobalData } from '../Context/ApiContext';
 
-export default function BettingAppsTable() {
+export default function BettingAppsTable({ sections = [] }) {
     const [copiedId, setCopiedId] = useState(null);
-    const { sections, translateText, language } = useGlobalData();
+    const { translateText, language } = useGlobalData();
     const [isMobile, setIsMobile] = useState(false);
     const [translatedSections, setTranslatedSections] = useState([]);
     const [staticLabels, setStaticLabels] = useState({

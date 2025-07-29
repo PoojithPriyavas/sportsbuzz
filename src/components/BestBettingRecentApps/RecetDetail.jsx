@@ -6,13 +6,13 @@ import Head from 'next/head';
 import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/router';
 
-export default function RecentAppsDetails() {
+export default function RecentAppsDetails({ bestSections = [] }) {
     const router = useRouter();
     const sectionId = router.query.id;
     const [isMobile, setIsMobile] = useState(false);
 
     const [copiedId, setCopiedId] = useState(null);
-    const { bestSections, translateText, language } = useGlobalData();
+    const { translateText, language } = useGlobalData();
 
     const [translatedSections, setTranslatedSections] = useState([]);
     const [staticLabels, setStaticLabels] = useState({

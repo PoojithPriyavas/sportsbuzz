@@ -31,9 +31,11 @@ export default function BestBettingApps() {
         teamImages,
         upcomingMatches,
         sport,
-        countryCode
-    } = useGlobalData();
+        countryCode,
+        bestSections,
 
+    } = useGlobalData();
+    console.log(bestSections, "tfsdhgas")
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false
         const timer1 = setTimeout(() => setLoading(false), 3000);
@@ -102,7 +104,7 @@ export default function BestBettingApps() {
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
-                        <RecentAppsDetails />
+                        <RecentAppsDetails bestSections={bestSections} />
                     </div>
                     <div className={styles.fourthColumn} >
                         <div className={styles.fourthColumnTwoColumns}>
