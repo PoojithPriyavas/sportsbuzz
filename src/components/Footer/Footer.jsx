@@ -142,7 +142,7 @@ const FooterTwo = () => {
                         <ul className={styles.linkList}>
                             <li><a href="/">{translatedText.home}</a></li>
                             {/* <li><a href="/live-scores">{translatedText.liveScores}</a></li> */}
-                            <li><a href="/best-betting-apps">{translatedText.bestApps}</a></li>
+                            <li><a href="/best-betting-apps/current">{translatedText.bestApps}</a></li>
                             <li><a href="/blogs/pages/all-blogs">{translatedText.blogs}</a></li>
                             <li><a href="/contact">{translatedText.contactUs}</a></li>
                         </ul>
