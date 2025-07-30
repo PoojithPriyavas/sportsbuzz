@@ -535,7 +535,7 @@ export const DataProvider = ({ children }) => {
 
     // CRICKET LIVE SCORE SECTION
 
-    const rapidApiKey = 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec';
+    const rapidApiKey = '812b8812eamshb7de013d33e4a99p11f675jsnb07fb552d36c';
 
     const [apiResponse, setApiResponse] = useState(null);
     const [matchTypes, setMatchTypes] = useState([]);
@@ -664,7 +664,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
+                'X-RapidAPI-Key': '812b8812eamshb7de013d33e4a99p11f675jsnb07fb552d36c',
             }
         };
 
@@ -695,7 +695,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
+                'X-RapidAPI-Key': '812b8812eamshb7de013d33e4a99p11f675jsnb07fb552d36c',
             }
         };
 
@@ -715,7 +715,7 @@ export const DataProvider = ({ children }) => {
             method: 'GET',
             url: 'https://cricbuzz-cricket.p.rapidapi.com/news/v1/index',
             headers: {
-                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
+                'X-RapidAPI-Key': '812b8812eamshb7de013d33e4a99p11f675jsnb07fb552d36c',
             },
         };
 
@@ -737,14 +737,14 @@ export const DataProvider = ({ children }) => {
     const [selectedNews, setSelectedNews] = useState(null);
 
     const fetchNewsDetails = async (id) => {
-        console.log(id,"click id")
+        console.log(id, "click id")
         try {
             const response = await axios.get(
                 `https://cricbuzz-cricket.p.rapidapi.com/news/v1/detail/${id}`,
                 {
 
                     headers: {
-                        'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
+                        'X-RapidAPI-Key': '812b8812eamshb7de013d33e4a99p11f675jsnb07fb552d36c',
                     },
                 }
             );
