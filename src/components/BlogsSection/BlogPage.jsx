@@ -24,7 +24,7 @@ export default function BlogsPage({ blogs = [] }) {
   const [filterValue, setFilterValue] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   const { language, translateText, fetchBlogs, countryCode } = useGlobalData();
   const searchParams = useSearchParams();
 
@@ -116,7 +116,7 @@ export default function BlogsPage({ blogs = [] }) {
         category: selectedCategoryId,
         subcategory: selectedSubcategoryId,
       });
-      
+
       fetchBlogs({
         countryCodeParam: countryCode?.country_code,
         search: searchTerm,
@@ -180,7 +180,7 @@ export default function BlogsPage({ blogs = [] }) {
   return (
     <>
       <div className={styles.container}>
-        <div className={styles.left}>
+        {/* <div className={styles.left}>
           <div className={styles.filterBar}>
             <h2 style={{ color: 'black' }}>{translations.latestBlogs}</h2>
             <div className={styles.controls}>
@@ -260,9 +260,8 @@ export default function BlogsPage({ blogs = [] }) {
                       <button
                         key={page}
                         onClick={() => handlePageChange(page)}
-                        className={`${styles.paginationButton} ${
-                          currentPage === page ? styles.active : ''
-                        }`}
+                        className={`${styles.paginationButton} ${currentPage === page ? styles.active : ''
+                          }`}
                       >
                         {page}
                       </button>
@@ -289,7 +288,128 @@ export default function BlogsPage({ blogs = [] }) {
           <BettingCard />
           <UpcomingFootballMatches />
           <UpcomingMatches />
+        </div> */}
+
+
+
+
+
+        <div className={styles.fourColumnRow}>
+          <div className={styles.leftThreeColumns}>
+            <div className={styles.filterBar}>
+              <h2 style={{ color: 'black' }}>{translations.latestBlogs}</h2>
+              <div className={styles.controls}>
+                {hasActiveFilters && (
+                  <button onClick={handleClearFilters} className={styles.clearFilterButton}>
+                    <FaTimes className={styles.clearIcon} />
+                    {translations.clearFilter}
+                  </button>
+                )}
+
+                <div className={styles.selectWrapper}>
+                  <select
+                    value={filterValue}
+                    onChange={(e) => setFilterValue(e.target.value)}
+                    className={styles.professionalSelect}
+                  >
+                    <option value="all">{translations.all}</option>
+                    <option value="latest">{translations.latest}</option>
+                  </select>
+                  <FaChevronDown className={styles.selectIcon} />
+                </div>
+
+                <div className={styles.searchWrapper}>
+                  <FaSearch className={styles.searchIcon} />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder={translations.searchPlaceholder}
+                    className={styles.searchInput}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className={styles.blogGrid}>
+              {currentBlogs.map((blog) => (
+                <Link
+                  key={blog.id}
+                  href={`/blog-details/${blog?.slug}`}
+                  className={styles.blogCard}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className={styles.blogImage}>
+                    <img src={blog?.image} alt={blog?.alt || blog?.title} />
+                  </div>
+                  <div className={styles.blogContent}>
+                    <h5>{blog?.title}</h5>
+                    <p>
+                      {blog?.author} <span>{blog?.date}</span>
+                    </p>
+                    <span className={styles.readMore}>{translations.readMore}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            {showPagination && (
+              <div className={styles.pagination}>
+                <button
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 1}
+                  className={`${styles.paginationButton} ${styles.prevNext}`}
+                >
+                  <FaChevronLeft className={styles.paginationIcon} />
+                  {translations.previous}
+                </button>
+
+                <div className={styles.pageNumbers}>
+                  {getPageNumbers().map((page, index) =>
+                    page === '...' ? (
+                      <span key={`ellipsis-${index}`} className={styles.ellipsis}>
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`${styles.paginationButton} ${currentPage === page ? styles.active : ''
+                          }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  )}
+                </div>
+
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                  className={`${styles.paginationButton} ${styles.prevNext}`}
+                >
+                  {translations.next}
+                  <FaChevronRight className={styles.paginationIcon} />
+                </button>
+              </div>
+            )}
+          </div>
+          <div className={styles.fourthColumn}>
+            <div className={styles.fourthColumnTwoColumns}>
+              <div className={styles.fourthColumnLeft}>
+                <JoinTelegramButton />
+                <div className={styles.bettingCardWrapper}>
+                  <BettingCard />
+                </div>
+
+
+              </div>
+              <div className={styles.fourthColumnRight}>
+                <UpcomingFootballMatches />
+              </div>
+            </div>
+
+          </div>
         </div>
+
       </div>
     </>
   );

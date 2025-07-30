@@ -9,6 +9,7 @@ import Head from "next/head";
 import styles from '../../styles/Home.module.css';
 // import { getBlogData } from "@/lib/blogs"; // create this to fetch blogs
 import { useGlobalData } from '@/components/Context/ApiContext';
+import HeaderTwo from "@/components/Header/HeaderTwo";
 
 export async function getServerSideProps(context) {
     const slug = context.params.slug;
@@ -85,7 +86,8 @@ export default function BlogDetailsMain({ blog }) {
                 <meta property="og:description" content={blog.meta_desc} />
                 <meta property="og:image" content={blog.image_big || blog.image} />
             </Head>
-            <Header />
+            {/* <Header /> */}
+             <HeaderTwo animationStage={animationStage} />
             <div className={` ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
                 <BlogDetailsPage blog={blog} />
             </div>

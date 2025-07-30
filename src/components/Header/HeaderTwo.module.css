@@ -3,12 +3,13 @@
 .loadingContainer {
     background-color: linear-gradient(135deg, #16213e 0%, #045fc6 50%, #16213e 100%);
     background: linear-gradient(135deg, #16213e 0%, #045fc6 50%, #16213e 100%);
-    position: relative;
+    position: fixed;
     transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
-    position: fixed;
     z-index: 9999;
     top: 0;
+    left: 0; /* Added to ensure proper positioning */
+    right: 0; /* Added to ensure proper positioning */
 }
 
 .loadingContainer.loading {
@@ -33,10 +34,9 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 1rem;
-    /* Reduced padding to give more space */
     max-width: 100vw;
-    overflow: hidden;
-    /* Prevent overflow */
+    overflow: visible; /* Changed from hidden to visible for dropdowns */
+    box-sizing: border-box; /* Added for consistent sizing */
 }
 
 .loadingAnimation {
@@ -66,6 +66,7 @@
 .loadingAnimation.header {
     opacity: 0;
     transform: scale(0.5);
+    pointer-events: none; /* Prevent interaction when hidden */
 }
 
 .loadingIcon {
@@ -120,11 +121,12 @@
 }
 
 .logo {
-    position: absolute;
     transition: all 1s ease-out;
+    position: relative; /* Changed from absolute positioning for header state */
 }
 
 .logo.loading {
+    position: absolute;
     bottom: 2rem;
     left: 2rem;
     transform: translateY(5rem);
@@ -132,6 +134,7 @@
 }
 
 .logo.logoReveal {
+    position: absolute;
     bottom: 2rem;
     left: 2rem;
     transform: translateY(0);
@@ -139,6 +142,7 @@
 }
 
 .logo.transition {
+    position: absolute;
     bottom: 2rem;
     left: 2rem;
     transform: translateY(0);
@@ -147,13 +151,12 @@
 }
 
 .logo.header {
-    position: static;
+    position: relative; /* Changed from static to relative */
     transform: none;
     opacity: 1;
     bottom: auto;
     left: auto;
     flex-shrink: 0;
-    /* Prevent logo from shrinking */
     padding: 10px;
 }
 
@@ -165,7 +168,6 @@
 
 .logoIcon {
     width: 120px;
-    /* Reduced width for more space */
     height: 3rem;
     display: flex;
     align-items: center;
@@ -194,13 +196,12 @@
 
 .divider {
     padding: 8px;
-    /* Reduced padding */
     border-right: 3px solid #fff;
     flex-shrink: 0;
 }
 
 .navigation {
-    position: static;
+    position: relative; /* Ensure proper positioning context */
     transform: none;
     opacity: 0;
     transition: opacity 1s ease-out 0.5s;
@@ -209,9 +210,7 @@
     align-items: center;
     width: 100%;
     min-width: 0;
-    /* Allow shrinking */
     padding-left: 15px;
-    /* Reduced padding */
 }
 
 .navigation.header {
@@ -222,41 +221,36 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    /* Reduced gap */
     flex: 1;
     min-width: 0;
-    /* Allow shrinking */
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to visible */
+    position: relative; /* Added for dropdown positioning */
 }
 
 .rightSection {
     display: flex;
     align-items: center;
     gap: 1rem;
-    /* Reduced gap */
     flex-shrink: 0;
-    /* Prevent right section from shrinking */
+    position: relative; /* Added for proper positioning */
 }
 
 .navLinks {
     display: flex;
     align-items: center;
     gap: 1rem;
-    /* Reduced gap */
     padding-left: 8px;
-    /* Reduced padding */
     flex-wrap: nowrap;
-    /* Keep items in one row */
-    overflow: hidden;
+    overflow: visible; /* Changed from hidden to visible */
     flex: 1;
     min-width: 0;
+    position: relative; /* Added for dropdown positioning */
 }
 
 .navLink {
     color: white;
     font-weight: 500;
     font-size: 1rem;
-    /* Slightly reduced font size */
     text-decoration: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
@@ -272,22 +266,20 @@
     color: white;
     font-weight: 500;
     font-size: 1rem;
-    /* Reduced font size */
     text-decoration: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    /* Reduced gap */
     white-space: nowrap;
     flex-shrink: 0;
+    position: relative; /* Added for proper positioning */
 }
 
 .navItem:hover,
 .navLink:hover {
     color: #67e8f9;
     transform: scale(1.02);
-    /* Reduced scale to prevent overflow */
 }
 
 .navItem.active {
@@ -295,11 +287,9 @@
     font-weight: 600;
 }
 
-/* 
 .dropdown {
     position: relative;
-    z-index: 10002;
-    isolation: isolate;
+    z-index: 10000; /* Reduced from extremely high value */
     flex-shrink: 0;
 }
 
@@ -314,7 +304,7 @@
     padding: 8px 0;
     min-width: 160px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 10;
+    z-index: 10001; /* Ensure it's above parent dropdown */
     list-style: none;
     opacity: 0;
     visibility: hidden;
@@ -323,37 +313,8 @@
     backface-visibility: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transform-style: preserve-3d;
-    image-rendering: crisp-edges;
-    text-rendering: optimizeLegibility;
+    pointer-events: none; /* Prevent interference when hidden */
 }
-
-.loadingContainer.fixedHeader .submenu {
-    z-index: 10000;
-}
-
-.dropdown:hover .submenu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) translateZ(0);
-}
-
-.submenuItem {
-    padding: 8px 16px;
-    display: block;
-    color: white;
-    text-decoration: none;
-    font-size: 14px;
-    white-space: nowrap;
-    transition: background-color 0.2s ease;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-}
-
-.submenuItem:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-} */
 
 /* Make submenu interactive when visible */
 .dropdown:hover .submenu {
@@ -361,15 +322,6 @@
     visibility: visible;
     transform: translateY(0) translateZ(0);
     pointer-events: auto;
-    /* Enable interactions when visible */
-}
-
-/* Alternative positioning for fixed approach - use this if you switch to fixed positioning */
-.dropdown:hover .submenu.fixed-positioned {
-    position: fixed;
-    top: calc(100% + 10px);
-    /* Adjust based on your header height */
-    left: 0;
 }
 
 .submenuItem {
@@ -384,78 +336,11 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     position: relative;
-    /* Ensure proper stacking context */
     z-index: 1;
-    /* Ensure items stack properly within submenu */
 }
 
 .submenuItem:hover {
     background-color: rgba(255, 255, 255, 0.1);
-}
-
-.dropdown {
-    position: relative;
-    z-index: 999999;
-    /* Increased dropdown z-index */
-    flex-shrink: 0;
-}
-
-.submenu {
-    position: fixed;
-    /* Changed from absolute to fixed to break out of stacking context */
-    top: auto;
-    /* Will be set dynamically with JavaScript if needed */
-    left: auto;
-    /* Will be set dynamically with JavaScript if needed */
-    background: #0046aa;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    padding: 8px 0;
-    min-width: 160px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 2147483647;
-    /* Maximum possible z-index value */
-    list-style: none;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-5px) translateZ(0);
-    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
-    backface-visibility: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transform-style: preserve-3d;
-    image-rendering: crisp-edges;
-    text-rendering: optimizeLegibility;
-    pointer-events: none;
-    /* Prevent interference when hidden */
-}
-
-/* Alternative approach - keep as absolute but ensure proper positioning */
-.submenu.absolute-positioned {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 2147483647;
-}
-
-/* Ensure submenu appears above everything including fixed header */
-.loadingContainer.fixedHeader .submenu,
-.loadingContainer .submenu {
-    z-index: 2147483647 !important;
-    /* Use !important to override any conflicting styles */
-}
-
-/* Additional override for any parent containers */
-.loadingContainer,
-.navigation,
-.leftSection,
-.navLinks {
-    position: relative;
-    z-index: auto;
-    /* Reset z-index to not interfere */
-    overflow: visible !important;
-    /* Ensure submenu isn't clipped */
 }
 
 .languageSelector,
@@ -464,19 +349,15 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: white;
     padding: 4px 8px;
-    /* Reduced padding */
     border-radius: 4px;
     font-size: 13px;
-    /* Slightly smaller font */
     cursor: pointer;
     outline: none;
     transition: all 0.3s ease;
     position: relative;
-    z-index: 10002;
+    z-index: 1000; /* Lower z-index to avoid conflicts */
     min-width: 80px;
-    /* Set minimum width */
     max-width: 120px;
-    /* Set maximum width */
 }
 
 .languageSelector:hover,
@@ -494,7 +375,6 @@
     background-color: #06b6d4;
     color: white;
     padding: 0.4rem 1rem;
-    /* Reduced padding */
     border-radius: 9999px;
     font-weight: 500;
     border: none;
@@ -503,7 +383,6 @@
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
     white-space: nowrap;
     font-size: 0.9rem;
-    /* Slightly smaller */
 }
 
 .signInButton:hover {
@@ -517,7 +396,6 @@
         height: 100vh;
         clip-path: inset(0 0 0 0);
     }
-
     100% {
         height: 5rem;
         clip-path: inset(0 0 0 0);
@@ -525,13 +403,10 @@
 }
 
 @keyframes pulse {
-
-    0%,
-    100% {
+    0%, 100% {
         opacity: 1;
         transform: scale(1);
     }
-
     50% {
         opacity: 0.7;
         transform: scale(1.05);
@@ -539,12 +414,9 @@
 }
 
 @keyframes bounce {
-
-    0%,
-    100% {
+    0%, 100% {
         transform: translateY(0);
     }
-
     50% {
         transform: translateY(-0.625rem);
     }
@@ -554,7 +426,6 @@
     from {
         transform: rotate(0deg);
     }
-
     to {
         transform: rotate(360deg);
     }
@@ -565,9 +436,7 @@
         transform: scale(1);
         opacity: 1;
     }
-
-    75%,
-    100% {
+    75%, 100% {
         transform: scale(2);
         opacity: 0;
     }
@@ -579,9 +448,8 @@
         bottom: 2rem;
         left: 2rem;
     }
-
     100% {
-        position: static;
+        position: relative; /* Changed from static to relative */
         bottom: auto;
         left: auto;
     }
@@ -629,7 +497,7 @@
     width: 280px;
     height: 100vh;
     background: linear-gradient(135deg, #16213e 0%, #045fc6 50%, #16213e 100%);
-    z-index: 9999;
+    z-index: 10000; /* Ensure it's above the header */
     transition: right 0.3s ease;
     overflow-y: auto;
     padding: 2rem 0;
@@ -908,7 +776,6 @@
     .mobileTopRow {
         display: flex;
         align-items: center;
-        /* justify-content: space-between; */
         justify-content: end;
         width: 100%;
     }

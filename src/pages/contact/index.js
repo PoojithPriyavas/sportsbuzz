@@ -19,6 +19,7 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 import Contact from '@/components/Contact/Contact';
 import Hero from '@/components/Hero/Hero';
 import TestHeader from "@/components/Header/TestHeader";
+import FooterTwo from "@/components/Footer/Footer";
 
 
 
@@ -94,7 +95,7 @@ export default function FootballMatchDetails() {
 
 
       </div>
-      <Footer />
+      <FooterTwo />
     </>
   )
 }
