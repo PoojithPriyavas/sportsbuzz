@@ -710,36 +710,41 @@ export const DataProvider = ({ children }) => {
     // NEWS SECTION
     const [news, setNews] = useState([]);
 
-    const fetchNews = async () => {
-        console.log("calling response")
+    const fetchNews = useCallback(async () => {
         const options = {
             method: 'GET',
             url: 'https://cricbuzz-cricket.p.rapidapi.com/news/v1/index',
             headers: {
-                'X-RapidAPI-Key': 'c098a6de0dmsh12ceee9d6756c0dp101779jsnf178e559067d',
-            }
+                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
+            },
         };
+
         try {
             const response = await axios.request(options);
-            // setNews(response.data?.homepageArticles[0])
-            setNews(response.data)
+            const newData = response.data;
+
+            // Only set state if changed
+            setNews((prev) => {
+                return JSON.stringify(prev) === JSON.stringify(newData) ? prev : newData;
+            });
         } catch (error) {
             console.error('Error fetching news:', error);
         }
-    };
+    }, []);
 
     //// NEWS DETAIL SECTION 
 
     const [selectedNews, setSelectedNews] = useState(null);
 
     const fetchNewsDetails = async (id) => {
+        console.log(id,"click id")
         try {
             const response = await axios.get(
-                `https://cricbuzz-cricket.p.rapidapi.com/news/v1/detail/122025`,
+                `https://cricbuzz-cricket.p.rapidapi.com/news/v1/detail/${id}`,
                 {
-                    params: { id },
+
                     headers: {
-                        'X-RapidAPI-Key': 'c098a6de0dmsh12ceee9d6756c0dp101779jsnf178e559067d',
+                        'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
                     },
                 }
             );
@@ -749,6 +754,20 @@ export const DataProvider = ({ children }) => {
             console.error("Error fetching news details:", error);
         }
     };
+    // useEffect(() => {
+    //     console.log('effect ran')
+    //     let called = false;
+
+    //     if (!called) {
+    //         console.log("called the infinite")
+    //         fetchNews();
+    //         called = true;
+    //     }
+
+    //     return () => {
+    //         called = true;
+    //     };
+    // }, []);
 
     useEffect(() => {
         fetchBlogCategories();
@@ -757,11 +776,18 @@ export const DataProvider = ({ children }) => {
         fetchUpcomingMatches();
         liveFootBall();
         upcomingFootBall();
-        fetchNews();
+        // fetchNews();
         fetchLocation();
         getCountryCode();
         fetchSettings();
     }, []);
+
+    useEffect(() => {
+        if (!news.length) {
+            fetchNews();
+        }
+    }, []);
+
 
     useEffect(() => {
         if (countryCode.country_code) {

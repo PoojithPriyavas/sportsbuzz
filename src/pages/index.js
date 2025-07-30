@@ -10,7 +10,8 @@ import UpcomingMatches from "@/components/UpComing/UpComingMatches";
 import AutoSlider from "@/components/AutoSlider/AutoSlider";
 import PredictionSection from "@/components/Prediction/Prediction";
 import SmallAdBox from "@/components/SmallAds/SmallAdsBox";
-import TopNewsSection from "@/components/NewsSection/TopNews";
+// import TopNewsSection from "@/components/NewsSection/TopNews";
+import NewsList from "@/components/NewsSection/TopNews";
 import MultiBannerSlider from "@/components/Multibanner/MultiBannerSlider";
 import BlogSection from "@/components/BlogsSection/BlogsSection";
 import AdsSlider from "@/components/AdSlider/AdSlider";
@@ -143,7 +144,9 @@ export default function Home() {
       <>
         <HeaderTwo animationStage={animationStage} />
         {showOtherDivs && (
-          <div style={{marginTop:'9.5rem'}} className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
+          <div 
+          // style={{marginTop:'9.5rem'}}
+           className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
             {sport === 'cricket' ? (
               <>
                 <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
@@ -160,15 +163,15 @@ export default function Home() {
                 )}
                 <div className={styles.twoSplitRow}>
                   <div className={styles.leftSplit}>
-                    {sport === 'cricket' ? (
+                    {/* {sport === 'cricket' ? (
                       <>
                         <UpcomingMatches upcomingMatches={upcomingMatches} />
                       </>
                     ) : (
                       <UpcomingFootballMatches />
-                    )}
+                    )} */}
                     <SportsOdsList />
-                    <TopNewsSection />
+                    <NewsList />
                   </div>
                   <div className={styles.centerSplit}>
                     <BlogSection blogs={blogs} />

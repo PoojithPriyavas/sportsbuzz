@@ -1,0 +1,251 @@
+
+.container {
+    /* max-width: 64rem;
+    margin: 0 auto; */
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.header {
+    background: linear-gradient(to right, #2563eb, #16a34a);
+    color: white;
+    padding: 1.5rem;
+}
+
+.headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.headerLeft {
+    flex: 1;
+}
+
+.headline {
+    font-size: 1.875rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.context {
+    color: #dbeafe;
+    font-size: 1.125rem;
+    margin-bottom: 0;
+}
+
+.intro {
+    color: #bfdbfe;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.headerRight {
+    text-align: right;
+    margin-left: 1rem;
+}
+
+.publishLabel {
+    font-size: 0.875rem;
+    color: #bfdbfe;
+    margin-bottom: 0.25rem;
+}
+
+.publishDate {
+    color: white;
+    font-weight: 500;
+}
+
+.coverImage {
+    position: relative;
+    height: 16rem;
+    background-color: #f3f4f6;
+}
+
+.imagePlaceholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9fafb;
+}
+
+.imagePlaceholderContent {
+    text-align: center;
+    padding: 1rem;
+}
+
+.imageIcon {
+    width: 4rem;
+    height: 4rem;
+    background-color: #d1d5db;
+    border-radius: 50%;
+    margin: 0 auto 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.imageId {
+    color: #4b5563;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.imageCaption {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.imageSource {
+    color: #9ca3af;
+    font-size: 0.75rem;
+}
+
+.briefScores {
+    background-color: #f9fafb;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    margin: 1.5rem;
+}
+
+.briefScoresTitle {
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.briefScoresContent {
+    color: #374151;
+    line-height: 1.625;
+}
+
+.briefScoresBold {
+    font-weight: bold;
+    color: #1d4ed8;
+}
+
+.content {
+    padding: 1.5rem;
+}
+
+.prose {
+    max-width: none;
+}
+
+.paragraph {
+    color: #374151;
+    line-height: 1.625;
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+
+.tagsSection {
+    padding: 0 1.5rem 1rem;
+}
+
+.tagsTitle {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+}
+
+.tagsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.tagTeam {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.tagSeries {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.tagMatch {
+    background-color: #f3e8ff;
+    color: #7c3aed;
+}
+
+.footer {
+    background-color: #f9fafb;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.footerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.footerLeft {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footerSeparator {
+    margin: 0 0.25rem;
+}
+
+.pageContainer {
+    min-height: 100vh;
+    background-color: #f3f4f6;
+    padding: 2rem 0;
+}
+
+@media (max-width: 768px) {
+    .headerContent {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .headerRight {
+        text-align: left;
+        margin-left: 0;
+    }
+
+    .headline {
+        font-size: 1.5rem;
+    }
+
+    .coverImage {
+        height: 12rem;
+    }
+
+    .footerContent {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .footerLeft {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    .footerSeparator {
+        display: none;
+    }
+}

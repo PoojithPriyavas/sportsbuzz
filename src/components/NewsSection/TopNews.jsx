@@ -4,13 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import styles from './TopNews.module.css';
 import { useGlobalData } from '../Context/ApiContext';
+import { useMemo } from 'react';
 
 const NewsList = () => {
   const { news, fetchNewsDetails, language, translateText } = useGlobalData();
   console.log(news, "newssssss")
-  
-  // Extract stories from the new API structure, filtering out ads
-  const stories = news?.storyList?.filter(item => item.story)?.map(item => item.story) || [];
+
+  const stories = useMemo(() => {
+    return news?.storyList?.filter(item => item.story)?.map(item => item.story) || [];
+  }, [news]);
   const router = useRouter();
 
   const [translatedNews, setTranslatedNews] = useState([]);
@@ -21,6 +23,7 @@ const NewsList = () => {
 
   // Translate headlines and article titles on language or data change
   useEffect(() => {
+    console.log("this useffect is the issue")
     const translateAll = async () => {
       if (!stories.length) return;
 
@@ -35,8 +38,8 @@ const NewsList = () => {
       const translated = await Promise.all(
         stories.map(async (item) => {
           const translatedTitle = await translateText(item.hline, 'en', language);
-          const translatedIntro = item.intro 
-            ? await translateText(item.intro, 'en', language) 
+          const translatedIntro = item.intro
+            ? await translateText(item.intro, 'en', language)
             : '';
           const originalCaption = item.coverImage?.caption || '';
           const translatedCaption = originalCaption
@@ -63,7 +66,7 @@ const NewsList = () => {
     const now = Date.now();
     const pubTime = parseInt(timestamp);
     const diffInMinutes = Math.floor((now - pubTime) / (1000 * 60));
-    
+
     if (diffInMinutes < 60) {
       return `${diffInMinutes} mins ago`;
     } else if (diffInMinutes < 1440) {
@@ -76,9 +79,9 @@ const NewsList = () => {
   };
 
   const openNews = async (item) => {
-    await fetchNewsDetails(item.id);
-    const slug = item.hline.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    router.push(`/news/${slug}`);
+    // await fetchNewsDetails(item.id);
+    // const slug = item.hline.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    router.push(`/news/${item.id}`);
   };
 
   return (
@@ -95,7 +98,7 @@ const NewsList = () => {
             className={styles.newsItem}
             onClick={() => openNews(item)}
           >
-            <div className={styles.thumbnail}>
+            {/* <div className={styles.thumbnail}>
               {item.coverImage?.id && (
                 <img
                   src={`https://your-image-base-url/${item.coverImage.id}`} // Update with your actual image base URL
@@ -103,7 +106,7 @@ const NewsList = () => {
                   className={styles.thumbnailImage}
                 />
               )}
-            </div>
+            </div> */}
 
             <div className={styles.newsInfo}>
               <h3 className={styles.newsTitle}>{item.translatedTitle}</h3>
