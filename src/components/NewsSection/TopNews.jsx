@@ -7,7 +7,10 @@ import { useGlobalData } from '../Context/ApiContext';
 
 const NewsList = () => {
   const { news, fetchNewsDetails, language, translateText } = useGlobalData();
-  const articles = news?.articles || [];
+  console.log(news, "newssssss")
+  
+  // Extract stories from the new API structure, filtering out ads
+  const stories = news?.storyList?.filter(item => item.story)?.map(item => item.story) || [];
   const router = useRouter();
 
   const [translatedNews, setTranslatedNews] = useState([]);
@@ -19,7 +22,7 @@ const NewsList = () => {
   // Translate headlines and article titles on language or data change
   useEffect(() => {
     const translateAll = async () => {
-      if (!articles.length) return;
+      if (!stories.length) return;
 
       // Translate static header strings
       const [title, subtitle] = await Promise.all([
@@ -28,19 +31,23 @@ const NewsList = () => {
       ]);
       setTranslatedHeader({ title, subtitle });
 
-      // Translate article titles and optional alt text
+      // Translate story headlines and captions
       const translated = await Promise.all(
-        articles.map(async (item) => {
-          const translatedTitle = await translateText(item.title, 'en', language);
-          const originalAlt = item.mainMedia?.[0]?.thumbnail?.alt || '';
-          const translatedAlt = originalAlt
-            ? await translateText(originalAlt, 'en', language)
+        stories.map(async (item) => {
+          const translatedTitle = await translateText(item.hline, 'en', language);
+          const translatedIntro = item.intro 
+            ? await translateText(item.intro, 'en', language) 
+            : '';
+          const originalCaption = item.coverImage?.caption || '';
+          const translatedCaption = originalCaption
+            ? await translateText(originalCaption, 'en', language)
             : '';
 
           return {
             ...item,
             translatedTitle,
-            translatedAlt,
+            translatedIntro,
+            translatedCaption,
           };
         })
       );
@@ -49,11 +56,28 @@ const NewsList = () => {
     };
 
     translateAll();
-  }, [articles, language]);
+  }, [stories, language]);
+
+  // Helper function to convert timestamp to readable format
+  const formatTime = (timestamp) => {
+    const now = Date.now();
+    const pubTime = parseInt(timestamp);
+    const diffInMinutes = Math.floor((now - pubTime) / (1000 * 60));
+    
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} mins ago`;
+    } else if (diffInMinutes < 1440) {
+      const hours = Math.floor(diffInMinutes / 60);
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    } else {
+      const days = Math.floor(diffInMinutes / 1440);
+      return `${days} day${days > 1 ? 's' : ''} ago`;
+    }
+  };
 
   const openNews = async (item) => {
     await fetchNewsDetails(item.id);
-    const slug = item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const slug = item.hline.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     router.push(`/news/${slug}`);
   };
 
@@ -72,10 +96,10 @@ const NewsList = () => {
             onClick={() => openNews(item)}
           >
             <div className={styles.thumbnail}>
-              {item.mainMedia?.[0]?.thumbnail?.url && (
+              {item.coverImage?.id && (
                 <img
-                  src={item.mainMedia[0].thumbnail.url}
-                  alt={item.translatedAlt || 'News Thumbnail'}
+                  src={`https://your-image-base-url/${item.coverImage.id}`} // Update with your actual image base URL
+                  alt={item.translatedCaption || 'News Thumbnail'}
                   className={styles.thumbnailImage}
                 />
               )}
@@ -83,10 +107,24 @@ const NewsList = () => {
 
             <div className={styles.newsInfo}>
               <h3 className={styles.newsTitle}>{item.translatedTitle}</h3>
+              {item.translatedIntro && (
+                <p className={styles.newsIntro}>{item.translatedIntro}</p>
+              )}
               <div className={styles.newsMeta}>
                 <span className={styles.newsDate}>
-                  📅 {item.updatedAt?.time} mins ago
+                  📅 {formatTime(item.pubTime)}
                 </span>
+                <span className={styles.newsSource}>
+                  📰 {item.source}
+                </span>
+                <span className={styles.newsType}>
+                  🏷️ {item.storyType}
+                </span>
+                {item.context && (
+                  <span className={styles.newsContext}>
+                    🏏 {item.context}
+                  </span>
+                )}
               </div>
             </div>
           </div>

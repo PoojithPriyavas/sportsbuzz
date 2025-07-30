@@ -129,7 +129,13 @@ export default function BestBettingApps({ sections }) {
 
             <div className='container'>
                 {/* <LiveScores /> */}
-                <TestLive />
+                {sport === 'cricket' ? (
+                    <>
+                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+                    </>
+                ) : (
+                    <TestLive />
+                )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
                         <BettingAppsTable sections={sections} />

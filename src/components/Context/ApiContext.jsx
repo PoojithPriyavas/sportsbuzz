@@ -535,7 +535,7 @@ export const DataProvider = ({ children }) => {
 
     // CRICKET LIVE SCORE SECTION
 
-    const rapidApiKey = 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1';
+    const rapidApiKey = 'c098a6de0dmsh12ceee9d6756c0dp101779jsnf178e559067d';
 
     const [apiResponse, setApiResponse] = useState(null);
     const [matchTypes, setMatchTypes] = useState([]);
@@ -664,7 +664,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
+                'X-RapidAPI-Key': 'c098a6de0dmsh12ceee9d6756c0dp101779jsnf178e559067d',
             }
         };
 
@@ -695,7 +695,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
+                'X-RapidAPI-Key': 'c098a6de0dmsh12ceee9d6756c0dp101779jsnf178e559067d',
             }
         };
 
@@ -711,17 +711,18 @@ export const DataProvider = ({ children }) => {
     const [news, setNews] = useState([]);
 
     const fetchNews = async () => {
+        console.log("calling response")
         const options = {
             method: 'GET',
-            url: 'https://livescore6.p.rapidapi.com/news/v2/list',
+            url: 'https://cricbuzz-cricket.p.rapidapi.com/news/v1/index',
             headers: {
-                'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
+                'X-RapidAPI-Key': 'c098a6de0dmsh12ceee9d6756c0dp101779jsnf178e559067d',
             }
         };
-
         try {
             const response = await axios.request(options);
-            setNews(response.data?.homepageArticles[0])
+            // setNews(response.data?.homepageArticles[0])
+            setNews(response.data)
         } catch (error) {
             console.error('Error fetching news:', error);
         }
@@ -734,11 +735,11 @@ export const DataProvider = ({ children }) => {
     const fetchNewsDetails = async (id) => {
         try {
             const response = await axios.get(
-                `https://livescore6.p.rapidapi.com/news/v2/detail`,
+                `https://cricbuzz-cricket.p.rapidapi.com/news/v1/detail/122025`,
                 {
                     params: { id },
                     headers: {
-                        'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
+                        'X-RapidAPI-Key': 'c098a6de0dmsh12ceee9d6756c0dp101779jsnf178e559067d',
                     },
                 }
             );
