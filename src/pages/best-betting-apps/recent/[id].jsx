@@ -36,6 +36,7 @@ export async function getServerSideProps(context) {
     return {
         props: {
             bestSections,
+            sectionId,
             countryCode,
         },
     };
@@ -106,11 +107,17 @@ export default function BestBettingApps({ bestSections, sectionId }) {
             return () => clearTimeout(timeout);
         }
     }, [showOtherDivs]);
+
+    const sectionIdNumber = parseInt(sectionId); // Convert to number
+    const matchedSection = bestSections.find(section => section.id === sectionIdNumber);
+
+    const metaTitle = matchedSection?.metatitle || 'Best Betting Apps';
+    const metaDescription = matchedSection?.meta_description?.replace(/<[^>]+>/g, '') || 'Discover the best betting apps available in India.';
     return (
         <>
             <Head>
-                <title>Best Betting Apps</title>
-                <meta name="description" content="Your site description here" />
+                <title>{metaTitle}</title>
+                <meta name="description" content={metaDescription} />
             </Head>
             {/* <Header /> */}
             {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}

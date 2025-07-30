@@ -52,7 +52,7 @@ export default function BestBettingApps({ sections }) {
         upcomingMatches,
         sport,
         countryCode,
-
+        bestSections
     } = useGlobalData();
     console.log(sections, "shgdfs")
 
@@ -172,7 +172,7 @@ export default function BestBettingApps({ sections }) {
 
                     </div>
                 </div> */}
-                <BettingAppsRecentTable />
+                <BettingAppsRecentTable bestSections={bestSections} />
 
             </div>
             <FooterTwo />

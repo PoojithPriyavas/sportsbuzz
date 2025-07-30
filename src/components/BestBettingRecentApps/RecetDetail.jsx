@@ -7,6 +7,7 @@ import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/router';
 
 export default function RecentAppsDetails({ bestSections = [], sectionId }) {
+    console.log(sectionId, "best sections id")
     // const router = useRouter();
     // const sectionId = router.query.id;
     const [isMobile, setIsMobile] = useState(false);
@@ -79,7 +80,7 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
                                 };
                             })
                     );
-
+                    console.log(translatedApps, "hsgdhgsd")
                     return {
                         ...section,
                         heading: translatedHeading,
