@@ -356,7 +356,7 @@
 
 @media (max-width: 480px) {
     .featuredButton {
-        padding: 8px 13px;
+        padding: 5px 1px;
         font-size: 14px;
         letter-spacing: 1px;
     }

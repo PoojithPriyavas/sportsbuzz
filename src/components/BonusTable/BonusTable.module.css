@@ -3,9 +3,125 @@
 /* Base wrapper styles */
 .wrapper {
   width: 100%;
-  max-width: 1200px;
+  /* max-width: 1200px; */
   margin: 0 auto;
   /* padding: 0 15px; */
+}
+
+/* Skeleton Loading Styles */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeletonLoading 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeletonLoading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Desktop Skeleton Styles */
+.skeletonRank {
+  width: 60px;
+  height: 40px;
+  border-radius: 50px;
+  margin: 0 auto;
+}
+
+.skeletonLogo {
+  width: 80px;
+  height: 50px;
+  border-radius: 8px;
+  margin: 0 auto;
+}
+
+.skeletonText {
+  height: 16px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.skeletonTextShort {
+  width: 70%;
+}
+
+.skeletonTextMedium {
+  width: 85%;
+}
+
+.skeletonBonus {
+  height: 20px;
+  width: 120px;
+  margin: 0 auto 10px;
+}
+
+.skeletonButton {
+  height: 36px;
+  width: 100%;
+  margin-bottom: 8px;
+  border-radius: 8px;
+}
+
+.skeletonButtonLarge {
+  height: 42px;
+}
+
+.skeletonStars {
+  height: 20px;
+  width: 100px;
+  margin: 0 auto;
+}
+
+/* Mobile Skeleton Styles */
+.skeletonMobileRank {
+  width: 50px;
+  height: 32px;
+  border-radius: 50px;
+}
+
+.skeletonMobileLogo {
+  width: 60px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+.skeletonMobileStars {
+  width: 80px;
+  height: 20px;
+}
+
+.skeletonMobileTitle {
+  height: 16px;
+  width: 80px;
+  margin-bottom: 8px;
+}
+
+.skeletonMobileText {
+  height: 14px;
+  margin-bottom: 6px;
+  width: 100%;
+}
+
+.skeletonMobileBonus {
+  height: 40px;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.skeletonMobileButton {
+  height: 44px;
+  width: 100%;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+.skeletonMobileButtonLarge {
+  height: 50px;
 }
 
 /* Table Container for horizontal scroll fallback */
@@ -569,6 +685,30 @@
     font-size: 20px;
     margin-bottom: 15px;
   }
+  
+  /* Mobile skeleton adjustments */
+  .skeletonMobileRank {
+    width: 40px;
+    height: 28px;
+  }
+  
+  .skeletonMobileLogo {
+    width: 50px;
+    height: 35px;
+  }
+  
+  .skeletonMobileStars {
+    width: 70px;
+    height: 18px;
+  }
+  
+  .skeletonMobileButton {
+    height: 40px;
+  }
+  
+  .skeletonMobileButtonLarge {
+    height: 44px;
+  }
 }
 
 /* Very Small Screens */
@@ -592,5 +732,29 @@
   .mobileReviewBtn {
     padding: 10px 14px;
     font-size: 11px;
+  }
+  
+  /* Very small screen skeleton adjustments */
+  .skeletonMobileRank {
+    width: 35px;
+    height: 26px;
+  }
+  
+  .skeletonMobileLogo {
+    width: 45px;
+    height: 30px;
+  }
+  
+  .skeletonMobileStars {
+    width: 60px;
+    height: 16px;
+  }
+  
+  .skeletonMobileButton {
+    height: 36px;
+  }
+  
+  .skeletonMobileButtonLarge {
+    height: 40px;
   }
 }

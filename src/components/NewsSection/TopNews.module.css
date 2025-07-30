@@ -270,7 +270,7 @@
 @media (max-width: 768px) {
   .container {
     padding: 10px;
-    margin: 10px;
+    /* margin: 10px; */
   }
 
   .news-item {

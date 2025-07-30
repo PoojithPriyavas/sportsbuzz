@@ -297,36 +297,46 @@ export default function BlogsPage({ blogs = [] }) {
         <div className={styles.fourColumnRow}>
           <div className={styles.leftThreeColumns}>
             <div className={styles.filterBar}>
-              <h2 style={{ color: 'black' }}>{translations.latestBlogs}</h2>
-              <div className={styles.controls}>
-                {hasActiveFilters && (
-                  <button onClick={handleClearFilters} className={styles.clearFilterButton}>
-                    <FaTimes className={styles.clearIcon} />
-                    {translations.clearFilter}
-                  </button>
-                )}
 
-                <div className={styles.selectWrapper}>
-                  <select
-                    value={filterValue}
-                    onChange={(e) => setFilterValue(e.target.value)}
-                    className={styles.professionalSelect}
-                  >
-                    <option value="all">{translations.all}</option>
-                    <option value="latest">{translations.latest}</option>
-                  </select>
-                  <FaChevronDown className={styles.selectIcon} />
+              <div className={styles.controls}>
+                <h2 style={{ color: 'black' }}>{translations.latestBlogs}</h2>
+                {/* Left side - Heading */}
+                <div className={styles.heading}>
+                  {/* Your heading content goes here */}
                 </div>
 
-                <div className={styles.searchWrapper}>
-                  <FaSearch className={styles.searchIcon} />
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder={translations.searchPlaceholder}
-                    className={styles.searchInput}
-                  />
+                {/* Right side - Button and Search */}
+                <div className={styles.rightControls}>
+                  {hasActiveFilters && (
+                    <button onClick={handleClearFilters} className={styles.clearFilterButton}>
+                      <FaTimes className={styles.clearIcon} />
+                      {translations.clearFilter}
+                    </button>
+                  )}
+
+                  {/* Uncomment if you need the select dropdown
+    <div className={styles.selectWrapper}>
+      <select
+        value={filterValue}
+        onChange={(e) => setFilterValue(e.target.value)}
+        className={styles.professionalSelect}
+      >
+        <option value="all">{translations.all}</option>
+        <option value="latest">{translations.latest}</option>
+      </select>
+      <FaChevronDown className={styles.selectIcon} />
+    </div> */}
+
+                  <div className={styles.searchWrapper}>
+                    <FaSearch className={styles.searchIcon} />
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      placeholder={translations.searchPlaceholder}
+                      className={styles.searchInput}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

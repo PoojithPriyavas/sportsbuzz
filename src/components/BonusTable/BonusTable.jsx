@@ -8,6 +8,7 @@ export default function BonusTable({ sections }) {
   const [copiedId, setCopiedId] = useState(null);
   const [translatedSections, setTranslatedSections] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { translateText, language } = useGlobalData();
 
   // Check if mobile view
@@ -24,33 +25,44 @@ export default function BonusTable({ sections }) {
   // Translate content when sections or language changes
   useEffect(() => {
     const translateSections = async () => {
-      if (!sections || sections.length === 0) return;
+      if (!sections || sections.length === 0) {
+        setIsLoading(false);
+        return;
+      }
 
-      const updated = await Promise.all(
-        sections.map(async (section) => {
-          const translatedHeading = await translateText(section.heading);
-          const translatedMetaTitle = await translateText(section.metatitle);
-          const translatedMetaDesc = await translateText(section.meta_description);
+      setIsLoading(true);
 
-          const translatedApps = await Promise.all(
-            (section.best_betting_apps || []).map(async (app) => ({
-              ...app,
-              features: await translateText(app.features),
-              welcome_bonus: await translateText(app.welcome_bonus),
-            }))
-          );
+      try {
+        const updated = await Promise.all(
+          sections.map(async (section) => {
+            const translatedHeading = await translateText(section.heading);
+            const translatedMetaTitle = await translateText(section.metatitle);
+            const translatedMetaDesc = await translateText(section.meta_description);
 
-          return {
-            ...section,
-            heading: translatedHeading,
-            metatitle: translatedMetaTitle,
-            meta_description: translatedMetaDesc,
-            best_betting_apps: translatedApps,
-          };
-        })
-      );
+            const translatedApps = await Promise.all(
+              (section.best_betting_apps || []).map(async (app) => ({
+                ...app,
+                features: await translateText(app.features),
+                welcome_bonus: await translateText(app.welcome_bonus),
+              }))
+            );
 
-      setTranslatedSections(updated);
+            return {
+              ...section,
+              heading: translatedHeading,
+              metatitle: translatedMetaTitle,
+              meta_description: translatedMetaDesc,
+              best_betting_apps: translatedApps,
+            };
+          })
+        );
+
+        setTranslatedSections(updated);
+      } catch (error) {
+        console.error('Translation error:', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     translateSections();
@@ -63,6 +75,93 @@ export default function BonusTable({ sections }) {
     });
   };
 
+  // Skeleton Loading Components
+  const SkeletonDesktopTable = () => (
+    <div className={styles.tableContainer}>
+      <table className={styles.table}>
+        <thead>
+          <tr className={styles.headerRow}>
+            <th>Rank</th>
+            <th>Site</th>
+            <th>Features</th>
+            <th>Welcome Bonus</th>
+            <th>Bet Now</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[1, 2, 3, 4, 5].map((index) => (
+            <tr className={styles.bodyRow} key={index}>
+              <td className={styles.rankCell}>
+                <div className={`${styles.skeleton} ${styles.skeletonRank}`}></div>
+              </td>
+              <td className={styles.site}>
+                <div className={`${styles.skeleton} ${styles.skeletonLogo}`}></div>
+              </td>
+              <td className={styles.features}>
+                <div className={`${styles.skeleton} ${styles.skeletonText}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonText} ${styles.skeletonTextShort}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonText} ${styles.skeletonTextMedium}`}></div>
+              </td>
+              <td className={styles.bonus}>
+                <div className={`${styles.skeleton} ${styles.skeletonBonus}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonButton}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonStars}`}></div>
+              </td>
+              <td className={styles.actions}>
+                <div className={`${styles.skeleton} ${styles.skeletonButton} ${styles.skeletonButtonLarge}`}></div>
+                <div className={`${styles.skeleton} ${styles.skeletonButton}`}></div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const SkeletonMobileCards = () => (
+    <div className={styles.mobileContainer}>
+      {[1, 2, 3, 4, 5].map((index) => (
+        <div className={styles.mobileCard} key={index}>
+          <div className={styles.mobileHeader}>
+            <div className={`${styles.skeleton} ${styles.skeletonMobileRank}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonMobileLogo}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonMobileStars}`}></div>
+          </div>
+          
+          <div className={styles.mobileContent}>
+            <div className={styles.mobileSection}>
+              <div className={`${styles.skeleton} ${styles.skeletonMobileTitle}`}></div>
+              <div className={`${styles.skeleton} ${styles.skeletonMobileText}`}></div>
+              <div className={`${styles.skeleton} ${styles.skeletonMobileText} ${styles.skeletonTextShort}`}></div>
+              <div className={`${styles.skeleton} ${styles.skeletonMobileText} ${styles.skeletonTextMedium}`}></div>
+            </div>
+            
+            <div className={styles.mobileSection}>
+              <div className={`${styles.skeleton} ${styles.skeletonMobileTitle}`}></div>
+              <div className={`${styles.skeleton} ${styles.skeletonMobileBonus}`}></div>
+            </div>
+          </div>
+          
+          <div className={styles.mobileActions}>
+            <div className={`${styles.skeleton} ${styles.skeletonMobileButton} ${styles.skeletonMobileButtonLarge}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonMobileButton}`}></div>
+            <div className={`${styles.skeleton} ${styles.skeletonMobileButton}`}></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  // Show skeleton loading
+  if (isLoading) {
+    return (
+      <div className={styles.wrapper}>
+        {isMobile ? <SkeletonMobileCards /> : <SkeletonDesktopTable />}
+      </div>
+    );
+  }
+
+  // Show nothing if no translated sections
   if (translatedSections.length === 0) return null;
 
   // Mobile Card View
