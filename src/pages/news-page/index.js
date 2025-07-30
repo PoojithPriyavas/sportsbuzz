@@ -2,6 +2,7 @@ import Header from "@/components/Loader/Loader";
 import BlogsPage from "@/components/BlogsSection/BlogPage";
 import LiveScores from "@/components/LiveScoreSection/LiveScoreSection";
 import Head from "next/head";
+import { useState, useEffect } from 'react';
 import { useGlobalData } from "@/components/Context/ApiContext";
 import FooterTwo from "@/components/Footer/Footer";
 import HeaderTwo from "@/components/Header/HeaderTwo";
