@@ -535,7 +535,7 @@ export const DataProvider = ({ children }) => {
 
     // CRICKET LIVE SCORE SECTION
 
-    const rapidApiKey = 'c098a6de0dmsh12ceee9d6756c0dp101779jsnf178e559067d';
+    const rapidApiKey = 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec';
 
     const [apiResponse, setApiResponse] = useState(null);
     const [matchTypes, setMatchTypes] = useState([]);
@@ -664,7 +664,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': 'c098a6de0dmsh12ceee9d6756c0dp101779jsnf178e559067d',
+                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
             }
         };
 
@@ -695,7 +695,7 @@ export const DataProvider = ({ children }) => {
                 Timezone: '-5'
             },
             headers: {
-                'X-RapidAPI-Key': 'c098a6de0dmsh12ceee9d6756c0dp101779jsnf178e559067d',
+                'X-RapidAPI-Key': 'efe47ba8d5mshfaf50a473c8685ep180cbcjsn11186002a7ec',
             }
         };
 
