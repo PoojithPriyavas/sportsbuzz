@@ -56,13 +56,13 @@ export default function NewsDetailSection() {
 
     return (
         <>
-            <Head>
+            {/* <Head>
                 <title>{meta.title}</title>
                 <meta name="description" content={article.description || meta.description} />
                 <meta property="og:title" content={meta.title} />
                 <meta property="og:description" content={article.description || meta.description} />
                 <meta property="og:image" content={mainImage} />
-            </Head>
+            </Head> */}
 
             <div className={styles.blogContent}>
                 <h1 className={styles.title}>{meta.title}</h1>

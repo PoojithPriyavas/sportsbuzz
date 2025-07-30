@@ -1,4 +1,5 @@
 import styles from './BlogDetails.module.css'
+import { useState, useEffect } from 'react';
 import BlogDetailContent from './BlogDetailsContent';
 import BlogSlider from './BlogSlider';
 import TopNewsSection from '../NewsSection/TopNews';
@@ -14,19 +15,39 @@ import JoinTelegramButton from '../JoinTelegram/JoinTelegramButton';
 
 
 export default function BlogDetailsPage({ blog }) {
+
     return (
-        <div className={styles.container}>
-            <div className={styles.left}>
-
+        <div >
+            {/* <div className={styles.left}>
                 <BlogDetailContent blog={blog} />
-
                 <BlogSlider />
             </div>
             <div className={styles.right}>
                 <JoinTelegramButton />
                 <BettingCard />
                 <UpcomingFootballMatches />
+            </div> */}
+            <div className={styles.fourColumnRow}>
+                <div className={styles.leftThreeColumns}>
+                    <BlogDetailContent blog={blog} />
+                    <BlogSlider />
+                </div>
+                <div className={styles.fourthColumn}>
+                    <div className={styles.fourthColumnTwoColumns}>
+                        <div className={styles.fourthColumnLeft}>
+                            <JoinTelegramButton />
+                            <div className={styles.bettingCardWrapper}>
+                                <BettingCard />
+                            </div>
 
+
+                        </div>
+                        <div className={styles.fourthColumnRight}>
+                            <UpcomingFootballMatches />
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     );

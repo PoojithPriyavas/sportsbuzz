@@ -7,8 +7,38 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 import FooterTwo from "@/components/Footer/Footer";
 import HeaderTwo from "@/components/Header/HeaderTwo";
 
-export default function BlogPages() {
-    const { blogs, } = useGlobalData()
+import { fetchBlogsSSR } from "@/lib/ftechBlogsSSR";
+
+export async function getServerSideProps({ req, query }) {
+
+    const countryCookie = req.cookies.countryData;
+    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
+
+    const {
+        category: categoryIdParam,
+        subcategory: subcategoryIdParam,
+        search: searchTerm = ''
+    } = query;
+
+    const blogs = await fetchBlogsSSR({
+        countryCode: countryData?.country_code || 'IN',
+        search: searchTerm,
+        category: categoryIdParam ? parseInt(categoryIdParam) : null,
+        subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam) : null,
+    });
+    console.log(blogs, "ssr friendly")
+    return {
+        props: {
+            blogs,
+            countryData,
+        },
+    };
+}
+
+
+export default function BlogPages({ blogs }) {
+    console.log(blogs, "blogs hhh")
+    // const { blogs, } = useGlobalData()
     const [loading, setLoading] = useState(true);
     const [animationStage, setAnimationStage] = useState('loading');
     const [showOtherDivs, setShowOtherDivs] = useState(false);
@@ -57,8 +87,26 @@ export default function BlogPages() {
         <>
             <Head>
                 <title>Sports Buzz | Blogs</title>
-                <meta name="description" content="Your site description here" />
+                <meta name="description" content="Explore the latest sports blogs, match analysis, and breaking sports news curated for fans worldwide." />
+                <meta name="keywords" content="sports blogs, football news, cricket updates, match analysis, sports buzz" />
+                <meta name="author" content="Sports Buzz" />
+
+                {/* Open Graph (Facebook, LinkedIn) */}
+                <meta property="og:title" content="Sports Buzz | Blogs" />
+                <meta property="og:description" content="Stay updated with the latest sports blogs and match breakdowns from around the world." />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content="https://www.sportsbuzz.com/blogs/pages/all-blogs" />
+                <meta property="og:image" content="https://www.sportsbuzz.com/images/social-preview.jpg" /> {/* Update this path */}
+
+                {/* Twitter Card */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Sports Buzz | Blogs" />
+                <meta name="twitter:description" content="Latest sports blogs, news and insights — only on Sports Buzz." />
+                <meta name="twitter:image" content="https://www.sportsbuzz.com/images/social-preview.jpg" /> {/* Update this path */}
+
+                <link rel="canonical" href="https://www.sportsbuzz.com/blogs/pages/all-blogs" />
             </Head>
+
             {/* <Header /> */}
             <HeaderTwo animationStage={animationStage} />
             <div className='container'>

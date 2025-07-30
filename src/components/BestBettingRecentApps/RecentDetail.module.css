@@ -594,3 +594,9 @@
     font-size: 11px;
   }
 }
+.description{
+  color: #000;
+  padding: 25px 0px;
+  text-align: justify;
+  line-height: 2rem;
+}

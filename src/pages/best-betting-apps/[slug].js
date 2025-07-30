@@ -17,39 +17,54 @@ import FooterTwo from "@/components/Footer/Footer";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 import HeaderTwo from "@/components/Header/HeaderTwo";
-import CustomAxios from "@/components/utilities/CustomAxios";
 
-export default function BestBettingApps({ initialSections, metaTitle, metaDescription }) {
+import { fetchBettingAppsSSR } from '@/lib/fetchBettingAppsSSR';
+
+
+export async function getServerSideProps({ req }) {
+    // Parse the cookie to get country code
+    const countryCookie = req.cookies.countryData;
+    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
+    const countryCode = countryData?.country_code || 'IN';
+
+    // Fetch betting apps data based on country code
+    const sections = await fetchBettingAppsSSR(countryCode);
+
+    return {
+        props: {
+            sections,
+            countryCode,
+        },
+    };
+}
+
+
+export default function BestBettingApps({ sections }) {
+
     const [loading, setLoading] = useState(true);
     const {
         blogCategories,
         blogs,
-        sections,
-        setSections, 
+        // sections,
         apiResponse,
         matchTypes,
         teamImages,
         upcomingMatches,
         sport,
-        countryCode
-    } = useGlobalData();
+        countryCode,
 
-    // Use server-side data as initial state
-    useEffect(() => {
-        if (initialSections && initialSections.length > 0) {
-            setSections(initialSections);
-        }
-    }, [initialSections, setSections]);
+    } = useGlobalData();
+    console.log(sections, "shgdfs")
 
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false
         const timer1 = setTimeout(() => setLoading(false), 3000);
         return () => clearTimeout(timer1);
     }, []);
-
     const [animationStage, setAnimationStage] = useState('loading');
     const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
+
 
     useEffect(() => {
         // Check if animation has been played before
@@ -89,12 +104,25 @@ export default function BestBettingApps({ initialSections, metaTitle, metaDescri
         }
     }, [showOtherDivs]);
 
+
     return (
         <>
             <Head>
-                <title>{metaTitle}</title>
-                <meta name="description" content={metaDescription} />
+                <title>{sections?.[0]?.metatitle || 'Best Betting Apps'}</title>
+                <meta
+                    name="description"
+                    content={
+                        sections?.[0]?.meta_description
+                            ? sections[0].meta_description.replace(/<[^>]+>/g, '').slice(0, 160)
+                            : 'Explore the best betting apps in India for July 2025.'
+                    }
+                />
+                <meta property="og:title" content={sections?.[0]?.metatitle || 'Best Betting Apps'} />
+                <meta property="og:description" content={sections?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
+                <meta name="twitter:title" content={sections?.[0]?.metatitle || 'Best Betting Apps'} />
+                <meta name="twitter:description" content={sections?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
             </Head>
+
             {/* <Header /> */}
             {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
             <HeaderTwo animationStage={animationStage} />
@@ -104,7 +132,7 @@ export default function BestBettingApps({ initialSections, metaTitle, metaDescri
                 <TestLive />
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
-                        <BettingAppsTable sections={sections || initialSections} />
+                        <BettingAppsTable sections={sections} />
                     </div>
                     <div className={styles.fourthColumn} >
                         <div className={styles.fourthColumnTwoColumns}>
@@ -126,56 +154,22 @@ export default function BestBettingApps({ initialSections, metaTitle, metaDescri
                         {/* <TopNewsSection /> */}
                     </div>
                 </div>
+                {/* <div className={styles.mainContent}>
+                    <div className={styles.leftSection}>
+
+                    </div>
+
+                    <div className={styles.rightSection}>
+
+                        <UpcomingMatches />
+                        <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
+
+                    </div>
+                </div> */}
                 <BettingAppsRecentTable />
+
             </div>
             <FooterTwo />
         </>
     )
-}
-
-export async function getServerSideProps(context) {
-    const { query, req } = context;
-    let countryCode = query.country_code || 'IN'; // Default fallback
-
- 
-    let initialSections = [];
-    let metaTitle = "Best Betting Apps - Sports Buzz";
-    let metaDescription = "Explore the top-rated betting apps available this month.";
-
-    try {
-        console.log('SSR: Fetching betting apps for country code:', countryCode);
-        
-        const response = await CustomAxios.get('/best-betting-headings', {
-            params: {
-                country_code: countryCode,
-                filter_by: 'current_month'
-            },
-        });
-
-        const data = response.data;
-        if (Array.isArray(data.results)) {
-            initialSections = data.results;
-        } else {
-            console.warn('SSR: Expected an array, but received:', data);
-        }
-
-        metaTitle = data.meta_title || 
-                   (initialSections[0]?.meta_title) || 
-                   "Best Betting Apps - Sports Buzz";
-        
-        metaDescription = data.meta_description || 
-                         (initialSections[0]?.meta_description) || 
-                         "Explore the top-rated betting apps available this month.";
-
-    } catch (error) {
-        console.error('SSR: Error fetching best betting headings:', error);
-    }
-
-    return {
-        props: {
-            initialSections,
-            metaTitle,
-            metaDescription,
-        },
-    };
 }

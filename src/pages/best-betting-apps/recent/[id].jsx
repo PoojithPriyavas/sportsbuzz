@@ -18,8 +18,32 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 import RecentAppsDetails from "@/components/BestBettingRecentApps/RecetDetail";
 import HeaderTwo from "@/components/Header/HeaderTwo";
+import { fetchBestBettingAppsSSR } from "@/lib/fetchBestBettingAppsSSR";
 
-export default function BestBettingApps() {
+
+export async function getServerSideProps(context) {
+    console.log(context, "contexxt")
+    const { req, query, params } = context;
+    // Parse the cookie to get country code
+    const countryCookie = req.cookies.countryData;
+    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
+    const countryCode = countryData?.country_code || 'IN';
+
+    const sectionId = params.id;
+    // Fetch betting apps data based on country code
+    const bestSections = await fetchBestBettingAppsSSR(countryCode);
+
+    return {
+        props: {
+            bestSections,
+            countryCode,
+        },
+    };
+}
+
+
+export default function BestBettingApps({ bestSections, sectionId }) {
+    console.log(bestSections, "jjjjjj")
 
     const [loading, setLoading] = useState(true);
     const {
@@ -32,10 +56,9 @@ export default function BestBettingApps() {
         upcomingMatches,
         sport,
         countryCode,
-        bestSections,
+        // bestSections,
 
     } = useGlobalData();
-    console.log(bestSections, "tfsdhgas")
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false
         const timer1 = setTimeout(() => setLoading(false), 3000);
@@ -104,7 +127,7 @@ export default function BestBettingApps() {
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
-                        <RecentAppsDetails bestSections={bestSections} />
+                        <RecentAppsDetails bestSections={bestSections} sectionId={sectionId} />
                     </div>
                     <div className={styles.fourthColumn} >
                         <div className={styles.fourthColumnTwoColumns}>
@@ -126,19 +149,8 @@ export default function BestBettingApps() {
                         {/* <TopNewsSection /> */}
                     </div>
                 </div>
-                {/* <div className={styles.mainContent}>
-                    <div className={styles.leftSection}>
 
-                    </div>
-
-                    <div className={styles.rightSection}>
-
-                        <UpcomingMatches />
-                        <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
-
-                    </div>
-                </div> */}
-                <BettingAppsRecentTable />
+                <BettingAppsRecentTable bestSections={bestSections} />
 
             </div>
             <FooterTwo />

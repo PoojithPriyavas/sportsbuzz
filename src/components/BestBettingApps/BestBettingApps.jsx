@@ -260,13 +260,13 @@ export default function BettingAppsTable({ sections = [] }) {
 
     return (
         <>
-            <Head>
+            {/* <Head>
                 <title>{translatedSections[0]?.metatitle}</title>
                 <meta
                     name="description"
                     content={stripHtml(translatedSections[0]?.meta_description)}
                 />
-            </Head>
+            </Head> */}
 
             {translatedSections.map((section) => (
                 <div className={styles.wrapper} key={section.id}>

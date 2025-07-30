@@ -101,9 +101,45 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Sportsbuz</title>
-        <meta name="description" content="Your site description here" />
+        <title>Sportsbuz | Live Scores, Sports News & Betting Predictions</title>
+        <meta
+          name="description"
+          content="Get the latest live scores, sports news, betting predictions, and match insights. Stay ahead in cricket, football and more with Sportsbuz."
+        />
+        <meta
+          name="keywords"
+          content="sports news, live scores, cricket scores, football matches, betting tips, match predictions, Sportsbuz"
+        />
+        <meta name="author" content="Sportsbuz" />
+
+        {/* Canonical */}
+        <link rel="canonical" href="https://www.sportsbuz.com/" />
+
+        {/* Open Graph (for Facebook, LinkedIn, etc.) */}
+        <meta property="og:title" content="Sportsbuz | Live Scores & Betting Tips" />
+        <meta
+          property="og:description"
+          content="Catch live scores and expert predictions for cricket, football and more. Your ultimate sports companion."
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.sportsbuz.com/" />
+        <meta property="og:image" content="https://www.sportsbuz.com/images/logo.png" />
+        <meta property="og:site_name" content="Sportsbuz" />
+
+        {/* Twitter Card (for Twitter/X) */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Sportsbuz | Live Scores & Predictions" />
+        <meta
+          name="twitter:description"
+          content="Live sports scores, news, and betting predictions for cricket, football and more — only on Sportsbuz."
+        />
+        <meta name="twitter:image" content="https://www.sportsbuz.com/images/logo.png" />
+        <meta name="twitter:site" content="@sportsbuz" />
+
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <>
         <HeaderTwo animationStage={animationStage} />
         {showOtherDivs && (

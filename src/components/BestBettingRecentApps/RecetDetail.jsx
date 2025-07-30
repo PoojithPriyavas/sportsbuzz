@@ -6,9 +6,9 @@ import Head from 'next/head';
 import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/router';
 
-export default function RecentAppsDetails({ bestSections = [] }) {
-    const router = useRouter();
-    const sectionId = router.query.id;
+export default function RecentAppsDetails({ bestSections = [], sectionId }) {
+    // const router = useRouter();
+    // const sectionId = router.query.id;
     const [isMobile, setIsMobile] = useState(false);
 
     const [copiedId, setCopiedId] = useState(null);
@@ -109,70 +109,72 @@ export default function RecentAppsDetails({ bestSections = [] }) {
         (section) => String(section.id) === String(sectionId)
     );
 
+    console.log(matchedSection, "trabdkdkd")
+
     if (!matchedSection) {
         return <div className={styles.wrapper}>No section found for ID: {sectionId}</div>;
     }
 
     const renderMobileCards = (apps) => (
+
         <>
+
             <div className={styles.mobileContainer}>
-                {[...apps]
-                    .sort((a, b) => a.order_by - b.order_by)
-                    .map((app) => (
-                        <div className={styles.mobileCard} key={app.id}>
-                            <div className={styles.mobileHeader}>
-                                <div className={styles.mobileRank}>#{app.order_by}</div>
-                                <img
-                                    src={`https://admin.sportsbuz.com${app.image}`}
-                                    alt="Betting App"
-                                    className={styles.mobileLogo}
-                                />
-                                <div className={styles.mobileStars}>
-                                    {'⭐'.repeat(app.rating)}
-                                </div>
-                            </div>
-
-                            <div className={styles.mobileContent}>
-                                <div className={styles.mobileSection}>
-                                    <h4>Features:</h4>
-                                    <div dangerouslySetInnerHTML={{ __html: app.features }} />
-                                </div>
-
-                                <div className={styles.mobileSection}>
-                                    <h4>Welcome Bonus:</h4>
-                                    <div
-                                        className={styles.mobileBonusAmount}
-                                        dangerouslySetInnerHTML={{ __html: app.welcome_bonus }}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className={styles.mobileActions}>
-                                <a
-                                    className={styles.mobileGetBtn}
-                                    href={app.referal_link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    GET BONUS
-                                </a>
-                                <button
-                                    className={styles.mobileCodeBtn}
-                                    onClick={() => handleCopy(app.referall_code, app.id)}
-                                >
-                                    {copiedId === app.id ? 'Copied!' : app.referall_code}
-                                </button>
-                                <button
-                                    className={styles.mobileReviewBtn}
-                                    onClick={() =>
-                                        window.open(app.review_link, '_blank', 'noopener,noreferrer')
-                                    }
-                                >
-                                    Read Review
-                                </button>
+                {[...apps].map((app) => (
+                    <div className={styles.mobileCard} key={app.id}>
+                        <div className={styles.mobileHeader}>
+                            <div className={styles.mobileRank}>#{app.order_by}</div>
+                            <img
+                                src={`https://admin.sportsbuz.com${app.image}`}
+                                alt="Betting App"
+                                className={styles.mobileLogo}
+                            />
+                            <div className={styles.mobileStars}>
+                                {'⭐'.repeat(app.rating)}
                             </div>
                         </div>
-                    ))}
+
+                        <div className={styles.mobileContent}>
+                            <div className={styles.mobileSection}>
+                                <h4>Features:</h4>
+                                <div dangerouslySetInnerHTML={{ __html: app.features }} />
+                            </div>
+
+                            <div className={styles.mobileSection}>
+                                <h4>Welcome Bonus:</h4>
+                                <div
+                                    className={styles.mobileBonusAmount}
+                                    dangerouslySetInnerHTML={{ __html: app.welcome_bonus }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.mobileActions}>
+                            <a
+                                className={styles.mobileGetBtn}
+                                href={app.referal_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                GET BONUS
+                            </a>
+                            <button
+                                className={styles.mobileCodeBtn}
+                                onClick={() => handleCopy(app.referall_code, app.id)}
+                            >
+                                {copiedId === app.id ? 'Copied!' : app.referall_code}
+                            </button>
+                            <button
+                                className={styles.mobileReviewBtn}
+                                onClick={() =>
+                                    window.open(app.review_link, '_blank', 'noopener,noreferrer')
+                                }
+                            >
+                                Read Review
+                            </button>
+                        </div>
+                    </div>
+                ))}
             </div>
             <div
                 className={styles.description}
@@ -258,29 +260,29 @@ export default function RecentAppsDetails({ bestSections = [] }) {
     );
     return (
         <>
-            <Head>
+            {/* <Head>
                 <title>{translatedSections[0]?.metatitle}</title>
                 <meta
                     name="description"
                     content={stripHtml(translatedSections[0]?.meta_description)}
                 />
-            </Head>
+            </Head> */}
 
-            {translatedSections.map((section) => (
-                <div className={styles.wrapper} key={section.id}>
-                    {/* Uncomment to show heading if needed */}
-                    {/* <h2 className={styles.heading}>{section.heading}</h2> */}
+            {/* {translatedSections.map((section) => ( */}
+            <div className={styles.wrapper}>
+                {/* Uncomment to show heading if needed */}
+                {/* <h2 className={styles.heading}>{section.heading}</h2> */}
 
-                    {matchedSection.best_betting_apps?.length > 0 && (
-                        <>
-                            {isMobile
-                                ? renderMobileCards(matchedSection.best_betting_apps)
-                                : renderDesktopTable(matchedSection.best_betting_apps)
-                            }
-                        </>
-                    )}
-                </div>
-            ))}
+                {matchedSection.best_betting_apps?.length > 0 && (
+                    <>
+                        {isMobile
+                            ? renderMobileCards(matchedSection.best_betting_apps)
+                            : renderDesktopTable(matchedSection.best_betting_apps)
+                        }
+                    </>
+                )}
+            </div>
+            {/* ))} */}
         </>
     );
 }

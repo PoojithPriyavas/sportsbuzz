@@ -4,9 +4,9 @@ import Head from 'next/head';
 import { useGlobalData } from '../Context/ApiContext';
 import Link from 'next/link';
 
-export default function BestBettingRecentApps() {
+export default function BestBettingRecentApps({bestSections=[]}) {
     const [copiedId, setCopiedId] = useState(null);
-    const { bestSections } = useGlobalData();
+    // const { bestSections } = useGlobalData();
 
     const handleCopy = (code, id) => {
         navigator.clipboard.writeText(code).then(() => {
@@ -20,10 +20,10 @@ export default function BestBettingRecentApps() {
     return (
         <>
             {/* SEO Meta from the first section */}
-            <Head>
+            {/* <Head>
                 <title>{bestSections[0]?.metatitle}</title>
                 <meta name="description" content={stripHtml(bestSections[0]?.meta_description)} />
-            </Head>
+            </Head> */}
 
             {/* Card Grid Layout */}
             <div className={styles.cardGrid}>
