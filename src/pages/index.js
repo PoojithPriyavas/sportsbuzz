@@ -49,7 +49,9 @@ export default function Home() {
     teamImages,
     upcomingMatches,
     sport,
-    countryCode
+    countryCode,
+    stages,
+    news
   } = useGlobalData();
 
   const [loading, setLoading] = useState(true);
@@ -144,15 +146,18 @@ export default function Home() {
       <>
         <HeaderTwo animationStage={animationStage} />
         {showOtherDivs && (
-          <div 
-          // style={{marginTop:'9.5rem'}}
-           className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
+          <div
+            // style={{marginTop:'9.5rem'}}
+            className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
             {sport === 'cricket' ? (
               <>
-                <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+                {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
               </>
             ) : (
-              <TestLive />
+              <>
+                {stages && <TestLive />}
+              </>
+
             )}
             <HeroCarousal />
 
@@ -171,7 +176,7 @@ export default function Home() {
                       <UpcomingFootballMatches />
                     )} */}
                     <SportsOdsList />
-                    <NewsList />
+                    {news && <NewsList />}
                   </div>
                   <div className={styles.centerSplit}>
                     <BlogSection blogs={blogs} />
