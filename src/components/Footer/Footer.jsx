@@ -162,7 +162,7 @@ const FooterTwo = () => {
                                 </button>
                             </li>
                             <li>
-                                <button className={styles.buttonLi}  onClick={() => handleSportChange('football')}>
+                                <button className={styles.buttonLi} onClick={() => handleSportChange('football')}>
                                     {translatedText.football}
                                 </button>
                             </li>
@@ -193,7 +193,7 @@ const FooterTwo = () => {
                                 </div>
                             )}
 
-                            {contact.whatsapp_number && (
+                            {/* {contact.whatsapp_number && (
                                 <div className={styles.contactItem}>
                                     <FaPhoneAlt className={styles.contactIcon} />
                                     <a
@@ -217,19 +217,19 @@ const FooterTwo = () => {
                                         {contact.whatsapp_number}
                                     </a>
                                 </div>
-                            )}
+                            )} */}
 
                             <div className={styles.contactItem}>
                                 <FaClock className={styles.contactIcon} />
                                 <span>{translatedText.availability}</span>
                             </div>
 
-                            {contact.address && (
+                            {/* {contact.address && (
                                 <div className={styles.contactItem}>
                                     <FaMapMarkerAlt className={styles.contactIcon} />
                                     <span>{contact.address}</span>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>

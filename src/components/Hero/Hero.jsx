@@ -15,9 +15,9 @@ const HeroSection = () => {
                 <button className={styles.heroButton}>Call to Action</button> */}
             </div>
             <div className={styles.heroImageContainer}>
-                <div className={styles.overlay}></div>
+                {/* <div className={styles.overlay}></div> */}
                 <img
-                    src="/contact.jpg"
+                    src="/contact.png"
                     alt="Hero visual"
                     className={styles.heroImage}
                 />

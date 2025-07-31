@@ -18,15 +18,7 @@ export default function BlogDetailsPage({ blog }) {
 
     return (
         <div >
-            {/* <div className={styles.left}>
-                <BlogDetailContent blog={blog} />
-                <BlogSlider />
-            </div>
-            <div className={styles.right}>
-                <JoinTelegramButton />
-                <BettingCard />
-                <UpcomingFootballMatches />
-            </div> */}
+
             <div className={styles.fourColumnRow}>
                 <div className={styles.leftThreeColumns}>
                     <BlogDetailContent blog={blog} />

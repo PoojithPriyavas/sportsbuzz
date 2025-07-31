@@ -7,15 +7,16 @@
     background-color: #f0f0f0;
     position: relative;
     aspect-ratio: 10/2 !important;
-    min-height: 300px; /* Ensure minimum height */
+    min-height: 300px;
+    /* Ensure minimum height */
 }
 
-.overlay {
+/* .overlay {
     position: absolute;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.2);
     z-index: 1;
-}
+} */
 
 .heroImageContainer {
     width: 100%;
@@ -46,7 +47,7 @@
 
 .heroTitle {
     font-size: clamp(2rem, 8vw, 80px);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); */
     margin-bottom: 1rem;
 }
 
@@ -74,19 +75,20 @@
 
 @media (max-width: 768px) {
     .hero {
-        aspect-ratio: 3/2; /* More square aspect ratio for mobile */
+        aspect-ratio: 3/2;
+        /* More square aspect ratio for mobile */
         min-height: 250px;
     }
-    
+
     .heroTitle {
         font-size: clamp(1.8rem, 6vw, 2.5rem);
     }
-    
+
     .heroSubtitle {
         font-size: clamp(0.85rem, 2vw, 1rem);
         margin-bottom: 1rem;
     }
-    
+
     .heroContent {
         padding: 1rem;
         /* Keep absolute positioning */
@@ -98,18 +100,18 @@
         aspect-ratio: 4/3;
         min-height: 200px;
     }
-    
+
     .heroTitle {
         font-size: clamp(1.5rem, 5vw, 2rem);
         margin-bottom: 0.5rem;
     }
-    
+
     .heroSubtitle {
         font-size: clamp(0.8rem, 1.8vw, 0.9rem);
         margin-bottom: 0.8rem;
         line-height: 1.4;
     }
-    
+
     .heroContent {
         padding: 0.5rem;
     }

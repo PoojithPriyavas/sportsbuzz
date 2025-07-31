@@ -79,8 +79,8 @@ const NewsList = () => {
   };
 
   const openNews = async (item) => {
-    // await fetchNewsDetails(item.id);
-    // const slug = item.hline.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    await fetchNewsDetails(item.id);
+    const slug = item.hline.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     router.push(`/news/${item.id}`);
   };
 

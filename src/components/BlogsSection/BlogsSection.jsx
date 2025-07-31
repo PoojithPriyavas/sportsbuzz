@@ -40,27 +40,32 @@ export default function BlogSection({ blogs = [] }) {
         </Link>
       </div>
 
-      <div className={styles.featuredBlog}>
-        <Link href={`/blog-details/${featuredBlog.slug}`}>
+      {/* Featured Blog - using same card style but full width */}
+      <div className={styles.featuredContainer}>
+        <Link
+          href={`/blog-details/${featuredBlog.slug}`}
+          className={`${styles.blogCard} ${styles.featuredCard}`}
+          key={featuredBlog.id}
+        >
           <div className={styles.image}>
             <img
               src={featuredBlog.image}
               alt={featuredBlog.alt_big || featuredBlog.title}
-              className={styles.featuredImg}
             />
           </div>
           <div className={styles.content}>
-            <h4>{featuredBlog.title}</h4>
+            <h5>{featuredBlog.title}</h5>
             <p>
               {featuredBlog.author} <span>· {featuredBlog.date}</span>
             </p>
-            <Link href={`/blog-details/${featuredBlog.slug}`}>Read More</Link>
+            <span className={styles.readMore}>Read More</span>
           </div>
         </Link>
       </div>
 
+      {/* Regular blog grid - 2 columns */}
       <div className={styles.blogGrid}>
-        {otherBlogs.slice(0,4).map((blog) => (
+        {otherBlogs.map((blog) => (
           <Link
             href={`/blog-details/${blog.slug}`}
             key={blog.id}
@@ -72,7 +77,7 @@ export default function BlogSection({ blogs = [] }) {
             <div className={styles.content}>
               <h5>{blog.title}</h5>
               <p>
-                {blog.author} <span>{blog.date}</span>
+                {blog.author} <span>· {blog.date}</span>
               </p>
               <span className={styles.readMore}>Read More</span>
             </div>

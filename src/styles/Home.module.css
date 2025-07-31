@@ -31,6 +31,13 @@
   /* Prevent flex item from overflowing */
 }
 
+.description {
+  color: #000;
+  padding: 25px 0px;
+  text-align: justify;
+  line-height: 2rem;
+}
+
 /* Inside leftThreeColumns: 2-column split */
 .twoSplitRow {
   display: flex;
@@ -90,19 +97,23 @@
     flex-direction: column;
     gap: 1rem;
     width: 100%;
-    height: auto; /* Let content determine height */
+    height: auto;
+    /* Let content determine height */
   }
 
   .fourthColumnRight {
-    flex: 0 0 auto; /* Don't grow or shrink, size based on content */
+    flex: 0 0 auto;
+    /* Don't grow or shrink, size based on content */
     width: 100%;
-    aspect-ratio: 2/3; /* Maintain 2:3 aspect ratio */
+    aspect-ratio: 2/3;
+    /* Maintain 2:3 aspect ratio */
     overflow: hidden;
     /* Remove max-height constraint that was cutting the height */
   }
 
   .fourthColumnLeft {
-    flex: 0 0 auto; /* Don't grow or shrink, size based on content */
+    flex: 0 0 auto;
+    /* Don't grow or shrink, size based on content */
     width: 100%;
   }
 }
@@ -205,7 +216,8 @@
   .fourthColumn {
     gap: 0.5rem;
   }
-/* 
+
+  /* 
   .offHeader {
     margin-top: 5rem !important;
   } */

@@ -139,6 +139,10 @@ export default function BestBettingApps({ sections }) {
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
                         <BettingAppsTable sections={sections} />
+                        <div
+                            className={styles.description}
+                            dangerouslySetInnerHTML={{ __html: sections?.[0]?.description }}
+                        />
                     </div>
                     <div className={styles.fourthColumn} >
                         <div className={styles.fourthColumnTwoColumns}>

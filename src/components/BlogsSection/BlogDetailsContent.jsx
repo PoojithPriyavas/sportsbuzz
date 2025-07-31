@@ -1,19 +1,12 @@
 'use client';
-
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useGlobalData } from '../Context/ApiContext';
 import styles from './BlogDetailContent.module.css';
 import Head from 'next/head';
 
-
-
 export default function BlogDetailContent({ blog }) {
   const { translateText, language } = useGlobalData();
-  // const params = useParams();
-  // const slug = params?.slug;
-
-  // const blog = blogs?.find((item) => item.slug === slug);
   const [translatedBlog, setTranslatedBlog] = useState(null);
 
   useEffect(() => {
@@ -54,28 +47,18 @@ export default function BlogDetailContent({ blog }) {
 
   return (
     <>
-      {/* <Head>
-        <title>{translatedBlog.meta_title}</title>
-        <meta name="description" content={translatedBlog.meta_desc} />
-        <meta name="keywords" content={translatedBlog.tags?.join(', ')} />
-        <meta property="og:title" content={translatedBlog.meta_title} />
-        <meta property="og:description" content={translatedBlog.meta_desc} />
-        <meta property="og:image" content={translatedBlog.image_big || translatedBlog.image} />
-      </Head> */}
-
       <div className={styles.blogContent}>
         <h1 className={styles.title}>{translatedBlog.title}</h1>
 
-        {translatedBlog.image && (
-          <div className={styles.thumbnail}>
+        {translatedBlog.image_big && (
+          <div className={styles.thumbnailContainer}>
             <img
               src={translatedBlog.image_big}
               alt={translatedBlog.alt_big || 'Blog thumbnail'}
-              className={styles.thumbnailImg}
+              className={styles.thumbnail}
             />
           </div>
         )}
-
 
         <div
           className={styles.description}

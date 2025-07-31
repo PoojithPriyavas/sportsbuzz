@@ -8,7 +8,7 @@ import { useGlobalData } from '../Context/ApiContext';
 const SkeletonLoader = ({ styles }) => {
     return (
         <div className={styles.skeletonContainer}>
-            {[1, 2, 3, 4].map((index) => (
+            {[1, 2,].map((index) => (
                 <div key={index} className={styles.skeletonCard}>
                     {/* Header Skeleton */}
                     <div className={styles.skeletonHeader}>
@@ -410,10 +410,10 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
             <div className={styles.header}>
                 <div className={styles.headerRow}>
                     <div className={styles.poweredBy}>
-                        <div className={styles.logoCircle}>
+                        {/* <div className={styles.logoCircle}>
                             <span className={styles.logoText}>1X</span>
-                        </div>
-                        <span className={styles.poweredText}>POWERED BY 1XBET</span>
+                        </div> */}
+                        <span className={styles.poweredText}>POWERED BY Bet Label</span>
                     </div>
                     <span className={styles.date}>{card.matchInfo}</span>
                 </div>
@@ -429,7 +429,7 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                     <div className={styles.teamLeft}>
                         <div className={styles.abbrCircle}>
                             {/* {card.team1.code} */}
-                            <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team1.logo}`} alt={card.team1.name} className={styles.teamLogo}/>
+                            <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team1.logo}`} alt={card.team1.name} className={styles.teamLogo} />
                         </div>
                         <span className={styles.teamName}>{card.team1.name}</span>
                     </div>
@@ -437,8 +437,8 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                     <div className={styles.teamRight}>
                         <span className={styles.teamName} style={{ textAlign: "end" }}>{card.team2.name}</span>
                         <div className={styles.abbrCircleRight}>
-                        {/* {card.team2.code} */}
-                         <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogo}/>
+                            {/* {card.team2.code} */}
+                            <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogo} />
                         </div>
                     </div>
                 </div>

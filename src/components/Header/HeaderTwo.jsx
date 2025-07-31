@@ -16,11 +16,11 @@ const HeaderTwo = ({ animationStage }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState(null);
-    
+
     // New state for mobile dropdown selectors
     const [expandedLanguageSelector, setExpandedLanguageSelector] = useState(false);
     const [expandedSportsSelector, setExpandedSportsSelector] = useState(false);
-    
+
     // New state to track if animation should play
     const [shouldPlayAnimation, setShouldPlayAnimation] = useState(false);
     const [currentAnimationStage, setCurrentAnimationStage] = useState('header');
@@ -51,21 +51,21 @@ const HeaderTwo = ({ animationStage }) => {
     // Check if animation should play on component mount
     useEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
-        
+
         if (!hasPlayedAnimation) {
             // First time - play the full animation
             setShouldPlayAnimation(true);
             setCurrentAnimationStage('loading');
-            
+
             // Animation sequence
             setTimeout(() => {
                 setCurrentAnimationStage('logoReveal');
             }, 1000);
-            
+
             setTimeout(() => {
                 setCurrentAnimationStage('transition');
             }, 2500);
-            
+
             setTimeout(() => {
                 setCurrentAnimationStage('header');
                 // Mark animation as played
@@ -319,13 +319,13 @@ const HeaderTwo = ({ animationStage }) => {
     const renderMobileMenu = () => (
         <>
             {/* Mobile Overlay */}
-            <div 
+            <div
                 className={`${styles.mobileOverlay} ${mobileMenuOpen ? styles.open : ''}`}
                 onClick={() => setMobileMenuOpen(false)}
             />
 
             {/* Mobile Sidebar */}
-            <div 
+            <div
                 ref={sidebarRef}
                 className={`${styles.mobileSidebar} ${mobileMenuOpen ? styles.open : ''}`}
             >
@@ -336,7 +336,7 @@ const HeaderTwo = ({ animationStage }) => {
                             <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                         </div>
                     </div>
-                    <button 
+                    <button
                         className={styles.mobileCloseButton}
                         onClick={() => setMobileMenuOpen(false)}
                     >
@@ -346,8 +346,8 @@ const HeaderTwo = ({ animationStage }) => {
 
                 {/* Mobile Navigation Links */}
                 <div className={styles.mobileNavLinks}>
-                    <Link 
-                        href="/" 
+                    <Link
+                        href="/"
                         className={`${styles.mobileNavItem} ${pathname === '/' ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
@@ -355,8 +355,8 @@ const HeaderTwo = ({ animationStage }) => {
                     </Link>
 
                     {countryCode?.location?.betting_apps === 'Active' && (
-                        <Link 
-                            href="/best-betting-apps/current" 
+                        <Link
+                            href="/best-betting-apps/current"
                             className={`${styles.mobileNavItem} ${pathname === '/best-betting-apps/current' ? styles.active : ''}`}
                             onClick={handleNavItemClick}
                         >
@@ -364,8 +364,8 @@ const HeaderTwo = ({ animationStage }) => {
                         </Link>
                     )}
 
-                    <Link 
-                        href="/match-schedules" 
+                    <Link
+                        href="/match-schedules"
                         className={`${styles.mobileNavItem} ${pathname === '/match-schedules' ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
@@ -375,7 +375,7 @@ const HeaderTwo = ({ animationStage }) => {
                     {/* Mobile Dropdown Categories */}
                     {translatedCategories.map((cat) => (
                         <div key={cat.id} className={styles.mobileDropdown}>
-                            <div 
+                            <div
                                 className={styles.mobileDropdownHeader}
                                 onClick={() => toggleCategory(cat.id)}
                             >
@@ -386,11 +386,11 @@ const HeaderTwo = ({ animationStage }) => {
                                     {capitalizeFirstLetter(cat.name)}
                                 </Link>
                                 {cat.subcategories?.length > 0 && (
-                                    <FaChevronDown 
-                                        style={{ 
+                                    <FaChevronDown
+                                        style={{
                                             transform: expandedCategory === cat.id ? 'rotate(180deg)' : 'rotate(0deg)',
                                             transition: 'transform 0.2s ease'
-                                        }} 
+                                        }}
                                     />
                                 )}
                             </div>
@@ -412,8 +412,8 @@ const HeaderTwo = ({ animationStage }) => {
                         </div>
                     ))}
 
-                    <Link 
-                        href="/contact" 
+                    <Link
+                        href="/contact"
                         className={`${styles.mobileNavItem} ${pathname === '/contact' ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
@@ -425,16 +425,16 @@ const HeaderTwo = ({ animationStage }) => {
                 <div className={styles.mobileSelectors}>
                     {/* Language Dropdown */}
                     <div className={styles.mobileDropdown}>
-                        <div 
+                        <div
                             className={styles.mobileDropdownHeader}
                             onClick={toggleLanguageSelector}
                         >
                             <span>{translatedText.language}: {getCurrentLanguageDisplay()}</span>
-                            <FaChevronDown 
-                                style={{ 
+                            <FaChevronDown
+                                style={{
                                     transform: expandedLanguageSelector ? 'rotate(180deg)' : 'rotate(0deg)',
                                     transition: 'transform 0.2s ease'
-                                }} 
+                                }}
                             />
                         </div>
                         <div className={`${styles.mobileSubmenu} ${expandedLanguageSelector ? styles.open : ''}`}>
@@ -452,16 +452,16 @@ const HeaderTwo = ({ animationStage }) => {
 
                     {/* Sports Dropdown */}
                     <div className={styles.mobileDropdown}>
-                        <div 
+                        <div
                             className={styles.mobileDropdownHeader}
                             onClick={toggleSportsSelector}
                         >
                             <span>{translatedText.sport}: {getCurrentSportDisplay()}</span>
-                            <FaChevronDown 
-                                style={{ 
+                            <FaChevronDown
+                                style={{
                                     transform: expandedSportsSelector ? 'rotate(180deg)' : 'rotate(0deg)',
                                     transition: 'transform 0.2s ease'
-                                }} 
+                                }}
                             />
                         </div>
                         <div className={`${styles.mobileSubmenu} ${expandedSportsSelector ? styles.open : ''}`}>
@@ -533,7 +533,7 @@ const HeaderTwo = ({ animationStage }) => {
                 <div className={styles.mobileTopRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <FeaturedButton />
-                        <button 
+                        <button
                             className={styles.mobileMenuButton}
                             onClick={toggleMobileMenu}
                         >
@@ -613,7 +613,7 @@ const HeaderTwo = ({ animationStage }) => {
                         <option value="cricket">{translatedText.cricket}</option>
                         <option value="football">{translatedText.football}</option>
                     </select>
-                    
+
                     <Link href="/contact" className={`${styles.navItem} ${pathname === '/contact' ? styles.active : ''}`}>
                         {translatedText.contact}
                     </Link>

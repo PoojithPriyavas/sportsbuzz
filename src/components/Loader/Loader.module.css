@@ -39,9 +39,11 @@
   width: 100%;
   padding: 20px;
   min-height: 70px;
-  overflow: visible; /* Changed from hidden to visible */
+  overflow: visible;
+  /* Changed from hidden to visible */
   position: relative;
-  z-index: 10000; /* Ensure header is above other content */
+  z-index: 10000;
+  /* Ensure header is above other content */
 }
 
 /* Left Section: Logo + Navigation */
@@ -91,8 +93,10 @@
   align-items: center;
   opacity: 0;
   transition: opacity 0.5s ease;
-  position: relative; /* Add positioning context */
-  z-index: 10001; /* Higher than header */
+  position: relative;
+  /* Add positioning context */
+  z-index: 10001;
+  /* Higher than header */
 }
 
 .separator {
@@ -118,7 +122,8 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  position: relative; /* Add positioning for active state */
+  position: relative;
+  /* Add positioning for active state */
 }
 
 .navItem:hover {
@@ -151,7 +156,7 @@
   opacity: 0;
   transition: opacity 0.5s ease;
   max-width: calc(100vw - 40px);
-  overflow: visible; 
+  overflow: visible;
   z-index: 10001;
 }
 
@@ -166,8 +171,10 @@
   cursor: pointer;
   outline: none;
   transition: all 0.3s ease;
-  position: relative; /* Add positioning context */
-  z-index: 10002; /* Higher z-index for dropdowns */
+  position: relative;
+  /* Add positioning context */
+  z-index: 10002;
+  /* Higher z-index for dropdowns */
 }
 
 .languageSelector:hover,
@@ -199,7 +206,8 @@
 /* Dropdown - MAIN FIX HERE */
 .dropdown {
   position: relative;
-  z-index: 10002; /* Ensure dropdown container has high z-index */
+  z-index: 10002;
+  /* Ensure dropdown container has high z-index */
 }
 
 .submenu {
@@ -213,12 +221,15 @@
   padding: 8px 0;
   min-width: 160px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 10003; /* HIGHEST z-index for submenu */
+  z-index: 10003;
+  /* HIGHEST z-index for submenu */
   list-style: none;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-5px) translateZ(0); /* Reduced transform, added translateZ for GPU */
-  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease; /* Separate transitions */
+  transform: translateY(-5px) translateZ(0);
+  /* Reduced transform, added translateZ for GPU */
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  /* Separate transitions */
   /* Remove blur and improve rendering */
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
@@ -232,7 +243,8 @@
 .dropdown:hover .submenu {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0) translateZ(0); /* Match the translateZ */
+  transform: translateY(0) translateZ(0);
+  /* Match the translateZ */
 }
 
 .submenuItem {
@@ -277,7 +289,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  overflow: visible; /* Ensure dropdowns can overflow */
+  overflow: visible;
+  /* Ensure dropdowns can overflow */
 }
 
 .shrink .loaderGif {
@@ -302,7 +315,8 @@
   position: static;
   max-width: none;
   flex-shrink: 0;
-  overflow: visible; /* Allow overflow for dropdowns */
+  overflow: visible;
+  /* Allow overflow for dropdowns */
 }
 
 /* Phase: Complete */
@@ -311,7 +325,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  overflow: visible; /* Ensure dropdowns can overflow */
+  overflow: visible;
+  /* Ensure dropdowns can overflow */
 }
 
 .complete .loaderGif {
@@ -333,7 +348,8 @@
   position: static;
   max-width: none;
   flex-shrink: 0;
-  overflow: visible; /* Allow overflow for dropdowns */
+  overflow: visible;
+  /* Allow overflow for dropdowns */
 }
 
 /* Additional fix: Ensure any content below header has lower z-index */
@@ -341,7 +357,8 @@
 .content-wrapper,
 .page-content {
   position: relative;
-  z-index: 1; /* Much lower than header */
+  z-index: 1;
+  /* Much lower than header */
 }
 
 /* Responsive */
@@ -364,7 +381,8 @@
     right: 15px;
     gap: 10px;
     max-width: calc(100vw - 30px);
-    overflow: visible; /* Allow overflow for dropdowns */
+    overflow: visible;
+    /* Allow overflow for dropdowns */
   }
 
   .languageSelector,

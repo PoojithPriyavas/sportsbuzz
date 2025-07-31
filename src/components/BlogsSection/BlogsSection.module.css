@@ -1,122 +1,12 @@
 .wrapper {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
 }
 
-.featuredBlog {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.featuredBlog .image {
-    height: 200px;
-    background: #ddd;
-}
-
-/* .featuredBlog .content {
-    padding: 1rem;
-    background: #fff;
-    position: relative;
-} */
-
-.featuredBlog .content {
-    padding: 1rem;
-    background: linear-gradient(to bottom, transparent, #000000);
-    position: relative;
-}
-
-
-
-
-.featuredBlog .content h4 {
-    color: rgb(255, 255, 255);
-    padding-bottom: 5px;
-}
-
-.featuredBlog .content p {
-    color: rgb(255, 255, 255);
-    padding-bottom: 5px;
-}
-
-.featuredBlog .content a {
-    color: rgb(247, 247, 247);
-    padding-bottom: 5px;
-}
-
-/* .blogGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-} */
-
-.blogGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
-}
-
-
-.blogCard {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* .blogCard .image {
-    aspect-ratio: 5 / 1;
-    height: 100px;
-    background: #eee;
-} */
-
-.blogCard .image {
-    height: 135px;
-    width: 100%;
-    background: #eee;
-    overflow: hidden;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-}
-
-.blogCard .image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-
-.blogCard .content {
-    padding: 0.75rem;
-    font-size: 14px;
-    position: relative;
-    background-color: #fff;
-}
-
-.blogCard .content h5 {
-    color: rgb(27, 27, 27);
-    padding-bottom: 5px;
-}
-
-.blogCard .content p {
-    color: rgb(118, 115, 115);
-    padding-bottom: 5px;
-}
-
-.blogCard .content span {
-    color: rgb(178, 178, 178);
-    padding-bottom: 5px;
-}
-
-.blogCard .content a {
-    color: rgb(72, 71, 71);
-    padding-bottom: 5px;
-}
-
-
-/* Header row for Latest Blogs and View All */
 .headingRow {
     display: flex;
     justify-content: space-between;
@@ -125,19 +15,126 @@
 }
 
 .headingRow h3 {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 1.5rem;
+    font-weight: 600;
     color: #222;
 }
 
 .viewAll {
-    font-size: 14px;
+    font-size: 1rem;
     color: #0070f3;
     text-decoration: none;
+    font-weight: 500;
 }
 
 .viewAll:hover {
     text-decoration: underline;
 }
 
-/* Keep existing styles for .featuredBlog, .blogGrid, .blogCard, etc. */
+/* Featured blog container */
+.featuredContainer {
+    width: 100%;
+}
+
+/* Blog grid layout */
+.blogGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .blogGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Blog card styles */
+.blogCard {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.blogCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Featured card specific styles */
+.featuredCard {
+    grid-column: 1 / -1;
+}
+
+.blogCard .image {
+    height: 180px;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.featuredCard .image {
+    height: 500px;
+}
+
+.blogCard .image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.blogCard:hover .image img {
+    transform: scale(1.05);
+}
+
+.blogCard .content {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.blogCard .content h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #222;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+}
+
+.blogCard .content p {
+    color: #666;
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.blogCard .content span {
+    color: #999;
+}
+
+.readMore {
+    color: #0070f3;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: auto;
+    align-self: flex-start;
+    font-size: 0.9rem;
+    padding-top: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .blogGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .featuredCard .image {
+        height: 200px;
+    }
+}
