@@ -9,6 +9,15 @@ export default function BonusTable({ sections }) {
   const [translatedSections, setTranslatedSections] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [translatedHeaders, setTranslatedHeaders] = useState({
+    rank: 'Rank',
+    site: 'Site',
+    features: 'Features',
+    welcomeBonus: 'Welcome Bonus',
+    betNow: 'Bet Now',
+    getBonus: 'GET BONUS',
+    readReview: 'Read Review',
+  });
   const { translateText, language } = useGlobalData();
 
   // Check if mobile view
@@ -21,6 +30,28 @@ export default function BonusTable({ sections }) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Translate table headers when language changes
+  useEffect(() => {
+    const translateHeaders = async () => {
+      try {
+        const headers = {
+          rank: await translateText('Rank'),
+          site: await translateText('Site'),
+          features: await translateText('Features'),
+          welcomeBonus: await translateText('Welcome Bonus'),
+          betNow: await translateText('Bet Now'),
+          getBonus: await translateText('GET BONUS'),
+          readReview: await translateText('Read Review'),
+        };
+        setTranslatedHeaders(headers);
+      } catch (error) {
+        console.error('Header translation error:', error);
+      }
+    };
+
+    translateHeaders();
+  }, [translateText, language]);
 
   // Translate content when sections or language changes
   useEffect(() => {
@@ -185,12 +216,12 @@ export default function BonusTable({ sections }) {
             
             <div className={styles.mobileContent}>
               <div className={styles.mobileSection}>
-                <h4>Features:</h4>
+                <h4>{translatedHeaders.features}:</h4>
                 <div dangerouslySetInnerHTML={{ __html: app.features }} />
               </div>
               
               <div className={styles.mobileSection}>
-                <h4>Welcome Bonus:</h4>
+                <h4>{translatedHeaders.welcomeBonus}:</h4>
                 <div 
                   className={styles.mobileBonusAmount}
                   dangerouslySetInnerHTML={{ __html: app.welcome_bonus }}
@@ -205,7 +236,7 @@ export default function BonusTable({ sections }) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                GET BONUS
+                {translatedHeaders.getBonus}
               </a>
               <button
                 className={styles.mobileCodeBtn}
@@ -219,7 +250,7 @@ export default function BonusTable({ sections }) {
                   window.open(app.review_link, '_blank', 'noopener,noreferrer')
                 }
               >
-                Read Review
+                {translatedHeaders.readReview}
               </button>
             </div>
           </div>
@@ -233,11 +264,11 @@ export default function BonusTable({ sections }) {
       <table className={styles.table}>
         <thead>
           <tr className={styles.headerRow}>
-            <th>Rank</th>
-            <th>Site</th>
-            <th>Features</th>
-            <th>Welcome Bonus</th>
-            <th>Bet Now</th>
+            <th>{translatedHeaders.rank}</th>
+            <th>{translatedHeaders.site}</th>
+            <th>{translatedHeaders.features}</th>
+            <th>{translatedHeaders.welcomeBonus}</th>
+            <th>{translatedHeaders.betNow}</th>
           </tr>
         </thead>
         <tbody>
@@ -269,7 +300,7 @@ export default function BonusTable({ sections }) {
                       window.open(app.review_link, '_blank', 'noopener,noreferrer')
                     }
                   >
-                    Read Review
+                    {translatedHeaders.readReview}
                   </button>
                   <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
                 </td>
@@ -280,7 +311,7 @@ export default function BonusTable({ sections }) {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    GET BONUS
+                    {translatedHeaders.getBonus}
                   </a>
                   <button
                     className={styles.codeBtn}

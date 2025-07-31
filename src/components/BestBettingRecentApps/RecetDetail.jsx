@@ -117,9 +117,7 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
     }
 
     const renderMobileCards = (apps) => (
-
         <>
-
             <div className={styles.mobileContainer}>
                 {[...apps].map((app) => (
                     <div className={styles.mobileCard} key={app.id}>
@@ -137,12 +135,12 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
 
                         <div className={styles.mobileContent}>
                             <div className={styles.mobileSection}>
-                                <h4>Features:</h4>
+                                <h4>{staticLabels.Features}:</h4>
                                 <div dangerouslySetInnerHTML={{ __html: app.features }} />
                             </div>
 
                             <div className={styles.mobileSection}>
-                                <h4>Welcome Bonus:</h4>
+                                <h4>{staticLabels['Welcome Bonus']}:</h4>
                                 <div
                                     className={styles.mobileBonusAmount}
                                     dangerouslySetInnerHTML={{ __html: app.welcome_bonus }}
@@ -157,13 +155,13 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
-                                GET BONUS
+                                {staticLabels['GET BONUS']}
                             </a>
                             <button
                                 className={styles.mobileCodeBtn}
                                 onClick={() => handleCopy(app.referall_code, app.id)}
                             >
-                                {copiedId === app.id ? 'Copied!' : app.referall_code}
+                                {copiedId === app.id ? staticLabels['Copied!'] : app.referall_code}
                             </button>
                             <button
                                 className={styles.mobileReviewBtn}
@@ -171,7 +169,7 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
                                     window.open(app.review_link, '_blank', 'noopener,noreferrer')
                                 }
                             >
-                                Read Review
+                                {staticLabels['Read Review']}
                             </button>
                         </div>
                     </div>
@@ -191,11 +189,11 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
                 <table className={styles.table}>
                     <thead>
                         <tr className={styles.headerRow}>
-                            <th>Rank</th>
-                            <th>Site</th>
-                            <th>Features</th>
-                            <th>Welcome Bonus</th>
-                            <th>Bet Now</th>
+                            <th>{staticLabels.Rank}</th>
+                            <th>{staticLabels.Site}</th>
+                            <th>{staticLabels.Features}</th>
+                            <th>{staticLabels['Welcome Bonus']}</th>
+                            <th>{staticLabels['Bet Now']}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -227,7 +225,7 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
                                                 window.open(app.review_link, '_blank', 'noopener,noreferrer')
                                             }
                                         >
-                                            Read Review
+                                            {staticLabels['Read Review']}
                                         </button>
                                         <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
                                     </td>
@@ -238,20 +236,19 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
-                                            GET BONUS
+                                            {staticLabels['GET BONUS']}
                                         </a>
                                         <button
                                             className={styles.codeBtn}
                                             onClick={() => handleCopy(app.referall_code, app.id)}
                                         >
-                                            {copiedId === app.id ? 'Copied!' : app.referall_code}
+                                            {copiedId === app.id ? staticLabels['Copied!'] : app.referall_code}
                                         </button>
                                     </td>
                                 </tr>
                             ))}
                     </tbody>
                 </table>
-
             </div>
             <div
                 className={styles.description}
@@ -259,21 +256,10 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
             />
         </>
     );
+
     return (
         <>
-            {/* <Head>
-                <title>{translatedSections[0]?.metatitle}</title>
-                <meta
-                    name="description"
-                    content={stripHtml(translatedSections[0]?.meta_description)}
-                />
-            </Head> */}
-
-            {/* {translatedSections.map((section) => ( */}
             <div className={styles.wrapper}>
-                {/* Uncomment to show heading if needed */}
-                {/* <h2 className={styles.heading}>{section.heading}</h2> */}
-
                 {matchedSection.best_betting_apps?.length > 0 && (
                     <>
                         {isMobile
@@ -283,7 +269,6 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
                     </>
                 )}
             </div>
-            {/* ))} */}
         </>
     );
 }

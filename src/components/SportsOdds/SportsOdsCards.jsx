@@ -285,7 +285,7 @@ export default function BettingCards() {
                         />
                     ))
                 ) : (
-                    <LoadingMessage 
+                    <LoadingMessage
                         message={translatedText.noEvents}
                         subMessage="Try selecting a different tournament"
                         styles={styles}
@@ -298,6 +298,8 @@ export default function BettingCards() {
 
 // ... rest of your existing functions (transformEventToCard, fetchMarketData, SportsOddsCard)
 function transformEventToCard(event, marketData) {
+    console.log(event.imageOpponent2[0], "eve");
+    console.log(marketData, "market dtaaasd")
     const isLive = event.waitingLive || event.period > 0;
     const startDate = new Date(event.startDate * 1000);
     const defaultOdds = [
@@ -327,11 +329,13 @@ function transformEventToCard(event, marketData) {
         matchInfo: `${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`,
         team1: {
             code: event.opponent1NameLocalization?.slice(0, 3).toUpperCase() || 'T1',
-            name: event.opponent1NameLocalization || 'Team 1'
+            name: event.opponent1NameLocalization || 'Team 1',
+            logo: event.imageOpponent1[0]
         },
         team2: {
             code: event.opponent2NameLocalization?.slice(0, 3).toUpperCase() || 'T2',
-            name: event.opponent2NameLocalization || 'Team 2'
+            name: event.opponent2NameLocalization || 'Team 2',
+            logo: event.imageOpponent2[0]
         },
         oddsTitle: 'Match Winner',
         odds,
@@ -351,6 +355,7 @@ async function fetchMarketData(token, sportEventId) {
 }
 
 const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced }) => {
+    console.log(card, "craddrssdsdsd")
     const [selectedOdd, setSelectedOdd] = useState(null);
     const [betAmount, setBetAmount] = useState('');
     const [win, setWin] = useState('0.00');
@@ -422,13 +427,19 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
 
                 <div className={styles.teamsRow}>
                     <div className={styles.teamLeft}>
-                        <div className={styles.abbrCircle}>{card.team1.code}</div>
+                        <div className={styles.abbrCircle}>
+                            {/* {card.team1.code} */}
+                            <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team1.logo}`} alt={card.team1.name} className={styles.teamLogo}/>
+                        </div>
                         <span className={styles.teamName}>{card.team1.name}</span>
                     </div>
 
                     <div className={styles.teamRight}>
                         <span className={styles.teamName} style={{ textAlign: "end" }}>{card.team2.name}</span>
-                        <div className={styles.abbrCircleRight}>{card.team2.code}</div>
+                        <div className={styles.abbrCircleRight}>
+                        {/* {card.team2.code} */}
+                         <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogo}/>
+                        </div>
                     </div>
                 </div>
 

@@ -158,7 +158,7 @@ export default function BettingCards() {
             <div className={styles.skeletonCard}>
                 <div className={`${styles.skeleton} ${styles.skeletonProvider}`}></div>
                 <div className={`${styles.skeleton} ${styles.skeletonMatchHeader}`}></div>
-                
+
                 <div className={styles.teamsSection}>
                     <div className={styles.teamsContainer}>
                         <div className={styles.skeletonTeam}>
@@ -302,11 +302,13 @@ function transformEventToCard(event, marketData) {
         matchInfo: `${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`,
         team1: {
             code: event.opponent1NameLocalization?.slice(0, 3).toUpperCase() || 'T1',
-            name: event.opponent1NameLocalization || 'Team 1'
+            name: event.opponent1NameLocalization || 'Team 1',
+            logo: event.imageOpponent1[0]
         },
         team2: {
             code: event.opponent2NameLocalization?.slice(0, 3).toUpperCase() || 'T2',
-            name: event.opponent2NameLocalization || 'Team 2'
+            name: event.opponent2NameLocalization || 'Team 2',
+            logo: event.imageOpponent2[0]
         },
         oddsTitle: 'Match Winner',
         odds,
@@ -394,12 +396,18 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
             <div className={styles.teamsSection}>
                 <div className={styles.teamsContainer}>
                     <div className={styles.team}>
-                        <div className={styles.teamLogo}>{card.team1.code}</div>
+                        <div className={styles.teamLogo}>
+                            {/* {card.team1.code} */}
+                            <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team1.logo}`} alt={card.team1.name} className={styles.teamLogoImg} />
+                        </div>
                         <div className={styles.teamName}>{card.team1.name}</div>
                     </div>
                     <div className={styles.vs}>{translatedText.vs}</div>
                     <div className={styles.team}>
-                        <div className={`${styles.teamLogo} ${styles.away}`}>{card.team2.code}</div>
+                        <div className={`${styles.teamLogo} ${styles.away}`}>
+                        {/* {card.team2.code} */}
+                         <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogoImg}/>
+                        </div>
                         <div className={styles.teamName}>{card.team2.name}</div>
                     </div>
                 </div>

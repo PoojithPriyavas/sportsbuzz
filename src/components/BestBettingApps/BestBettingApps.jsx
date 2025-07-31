@@ -18,6 +18,7 @@ export default function BettingAppsTable({ sections = [] }) {
         'GET BONUS': 'GET BONUS',
         'Copied!': 'Copied!'
     });
+
     // Check if mobile view
     useEffect(() => {
         const checkMobile = () => {
@@ -73,7 +74,7 @@ export default function BettingAppsTable({ sections = [] }) {
 
                     const translatedApps = await Promise.all(
                         (section.best_betting_apps || [])
-                            .sort((a, b) => a.order_by - b.order_by) // <-- Sort apps here
+                            .sort((a, b) => a.order_by - b.order_by)
                             .map(async (app) => {
                                 const translatedFeatures = await translateText(app.features || '', 'en', language, true); // HTML
                                 const translatedBonus = await translateText(app.welcome_bonus || '', 'en', language, true); // HTML
@@ -102,8 +103,6 @@ export default function BettingAppsTable({ sections = [] }) {
             translateSections();
         }
     }, [sections, language, translateText]);
-
-
 
     const handleCopy = (code, id) => {
         navigator.clipboard.writeText(code).then(() => {
@@ -136,12 +135,12 @@ export default function BettingAppsTable({ sections = [] }) {
 
                             <div className={styles.mobileContent}>
                                 <div className={styles.mobileSection}>
-                                    <h4>Features:</h4>
+                                    <h4>{staticLabels.Features}:</h4>
                                     <div dangerouslySetInnerHTML={{ __html: app.features }} />
                                 </div>
 
                                 <div className={styles.mobileSection}>
-                                    <h4>Welcome Bonus:</h4>
+                                    <h4>{staticLabels['Welcome Bonus']}:</h4>
                                     <div
                                         className={styles.mobileBonusAmount}
                                         dangerouslySetInnerHTML={{ __html: app.welcome_bonus }}
@@ -156,13 +155,13 @@ export default function BettingAppsTable({ sections = [] }) {
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    GET BONUS
+                                    {staticLabels['GET BONUS']}
                                 </a>
                                 <button
                                     className={styles.mobileCodeBtn}
                                     onClick={() => handleCopy(app.referall_code, app.id)}
                                 >
-                                    {copiedId === app.id ? 'Copied!' : app.referall_code}
+                                    {copiedId === app.id ? staticLabels['Copied!'] : app.referall_code}
                                 </button>
                                 <button
                                     className={styles.mobileReviewBtn}
@@ -170,7 +169,7 @@ export default function BettingAppsTable({ sections = [] }) {
                                         window.open(app.review_link, '_blank', 'noopener,noreferrer')
                                     }
                                 >
-                                    Read Review
+                                    {staticLabels['Read Review']}
                                 </button>
                             </div>
                         </div>
@@ -190,11 +189,11 @@ export default function BettingAppsTable({ sections = [] }) {
                 <table className={styles.table}>
                     <thead>
                         <tr className={styles.headerRow}>
-                            <th>Rank</th>
-                            <th>Site</th>
-                            <th>Features</th>
-                            <th>Welcome Bonus</th>
-                            <th>Bet Now</th>
+                            <th>{staticLabels.Rank}</th>
+                            <th>{staticLabels.Site}</th>
+                            <th>{staticLabels.Features}</th>
+                            <th>{staticLabels['Welcome Bonus']}</th>
+                            <th>{staticLabels['Bet Now']}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -226,7 +225,7 @@ export default function BettingAppsTable({ sections = [] }) {
                                                 window.open(app.review_link, '_blank', 'noopener,noreferrer')
                                             }
                                         >
-                                            Read Review
+                                            {staticLabels['Read Review']}
                                         </button>
                                         <div className={styles.stars}>{'⭐'.repeat(app.rating)}</div>
                                     </td>
@@ -237,13 +236,13 @@ export default function BettingAppsTable({ sections = [] }) {
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
-                                            GET BONUS
+                                            {staticLabels['GET BONUS']}
                                         </a>
                                         <button
                                             className={styles.codeBtn}
                                             onClick={() => handleCopy(app.referall_code, app.id)}
                                         >
-                                            {copiedId === app.id ? 'Copied!' : app.referall_code}
+                                            {copiedId === app.id ? staticLabels['Copied!'] : app.referall_code}
                                         </button>
                                     </td>
                                 </tr>
@@ -260,19 +259,8 @@ export default function BettingAppsTable({ sections = [] }) {
 
     return (
         <>
-            {/* <Head>
-                <title>{translatedSections[0]?.metatitle}</title>
-                <meta
-                    name="description"
-                    content={stripHtml(translatedSections[0]?.meta_description)}
-                />
-            </Head> */}
-
             {translatedSections.map((section) => (
                 <div className={styles.wrapper} key={section.id}>
-                    {/* Uncomment to show heading if needed */}
-                    {/* <h2 className={styles.heading}>{section.heading}</h2> */}
-
                     {section.best_betting_apps?.length > 0 && (
                         <>
                             {isMobile
