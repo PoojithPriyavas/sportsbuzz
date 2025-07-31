@@ -140,7 +140,7 @@ export default function Home() {
         <meta name="twitter:site" content="@sportsbuz" />
 
         {/* Favicon */}
-        <link rel="icon" href="/favicon.svg" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <>
