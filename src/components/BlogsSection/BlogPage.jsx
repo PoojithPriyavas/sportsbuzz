@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import styles from './BlogPage.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
+import Head from "next/head";
 import {
   FaSearch,
   FaChevronDown,
@@ -20,11 +21,32 @@ import UpcomingFootballMatches from '@/components/UpComing/UpComingFootball';
 import UpcomingMatches from '@/components/UpComing/UpComingMatches';
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 
-export default function BlogsPage({ blogs = [] }) {
-  const [filterValue, setFilterValue] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
+// export default function BlogsPage({
+//   blogs = [],
+//   // currentPage = initialPage = 1,
+//   searchTerm: initialSearchTerm = '',
+//   categoryId: initialCategoryId = null,
+//   subcategoryId: initialSubcategoryId = null,
+//   isLocalhost = false
+// }) {
+//   // In component
+//   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
+//   const [filterValue, setFilterValue] = useState('all');
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [searchTerm, setSearchTerm] = useState('');
 
+export default function BlogsPage({
+  blogs = [],
+  initialPage = 1, // Changed from currentPage to initialPage
+  searchTerm: initialSearchTerm = '',
+  categoryId: initialCategoryId = null,
+  subcategoryId: initialSubcategoryId = null,
+  isLocalhost = false
+}) {
+  const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
+  const [filterValue, setFilterValue] = useState('all');
+  const [currentPage, setCurrentPage] = useState(initialPage); // Use initialPage here
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const { language, translateText, fetchBlogs, countryCode } = useGlobalData();
   const searchParams = useSearchParams();
 
@@ -177,123 +199,23 @@ export default function BlogsPage({ blogs = [] }) {
     return pages;
   };
 
+  const buildPageUrl = (page) => {
+    const params = new URLSearchParams();
+    if (searchTerm) params.set('search', searchTerm);
+    if (selectedCategoryId) params.set('category', selectedCategoryId);
+    if (selectedSubcategoryId) params.set('subcategory', selectedSubcategoryId);
+
+    return `/blogs/pages/${page === 1 ? 'all-blogs' : page}?${params.toString()}`;
+  };
+
   return (
     <>
+      <Head>
+        {parseInt(currentPage) > 5 && (
+          <meta name="robots" content="noindex,follow" />
+        )}
+      </Head>
       <div className={styles.container}>
-        {/* <div className={styles.left}>
-          <div className={styles.filterBar}>
-            <h2 style={{ color: 'black' }}>{translations.latestBlogs}</h2>
-            <div className={styles.controls}>
-              {hasActiveFilters && (
-                <button onClick={handleClearFilters} className={styles.clearFilterButton}>
-                  <FaTimes className={styles.clearIcon} />
-                  {translations.clearFilter}
-                </button>
-              )}
-
-              <div className={styles.selectWrapper}>
-                <select
-                  value={filterValue}
-                  onChange={(e) => setFilterValue(e.target.value)}
-                  className={styles.professionalSelect}
-                >
-                  <option value="all">{translations.all}</option>
-                  <option value="latest">{translations.latest}</option>
-                </select>
-                <FaChevronDown className={styles.selectIcon} />
-              </div>
-
-              <div className={styles.searchWrapper}>
-                <FaSearch className={styles.searchIcon} />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder={translations.searchPlaceholder}
-                  className={styles.searchInput}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.wrapper}>
-            <div className={styles.blogGrid}>
-              {currentBlogs.map((blog) => (
-                <Link
-                  key={blog.id}
-                  href={`/blog-details/${blog?.slug}`}
-                  className={styles.blogCard}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className={styles.blogImage}>
-                    <img src={blog?.image} alt={blog?.alt || blog?.title} />
-                  </div>
-                  <div className={styles.blogContent}>
-                    <h5>{blog?.title}</h5>
-                    <p>
-                      {blog?.author} <span>{blog?.date}</span>
-                    </p>
-                    <span className={styles.readMore}>{translations.readMore}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-
-            {showPagination && (
-              <div className={styles.pagination}>
-                <button
-                  onClick={handlePreviousPage}
-                  disabled={currentPage === 1}
-                  className={`${styles.paginationButton} ${styles.prevNext}`}
-                >
-                  <FaChevronLeft className={styles.paginationIcon} />
-                  {translations.previous}
-                </button>
-
-                <div className={styles.pageNumbers}>
-                  {getPageNumbers().map((page, index) =>
-                    page === '...' ? (
-                      <span key={`ellipsis-${index}`} className={styles.ellipsis}>
-                        ...
-                      </span>
-                    ) : (
-                      <button
-                        key={page}
-                        onClick={() => handlePageChange(page)}
-                        className={`${styles.paginationButton} ${currentPage === page ? styles.active : ''
-                          }`}
-                      >
-                        {page}
-                      </button>
-                    )
-                  )}
-                </div>
-
-                <button
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  className={`${styles.paginationButton} ${styles.prevNext}`}
-                >
-                  {translations.next}
-                  <FaChevronRight className={styles.paginationIcon} />
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className={styles.right}>
-          <JoinTelegramButton />
-          <AutoSlider />
-          <BettingCard />
-          <UpcomingFootballMatches />
-          <UpcomingMatches />
-        </div> */}
-
-
-
-
-
         <div className={styles.fourColumnRow}>
           <div className={styles.leftThreeColumns}>
             <div className={styles.filterBar}>
@@ -314,18 +236,7 @@ export default function BlogsPage({ blogs = [] }) {
                     </button>
                   )}
 
-                  {/* Uncomment if you need the select dropdown
-    <div className={styles.selectWrapper}>
-      <select
-        value={filterValue}
-        onChange={(e) => setFilterValue(e.target.value)}
-        className={styles.professionalSelect}
-      >
-        <option value="all">{translations.all}</option>
-        <option value="latest">{translations.latest}</option>
-      </select>
-      <FaChevronDown className={styles.selectIcon} />
-    </div> */}
+
 
                   <div className={styles.searchWrapper}>
                     <FaSearch className={styles.searchIcon} />
@@ -361,7 +272,7 @@ export default function BlogsPage({ blogs = [] }) {
                 </Link>
               ))}
             </div>
-            {showPagination && (
+            {/* {showPagination && (
               <div className={styles.pagination}>
                 <button
                   onClick={handlePreviousPage}
@@ -399,6 +310,35 @@ export default function BlogsPage({ blogs = [] }) {
                   {translations.next}
                   <FaChevronRight className={styles.paginationIcon} />
                 </button>
+              </div>
+            )} */}
+
+            {showPagination && (
+              <div className={styles.pagination}>
+                <Link href={buildPageUrl(currentPage - 1)} scroll={false}>
+                  <button disabled={currentPage === 1}>
+                    <FaChevronLeft /> {translations.previous}
+                  </button>
+                </Link>
+
+                {/* Page numbers */}
+                {getPageNumbers().map((page, index) => (
+                  page === '...' ? (
+                    <span key={`ellipsis-${index}`}>...</span>
+                  ) : (
+                    <Link key={page} href={buildPageUrl(page)} scroll={false}>
+                      <button className={currentPage === page ? styles.active : ''}>
+                        {page}
+                      </button>
+                    </Link>
+                  )
+                ))}
+
+                <Link href={buildPageUrl(currentPage + 1)} scroll={false}>
+                  <button disabled={currentPage === totalPages}>
+                    {translations.next} <FaChevronRight />
+                  </button>
+                </Link>
               </div>
             )}
           </div>

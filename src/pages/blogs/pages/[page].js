@@ -9,7 +9,7 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 
 import { fetchBlogsSSR } from "@/lib/ftechBlogsSSR";
 
-export async function getServerSideProps({ req, query }) {
+export async function getServerSideProps({ req, query, resolvedUrl }) {
 
     const countryCookie = req.cookies.countryData;
     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
@@ -31,14 +31,30 @@ export async function getServerSideProps({ req, query }) {
         props: {
             blogs,
             countryData,
+            supportedLanguages: ['en', 'fr'],
+            supportedCountries: ['IN', 'FR'],
+            resolvedUrl,
+            isLocalhost: process.env.NODE_ENV === 'development'
         },
     };
+
+
 }
 
 
-export default function BlogPages({ blogs }) {
-    console.log(blogs, "blogs hhh")
-    // const { blogs, } = useGlobalData()
+export default function BlogPages({
+    blogs,
+    countryData,
+    supportedLanguages,
+    supportedCountries,
+    resolvedUrl,
+    isLocalhost, }) {
+    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
+    const countryCode = countryData?.country_code || 'IN';
+    // console.log(blogs, "blogs hhh")
+    // const { blogs, } = useGlobalData()   
+
+
     const [loading, setLoading] = useState(true);
     const [animationStage, setAnimationStage] = useState('loading');
     const [showOtherDivs, setShowOtherDivs] = useState(false);
@@ -91,6 +107,18 @@ export default function BlogPages({ blogs }) {
                 <meta name="keywords" content="sports blogs, football news, cricket updates, match analysis, sports buzz" />
                 <meta name="author" content="Sports Buzz" />
 
+                {supportedLanguages.map(lang => (
+                    supportedCountries.map(country => (
+                        <link
+                            key={`${lang}-${country}`}
+                            rel="alternate"
+                            href={`${baseUrl}/blogs/${country.toLowerCase()}/${lang}`}
+                            hreflang={`${lang}-${country}`}
+                        />
+                    ))
+                ))}
+                <link rel="alternate" href={`${baseUrl}/blogs`} hreflang="x-default" />
+
                 {/* Open Graph (Facebook, LinkedIn) */}
                 <meta property="og:title" content="Sports Buzz | Blogs" />
                 <meta property="og:description" content="Stay updated with the latest sports blogs and match breakdowns from around the world." />
@@ -103,8 +131,7 @@ export default function BlogPages({ blogs }) {
                 <meta name="twitter:title" content="Sports Buzz | Blogs" />
                 <meta name="twitter:description" content="Latest sports blogs, news and insights — only on Sports Buzz." />
                 <meta name="twitter:image" content="https://www.sportsbuzz.com/images/social-preview.jpg" /> {/* Update this path */}
-
-                <link rel="canonical" href="https://www.sportsbuzz.com/blogs/pages/all-blogs" />
+                <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
             </Head>
 
             {/* <Header /> */}
