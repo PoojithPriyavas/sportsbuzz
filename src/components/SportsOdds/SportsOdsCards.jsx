@@ -90,7 +90,8 @@ export default function BettingCards() {
         placeBet: 'Place Bet',
         potentialWinnings: 'Potential Winnings',
         selectOdds: 'Select your odds and enter stake to place your bet',
-        betSuccess: '✓ Bet Placed Successfully!',
+        // betSuccess: '✓ Bet Placed Successfully!',
+             betSuccess: 'Play responsibly at your own risk',
         team1Win: 'Team 1 Win',
         draw: 'Draw',
         team2Win: 'Team 2 Win',
@@ -118,7 +119,8 @@ export default function BettingCards() {
                 translateText('Place Bet', 'en', language),
                 translateText('Potential Winnings', 'en', language),
                 translateText('Select your odds and enter stake to place your bet', 'en', language),
-                translateText('✓ Bet Placed Successfully!', 'en', language),
+                // translateText('✓ Bet Placed Successfully!', 'en', language),
+                translateText('Play responsibly at your own risk!', 'en', language),
                 translateText('Team 1 Win', 'en', language),
                 translateText('Draw', 'en', language),
                 translateText('Team 2 Win', 'en', language),
@@ -413,7 +415,7 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                         {/* <div className={styles.logoCircle}>
                             <span className={styles.logoText}>1X</span>
                         </div> */}
-                        <span className={styles.poweredText}>POWERED BY Bet Label</span>
+                        <span className={styles.poweredText}>POWERED BY Betlabel</span>
                     </div>
                     <span className={styles.date}>{card.matchInfo}</span>
                 </div>

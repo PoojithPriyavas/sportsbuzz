@@ -52,7 +52,7 @@ const FooterTwo = () => {
         email: contact.email || 'info@sportsbuz.com',
         availability: '24/7 Sports Updates',
         copyright: '© 2025 SportsBuz. All rights reserved.',
-        disclaimer: 'Bet responsibly. 18+ only. Gambling can be addictive.',
+        disclaimer: 'Play responsibly. 18+ only. Gambling can be addictive.',
         terms: 'Terms of Use',
         privacy: 'Privacy Policy',
     });
@@ -77,7 +77,7 @@ const FooterTwo = () => {
                 playerStats: 'Player Stats',
                 news: 'Sports News',
                 availability: '24/7 Sports Updates',
-                disclaimer: 'Bet responsibly. 18+ only. Gambling can be addictive.',
+                disclaimer: 'Play responsibly. 18+ only. Gambling can be addictive.',
                 terms: 'Terms of Use',
                 privacy: 'Privacy Policy',
             };

@@ -19,7 +19,7 @@ import FooterTwo from "@/components/Footer/Footer";
 import { useParams } from "next/navigation";
 import HeaderTwo from "@/components/Header/HeaderTwo";
 
-
+import { useGlobalData } from "@/components/Context/ApiContext";
 
 
 export default function FootballMatchDetails() {
@@ -30,13 +30,13 @@ export default function FootballMatchDetails() {
     const matchId = params?.slug;
     console.log(matchId, "matchid")
 
-    useEffect(() => {
-        if (!matchId) {
-            console.error("Match ID is missing");
-            return;
-        }
-        getCricketDetails(matchId);
-    }, [matchId]);
+    // useEffect(() => {
+    //     if (!matchId) {
+    //         console.error("Match ID is missing");
+    //         return;
+    //     }
+    //     getCricketDetails(matchId);
+    // }, [matchId]);
 
     useEffect(() => {
         const timer1 = setTimeout(() => setLoading(false), 3000);

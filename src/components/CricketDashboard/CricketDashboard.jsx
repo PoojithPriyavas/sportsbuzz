@@ -1,6 +1,7 @@
 import styles from './CricketDashboard.module.css';
 
 const CricketDashboard = ({ cricketDetails }) => {
+  console.log(cricketDetails,"crick")
   if (!cricketDetails || !cricketDetails.matchInfo) {
     return <div>Loading match data...</div>;
   }

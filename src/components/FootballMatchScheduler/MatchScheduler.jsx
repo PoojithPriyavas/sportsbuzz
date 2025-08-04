@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import styles from './MatchScheduler.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/navigation';
+import { matchCards } from '../OddsMultiply/matchesData';
 
 // Spinner Loader Component
 const Spinner = ({ size = 'medium', text = 'Loading...' }) => {
@@ -42,6 +43,7 @@ export default function MatchScheduler() {
         fetchFootBallLineUp
     } = useGlobalData();
 
+    console.log(matchSchedule, "match schedule")
     const router = useRouter();
 
     const [translatedText, setTranslatedText] = useState({
@@ -191,8 +193,10 @@ export default function MatchScheduler() {
 
                 competition.matches.push({
                     eid: event.Eid,
-                    home: event.T1[0].Abr || event.T1[0].Nm.substring(0, 3).toUpperCase(),
-                    away: event.T2[0].Abr || event.T2[0].Nm.substring(0, 3).toUpperCase(),
+                    home: event.T1[0].Nm || event.T1[0].Nm.substring(0, 3).toUpperCase(),
+                    away: event.T2[0].Nm || event.T2[0].Nm.substring(0, 3).toUpperCase(),
+                    homeImg: event.T1[0].Abr || event.T1[0].Nm.substring(0, 3).toUpperCase(),
+                    awayImg: event.T2[0].Abr || event.T2[0].Nm.substring(0, 3).toUpperCase(),
                     homeScore: event.Tr1 ?? null,
                     awayScore: event.Tr2 ?? null,
                     status: event.Eps === 'NS' ? 'upcoming' : 'FT',
@@ -312,7 +316,7 @@ export default function MatchScheduler() {
                                         onKeyPress={(e) => e.key === 'Enter' && handleMatchClick(match.eid)}
                                     >
                                         <div className={`${styles.team} ${styles.home}`}>
-                                            <div className={styles.teamFlag}>{match.home}</div>
+                                            <div className={styles.teamFlag}>{match.homeImg}</div>
                                             <div className={styles.teamName}>{match.home}</div>
                                         </div>
                                         <div className={styles.matchScore}>
@@ -323,7 +327,7 @@ export default function MatchScheduler() {
                                             )}
                                         </div>
                                         <div className={`${styles.team} ${styles.away}`}>
-                                            <div className={styles.teamFlag}>{match.away}</div>
+                                            <div className={styles.teamFlag}>{match.awayImg}</div>
                                             <div className={styles.teamName}>{match.away}</div>
                                         </div>
                                     </div>

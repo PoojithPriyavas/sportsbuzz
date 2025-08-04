@@ -94,7 +94,7 @@ export default function MatchSchedulerScreen() {
                     <div className={styles.fourthColumn} >
                         <div className={styles.fourthColumnTwoColumns}>
                             <div className={styles.fourthColumnLeft}>
-                                <BettingCard />
+                                {/* <BettingCard /> */}
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>

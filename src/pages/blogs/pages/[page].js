@@ -10,6 +10,7 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 import { fetchBlogsSSR } from "@/lib/ftechBlogsSSR";
 
 export async function getServerSideProps({ req, query, resolvedUrl }) {
+    console.log(resolvedUrl, "urlsdssd")
 
     const countryCookie = req.cookies.countryData;
     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
@@ -51,6 +52,8 @@ export default function BlogPages({
     isLocalhost, }) {
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
     const countryCode = countryData?.country_code || 'IN';
+
+    console.log(resolvedUrl, "rshdhasd")
     // console.log(blogs, "blogs hhh")
     // const { blogs, } = useGlobalData()   
 
@@ -108,15 +111,23 @@ export default function BlogPages({
                 <meta name="author" content="Sports Buzz" />
 
                 {supportedLanguages.map(lang => (
-                    supportedCountries.map(country => (
-                        <link
-                            key={`${lang}-${country}`}
-                            rel="alternate"
-                            href={`${baseUrl}/blogs/${country.toLowerCase()}/${lang}`}
-                            hreflang={`${lang}-${country}`}
-                        />
-                    ))
+                    supportedCountries.map(country => {
+                        const href = `${baseUrl}/blogs/${country.toLowerCase()}/${lang}`;
+                        const hreflang = `${lang}-${country}`;
+
+                        console.log('Generated link:', { href, hreflang });
+
+                        return (
+                            <link
+                                key={`${lang}-${country}`}
+                                rel="alternate"
+                                href={href}
+                                hreflang={hreflang}
+                            />
+                        );
+                    })
                 ))}
+
                 <link rel="alternate" href={`${baseUrl}/blogs`} hreflang="x-default" />
 
                 {/* Open Graph (Facebook, LinkedIn) */}

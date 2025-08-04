@@ -51,13 +51,14 @@ export default function BlogDetailContent({ blog }) {
         <h1 className={styles.title}>{translatedBlog.title}</h1>
 
         {translatedBlog.image_big && (
-          <div className={styles.thumbnailContainer}>
+          <div className={styles.thumbnail}>
             <img
               src={translatedBlog.image_big}
               alt={translatedBlog.alt_big || 'Blog thumbnail'}
-              className={styles.thumbnail}
+              className={styles.thumbnailImg}
             />
           </div>
+
         )}
 
         <div

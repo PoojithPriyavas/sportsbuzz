@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
 import styles from './HeaderTwo.module.css';
 import { usePathname } from 'next/navigation';
 import { useGlobalData } from '../Context/ApiContext';
@@ -9,26 +10,29 @@ import axios from 'axios';
 import FeaturedButton from '../FeaturedButton/FeaturedButton';
 
 const HeaderTwo = ({ animationStage }) => {
-    const [phase, setPhase] = useState('loading');
     const [darkMode, setDarkMode] = useState(false);
-    const [loadingComplete, setLoadingComplete] = useState(false);
     const [headerFixed, setHeaderFixed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState(null);
 
-    // New state for mobile dropdown selectors
+    // Mobile dropdown states
     const [expandedLanguageSelector, setExpandedLanguageSelector] = useState(false);
     const [expandedSportsSelector, setExpandedSportsSelector] = useState(false);
 
-    // New state to track if animation should play
-    const [shouldPlayAnimation, setShouldPlayAnimation] = useState(false);
-    const [currentAnimationStage, setCurrentAnimationStage] = useState('header');
+    // Animation state
+    const [animationComplete, setAnimationComplete] = useState(false);
+    const [shouldShowAnimation, setShouldShowAnimation] = useState(false);
 
     // GSAP refs
-    const loadingContainerRef = useRef(null);
-    const mainContentRef = useRef(null);
+    const containerRef = useRef(null);
+    const loadingAnimationRef = useRef(null);
+    const logoRef = useRef(null);
+    const navigationRef = useRef(null);
     const sidebarRef = useRef(null);
+
+    // Timeline ref
+    const timelineRef = useRef(null);
 
     const pathname = usePathname();
     const {
@@ -48,42 +52,135 @@ const HeaderTwo = ({ animationStage }) => {
         upcomingMatches
     } = useGlobalData();
 
-    // Check if animation should play on component mount
+    // Initialize GSAP animation
     useEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
-
+        
+        // Set initial states IMMEDIATELY to prevent flash
+        gsap.set(containerRef.current, {
+            height: hasPlayedAnimation ? '5rem' : '100vh',
+            overflow: hasPlayedAnimation ? 'visible' : 'hidden',
+            display: hasPlayedAnimation ? 'flex' : 'block',
+            alignItems: hasPlayedAnimation ? 'center' : 'stretch',
+            justifyContent: hasPlayedAnimation ? 'space-between' : 'flex-start',
+            padding: hasPlayedAnimation ? '0 1rem' : '0'
+        });
+        
+        gsap.set(loadingAnimationRef.current, {
+            opacity: hasPlayedAnimation ? 0 : 1,
+            scale: hasPlayedAnimation ? 0.5 : 1,
+            display: hasPlayedAnimation ? 'none' : 'flex'
+        });
+        
+        gsap.set(logoRef.current, {
+            position: hasPlayedAnimation ? 'relative' : 'absolute',
+            bottom: hasPlayedAnimation ? 'auto' : '2rem',
+            left: hasPlayedAnimation ? 'auto' : '2rem',
+            opacity: hasPlayedAnimation ? 1 : 0,
+            x: 0,
+            y: hasPlayedAnimation ? 0 : 80,
+            visibility: hasPlayedAnimation ? 'visible' : 'hidden'
+        });
+        
+        gsap.set(navigationRef.current, {
+            opacity: hasPlayedAnimation ? 1 : 0,
+            display: hasPlayedAnimation ? 'flex' : 'none'
+        });
+        
         if (!hasPlayedAnimation) {
-            // First time - play the full animation
-            setShouldPlayAnimation(true);
-            setCurrentAnimationStage('loading');
+            setShouldShowAnimation(true);
+            
+            // Create the main timeline
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    setAnimationComplete(true);
+                    localStorage.setItem('headerAnimationPlayed', 'true');
+                }
+            });
 
-            // Animation sequence
-            setTimeout(() => {
-                setCurrentAnimationStage('logoReveal');
-            }, 1000);
+            // Step 1: Show loading animation (1 second)
+            tl.to({}, { duration: 2 })
+            
+            // Step 2: Hide loading animation and show logo (0.5 seconds)
+            .to(loadingAnimationRef.current, {
+                opacity: 0,
+                scale: 0.75,
+                duration: 0.75,
+                ease: "power2.inOut"
+            })
+            .to(logoRef.current, {
+                opacity: 1,
+                y: 0,
+                visibility: 'visible',
+                duration: 0.75,
+                ease: "power2.out"
+            }, "-=0.3")
+            
+            // Step 3: Wait a moment then start transition (1 second wait)
+            .to({}, { duration: 1 })
+            
+            // Step 4: Shrink container and move logo to header position (1.5 seconds)
+            .to(containerRef.current, {
+                height: '5rem',
+                duration: 1.5,
+                ease: "power2.inOut"
+            })
+            .to(logoRef.current, {
+                bottom: '50%',
+                left: '1rem',
+                y: '50%',
+                duration: 1.5,
+                ease: "power2.inOut"
+            }, "-=1.5")
+            
+            // Step 5: Convert logo to relative positioning after animation
+            .set(logoRef.current, {
+                position: 'relative',
+                bottom: 'auto',
+                left: 'auto',
+                x: 0,
+                y: 0
+            })
+            
+            // Step 6: Show navigation and set final states
+            .set(containerRef.current, {
+                overflow: 'visible',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0 1rem'
+            })
+            .set(navigationRef.current, {
+                display: 'flex'
+            })
+            .to(navigationRef.current, {
+                opacity: 1,
+                duration: 0.75,
+                ease: "power2.out"
+            })
+            .set(loadingAnimationRef.current, {
+                display: 'none'
+            });
 
-            setTimeout(() => {
-                setCurrentAnimationStage('transition');
-            }, 2500);
-
-            setTimeout(() => {
-                setCurrentAnimationStage('header');
-                // Mark animation as played
-                localStorage.setItem('headerAnimationPlayed', 'true');
-            }, 4000);
+            timelineRef.current = tl;
         } else {
-            // Animation already played - go directly to header
-            setShouldPlayAnimation(false);
-            setCurrentAnimationStage('header');
+            // Animation already played - already set to final state above
+            setShouldShowAnimation(false);
+            setAnimationComplete(true);
         }
+
+        // Cleanup function
+        return () => {
+            if (timelineRef.current) {
+                timelineRef.current.kill();
+            }
+        };
     }, []);
 
-    // Function to parse URL path for country code and language
-    const parseUrlPath = (pathname) => {
-        const parts = pathname.split('/').filter(part => part !== '');
-        const countryCode = parts.length > 0 ? parts[0].toUpperCase() : '';
-        const language = parts.length > 1 ? parts[1].toLowerCase() : '';
-        return { countryCode, language };
+    // Function to reset animation (for development)
+    const resetAnimation = () => {
+        localStorage.removeItem('headerAnimationPlayed');
+        window.location.reload();
     };
 
     // Check if mobile on mount and resize
@@ -97,6 +194,14 @@ const HeaderTwo = ({ animationStage }) => {
 
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    // Function to parse URL path for country code and language
+    const parseUrlPath = (pathname) => {
+        const parts = pathname.split('/').filter(part => part !== '');
+        const countryCode = parts.length > 0 ? parts[0].toUpperCase() : '';
+        const language = parts.length > 1 ? parts[1].toLowerCase() : '';
+        return { countryCode, language };
+    };
 
     // Handle URL-based country code and language
     useEffect(() => {
@@ -291,12 +396,12 @@ const HeaderTwo = ({ animationStage }) => {
 
     const toggleLanguageSelector = () => {
         setExpandedLanguageSelector(!expandedLanguageSelector);
-        setExpandedSportsSelector(false); // Close sports selector when opening language
+        setExpandedSportsSelector(false);
     };
 
     const toggleSportsSelector = () => {
         setExpandedSportsSelector(!expandedSportsSelector);
-        setExpandedLanguageSelector(false); // Close language selector when opening sports
+        setExpandedLanguageSelector(false);
     };
 
     // Function to get current language display name
@@ -308,12 +413,6 @@ const HeaderTwo = ({ animationStage }) => {
     // Function to get current sport display name
     const getCurrentSportDisplay = () => {
         return sport === 'cricket' ? translatedText.cricket : translatedText.football;
-    };
-
-    // Function to reset animation (you can call this if needed)
-    const resetAnimation = () => {
-        localStorage.removeItem('headerAnimationPlayed');
-        window.location.reload();
     };
 
     const renderMobileMenu = () => (
@@ -482,7 +581,7 @@ const HeaderTwo = ({ animationStage }) => {
                 </div>
 
                 {/* Debug button to reset animation (remove in production) */}
-                {/* {process.env.NODE_ENV === 'development' && (
+                {process.env.NODE_ENV === 'development' && (
                     <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.2)', marginTop: '1rem' }}>
                         <button 
                             onClick={resetAnimation}
@@ -498,37 +597,39 @@ const HeaderTwo = ({ animationStage }) => {
                             Reset Animation (Dev Only)
                         </button>
                     </div>
-                )} */}
+                )}
             </div>
         </>
     );
 
     return (
-        <div className={`${styles.loadingContainer} ${styles[currentAnimationStage]}`}>
-            {/* Loading Animation in Center - Only show if animation should play */}
-            {shouldPlayAnimation && (
-                <div className={`${styles.loadingAnimation} ${styles[currentAnimationStage]}`}>
-                    <div className={styles.loadingIcon}>
-                        {/* Main Loading Icon */}
-                        <div className={styles.mainIcon}>
-                            <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInner} />
-                        </div>
+        <div 
+            ref={containerRef}
+            className={styles.loadingContainer}
+        >
+            {/* Loading Animation - Only show during initial animation */}
+            <div 
+                ref={loadingAnimationRef}
+                className={styles.loadingAnimation}
+            >
+                <div className={styles.loadingIcon}>
+                    <div className={styles.mainIcon}>
+                        <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInner} />
                     </div>
                 </div>
-            )}
+            </div>
 
-            {/* SportsBuzz Logo (Bottom Left during loading or header position) */}
-            <div className={`${styles.logo} ${styles[currentAnimationStage]}`}>
+            {/* SportsBuzz Logo */}
+            <div ref={logoRef} className={styles.logo}>
                 <div className={styles.logoContent}>
-                    {/* Logo Icon */}
                     <div className={styles.logoIcon}>
                         <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                     </div>
                 </div>
             </div>
 
-            {/* Header Navigation (Final Stage) */}
-            <div className={`${styles.navigation} ${styles[currentAnimationStage]}`}>
+            {/* Header Navigation */}
+            <div ref={navigationRef} className={styles.navigation}>
                 {/* Mobile Top Row - Only visible on mobile/tablet */}
                 <div className={styles.mobileTopRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>

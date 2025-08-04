@@ -80,6 +80,7 @@
     padding: 8px 12px;
     cursor: pointer;
     font-size: 13px;
+    color: #4444;
 }
 
 .dropdownItem:hover {

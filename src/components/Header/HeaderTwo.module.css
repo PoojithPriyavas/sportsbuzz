@@ -1,46 +1,15 @@
-/* Header Component Styles - Fixed Navigation Overflow */
+/* Header Component Styles - GSAP Version */
 
 .loadingContainer {
-    background-color: linear-gradient(135deg, #16213e 0%, #045fc6 100%);
     background: linear-gradient(135deg, #16213e 0%, #045fc6 100%);
     position: fixed;
-    transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
     width: 100%;
     z-index: 9999;
     top: 0;
     left: 0;
-    /* Added to ensure proper positioning */
     right: 0;
-    /* Added to ensure proper positioning */
-}
-
-.loadingContainer.loading {
-    height: 100vh;
-    overflow: hidden;
-}
-
-.loadingContainer.logoReveal {
-    height: 100vh;
-    overflow: hidden;
-}
-
-.loadingContainer.transition {
-    height: 100vh;
-    overflow: hidden;
-    animation: shrinkToHeader 1.5s ease-in-out forwards;
-}
-
-.loadingContainer.header {
-    height: 5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1rem;
-    max-width: 100vw;
-    overflow: visible;
-    /* Changed from hidden to visible for dropdowns */
     box-sizing: border-box;
-    /* Added for consistent sizing */
+    /* Initial state will be set by GSAP */
 }
 
 .loadingAnimation {
@@ -49,29 +18,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.loadingAnimation.loading {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.loadingAnimation.logoReveal {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.loadingAnimation.transition {
-    opacity: 0;
-    transform: scale(0.75);
-}
-
-.loadingAnimation.header {
-    opacity: 0;
-    transform: scale(0.5);
-    pointer-events: none;
-    /* Prevent interaction when hidden */
+    /* Initial state will be set by GSAP */
 }
 
 .loadingIcon {
@@ -126,45 +73,13 @@
 }
 
 .logo {
-    transition: all 1s ease-out;
+    /* Initial state: completely hidden to prevent flash */
     position: relative;
-    /* Changed from absolute positioning for header state */
-}
-
-.logo.loading {
-    position: absolute;
-    bottom: 2rem;
-    left: 2rem;
-    transform: translateY(5rem);
-    opacity: 0;
-}
-
-.logo.logoReveal {
-    position: absolute;
-    bottom: 2rem;
-    left: 2rem;
-    transform: translateY(0);
-    opacity: 1;
-}
-
-.logo.transition {
-    position: absolute;
-    bottom: 2rem;
-    left: 2rem;
-    transform: translateY(0);
-    opacity: 1;
-    animation: moveToHeader 1.5s ease-in-out 1s forwards;
-}
-
-.logo.header {
-    position: relative;
-    /* Changed from static to relative */
-    transform: none;
-    opacity: 1;
-    bottom: auto;
-    left: auto;
     flex-shrink: 0;
     padding: 10px;
+    opacity: 0;
+    visibility: hidden;
+    /* GSAP will handle visibility and positioning */
 }
 
 .logoContent {
@@ -208,21 +123,16 @@
 }
 
 .navigation {
+    /* Initial state: hidden by default to prevent flash */
     position: relative;
-    /* Ensure proper positioning context */
-    transform: none;
+    display: none;
     opacity: 0;
-    transition: opacity 1s ease-out 0.5s;
-    display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
     min-width: 0;
     padding-left: 15px;
-}
-
-.navigation.header {
-    opacity: 1 !important;
+    /* GSAP will handle visibility */
 }
 
 .leftSection {
@@ -232,9 +142,7 @@
     flex: 1;
     min-width: 0;
     overflow: visible;
-    /* Changed from hidden to visible */
     position: relative;
-    /* Added for dropdown positioning */
 }
 
 .rightSection {
@@ -243,7 +151,6 @@
     gap: 1rem;
     flex-shrink: 0;
     position: relative;
-    /* Added for proper positioning */
 }
 
 .navLinks {
@@ -253,11 +160,9 @@
     padding-left: 8px;
     flex-wrap: nowrap;
     overflow: visible;
-    /* Changed from hidden to visible */
     flex: 1;
     min-width: 0;
     position: relative;
-    /* Added for dropdown positioning */
 }
 
 .navLink {
@@ -287,7 +192,6 @@
     white-space: nowrap;
     flex-shrink: 0;
     position: relative;
-    /* Added for proper positioning */
 }
 
 .navItem:hover,
@@ -304,7 +208,6 @@
 .dropdown {
     position: relative;
     z-index: 10000;
-    /* Reduced from extremely high value */
     flex-shrink: 0;
 }
 
@@ -320,7 +223,6 @@
     min-width: 160px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 10001;
-    /* Ensure it's above parent dropdown */
     list-style: none;
     opacity: 0;
     visibility: hidden;
@@ -330,7 +232,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     pointer-events: none;
-    /* Prevent interference when hidden */
 }
 
 /* Make submenu interactive when visible */
@@ -373,7 +274,6 @@
     transition: all 0.3s ease;
     position: relative;
     z-index: 1000;
-    /* Lower z-index to avoid conflicts */
     min-width: 80px;
     max-width: 120px;
 }
@@ -409,26 +309,11 @@
 }
 
 /* Keyframe Animations */
-@keyframes shrinkToHeader {
-    0% {
-        height: 100vh;
-        clip-path: inset(0 0 0 0);
-    }
-
-    100% {
-        height: 5rem;
-        clip-path: inset(0 0 0 0);
-    }
-}
-
 @keyframes pulse {
-
-    0%,
-    100% {
+    0%, 100% {
         opacity: 1;
         transform: scale(1);
     }
-
     50% {
         opacity: 0.7;
         transform: scale(1.05);
@@ -436,12 +321,9 @@
 }
 
 @keyframes bounce {
-
-    0%,
-    100% {
+    0%, 100% {
         transform: translateY(0);
     }
-
     50% {
         transform: translateY(-0.625rem);
     }
@@ -451,7 +333,6 @@
     from {
         transform: rotate(0deg);
     }
-
     to {
         transform: rotate(360deg);
     }
@@ -462,32 +343,16 @@
         transform: scale(1);
         opacity: 1;
     }
-
-    75%,
-    100% {
+    75%, 100% {
         transform: scale(2);
         opacity: 0;
     }
 }
 
-@keyframes moveToHeader {
-    0% {
-        position: absolute;
-        bottom: 2rem;
-        left: 2rem;
-    }
-
-    100% {
-        position: relative;
-        /* Changed from static to relative */
-        bottom: auto;
-        left: auto;
-    }
-}
-
-/* Mobile Menu Styles */
+/* Mobile Menu Button - Hidden by default */
 .mobileMenuButton {
     display: none;
+    opacity: 0;
     background: transparent;
     border: none;
     color: white;
@@ -528,7 +393,6 @@
     height: 100vh;
     background: linear-gradient(135deg, #16213e 0%, #045fc6 50%, #16213e 100%);
     z-index: 10000;
-    /* Ensure it's above the header */
     transition: right 0.3s ease;
     overflow-y: auto;
     padding: 2rem 0;
@@ -637,6 +501,7 @@
     display: block;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.2s ease;
+    cursor: pointer;
 }
 
 .mobileSubmenuItem:hover {
@@ -779,9 +644,8 @@
 
 /* Tablet and Mobile Responsive Design */
 @media (max-width: 1200px) {
-    .loadingContainer.header {
+    .loadingContainer {
         padding: 0 1rem;
-        height: 5rem;
         justify-content: space-between;
     }
 
@@ -813,6 +677,7 @@
 
     .mobileMenuButton {
         display: block;
+        opacity: 1;
     }
 
     .logoIcon {
@@ -827,9 +692,8 @@
 }
 
 @media (max-width: 640px) {
-    .loadingContainer.header {
+    .loadingContainer {
         padding: 0 0.75rem;
-        height: 5.5rem;
     }
 
     .logoIcon {
@@ -852,9 +716,8 @@
 }
 
 @media (max-width: 480px) {
-    .loadingContainer.header {
+    .loadingContainer {
         padding: 0 0.5rem;
-        height: 5rem;
     }
 
     .logoIcon {

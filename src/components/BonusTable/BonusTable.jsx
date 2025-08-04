@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { useGlobalData } from '../Context/ApiContext';
 
 export default function BonusTable({ sections }) {
+  console.log(sections,"sec tion")
   const [copiedId, setCopiedId] = useState(null);
   const [translatedSections, setTranslatedSections] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
