@@ -28,6 +28,7 @@ import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
 import Footer from '@/components/Footer/Footer';
 import TestHeader from "@/components/Header/TestHeader";
 import HeaderTwo from "@/components/Header/HeaderTwo";
+import RegionSelector from "@/components/RegionSelector/RegionSelector";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,6 +54,10 @@ export default function Home() {
     stages,
     news
   } = useGlobalData();
+
+  if (countryCode && countryCode.country_code) {
+    console.log("Valid country code:", countryCode.country_code);
+  }
 
   const [loading, setLoading] = useState(true);
   const [animationStage, setAnimationStage] = useState('loading');
@@ -144,6 +149,7 @@ export default function Home() {
       </Head>
 
       <>
+        <RegionSelector />
         <HeaderTwo animationStage={animationStage} />
         {showOtherDivs && (
           <div

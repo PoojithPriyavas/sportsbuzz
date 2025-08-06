@@ -24,6 +24,11 @@ export const DataProvider = ({ children }) => {
     const [sections, setSections] = useState([]);
     const [bestSections, setBestSections] = useState([]);
     // const [sport, setSport] = useState('cricket');
+    const [country, setCountry] = useState('India');
+    const [countryCodeCookie, setCountryCodeCookie] = useState('in')
+    const [hreflang, setHreflang] = useState('en');
+    const [locationData, setLocationData] = useState(null);
+    const [countryData, setCountryData] = useState(null);
 
     const pathname = usePathname();
     //  TIME ZONE IMPLEMENTATION
@@ -847,6 +852,16 @@ export const DataProvider = ({ children }) => {
                 fetchMatchSchedules,
                 currentTimezone,
                 settings,
+                countryCodeCookie,
+                setCountryCodeCookie,
+                hreflang,
+                locationData,
+                setLocationData,
+                countryData,
+                setCountryData,
+                setHreflang,
+                country,
+                setCountry
             }}>
             {children}
         </DataContext.Provider>

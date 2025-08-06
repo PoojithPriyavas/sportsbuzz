@@ -1,0 +1,41 @@
+/* components/RegionSelector.module.css */
+
+.container {
+  background-color: #f2f2f5;
+  padding: 1rem;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.text {
+  font-size: 1rem;
+  color: #1c1c1e;
+}
+
+.select {
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  min-width: 150px;
+}
+
+.button {
+  background-color: #1c1c1e;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}

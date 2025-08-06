@@ -2,7 +2,7 @@
 
 .loadingContainer {
     background: linear-gradient(135deg, #16213e 0%, #045fc6 100%);
-    position: fixed;
+    /* position: fixed; */
     width: 100%;
     z-index: 9999;
     top: 0;

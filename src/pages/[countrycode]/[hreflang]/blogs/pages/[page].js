@@ -10,11 +10,13 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 import { fetchBlogsSSR } from "@/lib/ftechBlogsSSR";
 
 export async function getServerSideProps({ req, query, resolvedUrl }) {
-    console.log(resolvedUrl, "urlsdssd")
+    // console.log(resolvedUrl, "urlsdssd")
 
     const countryCookie = req.cookies.countryData;
     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-
+    // console.log(countryData,"dgadjasdasdkajsd,akjsd")
+    const hrefLanCookie = req.cookies.lanTagValues;
+    const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
 
     const {
         category: categoryIdParam,
@@ -33,6 +35,7 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
         props: {
             blogs,
             countryData,
+            hrefLanData,
             supportedLanguages: ['en', 'fr'],
             supportedCountries: ['IN', 'FR'],
             resolvedUrl,
@@ -47,6 +50,7 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
 export default function BlogPages({
     blogs,
     countryData,
+    hrefLanData,
     supportedLanguages,
     supportedCountries,
     resolvedUrl,
@@ -54,8 +58,10 @@ export default function BlogPages({
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
     const countryCode = countryData?.country_code || 'IN';
 
-    console.log(resolvedUrl, "rshdhasd")
-    // console.log(blogs, "blogs hhh")
+    console.log(hrefLanData, "href lang data");
+    console.log(blogs, "blogs hhh");
+    console.log(baseUrl, "base url");
+    console.log(resolvedUrl, "resolved url")
     // const { blogs, } = useGlobalData()   
 
 
@@ -111,40 +117,40 @@ export default function BlogPages({
                 <meta name="keywords" content="sports blogs, football news, cricket updates, match analysis, sports buzz" />
                 <meta name="author" content="Sports Buzz" />
 
-                {supportedLanguages.map(lang => (
-                    supportedCountries.map(country => {
-                        const href = `${baseUrl}/blogs/${country.toLowerCase()}/${lang}`;
-                        const hreflang = `${lang}-${country}`;
+                {hrefLanData.map(({ hreflang, country_code }) => {
+                    console.log(hreflang,"href lan g")
+                    const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/blogs/pages/all-blogs`;
+                    const fullHrefLang = `${hreflang}-${country_code}`;
+                    console.log('Generated link:', { href, fullHrefLang });
 
-                        console.log('Generated link:', { href, hreflang });
+                    return (
+                        <link
+                            key={fullHrefLang}
+                            rel="alternate"
+                            href={href}
+                            hreflang={fullHrefLang}
+                        />
+                    );
+                })}
 
-                        return (
-                            <link
-                                key={`${lang}-${country}`}
-                                rel="alternate"
-                                href={href}
-                                hreflang={hreflang}
-                            />
-                        );
-                    })
-                ))}
-
-                <link rel="alternate" href={`${baseUrl}/blogs`} hreflang="x-default" />
+                <link rel="alternate" href={`${baseUrl}/blogs/pages/all-blogs`} hreflang="x-default" />
 
                 {/* Open Graph (Facebook, LinkedIn) */}
                 <meta property="og:title" content="Sports Buzz | Blogs" />
                 <meta property="og:description" content="Stay updated with the latest sports blogs and match breakdowns from around the world." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content="https://www.sportsbuzz.com/blogs/pages/all-blogs" />
-                <meta property="og:image" content="https://www.sportsbuzz.com/images/social-preview.jpg" /> {/* Update this path */}
+                <meta property="og:image" content="https://www.sportsbuzz.com/images/social-preview.jpg" />
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Sports Buzz | Blogs" />
                 <meta name="twitter:description" content="Latest sports blogs, news and insights — only on Sports Buzz." />
-                <meta name="twitter:image" content="https://www.sportsbuzz.com/images/social-preview.jpg" /> {/* Update this path */}
+                <meta name="twitter:image" content="https://www.sportsbuzz.com/images/social-preview.jpg" />
+
                 <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
             </Head>
+
 
             {/* <Header /> */}
             <HeaderTwo animationStage={animationStage} />
