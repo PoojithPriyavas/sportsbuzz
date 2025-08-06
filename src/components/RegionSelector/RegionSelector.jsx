@@ -1,4 +1,3 @@
-// components/RegionSelector.jsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -24,67 +23,74 @@ function getCookie(name) {
 
 export default function RegionSelector() {
   const [isVisible, setIsVisible] = useState(true);
-  const router = useRouter()
-  // const [country, setCountry] = useState('India');
-  // const [countryCodeCookie, setCountryCodeCookie] = useState('in')
-  // const [hreflang, setHreflang] = useState('en');
-  // const [locationData, setLocationData] = useState(null);
-  // const [countryData, setCountryData] = useState(null);
+  const [allLocations, setAllLocations] = useState([]); // from lanTagValues cookie
+  const [filteredHreflangs, setFilteredHreflangs] = useState([]);
+
+  const router = useRouter();
 
   const {
     countryCodeCookie,
     setCountryCodeCookie,
     hreflang,
-    locationData,
-    setLocationData,
-    countryData,
-    setCountryData,
     setHreflang,
     country,
-    setCountry
-  } = useGlobalData()
+    setCountry,
+    setCountryData,
+    setLocationData,
+    setLanguage
+  } = useGlobalData();
 
   useEffect(() => {
-    // Get data from cookies after component mounts
     const locationCookie = getCookie('locationData');
     const countryCookie = getCookie('countryData');
-    const hrefLangData= getCookie('lanTagValues');
+    const hrefLangData = getCookie('lanTagValues'); // full list
 
     setLocationData(locationCookie);
     setCountryData(countryCookie);
+    setAllLocations(hrefLangData || []);
 
-    console.log('Location Data:', hrefLangData);
-    console.log('Country Data:', countryCookie);
-
-    // Set initial values based on cookie data
-    if (locationData?.filtered_locations?.length > 0) {
-      const firstLocation = locationData.filtered_locations[0];
-      console.log(firstLocation, "first location")
+    if (locationCookie?.filtered_locations?.length > 0) {
+      const firstLocation = locationCookie.filtered_locations[0];
       setCountry(firstLocation.country);
       setHreflang(firstLocation.hreflang);
       setCountryCodeCookie(firstLocation.country_code.toLowerCase());
+
+      // Initial hreflangs for selected country
+      const initialHrefs = hrefLangData?.filter(
+        loc => loc.country === firstLocation.country
+      );
+      setFilteredHreflangs(initialHrefs);
     }
   }, []);
 
-  const hreflangTags = locationData?.hreflang_tags || [];
-  const filteredLocations = locationData?.filtered_locations || [];
+  // Update hreflangs based on selected country
+  useEffect(() => {
+    if (country && allLocations.length > 0) {
+      const matchingLangs = allLocations.filter(loc => loc.country === country);
+      setFilteredHreflangs(matchingLangs);
 
-  console.log(hreflangTags, "hreflang tags");
-  console.log(filteredLocations, "filtered locations");
+      if (matchingLangs.length > 0) {
+        setHreflang(matchingLangs[0].hreflang);
+        setCountryCodeCookie(matchingLangs[0].country_code.toLowerCase());
+      }
+    }
+  }, [country]);
 
   const handleContinue = () => {
-    // alert(`Country: ${country}\nHreflang: ${hreflang}`);
-    // You can redirect, store values, etc. here
-      const path = `${countryCodeCookie}/${hreflang}`;
-      router.push(path); 
+    setLanguage(hreflang);
+    const path = `${countryCodeCookie}/${hreflang}`;
+    router.push(path);
   };
 
   if (!isVisible) return null;
 
+  // Get unique country names from allLocations
+  const uniqueCountries = [...new Set(allLocations.map(loc => loc.country))];
+
   return (
     <div className={styles.container}>
       <span className={styles.text}>
-        Choose another country or region to see content specific to your location and shop online.
+        Choose another country or region to see content specific to your location.
       </span>
 
       <select
@@ -92,19 +98,11 @@ export default function RegionSelector() {
         onChange={(e) => setCountry(e.target.value)}
         className={styles.select}
       >
-        {filteredLocations.length > 0 ? (
-          filteredLocations.map((location) => (
-            <option key={location.id} value={location.country}>
-              {location.country}
-            </option>
-          ))
-        ) : (
-          <>
-            <option value="India">India</option>
-            <option value="United States">United States</option>
-            <option value="United Kingdom">United Kingdom</option>
-          </>
-        )}
+        {uniqueCountries.map((ctry, index) => (
+          <option key={index} value={ctry}>
+            {ctry}
+          </option>
+        ))}
       </select>
 
       <select
@@ -112,21 +110,14 @@ export default function RegionSelector() {
         onChange={(e) => setHreflang(e.target.value)}
         className={styles.select}
       >
-        {filteredLocations.length > 0 ? (
-          filteredLocations.map((location) => (
-            <option key={`${location.id}-${location.hreflang}`} value={location.hreflang}>
-              {location.language} ({location.hreflang})
+        {filteredHreflangs.length > 0 ? (
+          filteredHreflangs.map((loc) => (
+            <option key={`${loc.id}-${loc.hreflang}`} value={loc.hreflang}>
+              {loc.language} ({loc.hreflang})
             </option>
           ))
         ) : (
-          <>
-            <option value="en">English (India)</option>
-            <option value="en">English (US)</option>
-            <option value="en">English (UK)</option>
-            <option value="fr">French (France)</option>
-            <option value="de">German (Germany)</option>
-            <option value="ja">Japanese (Japan)</option>
-          </>
+          <option>No languages available</option>
         )}
       </select>
 
