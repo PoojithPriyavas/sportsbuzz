@@ -18,8 +18,6 @@ export async function middleware(request) {
       response.cookies.set('countryData', JSON.stringify(countryData), {
         path: '/',
         maxAge: 60 * 60 * 24, // 1 day
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
       });
 
       // Extract country code from the fresh data
@@ -54,14 +52,11 @@ export async function middleware(request) {
       response.cookies.set('locationData', JSON.stringify(locationFilterData), {
         path: '/',
         maxAge: 60 * 60 * 24, // 1 day
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
       });
       response.cookies.set('lanTagValues', JSON.stringify(locationsData), {
         path: '/',
         maxAge: 60 * 60 * 24,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        
       });
     }
 

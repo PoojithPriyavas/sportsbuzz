@@ -40,7 +40,37 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export default function Home() {
+import axios from 'axios';
+
+export async function getServerSideProps(context) {
+  try {
+    const [countryRes, locationRes] = await Promise.all([
+      axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
+      axios.get('https://admin.sportsbuz.com/api/locations')
+    ]);
+
+    const countryDataHome = countryRes.data;
+    const locationDataHome = locationRes.data;
+
+    return {
+      props: {
+        countryDataHome,
+        locationDataHome
+      }
+    };
+  } catch (error) {
+    console.error("Error fetching data from APIs:", error.message);
+    return {
+      props: {
+        countryDataHome: null,
+        locationDataHome: null,
+        isLocalhost: process.env.NODE_ENV === 'development'
+      }
+    };
+  }
+}
+
+export default function Home({ countryDataHome, locationDataHome, isLocalhost }) {
   const {
     blogCategories,
     blogs,
@@ -50,14 +80,19 @@ export default function Home() {
     teamImages,
     upcomingMatches,
     sport,
-    countryCode,
+    // countryCode,
     stages,
     news
   } = useGlobalData();
+  const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
 
-  if (countryCode && countryCode.country_code) {
-    console.log("Valid country code:", countryCode.country_code);
-  }
+  console.log(locationDataHome, "location home");
+  console.log(countryDataHome, "country data home")
+  console.log()
+
+  // if (countryCode && countryCode.country_code) {
+  //   console.log("Valid country code:", countryCode.country_code);
+  // }
 
   const [loading, setLoading] = useState(true);
   const [animationStage, setAnimationStage] = useState('loading');
@@ -104,7 +139,7 @@ export default function Home() {
   }, [showOtherDivs]);
 
 
-  console.log("enters this condition", countryCode?.location?.betting_apps?.trim() === 'Active');
+  // console.log("enters this condition", countryCode?.location?.betting_apps?.trim() === 'Active');
 
   return (
     <>
@@ -121,8 +156,21 @@ export default function Home() {
         <meta name="author" content="Sportsbuz" />
 
         {/* Canonical */}
-        <link rel="canonical" href="https://www.sportsbuz.com/" />
+        {locationDataHome.map(({ hreflang, country_code }) => {
+          console.log(hreflang, "href lan home")
+          const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/blogs/pages/all-blogs`;
+          const fullHrefLang = `${hreflang}-${country_code}`;
+          console.log('Generated link:', { href, fullHrefLang });
 
+          return (
+            <link
+              key={fullHrefLang}
+              rel="alternate"
+              href={href}
+              hreflang={fullHrefLang}
+            />
+          );
+        })}
         {/* Open Graph (for Facebook, LinkedIn, etc.) */}
         <meta property="og:title" content="Sportsbuz | Live Scores & Betting Tips" />
         <meta
@@ -149,7 +197,7 @@ export default function Home() {
       </Head>
 
       <>
-        <RegionSelector />
+        <RegionSelector countryDataHome={countryDataHome} locationDataHome={locationDataHome} />
         <HeaderTwo animationStage={animationStage} />
         {showOtherDivs && (
           <div
@@ -169,7 +217,7 @@ export default function Home() {
 
             <div className={styles.fourColumnRow}>
               <div className={styles.leftThreeColumns}>
-                {countryCode?.location?.betting_apps == 'Active' && (
+                {countryDataHome?.location?.betting_apps == 'Active' && (
                   <BonusTable sections={sections} />
                 )}
                 <div className={styles.twoSplitRow}>
