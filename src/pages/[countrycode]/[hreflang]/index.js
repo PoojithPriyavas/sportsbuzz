@@ -70,8 +70,8 @@ export default function Home({ countryData, hrefLanData, resolvedUrl, isLocalhos
         stages,
         news
     } = useGlobalData();
-    console.log(hrefLanData,"href home ");
-    console.log(resolvedUrl," resolved home")
+    console.log(apiResponse, "api response");
+    console.log(resolvedUrl, " resolved home")
 
     if (countryCode && countryCode.country_code) {
         console.log("Valid country code:", countryCode.country_code);
@@ -212,7 +212,7 @@ export default function Home({ countryData, hrefLanData, resolvedUrl, isLocalhos
                     ) : (
                       <UpcomingFootballMatches />
                     )} */}
-                                        {/* <SportsOdsList /> */}
+                                        <SportsOdsList />
                                         {news && <NewsList />}
                                     </div>
                                     <div className={styles.centerSplit}>
@@ -224,7 +224,7 @@ export default function Home({ countryData, hrefLanData, resolvedUrl, isLocalhos
                             <div className={styles.fourthColumn}>
                                 <div className={styles.fourthColumnTwoColumns}>
                                     <div className={styles.fourthColumnLeft}>
-                                        {/* <BettingCard /> */}
+                                        <BettingCard />
                                         <JoinTelegramButton />
                                     </div>
                                     <div className={styles.fourthColumnRight}>

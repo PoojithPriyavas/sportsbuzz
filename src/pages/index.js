@@ -181,7 +181,7 @@ export default function Home() {
                     ) : (
                       <UpcomingFootballMatches />
                     )} */}
-                    {/* <SportsOdsList /> */}
+                    <SportsOdsList />
                     {news && <NewsList />}
                   </div>
                   <div className={styles.centerSplit}>
@@ -193,7 +193,7 @@ export default function Home() {
               <div className={styles.fourthColumn}>
                 <div className={styles.fourthColumnTwoColumns}>
                   <div className={styles.fourthColumnLeft}>
-                    {/* <BettingCard /> */}
+                    <BettingCard />
                     <JoinTelegramButton />
                   </div>
                   <div className={styles.fourthColumnRight}>
