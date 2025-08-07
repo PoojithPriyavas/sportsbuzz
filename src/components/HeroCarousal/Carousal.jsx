@@ -19,9 +19,9 @@ export default function HeroCarousal() {
       try {
         const res = await fetch('https://admin.sportsbuz.com/api/banners'); 
         const data = await res.json();
-        console.log(data," banner")
+        // console.log(data," banner")
         const activeBanners = data.filter(b => b.is_active === 'Active');
-        console.log(activeBanners,"active banner")
+        // console.log(activeBanners,"active banner")
         setBanners(activeBanners.sort((a, b) => a.order_by - b.order_by));
       } catch (error) {
         console.error('Failed to fetch banners:', error);

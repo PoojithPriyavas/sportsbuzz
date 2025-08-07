@@ -43,7 +43,7 @@ export default function MatchScheduler() {
         fetchFootBallLineUp
     } = useGlobalData();
 
-    console.log(matchSchedule, "match schedule")
+    // console.log(matchSchedule, "match schedule")
     const router = useRouter();
 
     const [translatedText, setTranslatedText] = useState({

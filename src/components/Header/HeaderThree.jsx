@@ -92,8 +92,8 @@ const HeaderThree = ({ animationStage }) => {
         setLocationData(locationCookie);
         setCountryData(countryCookie);
 
-        console.log('Location Data:', locationCookie);
-        console.log('Country Data:', countryCookie);
+        // console.log('Location Data:', locationCookie);
+        // console.log('Country Data:', countryCookie);
 
         // Set initial values based on cookie data
         if (locationData?.filtered_locations?.length > 0) {
@@ -106,11 +106,11 @@ const HeaderThree = ({ animationStage }) => {
     const hreflangTags = locationData?.hreflang_tags || [];
     const filteredLocations = locationData?.filtered_locations || [];
 
-    console.log(hreflangTags, "hreflang tags");
-    console.log(filteredLocations, "filtered locations");
-    console.log('countryCodeCookie:', countryCodeCookie);
-    console.log('hreflang:', hreflang);
-    // Initialize GSAP animation
+    // console.log(hreflangTags, "hreflang tags");
+    // console.log(filteredLocations, "filtered locations");
+    // console.log('countryCodeCookie:', countryCodeCookie);
+    // console.log('hreflang:', hreflang);
+    // // Initialize GSAP animation
     useEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
 

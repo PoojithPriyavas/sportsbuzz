@@ -12,7 +12,7 @@ const NewsSectionCards = () => {
     const [error, setError] = useState(null);
 
     const fetchNewsDetails = async (id) => {
-        console.log(id, "click id")
+        // console.log(id, "click id")
         setLoading(true);
         setError(null);
         try {

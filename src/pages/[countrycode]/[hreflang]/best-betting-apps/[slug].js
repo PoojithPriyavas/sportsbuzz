@@ -64,8 +64,8 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, is
     // console.log(sections, "shgdfs")
     const router = useRouter();
     const { countryCode: routeCountryCode, hreflang: routeLang } = router.query;
-    console.log('router.query:', router.query);
-    console.log('hrefLanData:', hrefLanData);
+    // console.log('router.query:', router.query);
+    // console.log('hrefLanData:', hrefLanData);
 
     useEffect(() => {
         if (!routeCountryCode || !routeLang || !hrefLanData) return;
@@ -150,10 +150,10 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, is
                     }
                 />
                 {hrefLanData.map(({ hreflang, country_code }) => {
-                    console.log(hreflang, "href lan g")
+                    {/* console.log(hreflang, "href lan g") */}
                     const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    console.log('Generated link:', { href, fullHrefLang });
+                    {/* console.log('Generated link:', { href, fullHrefLang }); */}
 
                     return (
                         <link

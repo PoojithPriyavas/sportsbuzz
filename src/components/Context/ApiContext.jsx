@@ -37,7 +37,7 @@ export const DataProvider = ({ children }) => {
 
     const getTimezoneByCountryCode = (code) => {
         const country = countryTimezones.find(item => item[0] === code);
-        console.log(country, "countrydfdfgdfgd")
+        // console.log(country, "countrydfdfgdfgd")
         return country ? country[1] : '+0.00';
     };
 
@@ -59,7 +59,7 @@ export const DataProvider = ({ children }) => {
             console.error('Failed to fetch country code:', error);
         }
     };
-    console.log(countryCode, "country code")
+    // console.log(countryCode, "country code")
 
     // FETCH LOCATION
 
@@ -278,7 +278,7 @@ export const DataProvider = ({ children }) => {
     const [oneXTournament, setOneXTournament] = useState([]);
 
     const fetchOneXTournamentsData = async (token) => {
-        console.log("calls trnmnt")
+        // console.log("calls trnmnt")
         try {
             const data = await fetchOneXTournaments(token);
             setOneXTournament(data);
@@ -345,7 +345,7 @@ export const DataProvider = ({ children }) => {
     const [oneXEventIds, setOneXEventIds] = useState([]);
 
     const fetchOneXEventsIdData = async (token, id) => {
-        console.log("calls id ")
+        // console.log("calls id ")
         try {
             const data = await fetchOneXEventsIds({ token, id });
 
@@ -410,7 +410,7 @@ export const DataProvider = ({ children }) => {
     const [matchSchedule, setMatchSchedule] = useState([]);
 
     async function fetchMatchSchedules(Date, Timezone) {
-        console.log("calls fetch match", Date)
+        // console.log("calls fetch match", Date)
         try {
             const response = await fetch(`/api/get-match-schedule-by-date?Date=${Date}&Timezone=${Timezone}`);
             if (!response.ok) {
@@ -470,7 +470,7 @@ export const DataProvider = ({ children }) => {
                 params.subcategory_id = subcategory;
             }
 
-            console.log('Fetching blogs with params:', params); // Debug log
+            // console.log('Fetching blogs with params:', params); // Debug log
 
             const response = await CustomAxios.get('/get-blogs', {
                 params,
@@ -493,7 +493,7 @@ export const DataProvider = ({ children }) => {
         }
 
         try {
-            console.log('Fetching betting apps for country code:', countryCodeParam);
+            // console.log('Fetching betting apps for country code:', countryCodeParam);
             const response = await CustomAxios.get('/best-betting-headings', {
                 params: {
                     country_code: countryCodeParam,
@@ -561,7 +561,7 @@ export const DataProvider = ({ children }) => {
             res.data.typeMatches?.forEach(type =>
                 type.seriesMatches?.forEach(series => {
                     const matches = series.seriesAdWrapper?.matches || [];
-                    console.log(matches, "matches")
+                    // console.log(matches, "matches")
                     matches.forEach(match => {
                         const t1 = match.matchInfo?.team1?.imageId;
                         const t2 = match.matchInfo?.team2?.imageId;
@@ -742,7 +742,7 @@ export const DataProvider = ({ children }) => {
     const [selectedNews, setSelectedNews] = useState(null);
 
     const fetchNewsDetails = async (id) => {
-        console.log(id, "click id")
+        // console.log(id, "click id")
         try {
             const response = await axios.get(
                 `https://cricbuzz-cricket.p.rapidapi.com/news/v1/detail/${id}`,
@@ -796,7 +796,7 @@ export const DataProvider = ({ children }) => {
 
     useEffect(() => {
         if (countryCode.country_code) {
-            console.log('Country code available, fetching dependent data:', countryCode.country_code);
+            // console.log('Country code available, fetching dependent data:', countryCode.country_code);
             fetchBlogs({ countryCodeParam: countryCode.country_code }); // Pass as object
             fetchBettingApps(countryCode.country_code);
             fetchBestBettingAppsPrevious(countryCode.country_code);

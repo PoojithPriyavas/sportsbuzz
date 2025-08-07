@@ -12,7 +12,7 @@ const FeaturedButton = () => {
     const href = featuredCategory ? `/blogs/pages/all-blogs?category=${featuredCategory.id}` : '#';
 
     const handleClick = (e) => {
-        console.log('Featured content clicked with POWER!');
+        // console.log('Featured content clicked with POWER!');
 
         // Create explosive ripple effect
         if (buttonRef.current) {

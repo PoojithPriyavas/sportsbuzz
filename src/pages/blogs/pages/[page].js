@@ -10,7 +10,7 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 import { fetchBlogsSSR } from "@/lib/ftechBlogsSSR";
 
 export async function getServerSideProps({ req, query, resolvedUrl }) {
-    console.log(resolvedUrl, "urlsdssd")
+    // console.log(resolvedUrl, "urlsdssd")
 
     const countryCookie = req.cookies.countryData;
     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
@@ -28,7 +28,7 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
         category: categoryIdParam ? parseInt(categoryIdParam) : null,
         subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam) : null,
     });
-    console.log(blogs, "ssr friendly")
+    // console.log(blogs, "ssr friendly")
     return {
         props: {
             blogs,
@@ -54,7 +54,7 @@ export default function BlogPages({
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
     const countryCode = countryData?.country_code || 'IN';
 
-    console.log(resolvedUrl, "rshdhasd")
+    // console.log(resolvedUrl, "rshdhasd")
     // console.log(blogs, "blogs hhh")
     // const { blogs, } = useGlobalData()   
 
@@ -116,7 +116,7 @@ export default function BlogPages({
                         const href = `${baseUrl}/blogs/${country.toLowerCase()}/${lang}`;
                         const hreflang = `${lang}-${country}`;
 
-                        console.log('Generated link:', { href, hreflang });
+                        {/* console.log('Generated link:', { href, hreflang }); */}
 
                         return (
                             <link

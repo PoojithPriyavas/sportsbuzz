@@ -300,8 +300,8 @@ export default function BettingCards() {
 
 // ... rest of your existing functions (transformEventToCard, fetchMarketData, SportsOddsCard)
 function transformEventToCard(event, marketData) {
-    console.log(event.imageOpponent2[0], "eve");
-    console.log(marketData, "market dtaaasd")
+    // console.log(event.imageOpponent2[0], "eve");
+    // console.log(marketData, "market dtaaasd")
     const isLive = event.waitingLive || event.period > 0;
     const startDate = new Date(event.startDate * 1000);
     const defaultOdds = [
@@ -357,7 +357,7 @@ async function fetchMarketData(token, sportEventId) {
 }
 
 const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced }) => {
-    console.log(card, "craddrssdsdsd")
+    // console.log(card, "craddrssdsdsd")
     const [selectedOdd, setSelectedOdd] = useState(null);
     const [betAmount, setBetAmount] = useState('');
     const [win, setWin] = useState('0.00');

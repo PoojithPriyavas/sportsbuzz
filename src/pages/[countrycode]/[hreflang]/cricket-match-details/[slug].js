@@ -29,7 +29,7 @@ export default function CricketMatchDetails() {
 
     const params = useParams();
     const matchId = params?.slug;
-    console.log(matchId, "matchid")
+    // console.log(matchId, "matchid")
 
     useEffect(() => {
         if (!matchId) {

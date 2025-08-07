@@ -22,7 +22,7 @@ import { fetchBestBettingAppsSSR } from "@/lib/fetchBestBettingAppsSSR";
 
 
 export async function getServerSideProps(context) {
-    console.log(context, "contexxt")
+    // console.log(context, "contexxt")
     const { req, query, params } = context;
     // Parse the cookie to get country code
     const countryCookie = req.cookies.countryData;
@@ -44,7 +44,7 @@ export async function getServerSideProps(context) {
 
 
 export default function BestBettingApps({ bestSections, sectionId }) {
-    console.log(bestSections, "jjjjjj")
+    // console.log(bestSections, "jjjjjj")
 
     const [loading, setLoading] = useState(true);
     const {

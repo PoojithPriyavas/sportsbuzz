@@ -75,7 +75,7 @@ export default function BlogsPage({
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentBlogs = blogs.slice(startIndex, endIndex);
-  console.log(currentBlogs, "cyvdsbd");
+  // console.log(currentBlogs, "cyvdsbd");
 
   const hasActiveFilters =
     selectedCategoryId || selectedSubcategoryId || filterValue !== 'all' || searchTerm !== '';
@@ -132,12 +132,12 @@ export default function BlogsPage({
     }
 
     const delayDebounce = setTimeout(() => {
-      console.log('Fetching blogs from BlogsPage with params:', {
-        countryCodeParam: countryCode?.country_code,
-        search: searchTerm,
-        category: selectedCategoryId,
-        subcategory: selectedSubcategoryId,
-      });
+      // console.log('Fetching blogs from BlogsPage with params:', {
+      //   countryCodeParam: countryCode?.country_code,
+      //   search: searchTerm,
+      //   category: selectedCategoryId,
+      //   subcategory: selectedSubcategoryId,
+      // });
 
       fetchBlogs({
         countryCodeParam: countryCode?.country_code,

@@ -54,7 +54,7 @@ function getTime(esd) {
 export default function UpcomingFootballMatches() {
     const { upcoming, fetchFootBallLineUp, fetchFootballDetails } = useGlobalData();
     const [selectedLeague, setSelectedLeague] = useState('All');
-    console.log(upcoming, "up ckaskjdjsd")
+    // console.log(upcoming, "up ckaskjdjsd")
     // Prepare league names
     const allLeagues = upcoming?.Stages?.map(stage => stage?.Cnm).filter(Boolean) || [];
     const uniqueLeagues = Array.from(new Set(allLeagues));

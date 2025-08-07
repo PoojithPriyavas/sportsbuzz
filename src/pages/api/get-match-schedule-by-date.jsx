@@ -2,7 +2,7 @@
 export default async function fetchMatchLineUp(req, res) {
     // console.log("goes to fn")
     const { Date, Timezone } = req.query;
-    console.log(Date, "date", Timezone, "time zone")
+    // console.log(Date, "date", Timezone, "time zone")
     const url = `https://livescore6.p.rapidapi.com/matches/v2/list-by-date?Category=soccer&Date=${Date}&Timezone=${Timezone}`;
 
     const options = {

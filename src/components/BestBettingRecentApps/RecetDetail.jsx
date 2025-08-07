@@ -7,7 +7,7 @@ import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/router';
 
 export default function RecentAppsDetails({ bestSections = [], sectionId }) {
-    console.log(sectionId, "best sections id")
+    // console.log(sectionId, "best sections id")
     // const router = useRouter();
     // const sectionId = router.query.id;
     const [isMobile, setIsMobile] = useState(false);
@@ -80,7 +80,7 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
                                 };
                             })
                     );
-                    console.log(translatedApps, "hsgdhgsd")
+                    // console.log(translatedApps, "hsgdhgsd")
                     return {
                         ...section,
                         heading: translatedHeading,
@@ -110,7 +110,7 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
         (section) => String(section.id) === String(sectionId)
     );
 
-    console.log(matchedSection, "trabdkdkd")
+    // console.log(matchedSection, "trabdkdkd")
 
     if (!matchedSection) {
         return <div className={styles.wrapper}>No section found for ID: {sectionId}</div>;

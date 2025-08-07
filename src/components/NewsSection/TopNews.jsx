@@ -8,7 +8,7 @@ import { useMemo } from 'react';
 
 const NewsList = () => {
   const { news, fetchNewsDetails, language, translateText } = useGlobalData();
-  console.log(news, "newssssss")
+  // console.log(news, "newssssss")
 
   const stories = useMemo(() => {
     return news?.storyList?.filter(item => item.story)?.map(item => item.story) || [];
@@ -23,7 +23,7 @@ const NewsList = () => {
 
   // Translate headlines and article titles on language or data change
   useEffect(() => {
-    console.log("this useffect is the issue")
+    // console.log("this useffect is the issue")
     const translateAll = async () => {
       if (!stories.length) return;
 

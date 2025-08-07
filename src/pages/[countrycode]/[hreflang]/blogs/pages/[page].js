@@ -30,7 +30,7 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
         category: categoryIdParam ? parseInt(categoryIdParam) : null,
         subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam) : null,
     });
-    console.log(blogs, "ssr friendly")
+    // console.log(blogs, "ssr friendly")
     return {
         props: {
             blogs,
@@ -58,10 +58,10 @@ export default function BlogPages({
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
     const countryCode = countryData?.country_code || 'IN';
 
-    console.log(hrefLanData, "href lang data");
-    console.log(blogs, "blogs hhh");
-    console.log(baseUrl, "base url");
-    console.log(resolvedUrl, "resolved url")
+    // console.log(hrefLanData, "href lang data");
+    // console.log(blogs, "blogs hhh");
+    // console.log(baseUrl, "base url");
+    // console.log(resolvedUrl, "resolved url")
     // const { blogs, } = useGlobalData()   
 
 
@@ -118,10 +118,10 @@ export default function BlogPages({
                 <meta name="author" content="Sports Buzz" />
 
                 {hrefLanData.map(({ hreflang, country_code }) => {
-                    console.log(hreflang,"href lan g")
+                    {/* console.log(hreflang,"href lan g") */}
                     const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    console.log('Generated link:', { href, fullHrefLang });
+                    {/* console.log('Generated link:', { href, fullHrefLang }); */}
 
                     return (
                         <link

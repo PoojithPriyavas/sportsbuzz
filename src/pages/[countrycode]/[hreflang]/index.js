@@ -70,11 +70,11 @@ export default function Home({ countryData, hrefLanData, resolvedUrl, isLocalhos
         stages,
         news
     } = useGlobalData();
-    console.log(apiResponse, "api response");
-    console.log(resolvedUrl, " resolved home")
+    // console.log(apiResponse, "api response");
+    // console.log(resolvedUrl, " resolved home")
 
     if (countryCode && countryCode.country_code) {
-        console.log("Valid country code:", countryCode.country_code);
+        // console.log("Valid country code:", countryCode.country_code);
     }
 
     const [loading, setLoading] = useState(true);
@@ -137,10 +137,10 @@ export default function Home({ countryData, hrefLanData, resolvedUrl, isLocalhos
                 />
                 <meta name="author" content="Sportsbuz" />
                 {hrefLanData.map(({ hreflang, country_code }) => {
-                    console.log(hreflang, "href lan g")
+                    {/* console.log(hreflang, "href lan g") */}
                     const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    console.log('Generated link:', { href, fullHrefLang });
+                    {/* console.log('Generated link:', { href, fullHrefLang }); */}
 
                     return (
                         <link

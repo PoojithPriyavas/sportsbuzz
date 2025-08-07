@@ -54,7 +54,7 @@ export default function BestBettingApps({ sections }) {
         countryCode,
         bestSections
     } = useGlobalData();
-    console.log(sections, "shgdfs")
+    // console.log(sections, "shgdfs")
 
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false

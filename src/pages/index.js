@@ -84,11 +84,11 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
     stages,
     news
   } = useGlobalData();
-  const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
+  const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
 
-  console.log(locationDataHome, "location home");
-  console.log(countryDataHome, "country data home")
-  console.log()
+  // console.log(locationDataHome, "location home");
+  // console.log(countryDataHome, "country data home")
+
 
   // if (countryCode && countryCode.country_code) {
   //   console.log("Valid country code:", countryCode.country_code);
@@ -157,10 +157,10 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
         {/* Canonical */}
         {locationDataHome.map(({ hreflang, country_code }) => {
-          console.log(hreflang, "href lan home")
-          const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/blogs/pages/all-blogs`;
+          {/* console.log(hreflang, "href lan home") */}
+          const href = `${baseUrl}/${country_code.toLowerCase()}`;
           const fullHrefLang = `${hreflang}-${country_code}`;
-          console.log('Generated link:', { href, fullHrefLang });
+          {/* console.log('Generated link:', { href, fullHrefLang }); */}
 
           return (
             <link
