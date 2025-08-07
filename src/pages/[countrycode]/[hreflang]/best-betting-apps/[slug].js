@@ -17,7 +17,7 @@ import FooterTwo from "@/components/Footer/Footer";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 import HeaderTwo from "@/components/Header/HeaderTwo";
-
+import { useRouter } from "next/router";
 import { fetchBettingAppsSSR } from '@/lib/fetchBettingAppsSSR';
 
 
@@ -37,13 +37,14 @@ export async function getServerSideProps({ req, resolvedUrl }) {
             sections,
             // countryCode,
             hrefLanData,
-            resolvedUrl
+            resolvedUrl,
+            isLocalhost: process.env.NODE_ENV === 'development'
         },
     };
 }
 
 
-export default function BestBettingApps({ sections, hrefLanData, resolvedUrl }) {
+export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, isLocalhost }) {
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
     // const countryCode = countryData?.country_code || 'IN';
 
@@ -61,6 +62,31 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl }) 
         bestSections
     } = useGlobalData();
     // console.log(sections, "shgdfs")
+    const router = useRouter();
+    const { countryCode: routeCountryCode, hreflang: routeLang } = router.query;
+    console.log('router.query:', router.query);
+    console.log('hrefLanData:', hrefLanData);
+
+    useEffect(() => {
+        if (!routeCountryCode || !routeLang || !hrefLanData) return;
+
+        const validLangs = hrefLanData
+            .filter(loc => loc.country_code.toLowerCase() === routeCountryCode.toLowerCase())
+            .map(loc => loc.hreflang.toLowerCase());
+
+        const fallbackLang = validLangs[0]; // assume en
+
+        if (validLangs.includes(routeLang.toLowerCase())) {
+            setLanguage(routeLang); // valid
+        } else if (fallbackLang) {
+            setLanguage(fallbackLang); // fallback
+            const updatedUrl = router.asPath.replace(`/${routeLang}/`, `/${fallbackLang}/`);
+            if (updatedUrl !== router.asPath) {
+                router.replace(updatedUrl); // navigate
+            }
+        }
+    }, [routeCountryCode, routeLang, hrefLanData]);
+
 
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false
