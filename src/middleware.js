@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 
 export async function middleware(request) {
+  console.log('middle ware is being called.')
   const response = NextResponse.next();
   const existingCountryData = request.cookies.get('countryData');
   const existingLocationData = request.cookies.get('locationData');
@@ -17,6 +18,8 @@ export async function middleware(request) {
       response.cookies.set('countryData', JSON.stringify(countryData), {
         path: '/',
         maxAge: 60 * 60 * 24, // 1 day
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
       });
 
       // Extract country code from the fresh data
@@ -51,10 +54,14 @@ export async function middleware(request) {
       response.cookies.set('locationData', JSON.stringify(locationFilterData), {
         path: '/',
         maxAge: 60 * 60 * 24, // 1 day
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
       });
       response.cookies.set('lanTagValues', JSON.stringify(locationsData), {
         path: '/',
         maxAge: 60 * 60 * 24,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
       });
     }
 
