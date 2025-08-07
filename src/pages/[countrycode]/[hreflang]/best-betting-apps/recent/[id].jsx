@@ -27,19 +27,19 @@ export async function getServerSideProps(context) {
     // Parse the cookie to get country code
     const countryCookie = req.cookies.countryData;
     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    const countryCode = countryData?.country_code || 'IN';
+    const countryCodes = countryData?.country_code || 'IN';
     const hrefLanCookie = req.cookies.lanTagValues;
     const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
 
     const sectionId = params.id;
     // Fetch betting apps data based on country code
-    const bestSections = await fetchBestBettingAppsSSR(countryCode);
+    const bestSections = await fetchBestBettingAppsSSR(countryCodes);
 
     return {
         props: {
             bestSections,
             sectionId,
-            countryCode,
+            countryCodes,
             hrefLanData,
             resolvedUrl
         },
@@ -47,7 +47,7 @@ export async function getServerSideProps(context) {
 }
 
 
-export default function BestBettingApps({ bestSections, sectionId, countryCode, hrefLanData, resolvedUrl }) {
+export default function BestBettingApps({ bestSections, sectionId, countryCodes, hrefLanData, resolvedUrl }) {
 
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
     // const countryCode = countryData?.country_code || 'IN';

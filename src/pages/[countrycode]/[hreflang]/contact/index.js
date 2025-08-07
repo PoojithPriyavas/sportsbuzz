@@ -4,7 +4,7 @@ import Head from "next/head";
 import BettingAppsTable from "@/components/BestBettingApps/BestBettingApps";
 import BettingAppsRecentTable from "@/components/BestBettingRecentApps/BestBettingRecentApps";
 import UpcomingMatches from "@/components/UpComing/UpComingMatches";
-import styles from '../../styles/Home.module.css';
+// import styles from '../../styles/Home.module.css';
 import AutoSlider from "@/components/AutoSlider/AutoSlider";
 import TopNewsSection from "@/components/NewsSection/TopNews";
 import BlogSlider from "@/components/BlogsSection/BlogSlider";
