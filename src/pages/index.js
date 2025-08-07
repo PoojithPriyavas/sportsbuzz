@@ -46,7 +46,7 @@ export async function getServerSideProps(context) {
   try {
     const [countryRes, locationRes] = await Promise.all([
       axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
-      axios.get('https://admin.sportsbuz.com/api/locations/')
+      axios.get('https://admin.sportsbuz.com/api/locations')
     ]);
 
     const countryDataHome = countryRes.data;
