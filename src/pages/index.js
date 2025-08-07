@@ -46,7 +46,7 @@ export async function getServerSideProps(context) {
   try {
     const [countryRes, locationRes] = await Promise.all([
       axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
-      axios.get('https://admin.sportsbuz.com/api/locations')
+      axios.get('https://admin.sportsbuz.com/api/locations/')
     ]);
 
     const countryDataHome = countryRes.data;
@@ -84,7 +84,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
     stages,
     news
   } = useGlobalData();
-  const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
+  const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
 
   console.log(locationDataHome, "location home");
   console.log(countryDataHome, "country data home")
