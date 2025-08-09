@@ -135,13 +135,17 @@ export const DataProvider = ({ children }) => {
 
     //SPORT CHANGE CONDITION
 
-    const [sport, setSport] = useState(() => {
-        // Get from localStorage if available
+    const [sport, setSport] = useState('cricket');
+    
+    // Initialize sport from localStorage on client-side only
+    useEffect(() => {
         if (typeof window !== 'undefined') {
-            return localStorage.getItem('selectedSport') || 'cricket';
+            const savedSport = localStorage.getItem('selectedSport');
+            if (savedSport) {
+                setSport(savedSport);
+            }
         }
-        return 'cricket';
-    });
+    }, []);
 
     // Add this effect to update sport when country code changes
     useEffect(() => {

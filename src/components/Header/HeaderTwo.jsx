@@ -369,8 +369,10 @@ const HeaderTwo = ({ animationStage }) => {
     };
 
     const handleSportChange = (selectedSport) => {
-        setSport(selectedSport);
+        // First update localStorage to ensure consistency
         localStorage.setItem('selectedSport', selectedSport);
+        // Then update state
+        setSport(selectedSport);
         setExpandedSportsSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);

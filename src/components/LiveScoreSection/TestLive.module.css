@@ -26,6 +26,11 @@
     flex-direction: column;
     /* Key change: make it a flex container */
 }
+@media(max-width:768px){
+    .matchCard{
+        height: 230px;
+    }
+}
 
 .matchCard:hover {
     transform: translateY(-5px);

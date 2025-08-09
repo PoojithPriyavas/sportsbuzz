@@ -47,9 +47,9 @@ a {
   width: 100%;
 
 
-  margin-top: 5rem;
+  /* margin-top: 5rem; */
 }
-
+/* 
 @media(max-width:1200px) {
   .container {
     margin-top: 5rem !important;
@@ -66,4 +66,4 @@ a {
   .container {
     margin-top: 5rem !important;
   }
-}
+} */

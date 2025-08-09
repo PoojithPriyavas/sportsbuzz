@@ -157,10 +157,10 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
         {/* Canonical */}
         {locationDataHome.map(({ hreflang, country_code }) => {
-          {/* console.log(hreflang, "href lan home") */}
+          {/* console.log(hreflang, "href lan home") */ }
           const href = `${baseUrl}/${country_code.toLowerCase()}`;
           const fullHrefLang = `${hreflang}-${country_code}`;
-          {/* console.log('Generated link:', { href, fullHrefLang }); */}
+          {/* console.log('Generated link:', { href, fullHrefLang }); */ }
 
           return (
             <link
@@ -203,16 +203,19 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
           <div
             // style={{marginTop:'9.5rem'}}
             className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
-            {sport === 'cricket' ? (
-              <>
-                {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
-              </>
-            ) : (
-              <>
-                {stages && <TestLive />}
-              </>
 
+            {sport === 'cricket' && apiResponse && (
+              <LiveScores
+                apiResponse={apiResponse}
+                matchTypes={matchTypes}
+                teamImages={teamImages}
+              />
             )}
+
+            {sport === 'football' && stages && (
+              <TestLive />
+            )}
+
             <HeroCarousal />
 
             <div className={styles.fourColumnRow}>

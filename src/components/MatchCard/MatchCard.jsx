@@ -25,7 +25,10 @@ const MatchCard = () => {
     totalPlayers: 'Total Players',
     subs: 'Substitutions',
     matchStatus: 'Match Status',
-    completed: 'Completed'
+    completed: 'Completed',
+    loading: 'Loading...',
+    noTeamData: 'No team data available',
+    noMatchData: 'No match data available'
   });
 
   useEffect(() => {
@@ -46,7 +49,10 @@ const MatchCard = () => {
         totalPlayers,
         subs,
         matchStatus,
-        completed
+        completed,
+        loading,
+        noTeamData,
+        noMatchData
       ] = await Promise.all([
         translateText('Stadium', 'en', language),
         translateText('City', 'en', language),
@@ -63,7 +69,10 @@ const MatchCard = () => {
         translateText('Total Players', 'en', language),
         translateText('Substitutions', 'en', language),
         translateText('Match Status', 'en', language),
-        translateText('Completed', 'en', language)
+        translateText('Completed', 'en', language),
+        translateText('Loading...', 'en', language),
+        translateText('No team data available', 'en', language),
+        translateText('No match data available', 'en', language)
       ]);
 
       setTranslatedText({
@@ -82,14 +91,28 @@ const MatchCard = () => {
         totalPlayers,
         subs,
         matchStatus,
-        completed
+        completed,
+        loading,
+        noTeamData,
+        noMatchData
       });
     };
 
     translateLabels();
   }, [language, translateText]);
 
-  if (!footBallMatchDetails || !lineUp) return <div>Loading...</div>;
+  // Show loading state initially
+  if (!footBallMatchDetails || !lineUp) {
+    return (
+      <div className={styles.matchCard}>
+        <div className={styles.noDataSection}>
+          <div className={styles.loadingIcon}>⏳</div>
+          <h2>{translatedText.loading}</h2>
+          <p>Please wait while we fetch the match information...</p>
+        </div>
+      </div>
+    );
+  }
 
   const stadiumName = footBallMatchDetails?.Vnm || 'Unknown Stadium';
   const country = footBallMatchDetails?.VCnm || 'Unknown Country';
@@ -189,23 +212,76 @@ const MatchCard = () => {
   const processedTeamA = teamA ? processTeamData(teamA, 1) : null;
   const processedTeamB = teamB ? processTeamData(teamB, 2) : null;
 
-  if (!processedTeamA || !processedTeamB) return <div>Loading team data...</div>;
+  // Show no team data available message
+  if (!processedTeamA || !processedTeamB) {
+    return (
+      <div className={styles.matchCard}>
+        <div className={styles.matchHeader}>
+          <div className={styles.matchInfo}>
+            <div className={styles.matchInfoRow}>
+              <div className={styles.stadiumInfo}>
+                <div className={styles.stadiumName}>🏟️ {stadiumName}</div>
+                {city && <div>{translatedText.city}: {city}</div>}
+              </div>
+              <div className={styles.matchDetails}>
+                <div className={styles.matchDate}>📅 {translatedText.date}: {formattedDateTime.split(',')[0]}</div>
+                <div>⏰ {translatedText.time}: {formattedDateTime.split(',')[1]?.trim()}</div>
+              </div>
+              <div className={styles.countryInfo}>
+                <div>🌍 {translatedText.country}: {country}</div>
+                <div>{translatedText.league}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.teamsScore}>
+            <div className={styles.team}>
+              <div className={styles.teamBadge}>🔴</div>
+              <div className={styles.teamName}>Team A</div>
+              <div>{translatedText.coach}: Unknown Coach</div>
+            </div>
+            <div className={styles.vs}>{translatedText.vs}</div>
+            <div className={styles.team}>
+              <div className={styles.teamBadge}>🔵</div>
+              <div className={styles.teamName}>Team B</div>
+              <div>{translatedText.coach}: Unknown Coach</div>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.noDataSection}>
+          <div className={styles.noDataIcon}>❌</div>
+          <h2>{translatedText.noTeamData}</h2>
+          <p>Team lineups and player information could not be loaded for this match.</p>
+          <p>This might be due to:</p>
+          <ul className={styles.reasonsList}>
+            <li>Match data not yet available</li>
+            <li>Incomplete team information</li>
+            <li>Network connectivity issues</li>
+            <li>Data source temporarily unavailable</li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.matchCard}>
       <div className={styles.matchHeader}>
         <div className={styles.matchInfo}>
-          <div className={styles.stadiumInfo}>
-            <div className={styles.stadiumName}>🏟️ {stadiumName}</div>
-            {city && <div>{translatedText.city}: {city}</div>}
-          </div>
-          <div className={styles.matchDetails}>
-            <div className={styles.matchDate}>📅 {translatedText.date}: {formattedDateTime.split(',')[0]}</div>
-            <div>⏰ {translatedText.time}: {formattedDateTime.split(',')[1]?.trim()}</div>
-          </div>
-          <div className={styles.countryInfo}>
-            <div>🌍 {translatedText.country}: {country}</div>
-            <div>{translatedText.league}</div>
+          <div className={styles.matchInfoRow}>
+            <div className={styles.stadiumInfo}>
+              <div className={styles.stadiumName}>🏟️ {stadiumName}</div>
+              {city && <div>{translatedText.city}: {city}</div>}
+            </div>
+            <div className={styles.matchDetails}>
+              <div className={styles.matchDate}>📅 {translatedText.date}: {formattedDateTime.split(',')[0]}</div>
+              <div>⏰ {translatedText.time}: {formattedDateTime.split(',')[1]?.trim()}</div>
+            </div>
+            <div className={styles.countryInfo}>
+              <div>🌍 {translatedText.country}: {country}</div>
+              <div>{translatedText.league}</div>
+            </div>
           </div>
         </div>
 
@@ -224,7 +300,9 @@ const MatchCard = () => {
         </div>
       </div>
 
-      <Field teamA={processedTeamA} teamB={processedTeamB} />
+      <div className={styles.fieldContainer}>
+        <Field teamA={processedTeamA} teamB={processedTeamB} />
+      </div>
 
       <div className={styles.lineupsSection}>
         <h3>📋 {translatedText.lineup}</h3>
