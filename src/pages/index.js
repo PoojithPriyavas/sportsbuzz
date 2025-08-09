@@ -43,14 +43,23 @@ const geistMono = Geist_Mono({
 import axios from 'axios';
 
 export async function getServerSideProps(context) {
+  // Log the request origin (helpful for debugging)
+  console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
   try {
     const [countryRes, locationRes] = await Promise.all([
       axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
-      axios.get('https://admin.sportsbuz.com/api/locations')
+      axios.get('https://admin.sportsbuz.com/api/locations/')
     ]);
 
     const countryDataHome = countryRes.data;
     const locationDataHome = locationRes.data;
+
+    // Detailed logging
+    console.log('=== API RESPONSE DATA ===');
+    console.log('Country Data in the props:', JSON.stringify(countryRes.data, null, 2));
+    console.log('Location Data in the props:', JSON.stringify(locationRes.data, null, 2));
+    console.log('Response Headers - Country in the props:', countryRes.headers);
+    console.log('Response Headers - Location: in the props', locationRes.headers);
 
     return {
       props: {
@@ -59,7 +68,14 @@ export async function getServerSideProps(context) {
       }
     };
   } catch (error) {
-    console.error("Error fetching data from APIs:", error.message);
+    // console.error("Error fetching data from APIs:", error.message);
+    console.error("API Error Details: in the props", {
+      url: error.config?.url,
+      status: error.response?.status,
+      data: error.response?.data,
+      headers: error.response?.headers,
+      stack: error.stack
+    });
     return {
       props: {
         countryDataHome: null,
