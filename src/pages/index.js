@@ -213,7 +213,8 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
       </Head>
 
       <>
-        <RegionSelector countryDataHome={countryDataHome} locationDataHome={locationDataHome} />
+
+        {showOtherDivs && <RegionSelector countryDataHome={countryDataHome} locationDataHome={locationDataHome} />}
         <HeaderTwo animationStage={animationStage} />
         {showOtherDivs && (
           <div

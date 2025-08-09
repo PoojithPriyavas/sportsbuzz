@@ -233,3 +233,79 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Region Selector Container Styles */
+.regionSelectorContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9998; /* Below HeaderTwo but above other content */
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-100%);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Show region selector with animation */
+.regionSelectorContainer.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Adjust HeaderTwo positioning when region selector is visible */
+.headerWithRegion {
+  margin-top: 60px; /* Adjust this value based on your region selector height */
+}
+
+/* Content offset when both headers are visible */
+.offHeader {
+  margin-top: 12rem; /* Adjust based on combined height of both headers */
+}
+
+/* Animation classes for content */
+.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.fadeUpEnter {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.fadeUpEnterActive {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .regionSelectorContainer {
+    position: relative;
+    z-index: auto;
+  }
+  
+  .headerWithRegion {
+    margin-top: 0;
+  }
+  
+  .offHeader {
+    margin-top: 8rem; /* Reduced for mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .offHeader {
+    margin-top: 6rem;
+  }
+}
