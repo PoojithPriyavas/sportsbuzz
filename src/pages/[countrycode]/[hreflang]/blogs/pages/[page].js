@@ -9,54 +9,76 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 
 import { fetchBlogsSSR } from "@/lib/ftechBlogsSSR";
 
+import axios from 'axios';
+
 export async function getServerSideProps({ req, query, resolvedUrl }) {
-    // console.log(resolvedUrl, "urlsdssd")
+    let blogs = [];
+    let countryDataHome = null;
+    let locationDataHome = null;
 
-    const countryCookie = req.cookies.countryData;
-    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    // console.log(countryData,"dgadjasdasdkajsd,akjsd")
-    const hrefLanCookie = req.cookies.lanTagValues;
-    const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
+    try {
+        const [countryRes, locationRes] = await Promise.all([
+            axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
+            axios.get('https://admin.sportsbuz.com/api/locations/')
+        ]);
 
-    const {
-        category: categoryIdParam,
-        subcategory: subcategoryIdParam,
-        search: searchTerm = ''
-    } = query;
+        countryDataHome = countryRes.data;
+        locationDataHome = locationRes.data;
 
-    const blogs = await fetchBlogsSSR({
-        countryCode: countryData?.country_code || 'IN',
-        search: searchTerm,
-        category: categoryIdParam ? parseInt(categoryIdParam) : null,
-        subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam) : null,
-    });
-    // console.log(blogs, "ssr friendly")
+        const {
+            category: categoryIdParam,
+            subcategory: subcategoryIdParam,
+            search: searchTerm = ''
+        } = query;
+
+        blogs = await fetchBlogsSSR({
+            countryCode: countryDataHome?.country_code || 'IN',
+            search: searchTerm,
+            category: categoryIdParam ? parseInt(categoryIdParam, 10) : null,
+            subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam, 10) : null,
+        });
+
+        // Debug logs (remove in production)
+        console.log('=== API RESPONSE DATA ===');
+        console.log('Country Data:', JSON.stringify(countryDataHome, null, 2));
+        console.log('Location Data:', JSON.stringify(locationDataHome, null, 2));
+        console.log('Country Response Headers:', countryRes.headers);
+        console.log('Location Response Headers:', locationRes.headers);
+
+    } catch (error) {
+        console.error("API Error Details:", {
+            message: error.message,
+            url: error.config?.url,
+            status: error.response?.status,
+            data: error.response?.data,
+            headers: error.response?.headers,
+            stack: error.stack
+        });
+    }
+
     return {
         props: {
             blogs,
-            countryData,
-            hrefLanData,
-            supportedLanguages: ['en', 'fr'],
-            supportedCountries: ['IN', 'FR'],
+            countryDataHome,
+            locationDataHome,
             resolvedUrl,
             isLocalhost: process.env.NODE_ENV === 'development'
-        },
+        }
     };
-
-
 }
+
 
 
 export default function BlogPages({
     blogs,
-    countryData,
-    hrefLanData,
+    countryDataHome,
+    locationDataHome,
     supportedLanguages,
     supportedCountries,
     resolvedUrl,
     isLocalhost, }) {
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
-    const countryCode = countryData?.country_code || 'IN';
+    const countryCode = countryDataHome?.country_code || 'IN';
 
     // console.log(hrefLanData, "href lang data");
     // console.log(blogs, "blogs hhh");
@@ -117,11 +139,11 @@ export default function BlogPages({
                 <meta name="keywords" content="sports blogs, football news, cricket updates, match analysis, sports buzz" />
                 <meta name="author" content="Sports Buzz" />
 
-                {hrefLanData.map(({ hreflang, country_code }) => {
-                    {/* console.log(hreflang,"href lan g") */}
+                {locationDataHome.map(({ hreflang, country_code }) => {
+                    console.log(hreflang, "href lan g");
                     const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    {/* console.log('Generated link:', { href, fullHrefLang }); */}
+                    {/* console.log('Generated link:', { href, fullHrefLang }); */ }
 
                     return (
                         <link
