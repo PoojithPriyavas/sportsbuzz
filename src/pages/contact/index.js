@@ -25,7 +25,7 @@ import FooterTwo from "@/components/Footer/Footer";
 
 
 
-export default function FootballMatchDetails() {
+export default function ContactUs() {
 
   const [loading, setLoading] = useState(true);
 
@@ -79,7 +79,7 @@ export default function FootballMatchDetails() {
   return (
     <>
       <Head>
-        <title>Match Details</title>
+        <title>Sportsbuz | contact us</title>
         <meta name="description" content="Your site description here" />
       </Head>
       {/* <Header /> */}

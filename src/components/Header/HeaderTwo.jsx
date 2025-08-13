@@ -59,7 +59,7 @@ const HeaderTwo = ({ animationStage }) => {
         // Set initial states IMMEDIATELY to prevent flash
         gsap.set(containerRef.current, {
             height: hasPlayedAnimation ? '5rem' : '100vh',
-            top: hasPlayedAnimation ? '5rem' : '0', // Add top position control
+            // top: hasPlayedAnimation ? '5rem' : '0', // Add top position control
             overflow: hasPlayedAnimation ? 'visible' : 'hidden',
             display: hasPlayedAnimation ? 'flex' : 'block',
             alignItems: hasPlayedAnimation ? 'center' : 'stretch',
@@ -164,13 +164,13 @@ const HeaderTwo = ({ animationStage }) => {
             })
             
             // Step 7: Smoothly slide the header down from top: 0 to top: 5rem
-            .to(containerRef.current, {
-                top: '5rem',
-                duration: 1,
-                ease: "power2.inOut"
-            });
+            // .to(containerRef.current, {
+            //     top: '5rem',
+            //     duration: 1,
+            //     ease: "power2.inOut"
+            // });
 
-            timelineRef.current = tl;
+            // timelineRef.current = tl;
         } else {
             // Animation already played - already set to final state above
             setShouldShowAnimation(false);

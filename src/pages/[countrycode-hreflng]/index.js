@@ -2,7 +2,8 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
-import styles from "../../../styles/Home.module.css";
+import styles from "@/styles/Home.module.css";
+import Header from "@/components/Header/Header";
 import LiveScores from "@/components/LiveScoreSection/LiveScoreSection";
 import BonusTable from "@/components/BonusTable/BonusTable";
 import UpcomingMatches from "@/components/UpComing/UpComingMatches";
@@ -28,7 +29,10 @@ import Footer from '@/components/Footer/Footer';
 import TestHeader from "@/components/Header/TestHeader";
 import HeaderTwo from "@/components/Header/HeaderTwo";
 import RegionSelector from "@/components/RegionSelector/RegionSelector";
-import HeaderThree from "@/components/Header/HeaderThree";
+import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
+import { useLanguageValidation } from "@/hooks/useLanguageValidation";
+
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -39,24 +43,59 @@ const geistMono = Geist_Mono({
     variable: "--font-geist-mono",
     subsets: ["latin"],
 });
-export async function getServerSideProps({ req, query, resolvedUrl }) {
-    const countryCookie = req.cookies.countryData;
-    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    // console.log(countryData,"dgadjasdasdkajsd,akjsd")
-    const hrefLanCookie = req.cookies.lanTagValues;
-    const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
-    return {
-        props: {
 
-            countryData,
-            hrefLanData,
-            resolvedUrl,
-            isLocalhost: process.env.NODE_ENV === 'development'
-        },
-    };
+import axios from 'axios';
+import HeaderThree from "@/components/Header/HeaderThree";
+
+export async function getServerSideProps(context) {
+    // Log the request origin (helpful for debugging)
+    console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
+    try {
+        const { resolvedUrl, req } = context;
+        const [countryRes, locationRes] = await Promise.all([
+            axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
+            axios.get('https://admin.sportsbuz.com/api/locations/')
+        ]);
+
+        const countryDataHome = countryRes.data;
+        const locationDataHome = locationRes.data;
+
+        // Detailed logging
+        console.log('=== API RESPONSE DATA ===');
+        console.log('Country Data in the props:', JSON.stringify(countryRes.data, null, 2));
+        console.log('Location Data in the props:', JSON.stringify(locationRes.data, null, 2));
+        console.log('Response Headers - Country in the props:', countryRes.headers);
+        console.log('Response Headers - Location: in the props', locationRes.headers);
+
+        return {
+            props: {
+                countryDataHome,
+                locationDataHome,
+                resolvedUrl,
+            }
+        };
+    } catch (error) {
+        // console.error("Error fetching data from APIs:", error.message);
+        console.error("API Error Details: in the props", {
+            url: error.config?.url,
+            status: error.response?.status,
+            data: error.response?.data,
+            headers: error.response?.headers,
+            stack: error.stack
+        });
+        return {
+            props: {
+                countryDataHome: null,
+                locationDataHome: null,
+                resolvedUrl,
+                isLocalhost: process.env.NODE_ENV === 'development'
+            }
+        };
+    }
 }
-export default function Home({ countryData, hrefLanData, resolvedUrl, isLocalhost }) {
-    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
+
+export default function Home({ countryDataHome, locationDataHome, resolvedUrl, isLocalhost }) {
+
     const {
         blogCategories,
         blogs,
@@ -66,22 +105,36 @@ export default function Home({ countryData, hrefLanData, resolvedUrl, isLocalhos
         teamImages,
         upcomingMatches,
         sport,
-        countryCode,
+        // countryCode,
         stages,
-        news
-    } = useGlobalData();
-    // console.log(apiResponse, "api response");
-    // console.log(resolvedUrl, " resolved home")
+        news,
+        fetchBettingApps
 
-    if (countryCode && countryCode.country_code) {
-        // console.log("Valid country code:", countryCode.country_code);
-    }
+    } = useGlobalData();
+    console.log(sections, "sections")
+    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
+    const router = useRouter();
+    const { "countrycode-hreflng": countryLang } = useParams();
+    console.log(countryLang, "params value");
+
+    const languageValidation = useLanguageValidation(locationDataHome, countryLang);
+    // console.log(slug.countrycode-hreflng,"slug in index")
+
+    // console.log(locationDataHome, "location home");
+    // console.log(countryDataHome, "country data home")
+
+
+    // if (countryCode && countryCode.country_code) {
+    //   console.log("Valid country code:", countryCode.country_code);
+    // }
 
     const [loading, setLoading] = useState(true);
     const [animationStage, setAnimationStage] = useState('loading');
     const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
-
+    useEffect(() => {
+        fetchBettingApps()
+    },[])
 
     useEffect(() => {
         // Check if animation has been played before
@@ -122,6 +175,7 @@ export default function Home({ countryData, hrefLanData, resolvedUrl, isLocalhos
     }, [showOtherDivs]);
 
 
+    // console.log("enters this condition", countryCode?.location?.betting_apps?.trim() === 'Active');
 
     return (
         <>
@@ -136,11 +190,13 @@ export default function Home({ countryData, hrefLanData, resolvedUrl, isLocalhos
                     content="sports news, live scores, cricket scores, football matches, betting tips, match predictions, Sportsbuz"
                 />
                 <meta name="author" content="Sportsbuz" />
-                {hrefLanData.map(({ hreflang, country_code }) => {
-                    {/* console.log(hreflang, "href lan g") */}
-                    const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/blogs/pages/all-blogs`;
+
+                {/* Canonical */}
+                {locationDataHome.map(({ hreflang, country_code }) => {
+                    {/* console.log(hreflang, "href lan home") */ }
+                    const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    {/* console.log('Generated link:', { href, fullHrefLang }); */}
+                    {/* console.log('Generated link:', { href, fullHrefLang }); */ }
 
                     return (
                         <link
@@ -151,9 +207,6 @@ export default function Home({ countryData, hrefLanData, resolvedUrl, isLocalhos
                         />
                     );
                 })}
-                {/* Canonical */}
-                {/* <link rel="canonical" href="https://www.sportsbuz.com/" /> */}
-
                 {/* Open Graph (for Facebook, LinkedIn, etc.) */}
                 <meta property="og:title" content="Sportsbuz | Live Scores & Betting Tips" />
                 <meta
@@ -174,33 +227,37 @@ export default function Home({ countryData, hrefLanData, resolvedUrl, isLocalhos
                 />
                 <meta name="twitter:image" content="https://www.sportsbuz.com/images/logo.png" />
                 <meta name="twitter:site" content="@sportsbuz" />
-                <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
+
                 {/* Favicon */}
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
             <>
 
+                {/* {showOtherDivs && <RegionSelector countryDataHome={countryDataHome} locationDataHome={locationDataHome} />} */}
                 <HeaderThree animationStage={animationStage} />
                 {showOtherDivs && (
                     <div
                         // style={{marginTop:'9.5rem'}}
                         className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
-                        {sport === 'cricket' ? (
-                            <>
-                                {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
-                            </>
-                        ) : (
-                            <>
-                                {stages && <TestLive />}
-                            </>
 
+                        {sport === 'cricket' && apiResponse && (
+                            <LiveScores
+                                apiResponse={apiResponse}
+                                matchTypes={matchTypes}
+                                teamImages={teamImages}
+                            />
                         )}
+
+                        {sport === 'football' && stages && (
+                            <TestLive />
+                        )}
+
                         <HeroCarousal />
 
                         <div className={styles.fourColumnRow}>
                             <div className={styles.leftThreeColumns}>
-                                {countryCode?.location?.betting_apps == 'Active' && (
+                                {countryDataHome?.location?.betting_apps == 'Active' && (
                                     <BonusTable sections={sections} />
                                 )}
                                 <div className={styles.twoSplitRow}>

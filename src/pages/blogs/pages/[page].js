@@ -139,7 +139,7 @@ export default function BlogPages({
 
                 {locationDataHome.map(({ hreflang, country_code }) => {
                     {/* console.log(hreflang,"href lan g") */ }
-                    const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/blogs/pages/all-blogs`;
+                    const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
                     console.log('Generated link:', { href, fullHrefLang });
 

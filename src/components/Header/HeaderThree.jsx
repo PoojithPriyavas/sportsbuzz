@@ -255,9 +255,11 @@ const HeaderThree = ({ animationStage }) => {
 
     // Function to parse URL path for country code and language
     const parseUrlPath = (pathname) => {
+        const isUrlCountryPresent = pathname?.replace(/^,?\//, '').split('-');
+        console.log(isUrlCountryPresent, "is url")
         const parts = pathname.split('/').filter(part => part !== '');
-        const countryCode = parts.length > 0 ? parts[0].toUpperCase() : '';
-        const language = parts.length > 1 ? parts[1].toLowerCase() : '';
+        const countryCode = isUrlCountryPresent[1];
+        const language = isUrlCountryPresent[0];
         return { countryCode, language };
     };
 
@@ -504,8 +506,8 @@ const HeaderThree = ({ animationStage }) => {
                 {/* Mobile Navigation Links */}
                 <div className={styles.mobileNavLinks}>
                     <Link
-                        href="/"
-                        className={`${styles.mobileNavItem} ${pathname === '/' ? styles.active : ''}`}
+                        href={`/${hreflang}-${countryCodeCookie}/`}
+                        className={`${styles.mobileNavItem} ${pathname === `/${hreflang}-${countryCodeCookie}/` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.home}
@@ -513,8 +515,8 @@ const HeaderThree = ({ animationStage }) => {
 
                     {countryCode?.location?.betting_apps === 'Active' && (
                         <Link
-                            href={`/${countryCodeCookie}/${hreflang}/best-betting-apps/current`}
-                            className={`${styles.mobileNavItem} ${pathname === `/${countryCodeCookie}/${hreflang}/best-betting-apps/current` ? styles.active : ''}`}
+                            href={`/${hreflang}-${countryCodeCookie}/best-betting-apps/current`}
+                            className={`${styles.mobileNavItem} ${pathname === `/${hreflang}-${countryCodeCookie}/best-betting-apps/current` ? styles.active : ''}`}
                             onClick={handleNavItemClick}
                         >
                             {translatedText.apps}
@@ -522,8 +524,8 @@ const HeaderThree = ({ animationStage }) => {
                     )}
 
                     <Link
-                        href={`/${countryCodeCookie}/${hreflang}/match-schedules`}
-                        className={`${styles.mobileNavItem} ${pathname === `/${countryCodeCookie}/${hreflang}/match-schedules` ? styles.active : ''}`}
+                        href={`/${hreflang}-${countryCodeCookie}/match-schedules`}
+                        className={`${styles.mobileNavItem} ${pathname === `/${hreflang}-${countryCodeCookie}/match-schedules` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.schedule}
@@ -537,7 +539,7 @@ const HeaderThree = ({ animationStage }) => {
                                 onClick={() => toggleCategory(cat.id)}
                             >
                                 <Link
-                                    href={`/${countryCodeCookie}/${hreflang}/blogs/pages/all-blogs?category=${cat.id}`}
+                                    href={`/${hreflang}-${countryCodeCookie}/blogs/pages/all-blogs?category=${cat.id}`}
                                     onClick={handleNavItemClick}
                                 >
                                     {capitalizeFirstLetter(cat.name)}
@@ -557,7 +559,7 @@ const HeaderThree = ({ animationStage }) => {
                                     {cat.subcategories.map((sub) => (
                                         <Link
                                             key={sub.id}
-                                            href={`/${countryCodeCookie}/${hreflang}/blogs/pages/all-blogs?subcategory=${sub.id}`}
+                                            href={`/${hreflang}-${countryCodeCookie}/blogs/pages/all-blogs?subcategory=${sub.id}`}
                                             className={styles.mobileSubmenuItem}
                                             onClick={handleNavItemClick}
                                         >
@@ -570,8 +572,8 @@ const HeaderThree = ({ animationStage }) => {
                     ))}
 
                     <Link
-                        href={`/${countryCodeCookie}/${hreflang}/contact`}
-                        className={`${styles.mobileNavItem} ${pathname === `/${countryCodeCookie}/${hreflang}/contact` ? styles.active : ''}`}
+                        href={`/${hreflang}-${countryCodeCookie}/contact`}
+                        className={`${styles.mobileNavItem} ${pathname === `/${hreflang}-${countryCodeCookie}/contact` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.contact}
@@ -706,24 +708,24 @@ const HeaderThree = ({ animationStage }) => {
                     <div className={styles.divider}></div>
                     {/* Navigation Links */}
                     <div className={styles.navLinks}>
-                        <Link href={`/${countryCodeCookie}/${hreflang}/`} className={`${styles.navItem} ${pathname === `/${countryCodeCookie}/${hreflang}/` ? styles.active : ''}`}>
+                        <Link href={`/${hreflang}-${countryCodeCookie}/`} className={`${styles.navItem} ${pathname === `/${hreflang}-${countryCodeCookie}/` ? styles.active : ''}`}>
                             {translatedText.home}
                         </Link>
 
                         {countryCode?.location?.betting_apps === 'Active' && (
-                            <Link href={`/${countryCodeCookie}/${hreflang}/best-betting-apps/current`} className={`${styles.navItem} ${pathname === `/${countryCodeCookie}/${hreflang}/best-betting-apps/current` ? styles.active : ''}`}>
+                            <Link href={`/${hreflang}-${countryCodeCookie}/best-betting-apps/current`} className={`${styles.navItem} ${pathname === `/${hreflang}-${countryCodeCookie}/best-betting-apps/current` ? styles.active : ''}`}>
                                 {translatedText.apps}
                             </Link>
                         )}
 
-                        <Link href={`/${countryCodeCookie}/${hreflang}/match-schedules`} className={`${styles.navItem} ${pathname === `/${countryCodeCookie}/${hreflang}/match-schedules` ? styles.active : ''}`}>
+                        <Link href={`/${hreflang}-${countryCodeCookie}/match-schedules`} className={`${styles.navItem} ${pathname === `/${hreflang}-${countryCodeCookie}/match-schedules` ? styles.active : ''}`}>
                             {translatedText.schedule}
                         </Link>
 
                         {translatedCategories.map((cat) => (
                             <div key={cat.id} className={styles.dropdown}>
                                 <Link
-                                    href={`/${countryCodeCookie}/${hreflang}/blogs/pages/all-blogs?category=${cat.id}`}
+                                    href={`/${hreflang}-${countryCodeCookie}/blogs/pages/all-blogs?category=${cat.id}`}
                                     className={styles.navItem}
                                 >
                                     {capitalizeFirstLetter(cat.name)} <FaChevronDown />
@@ -734,7 +736,7 @@ const HeaderThree = ({ animationStage }) => {
                                         {cat.subcategories.map((sub) => (
                                             <li key={sub.id}>
                                                 <Link
-                                                    href={`/${countryCodeCookie}/${hreflang}/blogs/pages/all-blogs?subcategory=${sub.id}`}
+                                                    href={`/${hreflang}-${countryCodeCookie}/blogs/pages/all-blogs?subcategory=${sub.id}`}
                                                     className={styles.submenuItem}
                                                 >
                                                     {sub.name}
@@ -773,7 +775,7 @@ const HeaderThree = ({ animationStage }) => {
                         <option value="football">{translatedText.football}</option>
                     </select>
 
-                    <Link href={`/${countryCodeCookie}/${hreflang}/contact`} className={`${styles.navItem} ${pathname === `/${countryCodeCookie}/${hreflang}/contact` ? styles.active : ''}`}>
+                    <Link href={`/${hreflang}-${countryCodeCookie}/contact`} className={`${styles.navItem} ${pathname === `/${hreflang}-${countryCodeCookie}/contact` ? styles.active : ''}`}>
                         {translatedText.contact}
                     </Link>
                 </div>

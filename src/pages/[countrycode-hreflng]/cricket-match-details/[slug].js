@@ -4,7 +4,7 @@ import Head from "next/head";
 import BettingAppsTable from "@/components/BestBettingApps/BestBettingApps";
 import BettingAppsRecentTable from "@/components/BestBettingRecentApps/BestBettingRecentApps";
 import UpcomingMatches from "@/components/UpComing/UpComingMatches";
-import styles from "../../../../styles/Home.module.css";
+import styles from '../../../styles/Home.module.css';
 import AutoSlider from "@/components/AutoSlider/AutoSlider";
 import TopNewsSection from "@/components/NewsSection/TopNews";
 import BlogSlider from "@/components/BlogsSection/BlogSlider";
@@ -13,18 +13,38 @@ import { useEffect, useState } from "react";
 import TestLive from "@/components/LiveScoreSection/TestLive";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 import MatchScheduler from "@/components/FootballMatchScheduler/MatchScheduler";
+import CricketDashboard from '@/components/CricketDashboard/CricketDashboard';
+import Footer from '@/components/Footer/Footer';
+import { useParams } from "next/navigation";
 import FooterTwo from "@/components/Footer/Footer";
-import { useGlobalData } from "@/components/Context/ApiContext";
 import HeaderTwo from "@/components/Header/HeaderTwo";
-import JoinTelegramButton from "@/components/JoinTelegram/JoinTelegramButton";
+import { useLanguageValidation } from "@/hooks/useLanguageValidation";
+import { useGlobalData } from "@/components/Context/ApiContext";
+import HeaderThree from "@/components/Header/HeaderThree";
 
-export default function MatchSchedulerScreen() {
+export default function CricketMatchDetails() {
 
-    const { sport, apiResponse, teamImages, matchTypes } = useGlobalData();
+    const { getCricketDetails, cricketDetails, location } = useGlobalData();
+
     const [loading, setLoading] = useState(true);
 
+    const params = useParams();
+    const matchId = params?.slug;
+    // console.log(matchId, "matchid")
+
+    const { "countrycode-hreflng": countryLang } = useParams();
+
+      const languageValidation = useLanguageValidation(location, countryLang);
+
     useEffect(() => {
-        // Fixed: Timer was setting loading to true instead of false
+        if (!matchId) {
+            console.error("Match ID is missing");
+            return;
+        }
+        getCricketDetails(matchId);
+    }, [matchId]);
+
+    useEffect(() => {
         const timer1 = setTimeout(() => setLoading(false), 3000);
         return () => clearTimeout(timer1);
     }, []);
@@ -73,34 +93,24 @@ export default function MatchSchedulerScreen() {
     return (
         <>
             <Head>
-                <title>Match Schedules</title>
+                <title>Match Details</title>
                 <meta name="description" content="Your site description here" />
             </Head>
             {/* <Header /> */}
-            {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
-            <HeaderTwo animationStage={animationStage} />
+            <HeaderThree animationStage={animationStage} />
+
+
             <div className='container'>
-                {sport === 'cricket' ? (
-                    <>
-                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
-                    </>
-                ) : (
-                    <TestLive />
-                )}
+                {/* <LiveScores /> */}
+                {/* <TestLive /> */}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
-                        <MatchScheduler />
+                        <CricketDashboard cricketDetails={cricketDetails} />
                     </div>
                     <div className={styles.fourthColumn} >
-                        <div className={styles.fourthColumnTwoColumns}>
-                            <div className={styles.fourthColumnLeft}>
-                                {/* <BettingCard /> */}
-                                <JoinTelegramButton />
-                            </div>
-                            <div className={styles.fourthColumnRight}>
-                                <AutoSlider />
-                            </div>
-                        </div>
+                        <BettingCard />
+                        <AutoSlider />
+                        <TopNewsSection />
                     </div>
                 </div>
                 <div className={styles.mainContent}>
@@ -115,10 +125,11 @@ export default function MatchSchedulerScreen() {
 
                     </div>
                 </div>
-                <BettingAppsRecentTable />
+
 
             </div>
             <FooterTwo />
+            {/* <Footer /> */}
         </>
     )
 }

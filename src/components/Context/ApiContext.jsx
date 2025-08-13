@@ -29,9 +29,16 @@ export const DataProvider = ({ children }) => {
     const [hreflang, setHreflang] = useState('en');
     const [locationData, setLocationData] = useState(null);
     const [countryData, setCountryData] = useState(null);
+    const [validatedLocationData, setValidatedLocationData] = useState(null);
+    console.log(validatedLocationData, "validated location data")
 
     const pathname = usePathname();
+    console.log(pathname, "path name")
+    // const isUrlCountryPresent = pathname?.replace(/^,?\//, '').split('-');
+    // console.log(isUrlCountryPresent[1], "is url")
+
     //  TIME ZONE IMPLEMENTATION
+
 
     const [currentTimezone, setCurrentTimezone] = useState('+0.00');
 
@@ -46,20 +53,26 @@ export const DataProvider = ({ children }) => {
     const [countryCode, setCountryCode] = useState({});
 
     const getCountryCode = async () => {
-
         try {
-            const { countryCode: urlCountryCode } = parseUrlPath(pathname);
-
-            if (!urlCountryCode) {
+            if (validatedLocationData && validatedLocationData.country_code) {
+                setCountryCode(validatedLocationData);
+                setCurrentTimezone(getTimezoneByCountryCode(validatedLocationData.country_code));
+                console.log('Using validated location data:', validatedLocationData);
+            } else {
                 const res = await CustomAxios.get('/get-country-code');
                 setCountryCode(res.data || {});
                 setCurrentTimezone(getTimezoneByCountryCode(res.data.country_code));
+                console.log('Using API response:', res.data);
             }
         } catch (error) {
             console.error('Failed to fetch country code:', error);
         }
     };
-    // console.log(countryCode, "country code")
+
+    // useEffect to call getCountryCode when validatedLocationData changes
+    useEffect(() => {
+        getCountryCode();
+    }, [validatedLocationData]);
 
     // FETCH LOCATION
 
@@ -103,40 +116,40 @@ export const DataProvider = ({ children }) => {
     };
 
 
-    // LANGUAGE BASED ON THE URL
+    // // LANGUAGE BASED ON THE URL
 
-    useEffect(() => {
-        const { countryCode: urlCountryCode, language: urlLanguage } = parseUrlPath(pathname);
+    // useEffect(() => {
+    //     const { countryCode: urlCountryCode, language: urlLanguage } = parseUrlPath(pathname);
 
-        // Only proceed if we have values from URL
-        if (urlCountryCode || urlLanguage) {
-            // Set language from URL if available and valid
-            if (urlLanguage) {
-                const isValidLanguage = location.some(loc => loc.hreflang === urlLanguage);
-                if (isValidLanguage) {
-                    setLanguage(urlLanguage);
-                    localStorage.setItem('language', urlLanguage);
-                }
-            }
+    //     // Only proceed if we have values from URL
+    //     if (urlCountryCode || urlLanguage) {
+    //         // Set language from URL if available and valid
+    //         if (urlLanguage) {
+    //             const isValidLanguage = location.some(loc => loc.hreflang === urlLanguage);
+    //             if (isValidLanguage) {
+    //                 setLanguage(urlLanguage);
+    //                 localStorage.setItem('language', urlLanguage);
+    //             }
+    //         }
 
-            // Set country code from URL if available
-            if (urlCountryCode) {
-                const matchedLocation = location.find(loc => loc.country_code === urlCountryCode);
-                if (matchedLocation) {
-                    setCountryCode({
-                        country_code: urlCountryCode,
-                        location: matchedLocation
-                    });
-                }
-            }
-        }
-    }, [pathname, location]);
+    //         // Set country code from URL if available
+    //         if (urlCountryCode) {
+    //             const matchedLocation = location.find(loc => loc.country_code === urlCountryCode);
+    //             if (matchedLocation) {
+    //                 setCountryCode({
+    //                     country_code: urlCountryCode,
+    //                     location: matchedLocation
+    //                 });
+    //             }
+    //         }
+    //     }
+    // }, [pathname, location]);
 
 
     //SPORT CHANGE CONDITION
 
     const [sport, setSport] = useState('cricket');
-    
+
     // Initialize sport from localStorage on client-side only
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -491,6 +504,8 @@ export const DataProvider = ({ children }) => {
     // BETTING TABLE DATA - API IMPLEMENTATIONS
 
     const fetchBettingApps = async (countryCodeParam = countryCode.country_code) => {
+        console.log(countryCodeParam, "c param")
+        console.log("called the betting apps")
         if (!countryCodeParam) {
             console.warn('No country code available for fetching betting apps');
             return;
@@ -506,8 +521,10 @@ export const DataProvider = ({ children }) => {
             });
 
             const data = response.data;
+            console.log(response, "sections data")
             if (Array.isArray(data.results)) {
                 setSections(data.results);
+                console.log("enters the if condition", data.results)
             } else {
                 console.warn('Expected an array, but received:', data);
             }
@@ -814,6 +831,7 @@ export const DataProvider = ({ children }) => {
                 recentBlogs,
                 fetchBlogs,
                 blogs,
+                fetchBettingApps,
                 sections,
                 setSections,
                 bestSections,
@@ -865,7 +883,8 @@ export const DataProvider = ({ children }) => {
                 setCountryData,
                 setHreflang,
                 country,
-                setCountry
+                setCountry,
+                setValidatedLocationData
             }}>
             {children}
         </DataContext.Provider>

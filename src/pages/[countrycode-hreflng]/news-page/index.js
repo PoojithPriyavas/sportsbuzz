@@ -6,8 +6,60 @@ import { useState, useEffect } from 'react';
 import { useGlobalData } from "@/components/Context/ApiContext";
 import FooterTwo from "@/components/Footer/Footer";
 import HeaderTwo from "@/components/Header/HeaderTwo";
+import { useLanguageValidation } from "@/hooks/useLanguageValidation";
+import axios from "axios";
+import HeaderThree from "@/components/Header/HeaderThree";
 
-export default function NewsData() {
+export async function getServerSideProps(context) {
+    // Log the request origin (helpful for debugging)
+    console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
+    try {
+        const { resolvedUrl, req } = context;
+        const [countryRes, locationRes] = await Promise.all([
+            axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
+            axios.get('https://admin.sportsbuz.com/api/locations/')
+        ]);
+
+        const countryDataHome = countryRes.data;
+        const locationDataHome = locationRes.data;
+
+        // Detailed logging
+        console.log('=== API RESPONSE DATA ===');
+        console.log('Country Data in the props:', JSON.stringify(countryRes.data, null, 2));
+        console.log('Location Data in the props:', JSON.stringify(locationRes.data, null, 2));
+        console.log('Response Headers - Country in the props:', countryRes.headers);
+        console.log('Response Headers - Location: in the props', locationRes.headers);
+
+        return {
+            props: {
+                countryDataHome,
+                locationDataHome,
+                resolvedUrl,
+            }
+        };
+    } catch (error) {
+        // console.error("Error fetching data from APIs:", error.message);
+        console.error("API Error Details: in the props", {
+            url: error.config?.url,
+            status: error.response?.status,
+            data: error.response?.data,
+            headers: error.response?.headers,
+            stack: error.stack
+        });
+        return {
+            props: {
+                countryDataHome: null,
+                locationDataHome: null,
+                resolvedUrl,
+                isLocalhost: process.env.NODE_ENV === 'development'
+            }
+        };
+    }
+}
+
+export default function NewsData({ countryDataHome, locationDataHome, resolvedUrl, }) {
+    const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
+
     const { blogs, } = useGlobalData()
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false
@@ -63,7 +115,7 @@ export default function NewsData() {
                 <title>Sports Buzz | News</title>
                 <meta name="description" content="Your site description here" />
             </Head>
-            <HeaderTwo animationStage={animationStage} />
+            <HeaderThree animationStage={animationStage} />
             <div className='container'>
                 {/* <LiveScores /> */}
                 <BlogsPage blogs={blogs} />

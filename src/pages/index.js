@@ -174,7 +174,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
         {/* Canonical */}
         {locationDataHome.map(({ hreflang, country_code }) => {
           {/* console.log(hreflang, "href lan home") */ }
-          const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/`;
+          const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
           const fullHrefLang = `${hreflang}-${country_code}`;
           {/* console.log('Generated link:', { href, fullHrefLang }); */ }
 
@@ -214,7 +214,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
       <>
 
-        {showOtherDivs && <RegionSelector countryDataHome={countryDataHome} locationDataHome={locationDataHome} />}
+        {/* {showOtherDivs && <RegionSelector countryDataHome={countryDataHome} locationDataHome={locationDataHome} />} */}
         <HeaderTwo animationStage={animationStage} />
         {showOtherDivs && (
           <div

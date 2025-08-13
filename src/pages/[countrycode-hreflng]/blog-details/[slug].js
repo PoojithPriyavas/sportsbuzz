@@ -6,14 +6,25 @@ import BlogDetailsPage from "@/components/BlogsSection/BlogDetails";
 import Header from "@/components/Loader/Loader";
 import FooterTwo from "@/components/Footer/Footer";
 import Head from "next/head";
-import styles from '../../../../styles/Home.module.css';
+import styles from '../../../styles/Home.module.css';
 // import { getBlogData } from "@/lib/blogs"; // create this to fetch blogs
 import { useGlobalData } from '@/components/Context/ApiContext';
 import HeaderTwo from "@/components/Header/HeaderTwo";
+import { useLanguageValidation } from "@/hooks/useLanguageValidation";
+import axios from "axios";
+import { useParams } from "next/navigation";
+import HeaderThree from "@/components/Header/HeaderThree";
 
 export async function getServerSideProps(context) {
+    const { resolvedUrl } = context.resolvedUrl;
     const slug = context.params.slug;
+    const [countryRes, locationRes] = await Promise.all([
+        axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
+        axios.get('https://admin.sportsbuz.com/api/locations/')
+    ]);
 
+    let countryDataHome = countryRes.data;
+    let locationDataHome = locationRes.data;
     try {
         const res = await fetch(`https://admin.sportsbuz.com/api/blog-detail/${slug}`);
         if (!res.ok) {
@@ -23,7 +34,12 @@ export async function getServerSideProps(context) {
         const blog = await res.json();
 
         return {
-            props: { blog },
+            props: {
+                blog,
+                locationDataHome,
+
+
+            },
         };
     } catch (error) {
         console.error('Failed to fetch blog:', error);
@@ -32,8 +48,9 @@ export async function getServerSideProps(context) {
 }
 
 
-export default function BlogDetailsMain({ blog }) {
-
+export default function BlogDetailsMain({ blog, locationDataHome }) {
+    const { "countrycode-hreflng": countryLang } = useParams();
+    const languageValidation = useLanguageValidation(locationDataHome, countryLang);
     const [animationStage, setAnimationStage] = useState('loading');
     const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
@@ -87,7 +104,7 @@ export default function BlogDetailsMain({ blog }) {
                 <meta property="og:image" content={blog.image_big || blog.image} />
             </Head>
             {/* <Header /> */}
-             <HeaderTwo animationStage={animationStage} />
+            <HeaderThree animationStage={animationStage} />
             <div className={` ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
                 <BlogDetailsPage blog={blog} />
             </div>

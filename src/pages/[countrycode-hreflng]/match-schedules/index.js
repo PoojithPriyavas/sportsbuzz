@@ -4,7 +4,7 @@ import Head from "next/head";
 import BettingAppsTable from "@/components/BestBettingApps/BestBettingApps";
 import BettingAppsRecentTable from "@/components/BestBettingRecentApps/BestBettingRecentApps";
 import UpcomingMatches from "@/components/UpComing/UpComingMatches";
-import styles from '../../../../styles/Home.module.css';
+import styles from '../../../styles/Home.module.css';
 import AutoSlider from "@/components/AutoSlider/AutoSlider";
 import TopNewsSection from "@/components/NewsSection/TopNews";
 import BlogSlider from "@/components/BlogsSection/BlogSlider";
@@ -13,33 +13,68 @@ import { useEffect, useState } from "react";
 import TestLive from "@/components/LiveScoreSection/TestLive";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 import MatchScheduler from "@/components/FootballMatchScheduler/MatchScheduler";
-import CricketDashboard from '@/components/CricketDashboard/CricketDashboard';
-import Footer from '@/components/Footer/Footer';
-import { useParams } from "next/navigation";
 import FooterTwo from "@/components/Footer/Footer";
-import HeaderTwo from "@/components/Header/HeaderTwo";
-
 import { useGlobalData } from "@/components/Context/ApiContext";
+import HeaderTwo from "@/components/Header/HeaderTwo";
+import JoinTelegramButton from "@/components/JoinTelegram/JoinTelegramButton";
+import { useLanguageValidation } from "@/hooks/useLanguageValidation";
+import axios from "axios";
+import HeaderThree from "@/components/Header/HeaderThree";
+export async function getServerSideProps(context) {
+    // Log the request origin (helpful for debugging)
+    console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
+    try {
+        const { resolvedUrl, req } = context;
+        const [countryRes, locationRes] = await Promise.all([
+            axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
+            axios.get('https://admin.sportsbuz.com/api/locations/')
+        ]);
 
-export default function CricketMatchDetails() {
+        const countryDataHome = countryRes.data;
+        const locationDataHome = locationRes.data;
 
-    const { getCricketDetails, cricketDetails } = useGlobalData();
+        // Detailed logging
+        console.log('=== API RESPONSE DATA ===');
+        console.log('Country Data in the props:', JSON.stringify(countryRes.data, null, 2));
+        console.log('Location Data in the props:', JSON.stringify(locationRes.data, null, 2));
+        console.log('Response Headers - Country in the props:', countryRes.headers);
+        console.log('Response Headers - Location: in the props', locationRes.headers);
 
+        return {
+            props: {
+                countryDataHome,
+                locationDataHome,
+                resolvedUrl,
+            }
+        };
+    } catch (error) {
+        // console.error("Error fetching data from APIs:", error.message);
+        console.error("API Error Details: in the props", {
+            url: error.config?.url,
+            status: error.response?.status,
+            data: error.response?.data,
+            headers: error.response?.headers,
+            stack: error.stack
+        });
+        return {
+            props: {
+                countryDataHome: null,
+                locationDataHome: null,
+                resolvedUrl,
+                isLocalhost: process.env.NODE_ENV === 'development'
+            }
+        };
+    }
+}
+
+export default function MatchSchedulerScreen({ countryDataHome, locationDataHome, resolvedUrl, }) {
+    const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
+
+    const { sport, apiResponse, teamImages, matchTypes } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
-    const params = useParams();
-    const matchId = params?.slug;
-    // console.log(matchId, "matchid")
-
     useEffect(() => {
-        if (!matchId) {
-            console.error("Match ID is missing");
-            return;
-        }
-        getCricketDetails(matchId);
-    }, [matchId]);
-
-    useEffect(() => {
+        // Fixed: Timer was setting loading to true instead of false
         const timer1 = setTimeout(() => setLoading(false), 3000);
         return () => clearTimeout(timer1);
     }, []);
@@ -88,24 +123,34 @@ export default function CricketMatchDetails() {
     return (
         <>
             <Head>
-                <title>Match Details</title>
+                <title>Match Schedules</title>
                 <meta name="description" content="Your site description here" />
             </Head>
             {/* <Header /> */}
-            <HeaderTwo animationStage={animationStage} />
-
-
+            {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
+            <HeaderThree animationStage={animationStage} />
             <div className='container'>
-                {/* <LiveScores /> */}
-                {/* <TestLive /> */}
+                {sport === 'cricket' ? (
+                    <>
+                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+                    </>
+                ) : (
+                    <TestLive />
+                )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
-                        <CricketDashboard cricketDetails={cricketDetails} />
+                        <MatchScheduler />
                     </div>
                     <div className={styles.fourthColumn} >
-                        <BettingCard />
-                        <AutoSlider />
-                        <TopNewsSection />
+                        <div className={styles.fourthColumnTwoColumns}>
+                            <div className={styles.fourthColumnLeft}>
+                                {/* <BettingCard /> */}
+                                <JoinTelegramButton />
+                            </div>
+                            <div className={styles.fourthColumnRight}>
+                                <AutoSlider />
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className={styles.mainContent}>
@@ -120,11 +165,10 @@ export default function CricketMatchDetails() {
 
                     </div>
                 </div>
-
+                <BettingAppsRecentTable />
 
             </div>
             <FooterTwo />
-            {/* <Footer /> */}
         </>
     )
 }

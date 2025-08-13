@@ -263,7 +263,7 @@
 
 /* Content offset when both headers are visible */
 .offHeader {
-  margin-top: 12rem; /* Adjust based on combined height of both headers */
+  margin-top: 4rem;
 }
 
 /* Animation classes for content */
@@ -300,12 +300,12 @@
   }
   
   .offHeader {
-    margin-top: 8rem; /* Reduced for mobile */
+    margin-top: 4rem; /* Reduced for mobile */
   }
 }
 
 @media (max-width: 480px) {
   .offHeader {
-    margin-top: 6rem;
+    margin-top: 4rem;
   }
 }
