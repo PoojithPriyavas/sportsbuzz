@@ -15,7 +15,7 @@ import BettingCard from '@/components/OddsMultiply/BettingCard';
 import MatchScheduler from "@/components/FootballMatchScheduler/MatchScheduler";
 import CricketDashboard from '@/components/CricketDashboard/CricketDashboard';
 import Footer from '@/components/Footer/Footer';
-import { useParams } from "next/navigation";
+import { useRouter } from "next/router"; // Changed from next/navigation to next/router
 import FooterTwo from "@/components/Footer/Footer";
 import HeaderTwo from "@/components/Header/HeaderTwo";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
@@ -23,36 +23,30 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 import HeaderThree from "@/components/Header/HeaderThree";
 
 export default function CricketMatchDetails() {
-
     const { getCricketDetails, cricketDetails, location } = useGlobalData();
-
     const [loading, setLoading] = useState(true);
+    const [animationStage, setAnimationStage] = useState('loading');
+    const [showOtherDivs, setShowOtherDivs] = useState(false);
+    const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
-    const params = useParams();
-    const matchId = params?.slug;
-    // console.log(matchId, "matchid")
+    // Use useRouter instead of useParams for Pages Router
+    const router = useRouter();
+    const { slug: matchId, 'countrycode-hreflng': countryLang } = router.query;
 
-    const { "countrycode-hreflng": countryLang } = useParams();
+    const languageValidation = useLanguageValidation(location, countryLang);
 
-      const languageValidation = useLanguageValidation(location, countryLang);
-
+    // Get cricket details when matchId is available and router is ready
     useEffect(() => {
+        if (!router.isReady) return; // Wait for router to be ready
+        
         if (!matchId) {
             console.error("Match ID is missing");
             return;
         }
         getCricketDetails(matchId);
-    }, [matchId]);
+    }, [router.isReady, matchId, getCricketDetails]); // Added all dependencies
 
-    useEffect(() => {
-        const timer1 = setTimeout(() => setLoading(false), 3000);
-        return () => clearTimeout(timer1);
-    }, []);
-    const [animationStage, setAnimationStage] = useState('loading');
-    const [showOtherDivs, setShowOtherDivs] = useState(false);
-    const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
-
-
+    // Animation logic
     useEffect(() => {
         // Check if animation has been played before
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
@@ -78,7 +72,7 @@ export default function CricketMatchDetails() {
         }
     }, []);
 
-    // Original loading timer (keeping for compatibility)
+    // Loading timer
     useEffect(() => {
         const timer1 = setTimeout(() => setLoading(false), 3000);
         return () => clearTimeout(timer1);
@@ -90,24 +84,26 @@ export default function CricketMatchDetails() {
             return () => clearTimeout(timeout);
         }
     }, [showOtherDivs]);
+
+    // Show loading state while router is not ready or params are not available
+    if (!router.isReady || !matchId || !countryLang) {
+        return <LoadingScreen />; // Or your preferred loading component
+    }
+
     return (
         <>
             <Head>
                 <title>Match Details</title>
                 <meta name="description" content="Your site description here" />
             </Head>
-            {/* <Header /> */}
             <HeaderThree animationStage={animationStage} />
 
-
             <div className='container'>
-                {/* <LiveScores /> */}
-                {/* <TestLive /> */}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
                         <CricketDashboard cricketDetails={cricketDetails} />
                     </div>
-                    <div className={styles.fourthColumn} >
+                    <div className={styles.fourthColumn}>
                         <BettingCard />
                         <AutoSlider />
                         <TopNewsSection />
@@ -115,21 +111,14 @@ export default function CricketMatchDetails() {
                 </div>
                 <div className={styles.mainContent}>
                     <div className={styles.leftSection}>
-
+                        {/* Left section content */}
                     </div>
-
                     <div className={styles.rightSection}>
-
-                        {/* <UpcomingMatches /> */}
                         <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
-
                     </div>
                 </div>
-
-
             </div>
             <FooterTwo />
-            {/* <Footer /> */}
         </>
-    )
+    );
 }
