@@ -80,14 +80,14 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
     teamImages,
     upcomingMatches,
     sport,
-    // countryCode,
+    countryCode,
     stages,
     news
   } = useGlobalData();
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
 
   console.log(locationDataHome, "location home");
-  console.log(countryDataHome, "country data home")
+  console.log(countryCode, "country data home")
 
 
   // if (countryCode && countryCode.country_code) {
@@ -217,7 +217,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
             <div className={styles.fourColumnRow}>
               <div className={styles.leftThreeColumns}>
-                {countryDataHome?.location?.betting_apps == 'Active' && (
+                {countryCode?.location?.betting_apps == 'Active' && (
                   <BonusTable sections={sections} />
                 )}
                 <div className={styles.twoSplitRow}>
