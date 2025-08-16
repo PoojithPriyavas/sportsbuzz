@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import styles from './BlogPage.module.css';
 import Link from 'next/link';
+import DynamicLink from '../Common/DynamicLink';
 import Image from 'next/image';
 import Head from "next/head";
 import {
@@ -253,7 +254,7 @@ export default function BlogsPage({
             </div>
             <div className={styles.blogGrid}>
               {currentBlogs.map((blog) => (
-                <Link
+                <DynamicLink
                   key={blog.id}
                   href={`/blog-details/${blog?.slug}`}
                   className={styles.blogCard}
@@ -269,7 +270,7 @@ export default function BlogsPage({
                     </p>
                     <span className={styles.readMore}>{translations.readMore}</span>
                   </div>
-                </Link>
+                </DynamicLink>
               ))}
             </div>
             {/* {showPagination && (
@@ -315,30 +316,30 @@ export default function BlogsPage({
 
             {showPagination && (
               <div className={styles.pagination}>
-                <Link href={buildPageUrl(currentPage - 1)} scroll={false}>
+                <DynamicLink href={buildPageUrl(currentPage - 1)} scroll={false}>
                   <button disabled={currentPage === 1}>
                     <FaChevronLeft /> {translations.previous}
                   </button>
-                </Link>
+                </DynamicLink>
 
                 {/* Page numbers */}
                 {getPageNumbers().map((page, index) => (
                   page === '...' ? (
                     <span key={`ellipsis-${index}`}>...</span>
                   ) : (
-                    <Link key={page} href={buildPageUrl(page)} scroll={false}>
+                    <DynamicLink key={page} href={buildPageUrl(page)} scroll={false}>
                       <button className={currentPage === page ? styles.active : ''}>
                         {page}
                       </button>
-                    </Link>
+                    </DynamicLink>
                   )
                 ))}
 
-                <Link href={buildPageUrl(currentPage + 1)} scroll={false}>
+                <DynamicLink href={buildPageUrl(currentPage + 1)} scroll={false}>
                   <button disabled={currentPage === totalPages}>
                     {translations.next} <FaChevronRight />
                   </button>
-                </Link>
+                </DynamicLink>
               </div>
             )}
           </div>

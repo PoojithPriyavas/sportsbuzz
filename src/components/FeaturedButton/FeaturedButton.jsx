@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import Link from 'next/link';
+import DynamicLink from '../Common/DynamicLink';
 import styles from './FeaturedButton.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 
@@ -136,7 +137,7 @@ const FeaturedButton = () => {
     }, []);
 
     return (
-        <Link href={href}>
+        <DynamicLink href={href}>
             <button
                 ref={buttonRef}
                 className={styles.featuredButton}
@@ -172,7 +173,7 @@ const FeaturedButton = () => {
                     <span className={styles.powerIcon}>🔥</span>
                 </div>
             </button>
-        </Link>
+        </DynamicLink>
     );
 };
 

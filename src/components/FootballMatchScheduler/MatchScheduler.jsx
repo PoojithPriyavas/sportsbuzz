@@ -5,6 +5,7 @@ import styles from './MatchScheduler.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/navigation';
 import { matchCards } from '../OddsMultiply/matchesData';
+import { useDynamicRouter } from '@/hooks/useDynamicRouter';
 
 // Spinner Loader Component
 const Spinner = ({ size = 'medium', text = 'Loading...' }) => {
@@ -31,7 +32,7 @@ export default function MatchScheduler() {
     const [dates, setDates] = useState([]);
     const [isInitialized, setIsInitialized] = useState(false);
     const [isLoadingMatches, setIsLoadingMatches] = useState(false);
-
+    const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
     const {
         matchSchedule,
         fetchMatchSchedules,
@@ -234,7 +235,7 @@ export default function MatchScheduler() {
             fetchFootballDetails(eid),
             fetchFootBallLineUp(eid)
         ]);
-        router.push(`/football-match-details/${eid}`);
+       await pushDynamic(`/football-match-details/${eid}`);
     };
 
     if (currentTimezone === '+0.00' || !countryCode.country_code) {

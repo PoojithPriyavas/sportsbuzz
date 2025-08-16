@@ -490,11 +490,11 @@ const HeaderThree = ({ animationStage }) => {
             >
                 {/* Mobile Header */}
                 <div className={styles.mobileHeader}>
-                    <div className={styles.logoContent}>
+                    <Link href={`/${hreflang}-${countryCodeCookie}/`} className={styles.logoContent}>
                         <div className={styles.logoIcon}>
                             <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                         </div>
-                    </div>
+                    </Link>
                     <button
                         className={styles.mobileCloseButton}
                         onClick={() => setMobileMenuOpen(false)}
@@ -679,13 +679,13 @@ const HeaderThree = ({ animationStage }) => {
                 </div>
             </div>
 
-            {/* SportsBuzz Logo */}
+            {/* SportsBuzz Logo - Now wrapped with Link for navigation */}
             <div ref={logoRef} className={styles.logo}>
-                <div className={styles.logoContent}>
+                <Link href={`/${hreflang}-${countryCodeCookie}/`} className={styles.logoContent}>
                     <div className={styles.logoIcon}>
                         <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                     </div>
-                </div>
+                </Link>
             </div>
 
             {/* Header Navigation */}

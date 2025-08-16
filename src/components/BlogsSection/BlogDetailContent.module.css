@@ -17,9 +17,9 @@
 }
 
 .thumbnail {
-  width: 80%;
+  /* width: 80%;
   max-width: 80%;
-  max-height: 500px;
+  max-height: 500px; */
   margin: 2rem 0;
   /* border-radius: 12px; */
   overflow: hidden;
@@ -29,11 +29,17 @@
 }
 
 .thumbnailImg {
-  width: 80%;
+  /* width: 80%;
   max-width: 80%;
   max-height: 500px;
-  object-fit: contain;
+  object-fit: contain; */
   /* or 'contain' if you want full image visible */
+  
+  width: 100%;
+  object-fit: cover;
+  aspect-ratio: 3/1;
+
+
   object-position: left;
   display: block;
   transition: transform 0.3s ease;

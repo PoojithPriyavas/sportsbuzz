@@ -5,6 +5,7 @@ import styles from './BlogCard.module.css';
 import Link from 'next/link';
 import { FaSearch } from 'react-icons/fa';
 import { useGlobalData } from '../Context/ApiContext';
+import DynamicLink from '../Common/DynamicLink';
 
 export default function BlogCard({ blogs = [] }) {
   const { translateText, language } = useGlobalData();
@@ -71,7 +72,7 @@ export default function BlogCard({ blogs = [] }) {
       <div className={styles.wrapper}>
         {/* Featured Blog */}
         {featuredBlog && (
-          <Link href={`/blog-details/${featuredBlog?.slug || 'blog-title-1'}`} className={styles.featuredBlog}>
+          <DynamicLink href={`/blog-details/${featuredBlog?.slug || 'blog-title-1'}`} className={styles.featuredBlog}>
             <div className={styles.featuredImage}>
               <img
                 src={featuredBlog?.image_big}
@@ -84,13 +85,13 @@ export default function BlogCard({ blogs = [] }) {
               <p>{featuredBlog?.author} <span>· {featuredBlog?.date}</span></p>
               <span className={styles.readMore}>{translated.readMore}</span>
             </div>
-          </Link>
+          </DynamicLink>
         )}
 
         {/* Blog Grid */}
         <div className={styles.blogGrid}>
           {otherBlogs.map((blog) => (
-            <Link
+            <DynamicLink
               key={blog.id}
               href={`/blog-details/${blog?.slug}`}
               className={styles.blogCard}
@@ -104,7 +105,7 @@ export default function BlogCard({ blogs = [] }) {
                 <p>{blog?.author} <span>{blog?.date}</span></p>
                 <span className={styles.readMore}>{translated.readMore}</span>
               </div>
-            </Link>
+            </DynamicLink>
           ))}
         </div>
       </div>

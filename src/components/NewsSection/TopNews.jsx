@@ -5,11 +5,12 @@ import { useRouter } from 'next/router';
 import styles from './TopNews.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 import { useMemo } from 'react';
+import { useDynamicRouter } from '@/hooks/useDynamicRouter';
 
 const NewsList = () => {
   const { news, fetchNewsDetails, language, translateText } = useGlobalData();
   // console.log(news, "newssssss")
-
+  const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
   const stories = useMemo(() => {
     return news?.storyList?.filter(item => item.story)?.map(item => item.story) || [];
   }, [news]);
@@ -81,7 +82,7 @@ const NewsList = () => {
   const openNews = async (item) => {
     await fetchNewsDetails(item.id);
     const slug = item.hline.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    router.push(`/news/${item.id}`);
+    await pushDynamic(`/news/${item.id}`);
   };
 
   return (

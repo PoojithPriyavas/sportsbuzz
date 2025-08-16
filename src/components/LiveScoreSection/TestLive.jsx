@@ -3,13 +3,10 @@
 import { useEffect, useState } from 'react';
 import styles from './TestLive.module.css';
 import { useGlobalData } from '../Context/ApiContext';
-import { useRouter } from 'next/router';
-
+import { useDynamicRouter } from '@/hooks/useDynamicRouter';
 
 // ✅ Modified date formatter that accepts translated strings
 function formatDate(esd, labels = { today: 'Today', tomorrow: 'Tomorrow' }) {
-
-
     const raw = esd?.toString();
     if (!raw || raw.length !== 14) return '';
 
@@ -41,25 +38,28 @@ function formatDate(esd, labels = { today: 'Today', tomorrow: 'Tomorrow' }) {
     }
 }
 
-
-
 export default function TestLive() {
     const { stages, language, translateText, fetchFootballDetails, fetchFootBallLineUp } = useGlobalData();
     const [selectedLeague, setSelectedLeague] = useState('All');
     const [translatedStages, setTranslatedStages] = useState([]);
     const [dateLabels, setDateLabels] = useState({ today: 'Today', tomorrow: 'Tomorrow' });
     const [isTranslating, setIsTranslating] = useState(false);
-    const router = useRouter();
+    
+    // Use the dynamic router instead of regular router
+    const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
 
     // Keep track of what's been translated
     const [translationProgress, setTranslationProgress] = useState({});
 
+    // ✅ Updated handleMatchClick to use dynamic routing
     const handleMatchClick = async (eid) => {
         await Promise.all([
             fetchFootballDetails(eid),
             fetchFootBallLineUp(eid)
         ]);
-        router.push(`/football-match-details/${eid}`);
+        
+        // Use pushDynamic instead of router.push
+        await pushDynamic(`/football-match-details/${eid}`);
     };
 
     useEffect(() => {
@@ -150,19 +150,26 @@ export default function TestLive() {
         translateStageData();
     }, [stages, language]);
 
-    // ... rest of your component
-
-
     // Recreate filtered league lists
     const allLeagues = translatedStages.map(stage => stage.translatedLeague).filter(Boolean);
     const uniqueLeagues = Array.from(new Set(allLeagues));
     const topLeagues = uniqueLeagues.slice(0, 5);
     const otherLeagues = uniqueLeagues.slice(5);
 
-
-
     return (
         <>
+            {/* Debug info in development */}
+            {process.env.NODE_ENV === 'development' && (
+                <div style={{ 
+                    padding: '10px', 
+                    background: '#f0f0f0', 
+                    margin: '10px 0',
+                    fontSize: '12px' 
+                }}>
+                    <strong>Debug Info:</strong> Path Prefix: "{pathPrefix}"
+                </div>
+            )}
+
             {/* Filter Bar */}
             <div className={styles.leagueSelector}>
                 <span
@@ -271,8 +278,18 @@ export default function TestLive() {
                                             {status}
                                         </div>
                                     </div>
-                                </div>
 
+                                    {/* Debug info for each card in development */}
+                                    {/* {process.env.NODE_ENV === 'development' && (
+                                        <div style={{ 
+                                            fontSize: '10px', 
+                                            color: 'blue', 
+                                            marginTop: '5px' 
+                                        }}>
+                                            Will navigate to: {buildPath(`/football-match-details/${event.Eid}`)}
+                                        </div>
+                                    )} */}
+                                </div>
                             );
                         })
                     )}

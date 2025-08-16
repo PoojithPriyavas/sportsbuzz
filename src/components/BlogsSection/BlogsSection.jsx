@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import styles from './BlogsSection.module.css';
 import Link from 'next/link';
 import { useGlobalData } from '../Context/ApiContext';
+import DynamicLink from '../Common/DynamicLink';
 
 export default function BlogSection({ blogs = [] }) {
   const { translateText, language } = useGlobalData();
@@ -35,14 +36,14 @@ export default function BlogSection({ blogs = [] }) {
     <div className={styles.wrapper}>
       <div className={styles.headingRow}>
         <h3>{translateText && typeof translateText === 'function' ? 'Highlights' : 'Highlights'}</h3>
-        <Link href="/blogs/pages/all-blogs" className={styles.viewAll}>
+        <DynamicLink href="/blogs/pages/all-blogs" className={styles.viewAll}>
           View All
-        </Link>
+        </DynamicLink>
       </div>
 
       {/* Featured Blog - using same card style but full width */}
       <div className={styles.featuredContainer}>
-        <Link
+        <DynamicLink
           href={`/blog-details/${featuredBlog.slug}`}
           className={`${styles.blogCard} ${styles.featuredCard}`}
           key={featuredBlog.id}
@@ -60,13 +61,13 @@ export default function BlogSection({ blogs = [] }) {
             </p>
             <span className={styles.readMore}>Read More</span>
           </div>
-        </Link>
+        </DynamicLink>
       </div>
 
       {/* Regular blog grid - 2 columns */}
       <div className={styles.blogGrid}>
         {otherBlogs.map((blog) => (
-          <Link
+          <DynamicLink
             href={`/blog-details/${blog.slug}`}
             key={blog.id}
             className={styles.blogCard}
@@ -81,7 +82,7 @@ export default function BlogSection({ blogs = [] }) {
               </p>
               <span className={styles.readMore}>Read More</span>
             </div>
-          </Link>
+          </DynamicLink>
         ))}
       </div>
     </div>

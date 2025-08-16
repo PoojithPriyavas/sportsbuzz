@@ -241,17 +241,17 @@ export default function Home({ countryDataHome, locationDataHome, resolvedUrl, i
                         // style={{marginTop:'9.5rem'}}
                         className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
 
-                        {sport === 'cricket' && apiResponse && (
+                        {/* {sport === 'cricket' && apiResponse && (
                             <LiveScores
                                 apiResponse={apiResponse}
                                 matchTypes={matchTypes}
                                 teamImages={teamImages}
                             />
-                        )}
+                        )} */}
 
-                        {sport === 'football' && stages && (
+                        {/* {sport === 'football' && stages && ( */}
                             <TestLive />
-                        )}
+                        {/* )} */}
 
                         <HeroCarousal />
 

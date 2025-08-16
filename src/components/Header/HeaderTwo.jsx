@@ -440,11 +440,11 @@ const HeaderTwo = ({ animationStage }) => {
             >
                 {/* Mobile Header */}
                 <div className={styles.mobileHeader}>
-                    <div className={styles.logoContent}>
+                    <Link href='/' className={styles.logoContent}>
                         <div className={styles.logoIcon}>
                             <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                         </div>
-                    </div>
+                    </Link>
                     <button
                         className={styles.mobileCloseButton}
                         onClick={() => setMobileMenuOpen(false)}
@@ -631,11 +631,11 @@ const HeaderTwo = ({ animationStage }) => {
 
             {/* SportsBuzz Logo */}
             <div ref={logoRef} className={styles.logo}>
-                <div className={styles.logoContent}>
+                <Link href='/' className={styles.logoContent}>
                     <div className={styles.logoIcon}>
                         <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                     </div>
-                </div>
+                </Link>
             </div>
 
             {/* Header Navigation */}

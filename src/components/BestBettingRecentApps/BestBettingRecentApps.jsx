@@ -3,6 +3,7 @@ import styles from './BestBettingRecentApps.module.css';
 import Head from 'next/head';
 import { useGlobalData } from '../Context/ApiContext';
 import Link from 'next/link';
+import DynamicLink from '../Common/DynamicLink';
 
 export default function BestBettingRecentApps({ bestSections = [] }) {
     const [copiedId, setCopiedId] = useState(null);
@@ -70,7 +71,7 @@ export default function BestBettingRecentApps({ bestSections = [] }) {
                     const linkPath = `/best-betting-apps/recent/${encodeURIComponent(section.id)}`;
 
                     return (
-                        <Link href={linkPath} key={section.id} className={styles.card}>
+                        <DynamicLink href={linkPath} key={section.id} className={styles.card}>
                             <img
                                 className={styles.cardImage}
                                 src={imageUrl}
@@ -80,7 +81,7 @@ export default function BestBettingRecentApps({ bestSections = [] }) {
                                 }}
                             />
                             <h1 className={styles.heading}>{section.heading}</h1>
-                        </Link>
+                        </DynamicLink>
                     );
                 })}
             </div>
