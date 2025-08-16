@@ -8,13 +8,17 @@ import 'swiper/css/pagination';
 import styles from './AutoSlider.module.css';
 import CustomAxios from '../utilities/CustomAxios';
 
-export default function AutoSlider() {
+export default function AutoSlider({countryCode}) {
   const [banners, setBanners] = useState([]);
 
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await CustomAxios.get('/side-banners');
+        const response = await CustomAxios.get('/side-banners', {
+          params: {
+            country_code: countryCode?.location?.id
+          }
+        });
         const data = response.data;
         setBanners(data);
       } catch (error) {
@@ -24,7 +28,7 @@ export default function AutoSlider() {
     };
 
     fetchBanners();
-  }, []);
+  }, [countryCode]); // Added countryCode to dependency array
 
   return (
     <div className={styles.sliderWrapper}>

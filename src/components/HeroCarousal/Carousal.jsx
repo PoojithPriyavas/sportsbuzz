@@ -9,7 +9,7 @@ import 'swiper/css/pagination';
 import styles from './Carousal.module.css';
 import { useMediaQuery } from 'react-responsive';
 
-export default function HeroCarousal() {
+export default function HeroCarousal({countryCode}) {
   const [banners, setBanners] = useState([]);
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
@@ -17,11 +17,20 @@ export default function HeroCarousal() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await fetch('https://admin.sportsbuz.com/api/banners'); 
+        const url = new URL('https://admin.sportsbuz.com/api/banners');
+        if (countryCode?.location?.id) {
+          url.searchParams.append('country_code', countryCode.location.id);
+        }
+        
+        const res = await fetch(url.toString());
+
+
         const data = await res.json();
-        // console.log(data," banner")
+        console.log(data, " banner");
+        
         const activeBanners = data.filter(b => b.is_active === 'Active');
-        // console.log(activeBanners,"active banner")
+        console.log(activeBanners, "active banner");
+        
         setBanners(activeBanners.sort((a, b) => a.order_by - b.order_by));
       } catch (error) {
         console.error('Failed to fetch banners:', error);
@@ -29,7 +38,7 @@ export default function HeroCarousal() {
     };
 
     fetchBanners();
-  }, []);
+  }, [countryCode]); // Added countryCode to dependency array
 
   return (
     <div className={styles.carouselWrapper} style={{ marginTop: '20px' }}>

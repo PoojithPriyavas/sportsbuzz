@@ -213,7 +213,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
               </>
 
             )}
-            <HeroCarousal />
+            <HeroCarousal countryCode={countryCode} />
 
             <div className={styles.fourColumnRow}>
               <div className={styles.leftThreeColumns}>
@@ -245,7 +245,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                     <JoinTelegramButton />
                   </div>
                   <div className={styles.fourthColumnRight}>
-                    <AutoSlider />
+                    <AutoSlider countryCode={countryCode} />
                   </div>
                 </div>
                 {sport === 'cricket' ? (
