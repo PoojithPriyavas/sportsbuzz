@@ -44,9 +44,9 @@ export default function CricketMatchDetails() {
             return;
         }
         getCricketDetails(matchId);
-    }, [router.isReady, matchId, getCricketDetails]); // Added all dependencies
+    }, [router.isReady, matchId, getCricketDetails]); 
 
-    // Animation logic
+   
     useEffect(() => {
         // Check if animation has been played before
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');

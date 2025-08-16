@@ -49,6 +49,7 @@ export async function getServerSideProps(context) {
 
 
 export default function BlogDetailsMain({ blog, locationDataHome }) {
+    const { countryCode } = useGlobalData();
     const { "countrycode-hreflng": countryLang } = useParams();
     const languageValidation = useLanguageValidation(locationDataHome, countryLang);
     const [animationStage, setAnimationStage] = useState('loading');
@@ -106,7 +107,7 @@ export default function BlogDetailsMain({ blog, locationDataHome }) {
             {/* <Header /> */}
             <HeaderThree animationStage={animationStage} />
             <div className={` ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
-                <BlogDetailsPage blog={blog} />
+                <BlogDetailsPage blog={blog} countryCode={countryCode}/>
             </div>
             {showOtherDivs && <FooterTwo />}
         </>

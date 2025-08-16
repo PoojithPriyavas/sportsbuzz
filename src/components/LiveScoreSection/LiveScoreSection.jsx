@@ -4,6 +4,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import styles from './LiveScoreSection.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 import Link from 'next/link';
+import DynamicLink from '../Common/DynamicLink';
 
 export default function LiveScores({ apiResponse = [], matchTypes = [], teamImages = [] }) {
   const [activeType, setActiveType] = useState('');
@@ -72,7 +73,7 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
         const team2Img = teamImages[team2.imageId];
 
         cards.push(
-          <Link href={`/cricket-match-details/${info.matchId}`} key={`match-${info.matchId}`}>
+          <DynamicLink href={`/cricket-match-details/${info.matchId}`} key={`match-${info.matchId}`}>
             <div className={styles.card}>
               <div className={styles.status}>
                 <span className={styles.liveDot}></span>
@@ -116,7 +117,7 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
 
               <div className={styles.note}>{info.status}</div>
             </div>
-          </Link>
+          </DynamicLink>
         );
 
         if (matchCount % 2 === 0) {
