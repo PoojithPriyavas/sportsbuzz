@@ -376,15 +376,32 @@ const HeaderTwo = ({ animationStage }) => {
         }
     };
 
+    // Optimized sport change handler with debouncing
+    const [isChangingSport, setIsChangingSport] = useState(false);
+    
     const handleSportChange = (selectedSport) => {
+        // Prevent multiple rapid sport changes
+        if (isChangingSport) return;
+        
+        // Set loading state
+        setIsChangingSport(true);
+        
         // First update localStorage to ensure consistency
         localStorage.setItem('selectedSport', selectedSport);
-        // Then update state
-        setSport(selectedSport);
+        
+        // Close menus immediately for better UX
         setExpandedSportsSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);
         }
+        
+        // Delay the actual sport change to prevent UI freezing
+        setTimeout(() => {
+            // Then update state
+            setSport(selectedSport);
+            // Reset loading state after a short delay to ensure UI updates
+            setTimeout(() => setIsChangingSport(false), 300);
+        }, 50);
     };
 
     const capitalizeFirstLetter = (text) =>
@@ -578,13 +595,21 @@ const HeaderTwo = ({ animationStage }) => {
                                 className={`${styles.mobileSubmenuItem} ${sport === 'cricket' ? styles.active : ''}`}
                                 onClick={() => handleSportChange('cricket')}
                             >
-                                {translatedText.cricket}
+                                {isChangingSport && sport !== 'cricket' ? (
+                                    <span className={styles.loadingIndicator}>Loading...</span>
+                                ) : (
+                                    translatedText.cricket
+                                )}
                             </div>
                             <div
                                 className={`${styles.mobileSubmenuItem} ${sport === 'football' ? styles.active : ''}`}
                                 onClick={() => handleSportChange('football')}
                             >
-                                {translatedText.football}
+                                {isChangingSport && sport !== 'football' ? (
+                                    <span className={styles.loadingIndicator}>Loading...</span>
+                                ) : (
+                                    translatedText.football
+                                )}
                             </div>
                         </div>
                     </div>
@@ -716,14 +741,20 @@ const HeaderTwo = ({ animationStage }) => {
                         ))}
                     </select>
 
-                    <select
-                        className={styles.sportsSelector}
-                        value={sport}
-                        onChange={(e) => handleSportChange(e.target.value)}
-                    >
-                        <option value="cricket">{translatedText.cricket}</option>
-                        <option value="football">{translatedText.football}</option>
-                    </select>
+                    <div className={styles.sportsSelectorWrapper}>
+                        {isChangingSport && (
+                            <span className={styles.loadingIndicator}>Loading...</span>
+                        )}
+                        <select
+                            className={`${styles.sportsSelector} ${isChangingSport ? styles.disabled : ''}`}
+                            value={sport}
+                            onChange={(e) => handleSportChange(e.target.value)}
+                            disabled={isChangingSport}
+                        >
+                            <option value="cricket">{translatedText.cricket}</option>
+                            <option value="football">{translatedText.football}</option>
+                        </select>
+                    </div>
 
                     <Link href="/contact" className={`${styles.navItem} ${pathname === '/contact' ? styles.active : ''}`}>
                         {translatedText.contact}

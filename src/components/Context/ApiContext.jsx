@@ -18,6 +18,21 @@ const DataContext = createContext();
 
 
 export const DataProvider = ({ children }) => {
+    // Data caching state
+    const [dataCache, setDataCache] = useState({
+        cricket: {
+            matches: null,
+            upcomingMatches: null,
+            types: null,
+            teamImages: {}
+        },
+        football: {
+            liveMatches: null,
+            upcomingMatches: null
+        }
+    });
+    const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+    
     const [blogCategories, setBlogCategories] = useState([]);
     const [recentBlogs, setrecentBlogs] = useState([]);
     const [blogs, setBlogs] = useState([]);
@@ -160,16 +175,46 @@ export const DataProvider = ({ children }) => {
         }
     }, []);
 
-    // Add this effect to update sport when country code changes
+    // Add this effect to update sport when country code changes, but only if user hasn't manually selected a sport
     useEffect(() => {
         if (countryCode?.location?.sports) {
             const apiSport = countryCode.location.sports.toLowerCase();
-            if (apiSport !== sport) {
+            const userSelectedSport = localStorage.getItem('selectedSport');
+            
+            // Only update sport based on country if user hasn't manually selected a sport
+            // or if this is the first load (no user selection yet)
+            if (!userSelectedSport && apiSport !== sport) {
                 setSport(apiSport);
                 localStorage.setItem('selectedSport', apiSport);
             }
         }
     }, [countryCode]);
+    
+    // Handle sport changes and load sport-specific data
+    useEffect(() => {
+        if (!initialDataLoaded) return; // Skip during initial load
+        
+        console.log(`Sport changed to: ${sport}`);
+        
+        // Load sport-specific data based on current sport
+        if (sport === 'cricket') {
+            // Check if we have cached data
+            if (!dataCache.cricket.matches) {
+                fetchMatches();
+            }
+            if (!dataCache.cricket.upcomingMatches) {
+                fetchUpcomingMatches();
+            }
+        } else if (sport === 'football') {
+            // Check if we have cached data
+            if (!dataCache.football.liveMatches) {
+                liveFootBall();
+            }
+            if (!dataCache.football.upcomingMatches) {
+                upcomingFootBall();
+            }
+        }
+    }, [sport, initialDataLoaded]);
 
     // SETTINGS-API IMPLEMENTATION
     const [settings, setSettings] = useState([]);
@@ -507,7 +552,7 @@ export const DataProvider = ({ children }) => {
         console.log(countryCodeParam, "c param")
         console.log("called the betting apps")
         if (!countryCodeParam) {
-            console.warn('No country code available for fetching betting apps');
+            console.error('No country code available for fetching betting apps');
             return;
         }
 
@@ -569,6 +614,15 @@ export const DataProvider = ({ children }) => {
 
     const fetchMatches = async () => {
         try {
+            // Check if we already have cached data
+            if (dataCache.cricket.matches) {
+                console.log('Using cached cricket matches data');
+                setApiResponse(dataCache.cricket.matches.apiResponse);
+                setMatchTypes(dataCache.cricket.matches.matchTypes);
+                setTeamImages(dataCache.cricket.matches.teamImages);
+                return;
+            }
+            
             const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live', {
                 headers: { 'X-RapidAPI-Key': rapidApiKey },
             });
@@ -611,6 +665,21 @@ export const DataProvider = ({ children }) => {
                 })
             );
             setTeamImages(newTeamImages);
+            
+            // Cache the data
+             setDataCache(prev => ({
+                 ...prev,
+                 cricket: {
+                     ...prev.cricket,
+                     matches: {
+                         apiResponse: res.data,
+                         matchTypes: filterTypes,
+                         teamImages: newTeamImages
+                     }
+                 }
+             }));
+            
+            console.log('Cricket matches data fetched and cached');
         } catch (error) {
             console.error('Failed to fetch live matches:', error);
         }
@@ -634,7 +703,15 @@ export const DataProvider = ({ children }) => {
     const [upcomingMatches, setUpcomingMatches] = useState([]);
 
     const fetchUpcomingMatches = async () => {
+        console.log('Fetching upcoming cricket matches...');
         try {
+            // Check if we already have cached data
+            if (dataCache.cricket.upcomingMatches) {
+                console.log('Using cached upcoming cricket matches data');
+                setUpcomingMatches(dataCache.cricket.upcomingMatches);
+                return;
+            }
+            
             const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/upcoming', {
                 headers: {
                     'X-RapidAPI-Key': rapidApiKey,
@@ -671,6 +748,17 @@ export const DataProvider = ({ children }) => {
             });
 
             setUpcomingMatches(upcoming);
+            
+            // Cache the data
+            setDataCache(prev => ({
+                ...prev,
+                cricket: {
+                    ...prev.cricket,
+                    upcomingMatches: upcoming
+                }
+            }));
+            
+            console.log('Upcoming cricket matches data fetched and cached');
         } catch (error) {
             console.error('Failed to fetch upcoming matches:', error);
         }
@@ -679,24 +767,44 @@ export const DataProvider = ({ children }) => {
     // FOOTBALL LIVE SCORE SECTION
     const [stages, setStages] = useState([]);
     const liveFootBall = async () => {
+        console.log('Fetching live football matches...');
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0].replace(/-/g, '');
-        const options = {
-            method: 'GET',
-            url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
-            params: {
-                Category: 'soccer',
-                Date: formattedDate,
-                Timezone: '-5'
-            },
-            headers: {
-                'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
-            }
-        };
-
+        
         try {
+            // Check if we already have cached data
+            if (dataCache.football.liveMatches) {
+                console.log('Using cached live football matches data');
+                setStages(dataCache.football.liveMatches);
+                return;
+            }
+            
+            const options = {
+                method: 'GET',
+                url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
+                params: {
+                    Category: 'soccer',
+                    Date: formattedDate,
+                    Timezone: '-5'
+                },
+                headers: {
+                    'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
+                }
+            };
+
             const response = await axios.request(options);
-            setStages(response.data)
+            setStages(response.data);
+            
+            // Cache the data
+            setDataCache(prev => ({
+                ...prev,
+                football: {
+                    ...prev.football,
+                    liveMatches: response.data
+                }
+            }));
+            
+            console.log('Live football matches data fetched and cached');
         } catch (error) {
             console.error('Error fetching football matches:', error);
         }
@@ -706,28 +814,47 @@ export const DataProvider = ({ children }) => {
 
     const [upcoming, setUpcoming] = useState([]);
     const upcomingFootBall = async () => {
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-
-        const formattedDate = tomorrow.toISOString().split('T')[0].replace(/-/g, '');
-
-        const options = {
-            method: 'GET',
-            url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
-            params: {
-                Category: 'soccer',
-                Date: formattedDate,
-                Timezone: '-5'
-            },
-            headers: {
-                'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
-            }
-        };
-
+        console.log('Fetching upcoming football matches...');
         try {
+            // Check if we already have cached data
+            if (dataCache.football.upcomingMatches) {
+                console.log('Using cached upcoming football matches data');
+                setUpcoming(dataCache.football.upcomingMatches);
+                return;
+            }
+            
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+
+            const formattedDate = tomorrow.toISOString().split('T')[0].replace(/-/g, '');
+
+            const options = {
+                method: 'GET',
+                url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
+                params: {
+                    Category: 'soccer',
+                    Date: formattedDate,
+                    Timezone: '-5'
+                },
+                headers: {
+                    'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
+                }
+            };
+
             const response = await axios.request(options);
-            setUpcoming(response.data)
+            setUpcoming(response.data);
+            
+            // Cache the data
+            setDataCache(prev => ({
+                ...prev,
+                football: {
+                    ...prev.football,
+                    upcomingMatches: response.data
+                }
+            }));
+            
+            console.log('Upcoming football matches data fetched and cached');
         } catch (error) {
             console.error('Error fetching upcoming football matches:', error);
         }
@@ -795,18 +922,30 @@ export const DataProvider = ({ children }) => {
     //     };
     // }, []);
 
+    // Initial data loading effect
+    
+    // Load initial data only once
     useEffect(() => {
-        fetchBlogCategories();
-        fetchRecentBlogs();
-        fetchMatches();
-        fetchUpcomingMatches();
-        liveFootBall();
-        upcomingFootBall();
-        // fetchNews();
-        fetchLocation();
-        getCountryCode();
-        fetchSettings();
-    }, []);
+        if (!initialDataLoaded) {
+            // Load non-sport specific data
+            fetchBlogCategories();
+            fetchRecentBlogs();
+            fetchLocation();
+            getCountryCode();
+            fetchSettings();
+            
+            // Load sport-specific data based on current sport
+            if (sport === 'cricket') {
+                fetchMatches();
+                fetchUpcomingMatches();
+            } else if (sport === 'football') {
+                liveFootBall();
+                upcomingFootBall();
+            }
+            
+            setInitialDataLoaded(true);
+        }
+    }, [initialDataLoaded]);
 
     useEffect(() => {
         if (!news.length) {
