@@ -38,12 +38,141 @@ function formatDate(esd, labels = { today: 'Today', tomorrow: 'Tomorrow' }) {
     }
 }
 
+// Skeleton Card Component
+function SkeletonCard() {
+    return (
+        <div className={styles.matchCard} style={{ pointerEvents: 'none' }}>
+            {/* League header skeleton */}
+            <div className={styles.leagueHeader}>
+                <div className={styles.leagueName}>
+                    <div className={styles.skeleton} style={{ 
+                        width: '80%', 
+                        height: '16px', 
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)' 
+                    }}></div>
+                </div>
+                <div className={styles.subLeague}>
+                    <div className={styles.skeleton} style={{ 
+                        width: '60%', 
+                        height: '12px', 
+                        backgroundColor: 'rgba(255, 255, 255, 0.15)' 
+                    }}></div>
+                </div>
+            </div>
+
+            {/* Teams and scores skeleton */}
+            <div className={styles.matchContent}>
+                <div className={styles.teamsContainer}>
+                    {/* Home team skeleton */}
+                    <div className={styles.team}>
+                        <div className={styles.teamLogo}>
+                            <div className={styles.skeleton} style={{ 
+                                width: '36px', 
+                                height: '36px', 
+                                borderRadius: '50%',
+                                backgroundColor: '#e0e0e0'
+                            }}></div>
+                        </div>
+                        <div className={styles.skeleton} style={{ 
+                            width: '60px', 
+                            height: '13px', 
+                            backgroundColor: '#e0e0e0',
+                            marginTop: '8px'
+                        }}></div>
+                    </div>
+
+                    {/* Score section skeleton */}
+                    <div className={styles.scoreSection}>
+                        <div className={styles.skeleton} style={{ 
+                            width: '30px', 
+                            height: '33px', 
+                            backgroundColor: '#e0e0e0',
+                            margin: '0 15px'
+                        }}></div>
+                        <div className={styles.vs} style={{ color: '#bbb' }}>VS</div>
+                        <div className={styles.skeleton} style={{ 
+                            width: '30px', 
+                            height: '33px', 
+                            backgroundColor: '#e0e0e0',
+                            margin: '0 15px'
+                        }}></div>
+                    </div>
+
+                    {/* Away team skeleton */}
+                    <div className={styles.team}>
+                        <div className={styles.teamLogo}>
+                            <div className={styles.skeleton} style={{ 
+                                width: '36px', 
+                                height: '36px', 
+                                borderRadius: '50%',
+                                backgroundColor: '#e0e0e0'
+                            }}></div>
+                        </div>
+                        <div className={styles.skeleton} style={{ 
+                            width: '60px', 
+                            height: '13px', 
+                            backgroundColor: '#e0e0e0',
+                            marginTop: '8px'
+                        }}></div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Match info skeleton */}
+            <div className={styles.matchInfo}>
+                <div className={styles.skeleton} style={{ 
+                    width: '80px', 
+                    height: '12px', 
+                    backgroundColor: '#e0e0e0'
+                }}></div>
+                <div className={styles.skeleton} style={{ 
+                    width: '60px', 
+                    height: '20px', 
+                    backgroundColor: '#e0e0e0',
+                    borderRadius: '20px'
+                }}></div>
+            </div>
+        </div>
+    );
+}
+
+// Skeleton Filter Bar Component
+function SkeletonFilterBar() {
+    return (
+        <div className={styles.leagueSelector}>
+            <div className={styles.skeleton} style={{ 
+                width: '30px', 
+                height: '16px', 
+                backgroundColor: '#e0e0e0'
+            }}></div>
+            {Array.from({ length: 4 }).map((_, index) => (
+                <div 
+                    key={index}
+                    className={styles.skeleton} 
+                    style={{ 
+                        width: `${60 + (index * 10)}px`, 
+                        height: '16px', 
+                        backgroundColor: '#e0e0e0'
+                    }}
+                ></div>
+            ))}
+            <div className={styles.skeleton} style={{ 
+                width: '100px', 
+                height: '30px', 
+                backgroundColor: '#e0e0e0',
+                borderRadius: '6px'
+            }}></div>
+        </div>
+    );
+}
+
 export default function TestLive() {
     const { stages, language, translateText, fetchFootballDetails, fetchFootBallLineUp } = useGlobalData();
     const [selectedLeague, setSelectedLeague] = useState('All');
     const [translatedStages, setTranslatedStages] = useState([]);
     const [dateLabels, setDateLabels] = useState({ today: 'Today', tomorrow: 'Tomorrow' });
     const [isTranslating, setIsTranslating] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     
     // Use the dynamic router instead of regular router
     const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
@@ -64,8 +193,12 @@ export default function TestLive() {
 
     useEffect(() => {
         const translateStageData = async () => {
-            if (!stages?.Stages) return;
+            if (!stages?.Stages) {
+                setIsLoading(true);
+                return;
+            }
 
+            setIsLoading(false);
             setIsTranslating(true);
 
             // First translate just the date labels for immediate display
@@ -156,20 +289,22 @@ export default function TestLive() {
     const topLeagues = uniqueLeagues.slice(0, 5);
     const otherLeagues = uniqueLeagues.slice(5);
 
+    // Show skeleton loader when loading or no data
+    if (isLoading || !stages?.Stages) {
+        return (
+            <>
+                <SkeletonFilterBar />
+                <div className={styles.cardsContainer}>
+                    {Array.from({ length: 6 }).map((_, index) => (
+                        <SkeletonCard key={index} />
+                    ))}
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
-            {/* Debug info in development */}
-            {process.env.NODE_ENV === 'development' && (
-                <div style={{ 
-                    padding: '10px', 
-                    background: '#f0f0f0', 
-                    margin: '10px 0',
-                    fontSize: '12px' 
-                }}>
-                    <strong>Debug Info:</strong> Path Prefix: "{pathPrefix}"
-                </div>
-            )}
-
             {/* Filter Bar */}
             <div className={styles.leagueSelector}>
                 <span
@@ -278,17 +413,6 @@ export default function TestLive() {
                                             {status}
                                         </div>
                                     </div>
-
-                                    {/* Debug info for each card in development */}
-                                    {/* {process.env.NODE_ENV === 'development' && (
-                                        <div style={{ 
-                                            fontSize: '10px', 
-                                            color: 'blue', 
-                                            marginTop: '5px' 
-                                        }}>
-                                            Will navigate to: {buildPath(`/football-match-details/${event.Eid}`)}
-                                        </div>
-                                    )} */}
                                 </div>
                             );
                         })

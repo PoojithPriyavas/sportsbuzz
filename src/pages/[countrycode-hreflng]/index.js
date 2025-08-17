@@ -51,7 +51,7 @@ export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
     console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
     try {
-        const { resolvedUrl, req } = context;
+        const {  req } = context;
         const [countryRes, locationRes] = await Promise.all([
             axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
             axios.get('https://admin.sportsbuz.com/api/locations/')
@@ -71,7 +71,7 @@ export async function getServerSideProps(context) {
             props: {
                 countryDataHome,
                 locationDataHome,
-                resolvedUrl,
+                
             }
         };
     } catch (error) {
@@ -87,14 +87,14 @@ export async function getServerSideProps(context) {
             props: {
                 countryDataHome: null,
                 locationDataHome: null,
-                resolvedUrl,
+          
                 isLocalhost: process.env.NODE_ENV === 'development'
             }
         };
     }
 }
 
-export default function Home({ countryDataHome, locationDataHome, resolvedUrl, isLocalhost }) {
+export default function Home({ countryDataHome, locationDataHome,  isLocalhost }) {
 
     const {
         blogCategories,
@@ -192,7 +192,7 @@ export default function Home({ countryDataHome, locationDataHome, resolvedUrl, i
                 <meta name="author" content="Sportsbuz" />
 
                 {/* Canonical */}
-                {locationDataHome.map(({ hreflang, country_code }) => {
+                {locationDataHome?.map(({ hreflang, country_code }) => {
                     {/* console.log(hreflang, "href lan home") */ }
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
                     const fullHrefLang = `${hreflang}-${country_code}`;

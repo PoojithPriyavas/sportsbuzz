@@ -26,8 +26,9 @@
     flex-direction: column;
     /* Key change: make it a flex container */
 }
-@media(max-width:768px){
-    .matchCard{
+
+@media(max-width:768px) {
+    .matchCard {
         height: 230px;
     }
 }
@@ -269,4 +270,34 @@
 .leagueDropdown option {
     padding: 10px;
     font-size: 14px;
+}
+
+/* Add this to your existing TestLive.module.css file */
+
+/* Skeleton Animation */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Skeleton specific adjustments for match cards */
+.matchCard .skeleton {
+    display: block;
+}
+
+/* Ensure skeleton elements maintain proper spacing */
+.team .skeleton:last-child {
+    margin-top: 8px;
 }

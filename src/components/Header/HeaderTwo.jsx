@@ -56,126 +56,155 @@ const HeaderTwo = ({ animationStage }) => {
     useEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
         
-        // Set initial states IMMEDIATELY to prevent flash
-        gsap.set(containerRef.current, {
-            height: hasPlayedAnimation ? '5rem' : '100vh',
-            // top: hasPlayedAnimation ? '5rem' : '0', // Add top position control
-            overflow: hasPlayedAnimation ? 'visible' : 'hidden',
-            display: hasPlayedAnimation ? 'flex' : 'block',
-            alignItems: hasPlayedAnimation ? 'center' : 'stretch',
-            justifyContent: hasPlayedAnimation ? 'space-between' : 'flex-start',
-            padding: hasPlayedAnimation ? '0 1rem' : '0'
-        });
-        
-        gsap.set(loadingAnimationRef.current, {
-            opacity: hasPlayedAnimation ? 0 : 1,
-            scale: hasPlayedAnimation ? 0.5 : 1,
-            display: hasPlayedAnimation ? 'none' : 'flex'
-        });
-        
-        gsap.set(logoRef.current, {
-            position: hasPlayedAnimation ? 'relative' : 'absolute',
-            bottom: hasPlayedAnimation ? 'auto' : '2rem',
-            left: hasPlayedAnimation ? 'auto' : '2rem',
-            opacity: hasPlayedAnimation ? 1 : 0,
-            x: 0,
-            y: hasPlayedAnimation ? 0 : 80,
-            visibility: hasPlayedAnimation ? 'visible' : 'hidden'
-        });
-        
-        gsap.set(navigationRef.current, {
-            opacity: hasPlayedAnimation ? 1 : 0,
-            display: hasPlayedAnimation ? 'flex' : 'none'
-        });
-        
-        if (!hasPlayedAnimation) {
-            setShouldShowAnimation(true);
-            
-            // Create the main timeline
-            const tl = gsap.timeline({
-                onComplete: () => {
-                    setAnimationComplete(true);
-                    localStorage.setItem('headerAnimationPlayed', 'true');
-                }
-            });
-
-            // Step 1: Show loading animation (1 second)
-            tl.to({}, { duration: 2 })
-            
-            // Step 2: Hide loading animation and show logo (0.5 seconds)
-            .to(loadingAnimationRef.current, {
-                opacity: 0,
-                scale: 0.75,
-                duration: 0.75,
-                ease: "power2.inOut"
-            })
-            .to(logoRef.current, {
-                opacity: 1,
-                y: 0,
-                visibility: 'visible',
-                duration: 0.75,
-                ease: "power2.out"
-            }, "-=0.3")
-            
-            // Step 3: Wait a moment then start transition (1 second wait)
-            .to({}, { duration: 1 })
-            
-            // Step 4: Shrink container and move logo to header position (1.5 seconds)
-            .to(containerRef.current, {
+        if (hasPlayedAnimation) {
+            // Animation already played - set final state immediately
+            gsap.set(containerRef.current, {
                 height: '5rem',
-                duration: 1.5,
-                ease: "power2.inOut"
-            })
-            .to(logoRef.current, {
-                bottom: '50%',
-                left: '1rem',
-                y: '50%',
-                duration: 1.5,
-                ease: "power2.inOut"
-            }, "-=1.5")
-            
-            // Step 5: Convert logo to relative positioning after animation
-            .set(logoRef.current, {
-                position: 'relative',
-                bottom: 'auto',
-                left: 'auto',
-                x: 0,
-                y: 0
-            })
-            
-            // Step 6: Show navigation and set final states
-            .set(containerRef.current, {
                 overflow: 'visible',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '0 1rem'
-            })
-            .set(navigationRef.current, {
-                display: 'flex'
-            })
-            .to(navigationRef.current, {
-                opacity: 1,
-                duration: 0.75,
-                ease: "power2.out"
-            })
-            .set(loadingAnimationRef.current, {
-                display: 'none'
-            })
+            });
             
-            // Step 7: Smoothly slide the header down from top: 0 to top: 5rem
-            // .to(containerRef.current, {
-            //     top: '5rem',
-            //     duration: 1,
-            //     ease: "power2.inOut"
-            // });
-
-            // timelineRef.current = tl;
-        } else {
-            // Animation already played - already set to final state above
+            gsap.set(loadingAnimationRef.current, {
+                opacity: 0,
+                scale: 0.5,
+                display: 'none'
+            });
+            
+            gsap.set(logoRef.current, {
+                position: 'relative',
+                bottom: 'auto',
+                left: 'auto',
+                opacity: 1,
+                x: 0,
+                y: 0,
+                visibility: 'visible'
+            });
+            
+            gsap.set(navigationRef.current, {
+                opacity: 1,
+                display: 'flex'
+            });
+            
             setShouldShowAnimation(false);
             setAnimationComplete(true);
+            
+            // Additional safety measure
+            if (loadingAnimationRef.current) {
+                loadingAnimationRef.current.style.display = 'none';
+            }
+            
+            return; // Exit early if animation already played
         }
+        
+        // Animation hasn't played yet - set initial states for animation
+        gsap.set(containerRef.current, {
+            height: '100vh',
+            overflow: 'hidden',
+            display: 'block',
+            alignItems: 'stretch',
+            justifyContent: 'flex-start',
+            padding: '0'
+        });
+        
+        gsap.set(loadingAnimationRef.current, {
+            opacity: 1,
+            scale: 1,
+            display: 'flex'
+        });
+        
+        gsap.set(logoRef.current, {
+            position: 'absolute',
+            bottom: '2rem',
+            left: '2rem',
+            opacity: 0,
+            x: 0,
+            y: 80,
+            visibility: 'hidden'
+        });
+        
+        gsap.set(navigationRef.current, {
+            opacity: 0,
+            display: 'none'
+        });
+        
+        setShouldShowAnimation(true);
+        
+        // Create the main timeline
+        const tl = gsap.timeline({
+            onComplete: () => {
+                setAnimationComplete(true);
+                localStorage.setItem('headerAnimationPlayed', 'true');
+            }
+        });
+
+        // Step 1: Show loading animation (1 second)
+        tl.to({}, { duration: 2 })
+        
+        // Step 2: Hide loading animation and show logo (0.5 seconds)
+        .to(loadingAnimationRef.current, {
+            opacity: 0,
+            scale: 0.75,
+            duration: 0.75,
+            ease: "power2.inOut"
+        })
+        .to(logoRef.current, {
+            opacity: 1,
+            y: 0,
+            visibility: 'visible',
+            duration: 0.75,
+            ease: "power2.out"
+        }, "-=0.3")
+        
+        // Step 3: Wait a moment then start transition (1 second wait)
+        .to({}, { duration: 1 })
+        
+        // Step 4: Shrink container and move logo to header position (1.5 seconds)
+        .to(containerRef.current, {
+            height: '5rem',
+            duration: 1.5,
+            ease: "power2.inOut"
+        })
+        .to(logoRef.current, {
+            bottom: '50%',
+            left: '1rem',
+            y: '50%',
+            duration: 1.5,
+            ease: "power2.inOut"
+        }, "-=1.5")
+        
+        // Step 5: Convert logo to relative positioning after animation
+        .set(logoRef.current, {
+            position: 'relative',
+            bottom: 'auto',
+            left: 'auto',
+            x: 0,
+            y: 0
+        })
+        
+        // Step 6: Show navigation and set final states
+        .set(containerRef.current, {
+            overflow: 'visible',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 1rem'
+        })
+        .set(navigationRef.current, {
+            display: 'flex'
+        })
+        .to(navigationRef.current, {
+            opacity: 1,
+            duration: 0.75,
+            ease: "power2.out"
+        })
+        .set(loadingAnimationRef.current, {
+            display: 'none'
+        });
+
+        timelineRef.current = tl;
 
         // Cleanup function
         return () => {
@@ -596,7 +625,9 @@ const HeaderTwo = ({ animationStage }) => {
                                 onClick={() => handleSportChange('cricket')}
                             >
                                 {isChangingSport && sport !== 'cricket' ? (
-                                    <span className={styles.loadingIndicator}>Loading...</span>
+                                    <span className={styles.loadingIndicator}>
+                                    {/* Loading... */}
+                                    </span>
                                 ) : (
                                     translatedText.cricket
                                 )}
@@ -606,7 +637,9 @@ const HeaderTwo = ({ animationStage }) => {
                                 onClick={() => handleSportChange('football')}
                             >
                                 {isChangingSport && sport !== 'football' ? (
-                                    <span className={styles.loadingIndicator}>Loading...</span>
+                                    <span className={styles.loadingIndicator}>
+                                    {/* Loading... */}
+                                    </span>
                                 ) : (
                                     translatedText.football
                                 )}
@@ -643,16 +676,18 @@ const HeaderTwo = ({ animationStage }) => {
             className={styles.loadingContainer}
         >
             {/* Loading Animation - Only show during initial animation */}
-            <div 
-                ref={loadingAnimationRef}
-                className={styles.loadingAnimation}
-            >
-                <div className={styles.loadingIcon}>
-                    <div className={styles.mainIcon}>
-                        <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInner} />
+            {shouldShowAnimation && (
+                <div 
+                    ref={loadingAnimationRef}
+                    className={styles.loadingAnimation}
+                >
+                    <div className={styles.loadingIcon}>
+                        <div className={styles.mainIcon}>
+                            <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInner} />
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* SportsBuzz Logo */}
             <div ref={logoRef} className={styles.logo}>
