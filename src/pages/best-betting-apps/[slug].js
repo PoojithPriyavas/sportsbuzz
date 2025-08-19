@@ -20,34 +20,40 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 
 import { fetchBettingAppsSSR } from '@/lib/fetchBettingAppsSSR';
 
-export async function getServerSideProps(context) {
-  try {
-    const [countryRes, locationRes] = await Promise.all([
-      axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
-      axios.get('https://admin.sportsbuz.com/api/locations')
-    ]);
+export async function getServerSideProps({ req }) {
+    try {
+        // Parse the cookie to get country code
+        const countryCookie = req.cookies.countryData;
+        const countryData = countryCookie ? JSON.parse(countryCookie) : null;
+        const countryCode = countryData?.country_code || 'IN';
 
-    const countryDataHome = countryRes.data;
-    const locationDataHome = locationRes.data;
-    const sections = fetchBettingAppsSSR(countryDataHome)
+        console.log('🔍 SSR - Country Code:', countryCode);
+        
+        // Fetch betting apps data based on country code
+        const sections = await fetchBettingAppsSSR(countryCode);
+        
+        console.log('🔍 SSR - Sections fetched:', sections?.length || 0, 'items');
+        console.log('🔍 SSR - First section:', sections?.[0] ? 'exists' : 'missing');
 
-    return {
-      props: {
-        countryDataHome,
-        locationDataHome,
-        sections
-      }
-    };
-  } catch (error) {
-    console.error("Error fetching data from APIs:", error.message);
-    return {
-      props: {
-        countryDataHome: null,
-        locationDataHome: null,
-        isLocalhost: process.env.NODE_ENV === 'development'
-      }
-    };
-  }
+        return {
+            props: {
+                sections: sections || [], // Ensure it's always an array
+                countryCode,
+                // Add a timestamp to help debug
+                fetchTime: new Date().toISOString(),
+            },
+        };
+    } catch (error) {
+        console.error('🚨 SSR Error:', error);
+        return {
+            props: {
+                sections: [],
+                countryCode: 'IN',
+                fetchTime: new Date().toISOString(),
+                error: error.message,
+            },
+        };
+    }
 }
 
 export default function BestBettingApps({ sections, countryCode, fetchTime, error }) {
@@ -63,7 +69,6 @@ export default function BestBettingApps({ sections, countryCode, fetchTime, erro
     const {
         blogCategories,
         blogs,
-        // Remove sections from here to avoid conflict
         apiResponse,
         matchTypes,
         teamImages,
@@ -156,13 +161,13 @@ export default function BestBettingApps({ sections, countryCode, fetchTime, erro
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
                         {/* Debug display */}
-                        {/* <div style={{ padding: '10px', background: '#f0f0f0', margin: '10px 0' }}>
+                        <div style={{ padding: '10px', background: '#f0f0f0', margin: '10px 0' }}>
                             <strong>Debug Info:</strong><br/>
                             Sections length: {sections?.length || 0}<br/>
                             First section exists: {sections?.[0] ? 'Yes' : 'No'}<br/>
                             Fetch time: {fetchTime}<br/>
                             Country: {countryCode}
-                        </div> */}
+                        </div>
                         
                         <BettingAppsTable sections={sections} />
                         <div
