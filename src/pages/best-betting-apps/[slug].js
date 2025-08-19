@@ -28,7 +28,7 @@ export async function getServerSideProps({ req, params }) {
         // Fetch location data
         const locationResponse = await axios.get('https://admin.sportsbuz.com/api/locations');
         const locationData = locationResponse.data;
-        
+
         // Find current country data using the countryCode from URL
         const currentCountry = locationData.find(
             location => location.country_code.toLowerCase() === countryCode.toLowerCase()
@@ -68,7 +68,7 @@ export async function getServerSideProps({ req, params }) {
     }
 }
 
-export default function BestBettingApps({ countryCode, locationData, currentCountry ,bettingTableData}) {
+export default function BestBettingApps({ countryCode, locationData, currentCountry, bettingTableData }) {
     console.log(locationData, "location data for", bettingTableData);
 
     const [loading, setLoading] = useState(true);
@@ -152,45 +152,49 @@ export default function BestBettingApps({ countryCode, locationData, currentCoun
             <Head>
                 <title>{metaContent.title}</title>
                 <meta name="description" content={metaContent.description} />
-                
+
                 {/* Open Graph Meta Tags */}
                 <meta property="og:title" content={metaContent.title} />
                 <meta property="og:description" content={metaContent.description} />
                 <meta property="og:type" content="website" />
                 <meta property="og:locale" content={currentCountry?.hreflang || 'en'} />
                 <meta property="og:url" content={`https://www.sportsbuz.com/${currentCountry?.hreflang || 'en'}-${countryCode.toLowerCase()}/`} />
-                
+
                 {/* Twitter Meta Tags */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={metaContent.title} />
                 <meta name="twitter:description" content={metaContent.description} />
-                
+
                 {/* Canonical URL */}
-                <link rel="canonical" href={`https://www.sportsbuz.com/${currentCountry?.hreflang || 'en'}-${countryCode.toLowerCase()}/`} />
-                
-                {/* Hreflang tags for all available countries */}
-                {locationData?.map((location) => (
-                    <link
-                        key={location.country_code}
-                        rel="alternate"
-                        hrefLang={location.hreflang}
-                        href={`https://www.sportsbuz.com/${location.hreflang}-${location.country_code.toLowerCase()}/`}
-                    />
-                ))}
-                
-                {/* Default hreflang for unmatched regions */}
+                {locationData?.map(({ hreflang, country_code }) => {
+                    {/* console.log(hreflang, "href lan home") */ }
+                    const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
+                    const fullHrefLang = `${hreflang}-${country_code}`;
+                    {/* console.log('Generated link:', { href, fullHrefLang }); */ }
+
+                    return (
+                        <link
+                            key={fullHrefLang}
+                            rel="alternate"
+                            href={href}
+                            hreflang={fullHrefLang}
+                        />
+                    );
+                })}
+
+               
                 <link
                     rel="alternate"
                     hrefLang="x-default"
                     href="https://www.sportsbuz.com/en-in/"
                 />
-                
+
                 {/* Additional SEO Meta Tags */}
                 <meta name="robots" content="index, follow" />
                 <meta name="geo.region" content={countryCode} />
                 <meta name="geo.placename" content={currentCountry?.country} />
                 <meta name="language" content={currentCountry?.language} />
-                
+
                 {/* Structured Data */}
                 <script
                     type="application/ld+json"
@@ -225,7 +229,7 @@ export default function BestBettingApps({ countryCode, locationData, currentCoun
                 ) : (
                     <TestLive />
                 )}
-                
+
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
                         <BettingAppsTable sections={sections} />
@@ -251,10 +255,10 @@ export default function BestBettingApps({ countryCode, locationData, currentCoun
                         )}
                     </div>
                 </div>
-                
+
                 <BettingAppsRecentTable bestSections={bestSections} />
             </div>
-            
+
             <FooterTwo />
         </>
     );
