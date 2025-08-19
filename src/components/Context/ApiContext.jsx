@@ -70,6 +70,7 @@ export const DataProvider = ({ children }) => {
     const getCountryCode = async () => {
         try {
             if (validatedLocationData && validatedLocationData.country_code) {
+                console.log("calls the validation country code" ,validatedLocationData);
                 setCountryCode(validatedLocationData);
                 setCurrentTimezone(getTimezoneByCountryCode(validatedLocationData.country_code));
                 // console.log('Using validated location data:', validatedLocationData);
