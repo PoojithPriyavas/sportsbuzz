@@ -31,11 +31,11 @@ export async function getServerSideProps(context) {
 
     const sectionId = params.id;
     // Fetch betting apps data based on country code
-    const bestSections = await fetchBestBettingAppsSSR(countryCode);
+    const bestSectionsTab = await fetchBestBettingAppsSSR(countryCode);
 
     return {
         props: {
-            bestSections,
+            bestSectionsTab,
             sectionId,
             countryCode,
         },
@@ -43,7 +43,7 @@ export async function getServerSideProps(context) {
 }
 
 
-export default function BestBettingApps({ bestSections, sectionId }) {
+export default function BestBettingApps({ bestSectionsTab, sectionId }) {
     // console.log(bestSections, "jjjjjj")
 
     const [loading, setLoading] = useState(true);
@@ -57,7 +57,7 @@ export default function BestBettingApps({ bestSections, sectionId }) {
         upcomingMatches,
         sport,
         countryCode,
-        // bestSections,
+        bestSections,
 
     } = useGlobalData();
     useEffect(() => {
@@ -109,10 +109,10 @@ export default function BestBettingApps({ bestSections, sectionId }) {
     }, [showOtherDivs]);
 
     const sectionIdNumber = parseInt(sectionId); // Convert to number
-    const matchedSection = bestSections.find(section => section.id === sectionIdNumber);
+    const matchedSection = bestSectionsTab.find(section => section.id === sectionIdNumber);
 
     const metaTitle = matchedSection?.metatitle || 'Best Betting Apps';
-    const metaDescription = matchedSection?.meta_description?.replace(/<[^>]+>/g, '') || 'Discover the best betting apps available in India.';
+    const metaDescription = matchedSection?.meta_description?.replace(/<[^>]+>/g, '') || 'Discover top-rated betting apps with secure payments, live odds, and exclusive bonuses. Compare features, user reviews, and promotional offers to find your perfect mobile betting experience.';
     return (
         <>
             <Head>

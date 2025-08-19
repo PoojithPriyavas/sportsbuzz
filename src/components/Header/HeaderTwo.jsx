@@ -20,9 +20,10 @@ const HeaderTwo = ({ animationStage }) => {
     const [expandedLanguageSelector, setExpandedLanguageSelector] = useState(false);
     const [expandedSportsSelector, setExpandedSportsSelector] = useState(false);
 
-    // Animation state
+    // Animation state - FIXED: Initialize with safe defaults for SSR
     const [animationComplete, setAnimationComplete] = useState(false);
     const [shouldShowAnimation, setShouldShowAnimation] = useState(false);
+    const [isClient, setIsClient] = useState(false);
 
     // GSAP refs
     const containerRef = useRef(null);
@@ -52,8 +53,18 @@ const HeaderTwo = ({ animationStage }) => {
         upcomingMatches
     } = useGlobalData();
 
+    // Initialize client-side state and check localStorage
+    useEffect(() => {
+        setIsClient(true);
+        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
+        setAnimationComplete(hasPlayedAnimation);
+        setShouldShowAnimation(!hasPlayedAnimation);
+    }, []);
+
     // Initialize GSAP animation
     useEffect(() => {
+        if (!isClient) return; // Wait for client-side hydration
+        
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
         
         if (hasPlayedAnimation) {
@@ -67,11 +78,17 @@ const HeaderTwo = ({ animationStage }) => {
                 padding: '0 1rem'
             });
             
-            gsap.set(loadingAnimationRef.current, {
-                opacity: 0,
-                scale: 0.5,
-                display: 'none'
-            });
+            // FIXED: Ensure loading animation is completely hidden
+            if (loadingAnimationRef.current) {
+                gsap.set(loadingAnimationRef.current, {
+                    opacity: 0,
+                    scale: 0.5,
+                    display: 'none',
+                    visibility: 'hidden'
+                });
+                loadingAnimationRef.current.style.display = 'none';
+                loadingAnimationRef.current.style.visibility = 'hidden';
+            }
             
             gsap.set(logoRef.current, {
                 position: 'relative',
@@ -88,18 +105,17 @@ const HeaderTwo = ({ animationStage }) => {
                 display: 'flex'
             });
             
+            // FIXED: Ensure states are set correctly
             setShouldShowAnimation(false);
             setAnimationComplete(true);
-            
-            // Additional safety measure
-            if (loadingAnimationRef.current) {
-                loadingAnimationRef.current.style.display = 'none';
-            }
             
             return; // Exit early if animation already played
         }
         
         // Animation hasn't played yet - set initial states for animation
+        setShouldShowAnimation(true);
+        setAnimationComplete(false);
+        
         gsap.set(containerRef.current, {
             height: '100vh',
             overflow: 'hidden',
@@ -109,11 +125,14 @@ const HeaderTwo = ({ animationStage }) => {
             padding: '0'
         });
         
-        gsap.set(loadingAnimationRef.current, {
-            opacity: 1,
-            scale: 1,
-            display: 'flex'
-        });
+        if (loadingAnimationRef.current) {
+            gsap.set(loadingAnimationRef.current, {
+                opacity: 1,
+                scale: 1,
+                display: 'flex',
+                visibility: 'visible'
+            });
+        }
         
         gsap.set(logoRef.current, {
             position: 'absolute',
@@ -130,13 +149,18 @@ const HeaderTwo = ({ animationStage }) => {
             display: 'none'
         });
         
-        setShouldShowAnimation(true);
-        
         // Create the main timeline
         const tl = gsap.timeline({
             onComplete: () => {
                 setAnimationComplete(true);
+                setShouldShowAnimation(false); // FIXED: Hide animation on complete
                 localStorage.setItem('headerAnimationPlayed', 'true');
+                
+                // FIXED: Additional cleanup for loading animation
+                if (loadingAnimationRef.current) {
+                    loadingAnimationRef.current.style.display = 'none';
+                    loadingAnimationRef.current.style.visibility = 'hidden';
+                }
             }
         });
 
@@ -200,8 +224,10 @@ const HeaderTwo = ({ animationStage }) => {
             duration: 0.75,
             ease: "power2.out"
         })
+        // FIXED: Properly hide loading animation at the end
         .set(loadingAnimationRef.current, {
-            display: 'none'
+            display: 'none',
+            visibility: 'hidden'
         });
 
         timelineRef.current = tl;
@@ -212,7 +238,7 @@ const HeaderTwo = ({ animationStage }) => {
                 timelineRef.current.kill();
             }
         };
-    }, []);
+    }, [isClient]);
 
     // Function to reset animation (for development)
     const resetAnimation = () => {
@@ -675,11 +701,15 @@ const HeaderTwo = ({ animationStage }) => {
             ref={containerRef}
             className={styles.loadingContainer}
         >
-            {/* Loading Animation - Only show during initial animation */}
-            {shouldShowAnimation && (
+            {/* Loading Animation - FIXED: Only show when client-side and conditions are met */}
+            {isClient && shouldShowAnimation && !animationComplete && (
                 <div 
                     ref={loadingAnimationRef}
                     className={styles.loadingAnimation}
+                    style={{ 
+                        display: (isClient && shouldShowAnimation && !animationComplete) ? 'flex' : 'none',
+                        visibility: (isClient && shouldShowAnimation && !animationComplete) ? 'visible' : 'hidden'
+                    }}
                 >
                     <div className={styles.loadingIcon}>
                         <div className={styles.mainIcon}>

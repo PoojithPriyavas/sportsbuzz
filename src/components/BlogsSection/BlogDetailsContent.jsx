@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useGlobalData } from '../Context/ApiContext';
 import styles from './BlogDetailContent.module.css';
 import Head from 'next/head';
+import JoinTelegramButton from '../JoinTelegram/JoinTelegramButton';
 
 export default function BlogDetailContent({ blog }) {
   const { translateText, language } = useGlobalData();
@@ -65,6 +66,7 @@ export default function BlogDetailContent({ blog }) {
           className={styles.description}
           dangerouslySetInnerHTML={{ __html: translatedBlog.text_editor }}
         />
+        <div><JoinTelegramButton /></div>
         <div
           className={styles.description}
           dangerouslySetInnerHTML={{ __html: translatedBlog.text_editor_1 }}

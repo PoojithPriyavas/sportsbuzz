@@ -67,10 +67,8 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
     };
 }
 
-
-
 export default function BlogPages({
-    blogs,
+    // blogs,
     countryDataHome,
     locationDataHome,
     // supportedLanguages,
@@ -79,7 +77,7 @@ export default function BlogPages({
     isLocalhost, }) {
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
     const countryCode = countryDataHome?.country_code || 'IN';
-
+    const { blogs } = useGlobalData();
     // console.log(resolvedUrl, "rshdhasd")
     // console.log(blogs, "blogs hhh")
     // const { blogs, } = useGlobalData()   
@@ -141,7 +139,7 @@ export default function BlogPages({
                     {/* console.log(hreflang,"href lan g") */ }
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    {/* console.log('Generated link:', { href, fullHrefLang }); */}
+                    {/* console.log('Generated link:', { href, fullHrefLang }); */ }
 
                     return (
                         <link

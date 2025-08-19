@@ -35,8 +35,8 @@ export async function getServerSideProps({ req, resolvedUrl }) {
         axios.get('https://admin.sportsbuz.com/api/locations/')
     ]);
 
-   let countryDataHome = countryRes.data;
-   let locationDataHome = locationRes.data;
+    let countryDataHome = countryRes.data;
+    let locationDataHome = locationRes.data;
 
 
     // Fetch betting apps data based on country code
@@ -56,10 +56,10 @@ export async function getServerSideProps({ req, resolvedUrl }) {
 }
 
 
-export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, isLocalhost,countryDataHome,locationDataHome }) {
+export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome }) {
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
     // const countryCode = countryData?.country_code || 'IN';
-  const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
+    const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
     const [loading, setLoading] = useState(true);
     const {
         blogCategories,
@@ -162,11 +162,8 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, is
                     }
                 />
                 {hrefLanData.map(({ hreflang, country_code }) => {
-                    {/* console.log(hreflang, "href lan g") */ }
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    {/* console.log('Generated link:', { href, fullHrefLang }); */ }
-
                     return (
                         <link
                             key={fullHrefLang}
@@ -191,7 +188,7 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, is
                 {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
                     <>
-                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} countryCode={countryCode}/>
+                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} countryCode={countryCode} />
                     </>
                 ) : (
                     <TestLive countryCode={countryCode} />
@@ -207,8 +204,8 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, is
                     <div className={styles.fourthColumn} >
                         <div className={styles.fourthColumnTwoColumns}>
                             <div className={styles.fourthColumnLeft}>
-                                <BettingCard countryCode={countryCode}/>
-                                <JoinTelegramButton countryCode={countryCode}/>
+                                <BettingCard countryCode={countryCode} />
+                                <JoinTelegramButton countryCode={countryCode} />
                             </div>
                             <div className={styles.fourthColumnRight}>
                                 <AutoSlider countryCode={countryCode} />
@@ -216,10 +213,10 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, is
                         </div>
                         {sport === 'cricket' ? (
                             <>
-                                <UpcomingMatches upcomingMatches={upcomingMatches} countryCode={countryCode}/>
+                                <UpcomingMatches upcomingMatches={upcomingMatches} countryCode={countryCode} />
                             </>
                         ) : (
-                            <UpcomingFootballMatches countryCode={countryCode}/>
+                            <UpcomingFootballMatches countryCode={countryCode} />
                         )}
                         {/* <TopNewsSection /> */}
                     </div>
@@ -236,7 +233,7 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, is
 
                     </div>
                 </div> */}
-                <BettingAppsRecentTable bestSections={bestSections} countryCode={countryCode}/>
+                <BettingAppsRecentTable bestSections={bestSections} countryCode={countryCode} />
 
             </div>
             <FooterTwo />
