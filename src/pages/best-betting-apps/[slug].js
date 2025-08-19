@@ -34,7 +34,8 @@ export async function getServerSideProps(context) {
     return {
       props: {
         countryDataHome,
-        locationDataHome
+        locationDataHome,
+        sections
       }
     };
   } catch (error) {
