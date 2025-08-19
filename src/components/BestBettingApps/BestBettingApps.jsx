@@ -5,6 +5,11 @@ import { useGlobalData } from '../Context/ApiContext';
 
 export default function BettingAppsTable({ sections = [] }) {
     console.log(sections,"betting apps data")
+    // Early return with a message if sections is empty or undefined
+    if (!sections || sections.length === 0) {
+        console.log('No betting apps data available');
+        return <div className={styles.noData}>No betting apps data available at the moment.</div>;
+    }
     const [copiedId, setCopiedId] = useState(null);
     const { translateText, language } = useGlobalData();
     const [isMobile, setIsMobile] = useState(false);
@@ -80,10 +85,25 @@ export default function BettingAppsTable({ sections = [] }) {
                                 const translatedFeatures = await translateText(app.features || '', 'en', language, true); // HTML
                                 const translatedBonus = await translateText(app.welcome_bonus || '', 'en', language, true); // HTML
 
+                                // Clean up referral and review links
+                                let cleanReferalLink = app.referal_link;
+                                let cleanReviewLink = app.review_link;
+
+                                // Remove backticks and extra spaces from links
+                                if (cleanReferalLink) {
+                                    cleanReferalLink = cleanReferalLink.replace(/`/g, '').trim();
+                                }
+
+                                if (cleanReviewLink) {
+                                    cleanReviewLink = cleanReviewLink.replace(/`/g, '').trim();
+                                }
+
                                 return {
                                     ...app,
                                     features: translatedFeatures,
                                     welcome_bonus: translatedBonus,
+                                    referal_link: cleanReferalLink,
+                                    review_link: cleanReviewLink
                                 };
                             })
                     );
@@ -106,7 +126,15 @@ export default function BettingAppsTable({ sections = [] }) {
     }, [sections, language, translateText]);
 
     const handleCopy = (code, id) => {
-        navigator.clipboard.writeText(code).then(() => {
+        if (!code) {
+            console.log('No referral code to copy');
+            return;
+        }
+        
+        // Clean up the referral code if needed
+        const cleanCode = code.trim();
+        
+        navigator.clipboard.writeText(cleanCode).then(() => {
             setCopiedId(id);
             setTimeout(() => setCopiedId(null), 2000);
         });
@@ -152,9 +180,17 @@ export default function BettingAppsTable({ sections = [] }) {
                             <div className={styles.mobileActions}>
                                 <a
                                     className={styles.mobileGetBtn}
-                                    href={app.referal_link}
+                                    href={app.referal_link ? app.referal_link.trim() : '#'}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    onClick={(e) => {
+                                        // Check if the link is to the maintenance site
+                                        if (app.referal_link && app.referal_link.includes('moy.auraodin.com')) {
+                                            e.preventDefault();
+                                            console.log('Referral link is currently under maintenance');
+                                            alert('This service is currently under maintenance. Please try again later.');
+                                        }
+                                    }}
                                 >
                                     {staticLabels['GET BONUS']}
                                 </a>
@@ -166,9 +202,14 @@ export default function BettingAppsTable({ sections = [] }) {
                                 </button>
                                 <button
                                     className={styles.mobileReviewBtn}
-                                    onClick={() =>
-                                        window.open(app.review_link, '_blank', 'noopener,noreferrer')
-                                    }
+                                    onClick={() => {
+                                        if (app.review_link && app.review_link.includes('moy.auraodin.com')) {
+                                            console.log('Review link is currently under maintenance');
+                                            alert('This service is currently under maintenance. Please try again later.');
+                                        } else {
+                                            window.open(app.review_link ? app.review_link.trim() : '#', '_blank', 'noopener,noreferrer');
+                                        }
+                                    }}
                                 >
                                     {staticLabels['Read Review']}
                                 </button>
@@ -222,9 +263,14 @@ export default function BettingAppsTable({ sections = [] }) {
                                         />
                                         <button
                                             className={styles.codeBtn}
-                                            onClick={() =>
-                                                window.open(app.review_link, '_blank', 'noopener,noreferrer')
-                                            }
+                                            onClick={() => {
+                                                if (app.review_link && app.review_link.includes('moy.auraodin.com')) {
+                                                    console.log('Review link is currently under maintenance');
+                                                    alert('This service is currently under maintenance. Please try again later.');
+                                                } else {
+                                                    window.open(app.review_link ? app.review_link.trim() : '#', '_blank', 'noopener,noreferrer');
+                                                }
+                                            }}
                                         >
                                             {staticLabels['Read Review']}
                                         </button>
@@ -232,13 +278,21 @@ export default function BettingAppsTable({ sections = [] }) {
                                     </td>
                                     <td className={styles.actions}>
                                         <a
-                                            className={styles.getBtn}
-                                            href={app.referal_link}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            {staticLabels['GET BONUS']}
-                                        </a>
+                                    className={styles.getBtn}
+                                    href={app.referal_link ? app.referal_link.trim() : '#'}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => {
+                                        // Check if the link is to the maintenance site
+                                        if (app.referal_link && app.referal_link.includes('moy.auraodin.com')) {
+                                            e.preventDefault();
+                                            console.log('Referral link is currently under maintenance');
+                                            alert('This service is currently under maintenance. Please try again later.');
+                                        }
+                                    }}
+                                >
+                                    {staticLabels['GET BONUS']}
+                                </a>
                                         <button
                                             className={styles.codeBtn}
                                             onClick={() => handleCopy(app.referall_code, app.id)}
@@ -258,17 +312,25 @@ export default function BettingAppsTable({ sections = [] }) {
         </>
     );
 
+    // Check if we have any translated sections to display
+    if (!translatedSections || translatedSections.length === 0) {
+        console.log('No translated betting apps data available');
+        return <div className={styles.noData}>Loading betting apps data...</div>;
+    }
+
     return (
         <>
             {translatedSections.map((section) => (
                 <div className={styles.wrapper} key={section.id}>
-                    {section.best_betting_apps?.length > 0 && (
+                    {section.best_betting_apps?.length > 0 ? (
                         <>
                             {isMobile
                                 ? renderMobileCards(section.best_betting_apps)
                                 : renderDesktopTable(section.best_betting_apps)
                             }
                         </>
+                    ) : (
+                        <div className={styles.noData}>No betting apps available for this section.</div>
                     )}
                 </div>
             ))}
