@@ -1,3 +1,4 @@
+// pages/best-betting-apps/[countryCode].js
 import Header from "@/components/Header/Header";
 import LiveScores from "@/components/LiveScoreSection/LiveScoreSection";
 import Head from "next/head";
@@ -17,76 +18,91 @@ import FooterTwo from "@/components/Footer/Footer";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 import HeaderTwo from "@/components/Header/HeaderTwo";
-
+import axios from "axios";
 import { fetchBettingAppsSSR } from '@/lib/fetchBettingAppsSSR';
 
-export async function getServerSideProps({ req }) {
-    try {
-        // Parse the cookie to get country code
-        const countryCookie = req.cookies.countryData;
-        const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-        const countryCode = countryData?.country_code || 'IN';
+export async function getServerSideProps({ req, params }) {
+    const { countryCode } = params; // This comes from [countryCode].js filename
 
-        console.log('🔍 SSR - Country Code:', countryCode);
+    try {
+        // Fetch location data
+        const locationResponse = await axios.get('https://admin.sportsbuz.com/api/locations');
+        const locationData = locationResponse.data;
         
-        // Fetch betting apps data based on country code
-        const sections = await fetchBettingAppsSSR(countryCode);
-        
-        console.log('🔍 SSR - Sections fetched:', sections?.length || 0, 'items');
-        console.log('🔍 SSR - First section:', sections?.[0] ? 'exists' : 'missing');
+        // Find current country data using the countryCode from URL
+        const currentCountry = locationData.find(
+            location => location.country_code.toLowerCase() === countryCode.toLowerCase()
+        );
+
+        if (!currentCountry) {
+            return {
+                notFound: true,
+            };
+        }
+
+        // Fetch betting apps data for this specific country using the country_code
+        const bettingTableData = await fetchBettingAppsSSR(currentCountry.country_code);
+
+        console.log("Server-side props for country:", currentCountry.country_code, "Data:", bettingTableData);
 
         return {
             props: {
-                sections: sections || [], // Ensure it's always an array
-                countryCode,
-                // Add a timestamp to help debug
-                fetchTime: new Date().toISOString(),
+                bettingTableData,
+                countryCode: currentCountry.country_code,
+                locationData,
+                currentCountry,
+                isLocalhost: process.env.NODE_ENV === 'development'
             },
         };
     } catch (error) {
-        console.error('🚨 SSR Error:', error);
+        console.error('Error in getServerSideProps:', error);
         return {
             props: {
-                sections: [],
-                countryCode: 'IN',
-                fetchTime: new Date().toISOString(),
-                error: error.message,
+                bettingTableData: [],
+                countryCode: countryCode || 'IN',
+                locationData: [],
+                currentCountry: null,
+                isLocalhost: process.env.NODE_ENV === 'development'
             },
         };
     }
 }
 
-export default function BestBettingApps({ sections, countryCode, fetchTime, error }) {
-    // Debug logs
-    console.log('🔍 Component - Props received:');
-    console.log('  - sections:', sections);
-    console.log('  - sections length:', sections?.length);
-    console.log('  - countryCode:', countryCode);
-    console.log('  - fetchTime:', fetchTime);
-    console.log('  - error:', error);
+export default function BestBettingApps({ countryCode, locationData, currentCountry ,bettingTableData}) {
+    console.log(locationData, "location data for", countryCode);
 
     const [loading, setLoading] = useState(true);
     const {
         blogCategories,
         blogs,
+        sections,
         apiResponse,
         matchTypes,
         teamImages,
         upcomingMatches,
         sport,
-        countryCode: contextCountryCode,
         bestSections
     } = useGlobalData();
 
-    // Debug context data
-    console.log('🔍 Context - bestSections:', bestSections);
-    console.log('🔍 Context - sport:', sport);
+    // Generate dynamic meta content based on country
+    const generateMetaContent = () => {
+        if (bettingTableData?.[0]) {
+            return {
+                title: bettingTableData[0].metatitle || `Best Betting Apps in ${currentCountry?.country || 'Your Country'}`,
+                description: bettingTableData[0].meta_description
+                    ? bettingTableData[0].meta_description.replace(/<[^>]+>/g, '').slice(0, 160)
+                    : `Discover the top betting apps available in ${currentCountry?.country}. Compare odds, bonuses, and features for ${currentCountry?.sports?.toLowerCase() || 'sports'} betting.`
+            };
+        }
 
-    useEffect(() => {
-        console.log('🔍 useEffect - sections changed:', sections);
-    }, [sections]);
+        return {
+            title: `Best Betting Apps in ${currentCountry?.country || 'Your Country'}`,
+            description: `Find the best betting apps for ${currentCountry?.sports?.toLowerCase() || 'sports'} in ${currentCountry?.country}. Compare top bookmakers and betting platforms.`
+        };
+    };
 
-    // Rest of your component logic...
+    const metaContent = generateMetaContent();
+
     useEffect(() => {
         const timer1 = setTimeout(() => setLoading(false), 3000);
         return () => clearTimeout(timer1);
@@ -98,7 +114,7 @@ export default function BestBettingApps({ sections, countryCode, fetchTime, erro
 
     useEffect(() => {
         // Check if animation has been played before
-        const hasPlayedAnimation = typeof window !== 'undefined' && localStorage.getItem('headerAnimationPlayed');
+        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
 
         if (!hasPlayedAnimation) {
             const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
@@ -120,33 +136,85 @@ export default function BestBettingApps({ sections, countryCode, fetchTime, erro
     }, []);
 
     useEffect(() => {
+        const timer1 = setTimeout(() => setLoading(false), 3000);
+        return () => clearTimeout(timer1);
+    }, []);
+
+    useEffect(() => {
         if (showOtherDivs) {
             const timeout = setTimeout(() => setHasAnimatedIn(true), 50);
             return () => clearTimeout(timeout);
         }
     }, [showOtherDivs]);
 
-    // Add error display for debugging
-    if (error) {
-        return <div>Error loading betting apps: {error}</div>;
-    }
-
     return (
         <>
             <Head>
-                <title>{sections?.[0]?.metatitle || 'Best Betting Apps'}</title>
-                <meta
-                    name="description"
-                    content={
-                        sections?.[0]?.meta_description
-                            ? sections[0].meta_description.replace(/<[^>]+>/g, '').slice(0, 160)
-                            : 'Explore the best betting apps in India for July 2025.'
-                    }
+                <title>{metaContent.title}</title>
+                <meta name="description" content={metaContent.description} />
+                
+                {/* Open Graph Meta Tags */}
+                <meta property="og:title" content={metaContent.title} />
+                <meta property="og:description" content={metaContent.description} />
+                <meta property="og:type" content="website" />
+                <meta property="og:locale" content={currentCountry?.hreflang || 'en'} />
+                <meta property="og:url" content={`https://www.sportsbuz.com/${currentCountry?.hreflang || 'en'}-${countryCode.toLowerCase()}/`} />
+                
+                {/* Twitter Meta Tags */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={metaContent.title} />
+                <meta name="twitter:description" content={metaContent.description} />
+                
+                {/* Canonical URL */}
+                <link rel="canonical" href={`https://www.sportsbuz.com/${currentCountry?.hreflang || 'en'}-${countryCode.toLowerCase()}/`} />
+                
+                {/* Hreflang tags for all available countries */}
+                {locationData?.map((location) => (
+                    <link
+                        key={location.country_code}
+                        rel="alternate"
+                        hrefLang={location.hreflang}
+                        href={`https://www.sportsbuz.com/${location.hreflang}-${location.country_code.toLowerCase()}/`}
+                    />
+                ))}
+                
+                {/* Default hreflang for unmatched regions */}
+                <link
+                    rel="alternate"
+                    hrefLang="x-default"
+                    href="https://www.sportsbuz.com/en-in/"
                 />
-                <meta property="og:title" content={sections?.[0]?.metatitle || 'Best Betting Apps'} />
-                <meta property="og:description" content={sections?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
-                <meta name="twitter:title" content={sections?.[0]?.metatitle || 'Best Betting Apps'} />
-                <meta name="twitter:description" content={sections?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
+                
+                {/* Additional SEO Meta Tags */}
+                <meta name="robots" content="index, follow" />
+                <meta name="geo.region" content={countryCode} />
+                <meta name="geo.placename" content={currentCountry?.country} />
+                <meta name="language" content={currentCountry?.language} />
+                
+                {/* Structured Data */}
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "WebPage",
+                            "name": metaContent.title,
+                            "description": metaContent.description,
+                            "url": `https://www.sportsbuz.com/${currentCountry?.hreflang || 'en'}-${countryCode.toLowerCase()}/`,
+                            "inLanguage": currentCountry?.hreflang,
+                            "about": {
+                                "@type": "Thing",
+                                "name": `Betting Apps in ${currentCountry?.country}`,
+                                "sameAs": `https://www.sportsbuz.com/${currentCountry?.hreflang || 'en'}-${countryCode.toLowerCase()}/`
+                            },
+                            "mainEntity": {
+                                "@type": "ItemList",
+                                "name": `Best Betting Apps in ${currentCountry?.country}`,
+                                "description": `Top-rated betting applications available in ${currentCountry?.country}`
+                            }
+                        })
+                    }}
+                />
             </Head>
 
             <HeaderTwo animationStage={animationStage} />
@@ -160,19 +228,10 @@ export default function BestBettingApps({ sections, countryCode, fetchTime, erro
                 
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
-                        {/* Debug display */}
-                        <div style={{ padding: '10px', background: '#f0f0f0', margin: '10px 0' }}>
-                            <strong>Debug Info:</strong><br/>
-                            Sections length: {sections?.length || 0}<br/>
-                            First section exists: {sections?.[0] ? 'Yes' : 'No'}<br/>
-                            Fetch time: {fetchTime}<br/>
-                            Country: {countryCode}
-                        </div>
-                        
                         <BettingAppsTable sections={sections} />
                         <div
                             className={styles.description}
-                            dangerouslySetInnerHTML={{ __html: sections?.[0]?.description }}
+                            dangerouslySetInnerHTML={{ __html: bettingTableData?.[0]?.description }}
                         />
                     </div>
                     <div className={styles.fourthColumn}>
@@ -195,6 +254,7 @@ export default function BestBettingApps({ sections, countryCode, fetchTime, erro
                 
                 <BettingAppsRecentTable bestSections={bestSections} />
             </div>
+            
             <FooterTwo />
         </>
     );
