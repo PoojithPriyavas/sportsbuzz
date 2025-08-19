@@ -49,7 +49,7 @@ import HeaderThree from "@/components/Header/HeaderThree";
 
 export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
-    console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
+    // console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
     try {
         const {  req } = context;
         const [countryRes, locationRes] = await Promise.all([
@@ -61,11 +61,11 @@ export async function getServerSideProps(context) {
         const locationDataHome = locationRes.data;
 
         // Detailed logging
-        console.log('=== API RESPONSE DATA ===');
-        console.log('Country Data in the props:', JSON.stringify(countryRes.data, null, 2));
-        console.log('Location Data in the props:', JSON.stringify(locationRes.data, null, 2));
-        console.log('Response Headers - Country in the props:', countryRes.headers);
-        console.log('Response Headers - Location: in the props', locationRes.headers);
+        // console.log('=== API RESPONSE DATA ===');
+        // console.log('Country Data in the props:', JSON.stringify(countryRes.data, null, 2));
+        // console.log('Location Data in the props:', JSON.stringify(locationRes.data, null, 2));
+        // console.log('Response Headers - Country in the props:', countryRes.headers);
+        // console.log('Response Headers - Location: in the props', locationRes.headers);
 
         return {
             props: {
@@ -111,11 +111,11 @@ export default function Home({ countryDataHome, locationDataHome,  isLocalhost }
         fetchBettingApps
 
     } = useGlobalData();
-    console.log(sections, "sections")
+    // console.log(sections, "sections")
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
     const router = useRouter();
     const { "countrycode-hreflng": countryLang } = useParams();
-    console.log(countryLang, "params value");
+    // console.log(countryLang, "params value");
 
     const languageValidation = useLanguageValidation(locationDataHome, countryLang);
     // console.log(slug.countrycode-hreflng,"slug in index")

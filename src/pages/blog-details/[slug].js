@@ -34,7 +34,7 @@ export async function getServerSideProps(context) {
 
 export default function BlogDetailsMain({ blog }) {
 
-    console.log(blog,"blog details")
+    // console.log(blog,"blog details")
     const [animationStage, setAnimationStage] = useState('loading');
     const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);

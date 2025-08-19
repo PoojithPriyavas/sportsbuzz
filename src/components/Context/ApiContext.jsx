@@ -45,10 +45,10 @@ export const DataProvider = ({ children }) => {
     const [locationData, setLocationData] = useState(null);
     const [countryData, setCountryData] = useState(null);
     const [validatedLocationData, setValidatedLocationData] = useState(null);
-    console.log(validatedLocationData, "validated location data")
+    // console.log(validatedLocationData, "validated location data")
 
     const pathname = usePathname();
-    console.log(pathname, "path name")
+    // console.log(pathname, "path name")
     // const isUrlCountryPresent = pathname?.replace(/^,?\//, '').split('-');
     // console.log(isUrlCountryPresent[1], "is url")
 
@@ -72,12 +72,12 @@ export const DataProvider = ({ children }) => {
             if (validatedLocationData && validatedLocationData.country_code) {
                 setCountryCode(validatedLocationData);
                 setCurrentTimezone(getTimezoneByCountryCode(validatedLocationData.country_code));
-                console.log('Using validated location data:', validatedLocationData);
+                // console.log('Using validated location data:', validatedLocationData);
             } else {
                 const res = await CustomAxios.get('/get-country-code');
                 setCountryCode(res.data || {});
                 setCurrentTimezone(getTimezoneByCountryCode(res.data.country_code));
-                console.log('Using API response:', res.data);
+                // console.log('Using API response:', res.data);
             }
         } catch (error) {
             console.error('Failed to fetch country code:', error);
@@ -549,8 +549,8 @@ export const DataProvider = ({ children }) => {
     // BETTING TABLE DATA - API IMPLEMENTATIONS
 
     const fetchBettingApps = async (countryCodeParam = countryCode.country_code) => {
-        console.log(countryCodeParam, "c param")
-        console.log("called the betting apps")
+        // console.log(countryCodeParam, "c param")
+        // console.log("called the betting apps")
         if (!countryCodeParam) {
             console.error('No country code available for fetching betting apps');
             return;
@@ -566,10 +566,10 @@ export const DataProvider = ({ children }) => {
             });
 
             const data = response.data;
-            console.log(response, "sections data")
+            // console.log(response, "sections data")
             if (Array.isArray(data.results)) {
                 setSections(data.results);
-                console.log("enters the if condition", data.results)
+                // console.log("enters the if condition", data.results)
             } else {
                 console.warn('Expected an array, but received:', data);
             }
@@ -616,7 +616,7 @@ export const DataProvider = ({ children }) => {
         try {
             // Check if we already have cached data
             if (dataCache.cricket.matches) {
-                console.log('Using cached cricket matches data');
+                // console.log('Using cached cricket matches data');
                 setApiResponse(dataCache.cricket.matches.apiResponse);
                 setMatchTypes(dataCache.cricket.matches.matchTypes);
                 setTeamImages(dataCache.cricket.matches.teamImages);
@@ -679,7 +679,7 @@ export const DataProvider = ({ children }) => {
                  }
              }));
             
-            console.log('Cricket matches data fetched and cached');
+            // console.log('Cricket matches data fetched and cached');
         } catch (error) {
             console.error('Failed to fetch live matches:', error);
         }
@@ -703,11 +703,11 @@ export const DataProvider = ({ children }) => {
     const [upcomingMatches, setUpcomingMatches] = useState([]);
 
     const fetchUpcomingMatches = async () => {
-        console.log('Fetching upcoming cricket matches...');
+        // console.log('Fetching upcoming cricket matches...');
         try {
             // Check if we already have cached data
             if (dataCache.cricket.upcomingMatches) {
-                console.log('Using cached upcoming cricket matches data');
+                // console.log('Using cached upcoming cricket matches data');
                 setUpcomingMatches(dataCache.cricket.upcomingMatches);
                 return;
             }
@@ -758,7 +758,7 @@ export const DataProvider = ({ children }) => {
                 }
             }));
             
-            console.log('Upcoming cricket matches data fetched and cached');
+            // console.log('Upcoming cricket matches data fetched and cached');
         } catch (error) {
             console.error('Failed to fetch upcoming matches:', error);
         }
@@ -767,14 +767,14 @@ export const DataProvider = ({ children }) => {
     // FOOTBALL LIVE SCORE SECTION
     const [stages, setStages] = useState([]);
     const liveFootBall = async () => {
-        console.log('Fetching live football matches...');
+        // console.log('Fetching live football matches...');
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0].replace(/-/g, '');
         
         try {
             // Check if we already have cached data
             if (dataCache.football.liveMatches) {
-                console.log('Using cached live football matches data');
+                // console.log('Using cached live football matches data');
                 setStages(dataCache.football.liveMatches);
                 return;
             }
@@ -804,7 +804,7 @@ export const DataProvider = ({ children }) => {
                 }
             }));
             
-            console.log('Live football matches data fetched and cached');
+            // console.log('Live football matches data fetched and cached');
         } catch (error) {
             console.error('Error fetching football matches:', error);
         }
@@ -814,11 +814,11 @@ export const DataProvider = ({ children }) => {
 
     const [upcoming, setUpcoming] = useState([]);
     const upcomingFootBall = async () => {
-        console.log('Fetching upcoming football matches...');
+        // console.log('Fetching upcoming football matches...');
         try {
             // Check if we already have cached data
             if (dataCache.football.upcomingMatches) {
-                console.log('Using cached upcoming football matches data');
+                // console.log('Using cached upcoming football matches data');
                 setUpcoming(dataCache.football.upcomingMatches);
                 return;
             }
@@ -854,7 +854,7 @@ export const DataProvider = ({ children }) => {
                 }
             }));
             
-            console.log('Upcoming football matches data fetched and cached');
+            // console.log('Upcoming football matches data fetched and cached');
         } catch (error) {
             console.error('Error fetching upcoming football matches:', error);
         }

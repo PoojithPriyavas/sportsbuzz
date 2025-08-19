@@ -41,11 +41,11 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
         });
 
         // Debug logs (remove in production)
-        console.log('=== API RESPONSE DATA ===');
-        console.log('Country Data:', JSON.stringify(countryDataHome, null, 2));
-        console.log('Location Data:', JSON.stringify(locationDataHome, null, 2));
-        console.log('Country Response Headers:', countryRes.headers);
-        console.log('Location Response Headers:', locationRes.headers);
+        // console.log('=== API RESPONSE DATA ===');
+        // console.log('Country Data:', JSON.stringify(countryDataHome, null, 2));
+        // console.log('Location Data:', JSON.stringify(locationDataHome, null, 2));
+        // console.log('Country Response Headers:', countryRes.headers);
+        // console.log('Location Response Headers:', locationRes.headers);
 
     } catch (error) {
         console.error("API Error Details:", {
@@ -86,10 +86,10 @@ export default function BlogPages({
 
     const locationParts = resolvedUrl.replace(/^,?\//, '').split('/');
     const [countryPart, langPart] = locationParts[0].split('-'); // Fixed: country comes first, then language
-    console.log(countryPart, 'c',langPart,"lge")
+    // console.log(countryPart, 'c',langPart,"lge")
 
-    console.log(locationDataHome, "locationDataHome data");
-    console.log(resolvedUrl, "resolved url blogs data");
+    // console.log(locationDataHome, "locationDataHome data");
+    // console.log(resolvedUrl, "resolved url blogs data");
 
     const [loading, setLoading] = useState(true);
     const [animationStage, setAnimationStage] = useState('loading');
@@ -313,8 +313,8 @@ export default function BlogPages({
                 <meta name="author" content="Sports Buzz" />
 
                 {locationDataHome && Array.isArray(locationDataHome) && locationDataHome.map(({ hreflang, country_code }) => {
-                    console.log(hreflang, "href lang");
-                    const href = `${baseUrl}/${country_code.toLowerCase()}-${hreflang}/blogs/pages/all-blogs`;
+                    {/* console.log(hreflang, "href lang"); */}
+                    const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
 
                     return (

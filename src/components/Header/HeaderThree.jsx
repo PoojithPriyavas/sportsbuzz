@@ -256,7 +256,7 @@ const HeaderThree = ({ animationStage }) => {
     // Function to parse URL path for country code and language
     const parseUrlPath = (pathname) => {
         const isUrlCountryPresent = pathname?.replace(/^,?\//, '').split('-');
-        console.log(isUrlCountryPresent, "is url")
+        // console.log(isUrlCountryPresent, "is url")
         const parts = pathname.split('/').filter(part => part !== '');
         const countryCode = isUrlCountryPresent[1];
         const language = isUrlCountryPresent[0];

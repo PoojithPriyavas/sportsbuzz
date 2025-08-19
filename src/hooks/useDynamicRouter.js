@@ -42,13 +42,13 @@ export const useDynamicRouter = () => {
   
   const pushDynamic = useCallback(async (path, as, options) => {
     const dynamicPath = buildPath(path);
-    console.log('🚀 Dynamic router.push:', { original: path, dynamic: dynamicPath });
+    // console.log('🚀 Dynamic router.push:', { original: path, dynamic: dynamicPath });
     return router.push(dynamicPath, as, options);
   }, [router, buildPath]);
   
   const replaceDynamic = useCallback(async (path, as, options) => {
     const dynamicPath = buildPath(path);
-    console.log('🚀 Dynamic router.replace:', { original: path, dynamic: dynamicPath });
+    // console.log('🚀 Dynamic router.replace:', { original: path, dynamic: dynamicPath });
     return router.replace(dynamicPath, as, options);
   }, [router, buildPath]);
   

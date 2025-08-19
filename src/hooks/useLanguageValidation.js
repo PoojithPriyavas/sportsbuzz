@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useGlobalData } from '@/components/Context/ApiContext';
 
 export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
-    console.log(locationDataHome,"loc in lang val")
+    // console.log(locationDataHome,"loc in lang val")
     const router = useRouter();
     const [isValidating, setIsValidating] = useState(false);
     const {setLanguage, setValidatedLocationData} = useGlobalData(); // Added setValidatedLocationData
@@ -95,7 +95,7 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
                 location: matchingLocation
             };
 
-            console.log('✅ Created validated location data:', validatedLocationObject);
+            // console.log('✅ Created validated location data:', validatedLocationObject);
             
             // Store it in the global context
             setValidatedLocationData(validatedLocationObject);
@@ -121,7 +121,7 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
 
             // If no country or language parts, redirect to default
             if (!countryPart || !langPart) {
-                console.log('Missing country or language part, redirecting to default');
+                // console.log('Missing country or language part, redirecting to default');
                 
                 // Extract remaining path after the first part
                 const pathParts = resolvedUrl.replace(/^\//, '').split('/');
@@ -157,7 +157,7 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
             const languageExists = isLanguageCodeAvailable(langPart);
             
             if (languageExists) {
-                console.log('✅ Language code validation successful:', langPart);
+                // console.log('✅ Language code validation successful:', langPart);
                 
                 // Set the language using the provided language code
                 setLanguage(langPart);
@@ -174,7 +174,7 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
                 
                 // Optionally show success alert only in development
                 if (process.env.NODE_ENV === 'development') {
-                    console.log(`Success: Language '${langPart}' is available in the system.`)
+                    // console.log(`Success: Language '${langPart}' is available in the system.`)
                 }
             } else {
                 console.error('❌ Language code not found in system:', langPart, 'Using default "en"');
@@ -200,7 +200,7 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
             const newPath = constructNewPath(countryPart, newLanguageTag, resolvedUrl);
             router.push(newPath);
         } else {
-            console.log(`Error: Language '${newLanguageTag}' is not available in the system. Using default "en".`)
+            // console.log(`Error: Language '${newLanguageTag}' is not available in the system. Using default "en".`)
             // Use "en" as fallback
             const newPath = constructNewPath(countryPart, 'en', resolvedUrl);
             router.push(newPath);

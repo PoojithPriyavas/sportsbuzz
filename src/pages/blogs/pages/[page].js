@@ -39,11 +39,11 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
         });
 
         // Debug logs (remove in production)
-        console.log('=== API RESPONSE DATA ===');
-        console.log('Country Data:', JSON.stringify(countryDataHome, null, 2));
-        console.log('Location Data:', JSON.stringify(locationDataHome, null, 2));
-        console.log('Country Response Headers:', countryRes.headers);
-        console.log('Location Response Headers:', locationRes.headers);
+        // console.log('=== API RESPONSE DATA ===');
+        // console.log('Country Data:', JSON.stringify(countryDataHome, null, 2));
+        // console.log('Location Data:', JSON.stringify(locationDataHome, null, 2));
+        // console.log('Country Response Headers:', countryRes.headers);
+        // console.log('Location Response Headers:', locationRes.headers);
 
     } catch (error) {
         console.error("API Error Details:", {
@@ -141,7 +141,7 @@ export default function BlogPages({
                     {/* console.log(hreflang,"href lan g") */ }
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    console.log('Generated link:', { href, fullHrefLang });
+                    {/* console.log('Generated link:', { href, fullHrefLang }); */}
 
                     return (
                         <link

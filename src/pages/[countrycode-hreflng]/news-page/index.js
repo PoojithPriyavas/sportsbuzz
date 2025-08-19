@@ -12,7 +12,7 @@ import HeaderThree from "@/components/Header/HeaderThree";
 
 export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
-    console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
+    // console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
     try {
         const { resolvedUrl, req } = context;
         const [countryRes, locationRes] = await Promise.all([
@@ -24,11 +24,11 @@ export async function getServerSideProps(context) {
         const locationDataHome = locationRes.data;
 
         // Detailed logging
-        console.log('=== API RESPONSE DATA ===');
-        console.log('Country Data in the props:', JSON.stringify(countryRes.data, null, 2));
-        console.log('Location Data in the props:', JSON.stringify(locationRes.data, null, 2));
-        console.log('Response Headers - Country in the props:', countryRes.headers);
-        console.log('Response Headers - Location: in the props', locationRes.headers);
+        // console.log('=== API RESPONSE DATA ===');
+        // console.log('Country Data in the props:', JSON.stringify(countryRes.data, null, 2));
+        // console.log('Location Data in the props:', JSON.stringify(locationRes.data, null, 2));
+        // console.log('Response Headers - Country in the props:', countryRes.headers);
+        // console.log('Response Headers - Location: in the props', locationRes.headers);
 
         return {
             props: {

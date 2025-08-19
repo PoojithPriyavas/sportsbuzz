@@ -86,8 +86,8 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
   } = useGlobalData();
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
 
-  console.log(locationDataHome, "location home");
-  console.log(countryCode, "country data home")
+  // console.log(locationDataHome, "location home");
+  // console.log(countryCode, "country data home")
 
 
   // if (countryCode && countryCode.country_code) {
@@ -157,10 +157,10 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
         {/* Canonical */}
         {locationDataHome?.map(({ hreflang, country_code }) => {
-          console.log(hreflang, "href lan home")
-          const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/`;
+          {/* console.log(hreflang, "href lan home") */}
+          const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
           const fullHrefLang = `${hreflang}-${country_code}`;
-          console.log('Generated link:', { href, fullHrefLang });
+          {/* console.log('Generated link:', { href, fullHrefLang }); */}
 
           return (
             <link
