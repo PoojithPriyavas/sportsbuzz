@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { useGlobalData } from '../Context/ApiContext';
 
 export default function BettingAppsTable({ sections = [] }) {
+    console.log(sections,"betting apps data")
     const [copiedId, setCopiedId] = useState(null);
     const { translateText, language } = useGlobalData();
     const [isMobile, setIsMobile] = useState(false);
