@@ -69,7 +69,7 @@ export async function getServerSideProps({ req, params }) {
 }
 
 export default function BestBettingApps({ countryCode, locationData, currentCountry ,bettingTableData}) {
-    console.log(locationData, "location data for", countryCode);
+    console.log(locationData, "location data for", bettingTableData);
 
     const [loading, setLoading] = useState(true);
     const {
