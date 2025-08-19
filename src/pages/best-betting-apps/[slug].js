@@ -21,31 +21,31 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 import { fetchBettingAppsSSR } from '@/lib/fetchBettingAppsSSR';
 
 
-export async function getServerSideProps({ req }) {
-    // Parse the cookie to get country code
-    const countryCookie = req.cookies.countryData;
-    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    const countryCode = countryData?.country_code || 'IN';
+// export async function getServerSideProps({ req }) {
+//     // Parse the cookie to get country code
+//     const countryCookie = req.cookies.countryData;
+//     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
+//     const countryCode = countryData?.country_code || 'IN';
 
-    // Fetch betting apps data based on country code
-    const sections = await fetchBettingAppsSSR(countryCode);
+//     // Fetch betting apps data based on country code
+//     const sections = await fetchBettingAppsSSR(countryCode);
 
-    return {
-        props: {
-            sections,
-            countryCode,
-        },
-    };
-}
+//     return {
+//         props: {
+//             sections,
+//             countryCode,
+//         },
+//     };
+// }
 
 
-export default function BestBettingApps({ sections }) {
+export default function BestBettingApps() {
 
     const [loading, setLoading] = useState(true);
     const {
         blogCategories,
         blogs,
-        // sections,
+        sections,
         apiResponse,
         matchTypes,
         teamImages,
