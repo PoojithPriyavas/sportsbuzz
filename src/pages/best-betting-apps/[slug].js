@@ -20,62 +20,92 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 
 import { fetchBettingAppsSSR } from '@/lib/fetchBettingAppsSSR';
 
-
 export async function getServerSideProps({ req }) {
-    // Parse the cookie to get country code
-    const countryCookie = req.cookies.countryData;
-    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    const countryCode = countryData?.country_code || 'IN';
+    try {
+        // Parse the cookie to get country code
+        const countryCookie = req.cookies.countryData;
+        const countryData = countryCookie ? JSON.parse(countryCookie) : null;
+        const countryCode = countryData?.country_code || 'IN';
 
-    // Fetch betting apps data based on country code
-    const sections = await fetchBettingAppsSSR(countryCode);
+        console.log('🔍 SSR - Country Code:', countryCode);
+        
+        // Fetch betting apps data based on country code
+        const sections = await fetchBettingAppsSSR(countryCode);
+        
+        console.log('🔍 SSR - Sections fetched:', sections?.length || 0, 'items');
+        console.log('🔍 SSR - First section:', sections?.[0] ? 'exists' : 'missing');
 
-    return {
-        props: {
-            sections,
-            countryCode,
-        },
-    };
+        return {
+            props: {
+                sections: sections || [], // Ensure it's always an array
+                countryCode,
+                // Add a timestamp to help debug
+                fetchTime: new Date().toISOString(),
+            },
+        };
+    } catch (error) {
+        console.error('🚨 SSR Error:', error);
+        return {
+            props: {
+                sections: [],
+                countryCode: 'IN',
+                fetchTime: new Date().toISOString(),
+                error: error.message,
+            },
+        };
+    }
 }
 
-
-export default function BestBettingApps({sections}) {
+export default function BestBettingApps({ sections, countryCode, fetchTime, error }) {
+    // Debug logs
+    console.log('🔍 Component - Props received:');
+    console.log('  - sections:', sections);
+    console.log('  - sections length:', sections?.length);
+    console.log('  - countryCode:', countryCode);
+    console.log('  - fetchTime:', fetchTime);
+    console.log('  - error:', error);
 
     const [loading, setLoading] = useState(true);
     const {
         blogCategories,
         blogs,
-        // sections,
+        // Remove sections from here to avoid conflict
         apiResponse,
         matchTypes,
         teamImages,
         upcomingMatches,
         sport,
-        countryCode,
+        countryCode: contextCountryCode,
         bestSections
     } = useGlobalData();
-    // console.log(sections, "shgdfs")
+
+    // Debug context data
+    console.log('🔍 Context - bestSections:', bestSections);
+    console.log('🔍 Context - sport:', sport);
 
     useEffect(() => {
-        // Fixed: Timer was setting loading to true instead of false
+        console.log('🔍 useEffect - sections changed:', sections);
+    }, [sections]);
+
+    // Rest of your component logic...
+    useEffect(() => {
         const timer1 = setTimeout(() => setLoading(false), 3000);
         return () => clearTimeout(timer1);
     }, []);
+
     const [animationStage, setAnimationStage] = useState('loading');
     const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
-
     useEffect(() => {
         // Check if animation has been played before
-        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
+        const hasPlayedAnimation = typeof window !== 'undefined' && localStorage.getItem('headerAnimationPlayed');
 
         if (!hasPlayedAnimation) {
-            // First time - play the full animation sequence
             const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
             const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
             const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
-            const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); // Show content after transition completes
+            const timer4 = setTimeout(() => setShowOtherDivs(true), 6500);
 
             return () => {
                 clearTimeout(timer1);
@@ -84,26 +114,23 @@ export default function BestBettingApps({sections}) {
                 clearTimeout(timer4);
             };
         } else {
-            // Animation already played - go directly to header and show content immediately
             setAnimationStage('header');
             setShowOtherDivs(true);
             setLoading(false);
         }
     }, []);
 
-    // Original loading timer (keeping for compatibility)
-    useEffect(() => {
-        const timer1 = setTimeout(() => setLoading(false), 3000);
-        return () => clearTimeout(timer1);
-    }, []);
-
     useEffect(() => {
         if (showOtherDivs) {
-            const timeout = setTimeout(() => setHasAnimatedIn(true), 50); // slight delay triggers transition
+            const timeout = setTimeout(() => setHasAnimatedIn(true), 50);
             return () => clearTimeout(timeout);
         }
     }, [showOtherDivs]);
 
+    // Add error display for debugging
+    if (error) {
+        return <div>Error loading betting apps: {error}</div>;
+    }
 
     return (
         <>
@@ -123,28 +150,33 @@ export default function BestBettingApps({sections}) {
                 <meta name="twitter:description" content={sections?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
             </Head>
 
-            {/* <Header /> */}
-            {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
             <HeaderTwo animationStage={animationStage} />
 
             <div className='container'>
-                {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
-                    <>
-                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
-                    </>
+                    <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
                 ) : (
                     <TestLive />
                 )}
+                
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
+                        {/* Debug display */}
+                        <div style={{ padding: '10px', background: '#f0f0f0', margin: '10px 0' }}>
+                            <strong>Debug Info:</strong><br/>
+                            Sections length: {sections?.length || 0}<br/>
+                            First section exists: {sections?.[0] ? 'Yes' : 'No'}<br/>
+                            Fetch time: {fetchTime}<br/>
+                            Country: {countryCode}
+                        </div>
+                        
                         <BettingAppsTable sections={sections} />
                         <div
                             className={styles.description}
                             dangerouslySetInnerHTML={{ __html: sections?.[0]?.description }}
                         />
                     </div>
-                    <div className={styles.fourthColumn} >
+                    <div className={styles.fourthColumn}>
                         <div className={styles.fourthColumnTwoColumns}>
                             <div className={styles.fourthColumnLeft}>
                                 <BettingCard />
@@ -155,31 +187,16 @@ export default function BestBettingApps({sections}) {
                             </div>
                         </div>
                         {sport === 'cricket' ? (
-                            <>
-                                <UpcomingMatches upcomingMatches={upcomingMatches} />
-                            </>
+                            <UpcomingMatches upcomingMatches={upcomingMatches} />
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                        {/* <TopNewsSection /> */}
                     </div>
                 </div>
-                {/* <div className={styles.mainContent}>
-                    <div className={styles.leftSection}>
-
-                    </div>
-
-                    <div className={styles.rightSection}>
-
-                        <UpcomingMatches />
-                        <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
-
-                    </div>
-                </div> */}
+                
                 <BettingAppsRecentTable bestSections={bestSections} />
-
             </div>
             <FooterTwo />
         </>
-    )
+    );
 }
