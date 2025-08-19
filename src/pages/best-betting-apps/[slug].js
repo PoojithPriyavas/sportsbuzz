@@ -168,7 +168,7 @@ export default function BestBettingApps({ countryCode, locationData, currentCoun
                 {/* Canonical URL */}
                 {locationData?.map(({ hreflang, country_code }) => {
                     {/* console.log(hreflang, "href lan home") */ }
-                    const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
+                    const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/best-betting-apps/current`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
                     {/* console.log('Generated link:', { href, fullHrefLang }); */ }
 
@@ -181,14 +181,6 @@ export default function BestBettingApps({ countryCode, locationData, currentCoun
                         />
                     );
                 })}
-
-               
-                <link
-                    rel="alternate"
-                    hrefLang="x-default"
-                    href="https://www.sportsbuz.com/en-in/"
-                />
-
                 {/* Additional SEO Meta Tags */}
                 <meta name="robots" content="index, follow" />
                 <meta name="geo.region" content={countryCode} />
