@@ -12,8 +12,12 @@ export async function fetchBettingAppsSSR(countryCode) {
 
     const data = response.data;
     if (Array.isArray(data.results)) {
+      console.log("enters the is array condition")
+      console.log(" the betting response is :",response.data)
       return data.results;
     } else {
+      console.log("enters the not array condition")
+      console.log(" the betting response is :",data.results)
       console.warn('Expected array in betting apps SSR, got:', data);
       return [];
     }
