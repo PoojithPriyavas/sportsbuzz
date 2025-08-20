@@ -53,7 +53,7 @@ export default function BestBettingRecentApps({ bestSections = [] }) {
 
     // Use translated sections if available, otherwise fall back to original
     const displaySections = translatedSections.length > 0 ? translatedSections : bestSections;
-
+console.log(displaySections,"disp section")
     if (displaySections.length === 0) return null;
 
     return (
@@ -68,7 +68,7 @@ export default function BestBettingRecentApps({ bestSections = [] }) {
             <div className={styles.cardGrid}>
                 {displaySections.map((section) => {
                     const imageUrl = `https://admin.sportsbuz.com${section.best_betting_apps?.[0]?.image || ''}`;
-                    const linkPath = `/best-betting-apps/recent/${encodeURIComponent(section.id)}`;
+                    const linkPath = `/best-betting-apps/recent/${section.slug}/${encodeURIComponent(section.id)}`;
 
                     return (
                         <DynamicLink href={linkPath} key={section.id} className={styles.card}>

@@ -22,7 +22,7 @@ export default function BlogDetailsPage({ blog }) {
             <div className={styles.fourColumnRow}>
                 <div className={styles.leftThreeColumns}>
                     <BlogDetailContent blog={blog} />
-                    <BlogSlider />
+                    {/* <BlogSlider /> */}
                 </div>
                 <div className={styles.fourthColumn}>
                     <div className={styles.fourthColumnTwoColumns}>

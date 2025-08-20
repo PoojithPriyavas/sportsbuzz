@@ -8,7 +8,7 @@ import 'swiper/css/pagination';
 import styles from './AutoSlider.module.css';
 import CustomAxios from '../utilities/CustomAxios';
 
-export default function AutoSlider({countryCode}) {
+export default function AutoSliderEven({countryCode}) {
   const [banners, setBanners] = useState([]);
 
   useEffect(() => {
@@ -29,7 +29,8 @@ export default function AutoSlider({countryCode}) {
 
     fetchBanners();
   }, [countryCode]); // Added countryCode to dependency array
-  const oddBanners = banners.filter((item,i)=>(item.order_by %2 !==0));
+  const evenBanners = banners.filter((item,i)=>(item.order_by %2 ===0));
+  console.log(evenBanners,"even")
 
   return (
     <div className={styles.sliderWrapper}>
@@ -40,7 +41,7 @@ export default function AutoSlider({countryCode}) {
         pagination={{ clickable: true }}
         className={styles.slider}
       >
-        {oddBanners.map(banner => (
+        {evenBanners.map(banner => (
           <SwiperSlide key={banner.id}>
             <a href={banner.url} target="_blank" rel="noopener noreferrer">
               <img src={banner.image} alt="Banner" className={styles.slideImage} />

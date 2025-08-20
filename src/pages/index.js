@@ -29,6 +29,7 @@ import Footer from '@/components/Footer/Footer';
 import TestHeader from "@/components/Header/TestHeader";
 import HeaderTwo from "@/components/Header/HeaderTwo";
 import RegionSelector from "@/components/RegionSelector/RegionSelector";
+import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -157,10 +158,10 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
         {/* Canonical */}
         {locationDataHome?.map(({ hreflang, country_code }) => {
-          {/* console.log(hreflang, "href lan home") */}
+          {/* console.log(hreflang, "href lan home") */ }
           const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
           const fullHrefLang = `${hreflang}-${country_code}`;
-          {/* console.log('Generated link:', { href, fullHrefLang }); */}
+          {/* console.log('Generated link:', { href, fullHrefLang }); */ }
 
           return (
             <link
@@ -255,6 +256,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                 ) : (
                   <UpcomingFootballMatches />
                 )}
+                <AutoSliderEven countryCode={countryCode}/>
               </div>
             </div>
           </div>

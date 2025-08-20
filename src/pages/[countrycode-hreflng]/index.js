@@ -32,6 +32,7 @@ import RegionSelector from "@/components/RegionSelector/RegionSelector";
 import { useRouter } from "next/router";
 import { useParams } from "next/navigation";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
+import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 
 
 const geistSans = Geist({
@@ -295,6 +296,7 @@ export default function Home({ countryDataHome, locationDataHome,  isLocalhost }
                                 ) : (
                                     <UpcomingFootballMatches />
                                 )}
+                                <AutoSliderEven />
                             </div>
                         </div>
                     </div>
