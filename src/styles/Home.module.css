@@ -309,3 +309,12 @@
     margin-top: 4rem;
   }
 }
+.hideOnMobile {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .hideOnMobile {
+    display: none !important;
+  }
+}

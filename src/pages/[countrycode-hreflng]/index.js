@@ -52,7 +52,7 @@ export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
     // console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
     try {
-        const {  req } = context;
+        const { req } = context;
         const [countryRes, locationRes] = await Promise.all([
             axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
             axios.get('https://admin.sportsbuz.com/api/locations/')
@@ -72,7 +72,7 @@ export async function getServerSideProps(context) {
             props: {
                 countryDataHome,
                 locationDataHome,
-                
+
             }
         };
     } catch (error) {
@@ -88,14 +88,14 @@ export async function getServerSideProps(context) {
             props: {
                 countryDataHome: null,
                 locationDataHome: null,
-          
+
                 isLocalhost: process.env.NODE_ENV === 'development'
             }
         };
     }
 }
 
-export default function Home({ countryDataHome, locationDataHome,  isLocalhost }) {
+export default function Home({ countryDataHome, locationDataHome, isLocalhost }) {
 
     const {
         blogCategories,
@@ -135,7 +135,7 @@ export default function Home({ countryDataHome, locationDataHome,  isLocalhost }
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
     useEffect(() => {
         fetchBettingApps()
-    },[])
+    }, [])
 
     useEffect(() => {
         // Check if animation has been played before
@@ -271,7 +271,11 @@ export default function Home({ countryDataHome, locationDataHome,  isLocalhost }
                       <UpcomingFootballMatches />
                     )} */}
                                         <SportsOdsList />
-                                        {news && <NewsList />}
+                                        {news && (
+                                            <div className={styles.hideOnMobile}>
+                                                <NewsList />
+                                            </div>
+                                        )}
                                     </div>
                                     <div className={styles.centerSplit}>
                                         <BlogSection blogs={blogs} />

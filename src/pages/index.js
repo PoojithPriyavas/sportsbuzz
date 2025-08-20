@@ -231,7 +231,11 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                       <UpcomingFootballMatches />
                     )} */}
                     <SportsOdsList />
-                    {news && <NewsList />}
+                    {news && (
+                      <div className={styles.hideOnMobile}>
+                        <NewsList />
+                      </div>
+                    )}
                   </div>
                   <div className={styles.centerSplit}>
                     <BlogSection blogs={blogs} />
@@ -256,7 +260,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                 ) : (
                   <UpcomingFootballMatches />
                 )}
-                <AutoSliderEven countryCode={countryCode}/>
+                <AutoSliderEven countryCode={countryCode} />
               </div>
             </div>
           </div>
