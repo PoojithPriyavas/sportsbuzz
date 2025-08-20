@@ -11,6 +11,8 @@ import UpcomingMatches from '../UpComing/UpComingMatches';
 import BettingCard from '../OddsMultiply/BettingCard';
 import UpcomingFootballMatches from '../UpComing/UpComingFootball';
 import JoinTelegramButton from '../JoinTelegram/JoinTelegramButton';
+import AutoSliderEven from '../AutoSlider/AutoSliderEven';
+import AutoSlider from '../AutoSlider/AutoSlider';
 
 
 
@@ -30,13 +32,19 @@ export default function BlogDetailsPage({ blog }) {
                             <JoinTelegramButton />
                             <div className={styles.bettingCardWrapper}>
                                 <BettingCard />
+                                <div style={{ margin: '10px 0' }}>
+                                    <AutoSliderEven />
+                                </div>
+
                             </div>
 
-
-                        </div>
-                        <div className={styles.fourthColumnRight}>
                             <UpcomingFootballMatches />
                         </div>
+                        <div className={styles.fourthColumnRight}>
+                            <AutoSlider />
+
+                        </div>
+
                     </div>
 
                 </div>

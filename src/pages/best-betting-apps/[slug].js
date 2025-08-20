@@ -19,6 +19,7 @@ import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 import HeaderTwo from "@/components/Header/HeaderTwo";
 
 import { fetchBettingAppsSSR } from '@/lib/fetchBettingAppsSSR';
+import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 
 
 export async function getServerSideProps({ req }) {
@@ -161,6 +162,7 @@ export default function BestBettingApps({ sectionsTab }) {
                         ) : (
                             <UpcomingFootballMatches />
                         )}
+                        <AutoSliderEven countryCode={countryCode}/>
                         {/* <TopNewsSection /> */}
                     </div>
                 </div>
