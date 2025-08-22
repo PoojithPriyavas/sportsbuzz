@@ -13,6 +13,7 @@ import UpcomingFootballMatches from '../UpComing/UpComingFootball';
 import JoinTelegramButton from '../JoinTelegram/JoinTelegramButton';
 import AutoSliderEven from '../AutoSlider/AutoSliderEven';
 import AutoSlider from '../AutoSlider/AutoSlider';
+import SportsOddsList from '../SportsOdds/SportsOdsList';
 
 
 
@@ -42,8 +43,9 @@ export default function BlogDetailsPage({ blog }) {
                         </div>
                         <div className={styles.fourthColumnRight}>
                             <AutoSlider />
-
+                            
                         </div>
+                        <SportsOddsList />
 
                     </div>
 

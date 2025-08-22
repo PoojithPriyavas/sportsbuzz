@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import styles from './BestBettingApps.module.css';
 import Head from 'next/head';
 import { useGlobalData } from '../Context/ApiContext';
+import { useRouter } from 'next/router';
 
-export default function BettingAppsTable({ sections}) {
-    console.log(sections,"section in the bettingapps table")
+export default function BettingAppsTable({ sections }) {
+    console.log(sections, "section in the bettingapps table")
     const [copiedId, setCopiedId] = useState(null);
+    const route = useRouter();
     const { translateText, language } = useGlobalData();
     const [isMobile, setIsMobile] = useState(false);
     const [translatedSections, setTranslatedSections] = useState([]);
@@ -121,7 +123,12 @@ export default function BettingAppsTable({ sections}) {
                 {[...apps]
                     .sort((a, b) => a.order_by - b.order_by)
                     .map((app) => (
-                        <div className={styles.mobileCard} key={app.id}>
+                        <div
+                            className={styles.mobileCard}
+                            key={app.id}
+                              onClick={() => window.open(app.referal_link, '_blank', 'noopener,noreferrer')}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <div className={styles.mobileHeader}>
                                 <div className={styles.mobileRank}>#{app.order_by}</div>
                                 <img
@@ -155,20 +162,25 @@ export default function BettingAppsTable({ sections}) {
                                     href={app.referal_link}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
                                 >
                                     {staticLabels['GET BONUS']}
                                 </a>
                                 <button
                                     className={styles.mobileCodeBtn}
-                                    onClick={() => handleCopy(app.referall_code, app.id)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCopy(app.referall_code, app.id);
+                                    }}
                                 >
                                     {copiedId === app.id ? staticLabels['Copied!'] : app.referall_code}
                                 </button>
                                 <button
                                     className={styles.mobileReviewBtn}
-                                    onClick={() =>
-                                        window.open(app.review_link, '_blank', 'noopener,noreferrer')
-                                    }
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        window.open(app.review_link, '_blank', 'noopener,noreferrer');
+                                    }}
                                 >
                                     {staticLabels['Read Review']}
                                 </button>

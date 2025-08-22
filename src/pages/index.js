@@ -29,7 +29,6 @@ import Footer from '@/components/Footer/Footer';
 import TestHeader from "@/components/Header/TestHeader";
 import HeaderTwo from "@/components/Header/HeaderTwo";
 import RegionSelector from "@/components/RegionSelector/RegionSelector";
-import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,14 +80,14 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
     teamImages,
     upcomingMatches,
     sport,
-    countryCode,
+    // countryCode,
     stages,
     news
   } = useGlobalData();
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
 
-  // console.log(locationDataHome, "location home");
-  // console.log(countryCode, "country data home")
+  console.log(locationDataHome, "location home");
+  console.log(countryDataHome, "country data home")
 
 
   // if (countryCode && countryCode.country_code) {
@@ -157,11 +156,11 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
         <meta name="author" content="Sportsbuz" />
 
         {/* Canonical */}
-        {locationDataHome?.map(({ hreflang, country_code }) => {
-          {/* console.log(hreflang, "href lan home") */ }
-          const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
+        {locationDataHome.map(({ hreflang, country_code }) => {
+          console.log(hreflang, "href lan home")
+          const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/`;
           const fullHrefLang = `${hreflang}-${country_code}`;
-          {/* console.log('Generated link:', { href, fullHrefLang }); */ }
+          console.log('Generated link:', { href, fullHrefLang });
 
           return (
             <link
@@ -214,11 +213,11 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
               </>
 
             )}
-            <HeroCarousal countryCode={countryCode} />
+            <HeroCarousal />
 
             <div className={styles.fourColumnRow}>
               <div className={styles.leftThreeColumns}>
-                {countryCode?.location?.betting_apps == 'Active' && (
+                {countryDataHome?.location?.betting_apps == 'Active' && (
                   <BonusTable sections={sections} />
                 )}
                 <div className={styles.twoSplitRow}>
@@ -231,11 +230,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                       <UpcomingFootballMatches />
                     )} */}
                     <SportsOdsList />
-                    {news && (
-                      <div className={styles.hideOnMobile}>
-                        <NewsList />
-                      </div>
-                    )}
+                    {news && <NewsList />}
                   </div>
                   <div className={styles.centerSplit}>
                     <BlogSection blogs={blogs} />
@@ -250,7 +245,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                     <JoinTelegramButton />
                   </div>
                   <div className={styles.fourthColumnRight}>
-                    <AutoSlider countryCode={countryCode} />
+                    <AutoSlider />
                   </div>
                 </div>
                 {sport === 'cricket' ? (
@@ -260,7 +255,6 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                 ) : (
                   <UpcomingFootballMatches />
                 )}
-                <AutoSliderEven countryCode={countryCode} />
               </div>
             </div>
           </div>

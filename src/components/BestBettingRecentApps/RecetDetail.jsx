@@ -121,7 +121,7 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
         <>
             <div className={styles.mobileContainer}>
                 {[...apps].map((app) => (
-                    <div className={styles.mobileCard} key={app.id}>
+                    <div className={styles.mobileCard} key={app.id}   onClick={() => window.open(app.referal_link, '_blank', 'noopener,noreferrer')} style={{cursor:'pointer'}}>
                         <div className={styles.mobileHeader}>
                             <div className={styles.mobileRank}>#{app.order_by}</div>
                             <img
@@ -201,7 +201,7 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
                         {[...apps]
                             .sort((a, b) => a.order_by - b.order_by)
                             .map((app) => (
-                                <tr className={styles.bodyRow} key={app.id}>
+                                <tr className={styles.bodyRow} key={app.id}   onClick={() => window.open(app.referal_link, '_blank', 'noopener,noreferrer')} style={{cursor:'pointer'}}>
                                     <td className={styles.rankCell}>
                                         <div className={styles.rankBadge}>#{app.order_by}</div>
                                     </td>

@@ -407,8 +407,8 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                     <div className={styles.vs}>{translatedText.vs}</div>
                     <div className={styles.team}>
                         <div className={`${styles.teamLogo} ${styles.away}`}>
-                        {/* {card.team2.code} */}
-                         <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogoImg}/>
+                            {/* {card.team2.code} */}
+                            <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogoImg} />
                         </div>
                         <div className={styles.teamName}>{card.team2.name}</div>
                     </div>
@@ -452,7 +452,7 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                         </div>
 
                         {selectedOdd && betAmount && (
-                            <div className={styles.potentialWin}>
+                            <div className={styles.potentialWin} onClick={placeBet} style={{ cursor: 'pointer' }}>
                                 <div className={styles.potentialWinLabel}>{translatedText.potentialWinnings}</div>
                                 <div className={styles.potentialWinAmount}>
                                     ₹{win}
