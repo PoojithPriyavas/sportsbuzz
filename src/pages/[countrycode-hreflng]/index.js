@@ -113,7 +113,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
     } = useGlobalData();
     // console.log(sections, "sections")
-    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
+    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     const router = useRouter();
     const { "countrycode-hreflng": countryLang } = useParams();
     // console.log(countryLang, "params value");

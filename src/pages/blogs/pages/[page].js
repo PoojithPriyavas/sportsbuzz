@@ -75,7 +75,7 @@ export default function BlogPages({
     // supportedCountries,
     resolvedUrl,
     isLocalhost, }) {
-    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
+    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     const countryCode = countryDataHome?.country_code || 'IN';
     const { blogs } = useGlobalData();
     // console.log(resolvedUrl, "rshdhasd")
