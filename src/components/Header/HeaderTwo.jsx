@@ -807,9 +807,9 @@ const HeaderTwo = ({ animationStage }) => {
                     </select>
 
                     <div className={styles.sportsSelectorWrapper}>
-                        {isChangingSport && (
+                        {/* {isChangingSport && (
                             <span className={styles.loadingIndicator}>Loading...</span>
-                        )}
+                        )} */}
                         <select
                             className={`${styles.sportsSelector} ${isChangingSport ? styles.disabled : ''}`}
                             value={sport}

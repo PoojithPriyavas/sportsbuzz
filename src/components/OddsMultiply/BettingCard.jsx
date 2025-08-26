@@ -1,15 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './BettingCard.module.css';
 import { useGlobalData } from '../Context/ApiContext';
+import { useRouter } from 'next/router';
 
 export default function BettingCards() {
     const scrollRef = useRef(null);
     const dropdownRef = useRef(null);
+    const inactivityTimerRef = useRef(null); // New: Timer for inactivity
     const [paused, setPaused] = useState(false);
     const [selectedTournament, setSelectedTournament] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [transformedCards, setTransformedCards] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+
     const [translatedText, setTranslatedText] = useState({
         bettingOdds: 'Betting Odds',
         allTournaments: 'All Tournaments',
@@ -22,7 +25,6 @@ export default function BettingCards() {
         placeBet: 'Place Bet',
         potentialWinnings: 'Potential Winnings',
         selectOdds: 'Select your odds and enter stake to place your bet',
-        // betSuccess: '✓ Bet Placed Successfully!',
         betSuccess: 'Play responsibly at your own risk',
         team1Win: 'Team 1 Win',
         draw: 'Draw',
@@ -31,6 +33,38 @@ export default function BettingCards() {
     });
 
     const { tournament, accessToken, fetchEventsIdData, eventDetails, translateText, language } = useGlobalData();
+
+    // New: Function to start inactivity timer
+    const startInactivityTimer = () => {
+        if (inactivityTimerRef.current) {
+            clearTimeout(inactivityTimerRef.current);
+        }
+
+        inactivityTimerRef.current = setTimeout(() => {
+            setPaused(false);
+        }, 10000); // 10 seconds
+    };
+
+    // New: Function to handle user activity (stops auto-scroll and starts timer)
+    const handleUserActivity = () => {
+        setPaused(true);
+        startInactivityTimer();
+    };
+
+    // New: Function to handle bet completion
+    const handleBetCompletion = () => {
+        setPaused(true);
+        startInactivityTimer();
+    };
+
+    // Clean up timer on unmount
+    useEffect(() => {
+        return () => {
+            if (inactivityTimerRef.current) {
+                clearTimeout(inactivityTimerRef.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         const translateLabels = async () => {
@@ -50,7 +84,6 @@ export default function BettingCards() {
                 translateText('Place Bet', 'en', language),
                 translateText('Potential Winnings', 'en', language),
                 translateText('Select your odds and enter stake to place your bet', 'en', language),
-                // translateText('✓ Bet Placed Successfully!', 'en', language),
                 translateText('Play responsibly at your own risk!', 'en', language),
                 translateText('Team 1 Win', 'en', language),
                 translateText('Draw', 'en', language),
@@ -126,10 +159,11 @@ export default function BettingCards() {
         });
         setSelectedTournament(tournamentId);
         setIsDropdownOpen(false);
-        setPaused(true);
-        setTimeout(() => setPaused(false), 2000);
+        // Modified: Use the new activity handler
+        handleUserActivity();
     };
 
+    // Auto-scroll effect (unchanged timing)
     useEffect(() => {
         const container = scrollRef.current;
         if (!container || paused || transformedCards.length === 0) return;
@@ -247,7 +281,6 @@ export default function BettingCards() {
 
             <div className={styles.cardsContainer} ref={scrollRef}>
                 {isLoading ? (
-                    // Show skeleton cards while loading
                     <>
                         <SkeletonCard />
                         <SkeletonCard />
@@ -260,8 +293,8 @@ export default function BettingCards() {
                             card={card}
                             styles={styles}
                             translatedText={translatedText}
-                            onSelectOdd={() => setPaused(true)}
-                            onBetPlaced={() => setTimeout(() => setPaused(false), 5000)}
+                            onSelectOdd={handleUserActivity} // Modified: Use activity handler
+                            onBetPlaced={handleBetCompletion} // Modified: Use bet completion handler
                         />
                     ))
                 ) : (
@@ -330,16 +363,18 @@ async function fetchMarketData(token, sportEventId) {
 }
 
 function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced }) {
+    console.log("card name", card);
     const [selectedOdd, setSelectedOdd] = useState(null);
     const [betAmount, setBetAmount] = useState('');
     const [win, setWin] = useState('0.00');
     const [success, setSuccess] = useState(false);
     const [showBettingSection, setShowBettingSection] = useState(false);
+    const navigate = useRouter();
 
     const handleSelect = (odd) => {
         setSelectedOdd(odd);
         setShowBettingSection(true);
-        onSelectOdd();
+        onSelectOdd(); // This will now pause auto-scroll for 10 seconds
         if (betAmount) calculateWin(betAmount, odd.value);
     };
 
@@ -348,6 +383,8 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
         if (amount < 0) return;
         setBetAmount(amount);
         if (selectedOdd) calculateWin(amount, selectedOdd.value);
+        // Optional: You can also pause auto-scroll when user types
+        // onSelectOdd();
     };
 
     const calculateWin = (amount, oddValue) => {
@@ -359,15 +396,25 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
         if (selectedOdd && betAmount > 0) {
             setSuccess(true);
             onBetPlaced();
-            setTimeout(() => {
-                setSelectedOdd(null);
-                setBetAmount('');
-                setWin('0.00');
-                setSuccess(false);
-                setShowBettingSection(false);
-            }, 3000);
+            // setTimeout(() => {
+            //     setSelectedOdd(null);
+            //     setBetAmount('');
+            //     setWin('0.00');
+            //     setSuccess(false);
+            //     setShowBettingSection(false);
+            // }, 3000);
         }
     };
+    const potentialClick = () => {
+        navigate('/')
+        setTimeout(() => {
+            setSelectedOdd(null);
+            setBetAmount('');
+            setWin('0.00');
+            setSuccess(false);
+            setShowBettingSection(false);
+        }, 3000);
+    }
 
     const getOddLabel = (type) => {
         switch (type) {
@@ -399,7 +446,6 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                 <div className={styles.teamsContainer}>
                     <div className={styles.team}>
                         <div className={styles.teamLogo}>
-                            {/* {card.team1.code} */}
                             <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team1.logo}`} alt={card.team1.name} className={styles.teamLogoImg} />
                         </div>
                         <div className={styles.teamName}>{card.team1.name}</div>
@@ -407,7 +453,6 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                     <div className={styles.vs}>{translatedText.vs}</div>
                     <div className={styles.team}>
                         <div className={`${styles.teamLogo} ${styles.away}`}>
-                            {/* {card.team2.code} */}
                             <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogoImg} />
                         </div>
                         <div className={styles.teamName}>{card.team2.name}</div>
@@ -450,9 +495,10 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                                 {translatedText.placeBet}
                             </button>
                         </div>
+                        \
 
-                        {selectedOdd && betAmount && (
-                            <div className={styles.potentialWin} onClick={placeBet} style={{ cursor: 'pointer' }}>
+                        {success && (
+                            <div className={styles.potentialWin} onClick={() => potentialClick()} style={{ cursor: 'pointer' }}>
                                 <div className={styles.potentialWinLabel}>{translatedText.potentialWinnings}</div>
                                 <div className={styles.potentialWinAmount}>
                                     ₹{win}

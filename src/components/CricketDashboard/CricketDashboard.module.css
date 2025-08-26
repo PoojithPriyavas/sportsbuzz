@@ -381,8 +381,16 @@
         gap: 15px;
     }
 
+    .teamCard:first-child {
+        order: 1;
+    }
+
     .vsDivider {
         order: 2;
+    }
+
+    .teamCard:last-child {
+        order: 3;
     }
 
     .squadsContainer {
