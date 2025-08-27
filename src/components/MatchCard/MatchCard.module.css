@@ -5,6 +5,13 @@
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Dark mode styles for matchCard */
+:global(.dark-theme) .matchCard {
+    background: #1a1a2e;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .matchHeader {
@@ -13,6 +20,11 @@
     padding: clamp(20px, 5vw, 30px);
     text-align: center;
     position: relative;
+}
+
+/* Dark mode header (already dark, but can adjust if needed) */
+:global(.dark-theme) .matchHeader {
+    background: linear-gradient(135deg, #0a0a1a 0%, #0d1426 50%, #061d38 100%);
 }
 
 .matchInfo {
@@ -72,6 +84,12 @@
 /* Field Container - Hidden on Mobile */
 .fieldContainer {
     display: block;
+    background: white;
+    transition: background-color 0.3s ease;
+}
+
+:global(.dark-theme) .fieldContainer {
+    background: #16213e;
 }
 
 .teamsScore {
@@ -106,6 +124,11 @@
     justify-content: center;
     margin: 0 auto 10px;
     font-size: clamp(1.2rem, 3vw, 1.5em);
+    transition: background-color 0.3s ease;
+}
+
+:global(.dark-theme) .teamBadge {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .vs {
@@ -122,6 +145,12 @@
     background: #f8f9fa;
     padding: clamp(20px, 4vw, 30px);
     border-top: 1px solid #e9ecef;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+:global(.dark-theme) .lineupsSection {
+    background: #0f1419;
+    border-top: 1px solid #2d3748;
 }
 
 .matchStats h3,
@@ -130,6 +159,12 @@
     margin-bottom: clamp(20px, 4vw, 30px);
     color: #333;
     font-size: clamp(1.2rem, 3vw, 1.5em);
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .matchStats h3,
+:global(.dark-theme) .lineupsSection h3 {
+    color: #e2e8f0;
 }
 
 .lineupsContainer {
@@ -143,6 +178,11 @@
 .substitutions {
     background: #f8f9fa;
     padding: clamp(20px, 4vw, 30px);
+    transition: background-color 0.3s ease;
+}
+
+:global(.dark-theme) .substitutions {
+    background: #0f1419;
 }
 
 .substitutions h3 {
@@ -150,6 +190,11 @@
     margin-bottom: clamp(15px, 3vw, 20px);
     color: #333;
     font-size: clamp(1.1rem, 2.8vw, 1.3em);
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .substitutions h3 {
+    color: #e2e8f0;
 }
 
 .subsContainer {
@@ -163,6 +208,12 @@
     padding: clamp(15px, 3vw, 20px);
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+:global(.dark-theme) .teamSubs {
+    background: #2d3748;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .teamSubs h4 {
@@ -170,6 +221,11 @@
     color: #333;
     text-align: center;
     font-size: clamp(1rem, 2.5vw, 1.1em);
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .teamSubs h4 {
+    color: #e2e8f0;
 }
 
 .subItem {
@@ -182,6 +238,13 @@
     font-size: clamp(0.8rem, 2vw, 0.9em);
     flex-wrap: wrap;
     gap: 5px;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+:global(.dark-theme) .subItem {
+    background: #1a202c;
+    color: #cbd5e0;
 }
 
 .subTime {
@@ -197,6 +260,11 @@
 .subArrow {
     margin: 0 5px;
     color: #666;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .subArrow {
+    color: #a0aec0;
 }
 
 .matchStats {
@@ -204,6 +272,12 @@
     padding: clamp(15px, 3vw, 20px);
     text-align: center;
     border-top: 1px solid #e9ecef;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+:global(.dark-theme) .matchStats {
+    background: #0f1419;
+    border-top: 1px solid #2d3748;
 }
 
 .statsGrid {
@@ -218,6 +292,12 @@
     padding: clamp(12px, 3vw, 15px);
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+:global(.dark-theme) .statItem {
+    background: #2d3748;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .statLabel {
@@ -225,12 +305,22 @@
     color: #333;
     margin-bottom: 5px;
     font-size: clamp(0.8rem, 2vw, 0.9em);
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .statLabel {
+    color: #e2e8f0;
 }
 
 .statValue {
     font-size: clamp(1rem, 2.5vw, 1.2em);
     color: #667eea;
     word-wrap: break-word;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .statValue {
+    color: #90cdf4;
 }
 
 /* No Data Section Styles */
@@ -245,6 +335,13 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+:global(.dark-theme) .noDataSection {
+    background: #0f1419;
+    border-top: 1px solid #2d3748;
+    color: #a0aec0;
 }
 
 .loadingIcon,
@@ -259,6 +356,11 @@
     margin-bottom: clamp(12px, 3vw, 15px);
     font-size: clamp(1.3rem, 3.5vw, 1.8em);
     font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .noDataSection h2 {
+    color: #e2e8f0;
 }
 
 .noDataSection p {
@@ -277,6 +379,12 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     max-width: 500px;
     width: 100%;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+:global(.dark-theme) .reasonsList {
+    background: #2d3748;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .reasonsList li {
@@ -286,6 +394,11 @@
     list-style-type: disc;
     margin-left: 20px;
     line-height: 1.4;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .reasonsList li {
+    color: #cbd5e0;
 }
 
 /* Loading animation for the loading icon */

@@ -1,16 +1,62 @@
-/* Enhanced Betting Apps Table Styling - Fully Responsive */
+/* Enhanced Betting Apps Table Styling - Fully Responsive with Dark Mode */
 
 /* Base wrapper styles */
 .wrapper {
   width: 100%;
-  /* max-width: 1200px; */
   margin: 0 auto;
-  /* padding: 0 15px; */
+  
+  /* Light theme variables (default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #f0f0f0;
+  --bg-gradient-header: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --bg-hover: linear-gradient(135deg, #f8f9ff 0%, #e6f3ff 100%);
+  --text-primary: #333333;
+  --text-secondary: #555555;
+  --text-light: #000000;
+  --text-white: #ffffff;
+  --border-color: #f0f0f0;
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.1);
+  --shadow-strong: rgba(0, 0, 0, 0.15);
+  --skeleton-bg: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  --accent-green: #4CAF50;
+  --accent-gold: linear-gradient(135deg, #FFD700, #FFA500);
+  --accent-red: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  --accent-blue: linear-gradient(135deg, #667eea, #764ba2);
+  --accent-teal: linear-gradient(135deg, #4ecdc4, #44b3a8);
+  --bonus-bg: linear-gradient(135deg, #fff5f5, #ffe5e5);
+  --code-btn-bg: linear-gradient(135deg, #e8fffe, #b8f5f1);
+}
+
+/* Dark theme overrides */
+:global(.dark-theme) .wrapper {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #404040;
+  --bg-gradient-header: linear-gradient(135deg, #4a5568 0%, #553c9a 100%);
+  --bg-hover: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  --text-primary: #e2e8f0;
+  --text-secondary: #cbd5e0;
+  --text-light: #f7fafc;
+  --text-white: #ffffff;
+  --border-color: #4a5568;
+  --shadow-light: rgba(0, 0, 0, 0.3);
+  --shadow-medium: rgba(0, 0, 0, 0.4);
+  --shadow-strong: rgba(0, 0, 0, 0.6);
+  --skeleton-bg: linear-gradient(90deg, #2d2d2d 25%, #404040 50%, #2d2d2d 75%);
+  --accent-green: #68d391;
+  --accent-gold: linear-gradient(135deg, #f6e05e, #d69e2e);
+  --accent-red: linear-gradient(135deg, #fc8181, #e53e3e);
+  --accent-blue: linear-gradient(135deg, #4299e1, #553c9a);
+  --accent-teal: linear-gradient(135deg, #4fd1c7, #38b2ac);
+  --bonus-bg: linear-gradient(135deg, #2d1b1b, #3c1e1e);
+  --code-btn-bg: linear-gradient(135deg, #1a2e2e, #2d4a4a);
 }
 
 /* Skeleton Loading Styles */
 .skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: var(--skeleton-bg);
   background-size: 200% 100%;
   animation: skeletonLoading 1.5s infinite;
   border-radius: 4px;
@@ -130,7 +176,7 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: 15px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 20px 40px var(--shadow-light);
 }
 
 /* Desktop Table Styles */
@@ -138,12 +184,13 @@
   width: 100%;
   min-width: 800px;
   border-collapse: collapse;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 15px;
   overflow: hidden;
   border: none;
   margin-bottom: 0px;
   position: relative;
+  color: var(--text-primary);
 }
 
 .table::before {
@@ -158,7 +205,7 @@
 
 /* Header Styling */
 .table thead tr {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-gradient-header);
   position: relative;
 }
 
@@ -167,7 +214,7 @@
   text-align: center;
   font-weight: 700;
   font-size: 16px;
-  color: white;
+  color: var(--text-white);
   border-bottom: none;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -178,19 +225,20 @@
 /* Body Row Styling */
 .table tbody tr {
   transition: all 0.3s ease;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .table tbody tr:hover {
-  background: linear-gradient(135deg, #f8f9ff 0%, #e6f3ff 100%);
+  background: var(--bg-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px var(--shadow-medium);
 }
 
 .table tbody tr td {
   padding: 20px 15px;
   vertical-align: middle;
   border-bottom: none;
+  color: var(--text-primary);
 }
 
 /* Rank Cell Styling */
@@ -208,8 +256,8 @@
   min-width: 60px;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #333;
+  background: var(--accent-gold);
+  color: var(--text-primary);
   font-size: 18px;
 }
 
@@ -245,7 +293,7 @@
 
 .site img:hover {
   transform: scale(1.05);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 15px var(--shadow-medium);
 }
 
 /* Features Cell Styling */
@@ -253,6 +301,7 @@
   font-size: 14px;
   line-height: 1.6;
   max-width: 250px;
+  color: var(--text-primary);
 }
 
 .features ul {
@@ -262,7 +311,7 @@
 }
 
 .features li {
-  color: #333;
+  color: var(--text-primary);
   padding: 4px 0;
   position: relative;
 }
@@ -271,7 +320,7 @@
   content: '✓';
   position: absolute;
   left: -20px;
-  color: #4CAF50;
+  color: var(--accent-green);
   font-weight: bold;
 }
 
@@ -287,7 +336,7 @@
 .bonus .amount {
   font-size: 18px;
   font-weight: bold;
-  color: #000000 !important;
+  color: var(--text-light) !important;
   margin-bottom: 10px;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
@@ -299,8 +348,8 @@
   border-radius: 25px;
   cursor: pointer;
   font-size: 12px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: var(--accent-blue);
+  color: var(--text-white);
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -345,8 +394,8 @@
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-  color: white;
+  background: var(--accent-red);
+  color: var(--text-white);
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
   text-align: center;
@@ -363,7 +412,7 @@
   padding: 10px 18px;
   margin: 5px 0;
   border: 2px dotted #4ecdc4;
-  background: linear-gradient(135deg, #e8fffe, #b8f5f1);
+  background: var(--code-btn-bg);
   color: #00695c;
   border-radius: 10px;
   cursor: pointer;
@@ -374,9 +423,14 @@
   transition: all 0.3s ease;
 }
 
+:global(.dark-theme) .actions .codeBtn {
+  color: #4fd1c7;
+  border-color: #4fd1c7;
+}
+
 .actions .codeBtn:hover {
-  background: linear-gradient(135deg, #4ecdc4, #44b3a8);
-  color: white;
+  background: var(--accent-teal);
+  color: var(--text-white);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
 }
@@ -389,17 +443,18 @@
 }
 
 .mobileCard {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 15px;
   padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border: 1px solid #f0f0f0;
+  box-shadow: 0 10px 30px var(--shadow-medium);
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
+  color: var(--text-primary);
 }
 
 .mobileCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 15px 40px var(--shadow-strong);
 }
 
 .mobileHeader {
@@ -408,12 +463,12 @@
   justify-content: space-between;
   margin-bottom: 15px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #f8f9fa;
+  border-bottom: 2px solid var(--border-color);
 }
 
 .mobileRank {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #333;
+  background: var(--accent-gold);
+  color: var(--text-primary);
   font-weight: bold;
   padding: 8px 12px;
   border-radius: 50px;
@@ -443,7 +498,7 @@
 }
 
 .mobileSection h4 {
-  color: #333;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 700;
   margin-bottom: 8px;
@@ -458,7 +513,7 @@
 }
 
 .mobileSection li {
-  color: #555;
+  color: var(--text-secondary);
   padding: 2px 0;
   position: relative;
   font-size: 13px;
@@ -468,17 +523,17 @@
   content: '✓';
   position: absolute;
   left: -20px;
-  color: #4CAF50;
+  color: var(--accent-green);
   font-weight: bold;
 }
 
 .mobileBonusAmount {
   font-size: 16px;
   font-weight: bold;
-  color: #000;
+  color: var(--text-light);
   text-align: center;
   padding: 10px;
-  background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+  background: var(--bonus-bg);
   border-radius: 8px;
   margin-bottom: 10px;
 }
@@ -492,8 +547,8 @@
 .mobileGetBtn {
   display: block;
   padding: 14px 20px;
-  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-  color: white;
+  background: var(--accent-red);
+  color: var(--text-white);
   text-decoration: none;
   border-radius: 10px;
   text-align: center;
@@ -513,7 +568,7 @@
 .mobileCodeBtn {
   padding: 12px 18px;
   border: 2px dotted #4ecdc4;
-  background: linear-gradient(135deg, #e8fffe, #b8f5f1);
+  background: var(--code-btn-bg);
   color: #00695c;
   border-radius: 10px;
   cursor: pointer;
@@ -524,16 +579,21 @@
   transition: all 0.3s ease;
 }
 
+:global(.dark-theme) .mobileCodeBtn {
+  color: #4fd1c7;
+  border-color: #4fd1c7;
+}
+
 .mobileCodeBtn:hover {
-  background: linear-gradient(135deg, #4ecdc4, #44b3a8);
-  color: white;
+  background: var(--accent-teal);
+  color: var(--text-white);
   transform: translateY(-2px);
 }
 
 .mobileReviewBtn {
   padding: 10px 16px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
+  background: var(--accent-blue);
+  color: var(--text-white);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -551,7 +611,7 @@
 
 /* Heading Styling */
 .heading {
-  color: #333;
+  color: var(--text-primary);
   font-size: 28px;
   font-weight: 800;
   text-align: center;
@@ -575,7 +635,7 @@
 }
 
 .heading * {
-  color: #333 !important;
+  color: var(--text-primary) !important;
 }
 
 /* Responsive Breakpoints */

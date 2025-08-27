@@ -1,3 +1,4 @@
+/* Light Mode (Default) */
 .cardsContainer {
     display: flex;
     flex-direction: row;
@@ -20,11 +21,10 @@
     width: 100%;
     max-width: 350px;
     min-width: 340px;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
     height: 260px;
     display: flex;
     flex-direction: column;
-    /* Key change: make it a flex container */
 }
 
 @media(max-width:768px) {
@@ -43,7 +43,6 @@
     padding: 15px 20px;
     text-align: center;
     flex-shrink: 0;
-    /* Prevent shrinking */
 }
 
 .leagueName {
@@ -61,18 +60,15 @@
 .matchContent {
     padding: 20px 10px;
     flex-grow: 1;
-    /* Key change: make this section grow to fill available space */
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* Center the content vertically */
 }
 
 .teamsContainer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
 }
 
 .team {
@@ -82,19 +78,6 @@
     flex: 1;
 }
 
-/* .teamLogo {
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    font-size: 15px;
-    color: white;
-    font-weight: bold;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-} */
 .teamLogo {
     width: 36px;
     height: 36px;
@@ -132,9 +115,7 @@
     -webkit-box-orient: vertical;
     line-height: 1.2;
     max-height: calc(1.2em * 2);
-    /* 2 lines * line-height */
 }
-
 
 .scoreSection {
     display: flex;
@@ -164,9 +145,7 @@
     background: #f8f9fa;
     border-top: 1px solid #ecf0f1;
     flex-shrink: 0;
-    /* Key change: prevent shrinking and keep at bottom */
     margin-top: auto;
-    /* Push to bottom */
 }
 
 .matchTime {
@@ -197,11 +176,9 @@
     0% {
         opacity: 1;
     }
-
     50% {
         opacity: 0.5;
     }
-
     100% {
         opacity: 1;
     }
@@ -234,27 +211,18 @@
     color: #555;
     font-size: 16px;
     font-weight: 400;
+    transition: color 0.3s ease;
 }
 
 .selectedLeague {
     cursor: pointer;
     font-weight: 600;
-    /* text-decoration: underline; */
     color: #0066da;
 }
-
-/* 
-.leagueDropdown {
-    font-size: 14px;
-    color: #000;
-    padding: 10px 6px;
-    margin-left: 20px;
-} */
 
 .leagueDropdown {
     font-size: 14px;
     padding: 3px 12px;
-    /* Increases height */
     line-height: 1.5;
     color: #000;
     border-radius: 6px;
@@ -262,17 +230,13 @@
     border: 1px solid #ccc;
     cursor: pointer;
     appearance: none;
-    /* min-height: 30px; */
-    /* Ensures tall enough box */
+    transition: all 0.3s ease;
 }
 
-/* Optional: Style the options inside the dropdown (some browsers support this) */
 .leagueDropdown option {
     padding: 10px;
     font-size: 14px;
 }
-
-/* Add this to your existing TestLive.module.css file */
 
 /* Skeleton Animation */
 .skeleton {
@@ -286,18 +250,90 @@
     0% {
         background-position: 200% 0;
     }
-
     100% {
         background-position: -200% 0;
     }
 }
 
-/* Skeleton specific adjustments for match cards */
 .matchCard .skeleton {
     display: block;
 }
 
-/* Ensure skeleton elements maintain proper spacing */
 .team .skeleton:last-child {
     margin-top: 8px;
+}
+
+/* Dark Mode Styles */
+:global(.dark-theme) .matchCard {
+    background: #2d3748;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+}
+
+:global(.dark-theme) .teamName {
+    color: #e2e8f0;
+}
+
+:global(.dark-theme) .score {
+    color: #e2e8f0;
+}
+
+:global(.dark-theme) .vs {
+    color: #a0aec0;
+}
+
+:global(.dark-theme) .matchInfo {
+    background: #1a202c;
+    border-top: 1px solid #4a5568;
+}
+
+:global(.dark-theme) .matchTime {
+    color: #a0aec0;
+}
+
+:global(.dark-theme) .teamLogo {
+    background: #4a5568;
+}
+
+:global(.dark-theme) .leagueItem {
+    color: #a0aec0;
+}
+
+:global(.dark-theme) .leagueItem:hover {
+    color: #e2e8f0;
+}
+
+:global(.dark-theme) .selectedLeague {
+    color: #63b3ed;
+}
+
+:global(.dark-theme) .leagueDropdown {
+    background: #2d3748;
+    color: #e2e8f0;
+    border: 1px solid #4a5568;
+}
+
+:global(.dark-theme) .leagueDropdown option {
+    background: #2d3748;
+    color: #e2e8f0;
+}
+
+/* Dark mode skeleton styles */
+:global(.dark-theme) .skeleton {
+    background: linear-gradient(90deg, #4a5568 25%, #2d3748 50%, #4a5568 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading-dark 1.5s infinite;
+}
+
+@keyframes skeleton-loading-dark {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Dark mode hover effects */
+:global(.dark-theme) .matchCard:hover {
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
 }

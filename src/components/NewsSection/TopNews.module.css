@@ -9,10 +9,25 @@
   max-height: 90vh;
   display: flex;
   flex-direction: column;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
+
+/* Dark theme for container */
+:global(.dark-theme) .container {
+  background: rgba(30, 30, 30, 0.95);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
 .newsIntro{
   color: #7777 !important;
+  transition: color 0.3s ease;
 }
+
+/* Dark theme for news intro */
+:global(.dark-theme) .newsIntro {
+  color: #aaa !important;
+}
+
 .header {
   text-align: center;
   margin-bottom: 30px;
@@ -22,33 +37,42 @@
 
 .header h2 {
   font-size: 25px;
-  /* background: linear-gradient(45deg, #667eea, #764ba2); */
-  background:
-    #000;
-
+  background: #000;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   margin-bottom: 10px;
   margin-top: 20px;
+  transition: background 0.3s ease;
+}
+
+/* Dark theme for header h2 */
+:global(.dark-theme) .header h2 {
+  background: linear-gradient(45deg, #fff, #ccc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .header p {
   color: #666;
   font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme for header p */
+:global(.dark-theme) .header p {
+  color: #bbb;
 }
 
 .newsList {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  /* This adds space between each card */
   overflow-y: auto;
   max-height: 70vh;
-  /* Add this if not present */
   padding-right: 10px;
 }
-
 
 .news-list::-webkit-scrollbar {
   width: 8px;
@@ -57,6 +81,10 @@
 .news-list::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
+}
+
+:global(.dark-theme) .news-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .news-list::-webkit-scrollbar-thumb {
@@ -83,6 +111,17 @@
   animation: fadeInUp 0.6s ease-out both;
 }
 
+/* Dark theme for news items */
+:global(.dark-theme) .newsItem {
+  background: rgba(45, 45, 45, 0.9);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark-theme) .newsItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  border-color: #667eea;
+}
 
 .thumbnail::before {
   content: '📷';
@@ -92,6 +131,11 @@
   transform: translate(-50%, -50%);
   font-size: 1.5rem;
   color: #999;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .thumbnail::before {
+  color: #666;
 }
 
 .newsInfo {
@@ -106,11 +150,23 @@
   font-weight: 600;
   color: #2d3748;
   margin: 0;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme for news titles */
+:global(.dark-theme) .newsTitle {
+  color: #e2e8f0;
 }
 
 .newsMeta {
   font-size: 0.85rem;
   color: #718096;
+  transition: color 0.3s ease;
+}
+
+/* Dark theme for news meta */
+:global(.dark-theme) .newsMeta {
+  color: #a0aec0;
 }
 
 .news-item {
@@ -127,10 +183,19 @@
   animation: fadeInUp 0.6s ease-out both;
 }
 
+:global(.dark-theme) .news-item {
+  background: rgba(45, 45, 45, 0.9);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
 .news-item:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
   border-color: #667eea;
+}
+
+:global(.dark-theme) .news-item:hover {
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
 }
 
 .thumbnail {
@@ -142,6 +207,11 @@
   background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
   position: relative;
   overflow: hidden;
+  transition: background 0.3s ease;
+}
+
+:global(.dark-theme) .thumbnail {
+  background: linear-gradient(45deg, #404040, #303030);
 }
 
 .thumbnail::before {
@@ -167,6 +237,11 @@
   color: #2d3748;
   line-height: 1.4;
   margin-bottom: 5px;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .news-title {
+  color: #e2e8f0;
 }
 
 .news-summary {
@@ -174,6 +249,11 @@
   font-size: 0.95rem;
   line-height: 1.5;
   margin-bottom: 10px;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .news-summary {
+  color: #a0aec0;
 }
 
 .news-meta {
@@ -182,6 +262,11 @@
   gap: 15px;
   font-size: 0.85rem;
   color: #a0aec0;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .news-meta {
+  color: #718096;
 }
 
 .news-date,
@@ -223,6 +308,10 @@
 
 .bookmark-btn.active {
   color: #f6ad55;
+}
+
+:global(.dark-theme) .bookmark-btn {
+  color: #4a5568;
 }
 
 .share-btn {
@@ -270,7 +359,6 @@
 @media (max-width: 768px) {
   .container {
     padding: 10px;
-    /* margin: 10px; */
   }
 
   .news-item {

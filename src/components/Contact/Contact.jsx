@@ -54,8 +54,37 @@ const ContactUsPage = () => {
     const [success, setSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(false);
     const { settings } = useGlobalData();
     const contact = settings?.[0] || {};
+
+    // Check for dark mode on mount and listen for changes
+    useEffect(() => {
+        const checkDarkMode = () => {
+            setIsDarkMode(document.documentElement.classList.contains('dark-theme'));
+        };
+
+        // Initial check
+        checkDarkMode();
+
+        // Create observer to watch for class changes on document element
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    checkDarkMode();
+                }
+            });
+        });
+
+        // Start observing
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
+        // Cleanup
+        return () => observer.disconnect();
+    }, []);
 
     // Check screen size on mount and resize
     useEffect(() => {
@@ -188,11 +217,56 @@ const ContactUsPage = () => {
         }
     };
 
+    // Theme-aware colors
+    const getThemeColors = () => {
+        if (isDarkMode) {
+            return {
+                background: '#1a1a1a',
+                cardBackground: '#2d2d2d',
+                textPrimary: '#ffffff',
+                textSecondary: '#b0b0b0',
+                borderColor: '#404040',
+                inputBackground: '#383838',
+                inputBorder: '#505050',
+                inputBorderFocus: '#3498db',
+                inputBorderError: '#e74c3c',
+                errorBackground: '#4a2c2c',
+                successBackground: '#2c4a2c',
+                successBorder: '#4a6b4a',
+                successText: '#8fbc8f',
+                contactItemBackground: '#383838',
+                placeholderColor: '#888888'
+            };
+        } else {
+            return {
+                background: '#f8f9fa',
+                cardBackground: '#ffffff',
+                textPrimary: '#2c3e50',
+                textSecondary: '#6c757d',
+                borderColor: '#e9ecef',
+                inputBackground: '#fff',
+                inputBorder: '#e9ecef',
+                inputBorderFocus: '#3498db',
+                inputBorderError: '#e74c3c',
+                errorBackground: '#fdf2f2',
+                successBackground: '#d4edda',
+                successBorder: '#c3e6cb',
+                successText: '#155724',
+                contactItemBackground: '#f8f9fa',
+                placeholderColor: '#666666'
+            };
+        }
+    };
+
+    const colors = getThemeColors();
+
     const styles = {
         pageContainer: {
             minHeight: '100vh',
-            backgroundColor: '#f8f9fa',
-            padding: '20px 0'
+            backgroundColor: colors.background,
+            padding: '20px 0',
+            color: colors.textPrimary,
+            transition: 'background-color 0.3s ease, color 0.3s ease'
         },
         container: {
             maxWidth: '1200px',
@@ -207,7 +281,7 @@ const ContactUsPage = () => {
         title: {
             fontSize: isMobile ? '2.5rem' : '3rem',
             fontWeight: 'bold',
-            color: '#2c3e50',
+            color: colors.textPrimary,
             marginBottom: '16px',
             position: 'relative'
         },
@@ -221,7 +295,7 @@ const ContactUsPage = () => {
         },
         subtitle: {
             fontSize: '1.2rem',
-            color: '#6c757d',
+            color: colors.textSecondary,
             maxWidth: '600px',
             margin: '0 auto',
             lineHeight: '1.6'
@@ -233,16 +307,17 @@ const ContactUsPage = () => {
             alignItems: 'start'
         },
         formContainer: {
-            backgroundColor: 'white',
+            backgroundColor: colors.cardBackground,
             padding: isMobile ? '30px 20px' : '40px',
             borderRadius: '12px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #e9ecef'
+            boxShadow: isDarkMode ? '0 4px 6px rgba(0, 0, 0, 0.3)' : '0 4px 6px rgba(0, 0, 0, 0.1)',
+            border: `1px solid ${colors.borderColor}`,
+            transition: 'background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease'
         },
         formTitle: {
             fontSize: '1.5rem',
             fontWeight: '600',
-            color: '#2c3e50',
+            color: colors.textPrimary,
             marginBottom: '30px'
         },
         formGrid: {
@@ -262,7 +337,7 @@ const ContactUsPage = () => {
             display: 'block',
             marginBottom: '8px',
             fontWeight: '600',
-            color: '#2c3e50',
+            color: colors.textPrimary,
             fontSize: '0.95rem'
         },
         required: {
@@ -271,54 +346,54 @@ const ContactUsPage = () => {
         input: {
             width: '100%',
             padding: '12px 16px',
-            border: '2px solid #e9ecef',
+            border: `2px solid ${colors.inputBorder}`,
             borderRadius: '8px',
             fontSize: '1rem',
             transition: 'all 0.3s ease',
-            backgroundColor: '#fff',
+            backgroundColor: colors.inputBackground,
             fontFamily: 'inherit',
             boxSizing: 'border-box',
-            color: 'black'
+            color: colors.textPrimary
         },
         inputFocus: {
-            borderColor: '#3498db',
+            borderColor: colors.inputBorderFocus,
             boxShadow: '0 0 0 3px rgba(52, 152, 219, 0.1)'
         },
         inputError: {
-            borderColor: '#e74c3c',
-            backgroundColor: '#fdf2f2'
+            borderColor: colors.inputBorderError,
+            backgroundColor: colors.errorBackground
         },
         textarea: {
             width: '100%',
             padding: '12px 16px',
-            border: '2px solid #e9ecef',
+            border: `2px solid ${colors.inputBorder}`,
             borderRadius: '8px',
             fontSize: '1rem',
             transition: 'all 0.3s ease',
-            backgroundColor: '#fff',
+            backgroundColor: colors.inputBackground,
             fontFamily: 'inherit',
             resize: 'vertical',
             minHeight: '120px',
             boxSizing: 'border-box',
-            color: 'black'
+            color: colors.textPrimary
         },
         select: {
             width: '100%',
             padding: '12px 16px',
-            border: '2px solid #e9ecef',
+            border: `2px solid ${colors.inputBorder}`,
             borderRadius: '8px',
             fontSize: '1rem',
             transition: 'all 0.3s ease',
-            backgroundColor: '#fff',
+            backgroundColor: colors.inputBackground,
             fontFamily: 'inherit',
             appearance: 'none',
-            backgroundImage: "url(\"data:image/svg+xml,%3csvg viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e\")",
+            backgroundImage: `url("data:image/svg+xml,%3csvg viewBox='0 0 24 24' fill='none' stroke='${isDarkMode ? '%23fff' : '%23666'}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e")`,
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'right 12px center',
             backgroundSize: '16px',
             paddingRight: '40px',
             boxSizing: 'border-box',
-            color: 'black'
+            color: colors.textPrimary
         },
         checkboxContainer: {
             display: 'flex',
@@ -333,7 +408,7 @@ const ContactUsPage = () => {
         },
         checkboxLabel: {
             fontSize: '0.95rem',
-            color: '#2c3e50',
+            color: colors.textPrimary,
             cursor: 'pointer'
         },
         errorMessage: {
@@ -368,29 +443,31 @@ const ContactUsPage = () => {
             transform: 'none'
         },
         successMessage: {
-            backgroundColor: '#d4edda',
-            color: '#155724',
-            border: '1px solid #c3e6cb',
+            backgroundColor: colors.successBackground,
+            color: colors.successText,
+            border: `1px solid ${colors.successBorder}`,
             padding: '16px 20px',
             borderRadius: '8px',
             marginBottom: '24px',
             textAlign: 'center',
-            fontWeight: '500'
+            fontWeight: '500',
+            transition: 'all 0.3s ease'
         },
         contactInfo: {
-            backgroundColor: 'white',
+            backgroundColor: colors.cardBackground,
             padding: isMobile ? '30px 20px' : '40px 30px',
             borderRadius: '12px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #e9ecef',
+            boxShadow: isDarkMode ? '0 4px 6px rgba(0, 0, 0, 0.3)' : '0 4px 6px rgba(0, 0, 0, 0.1)',
+            border: `1px solid ${colors.borderColor}`,
             height: 'fit-content',
             position: isMobile ? 'relative' : 'sticky',
-            top: isMobile ? 'auto' : '20px'
+            top: isMobile ? 'auto' : '20px',
+            transition: 'background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease'
         },
         contactInfoTitle: {
             fontSize: '1.4rem',
             fontWeight: '600',
-            color: '#2c3e50',
+            color: colors.textPrimary,
             marginBottom: '30px'
         },
         contactItem: {
@@ -399,9 +476,10 @@ const ContactUsPage = () => {
             gap: '15px',
             marginBottom: '25px',
             padding: '20px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: colors.contactItemBackground,
             borderRadius: '8px',
-            border: '1px solid #e9ecef'
+            border: `1px solid ${colors.borderColor}`,
+            transition: 'background-color 0.3s ease, border-color 0.3s ease'
         },
         contactIcon: {
             fontSize: '1.5rem',
@@ -413,12 +491,12 @@ const ContactUsPage = () => {
         contactTitle: {
             fontSize: '1rem',
             fontWeight: '600',
-            color: '#2c3e50',
+            color: colors.textPrimary,
             marginBottom: '5px'
         },
         contactText: {
             fontSize: '0.9rem',
-            color: '#6c757d',
+            color: colors.textSecondary,
             lineHeight: '1.4'
         }
     };
@@ -607,7 +685,7 @@ const ContactUsPage = () => {
                                     >
                                         <option value="">Select your category</option>
                                         {categories.map(category => (
-                                            <option key={category} value={category} style={{ color: '#6c757d' }}>{category}</option>
+                                            <option key={category} value={category} style={{ color: colors.textSecondary }}>{category}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -671,6 +749,50 @@ const ContactUsPage = () => {
                     </div>
 
                     <ContactInfoSection />
+                </div>
+            </div>
+
+            {/* Demo controls for testing */}
+            <div style={{
+                position: 'fixed',
+                bottom: '20px',
+                right: '20px',
+                backgroundColor: colors.cardBackground,
+                padding: '15px',
+                borderRadius: '8px',
+                border: `1px solid ${colors.borderColor}`,
+                boxShadow: isDarkMode ? '0 4px 6px rgba(0, 0, 0, 0.3)' : '0 4px 6px rgba(0, 0, 0, 0.1)',
+                zIndex: 1000,
+                transition: 'all 0.3s ease'
+            }}>
+                <button
+                    onClick={() => {
+                        if (document.documentElement.classList.contains('dark-theme')) {
+                            document.documentElement.classList.remove('dark-theme');
+                        } else {
+                            document.documentElement.classList.add('dark-theme');
+                        }
+                    }}
+                    style={{
+                        backgroundColor: '#3498db',
+                        color: 'white',
+                        border: 'none',
+                        padding: '8px 16px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                    }}
+                >
+                    Toggle Dark Mode
+                </button>
+                <div style={{ 
+                    fontSize: '12px', 
+                    color: colors.textSecondary, 
+                    marginTop: '8px',
+                    textAlign: 'center' 
+                }}>
+                    Demo: {isDarkMode ? 'Dark' : 'Light'} Mode
                 </div>
             </div>
         </div>

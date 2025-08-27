@@ -2,6 +2,11 @@
   min-height: 100vh;
   background-color: #f8f9fa;
   padding: 20px 0;
+  transition: background-color 0.3s ease;
+}
+
+:global(.dark-theme) .pageContainer {
+  background-color: #1a1a2e;
 }
 
 .container {
@@ -22,6 +27,11 @@
   color: #2c3e50;
   margin-bottom: 16px;
   position: relative;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .title {
+  color: #f7fafc;
 }
 
 .titleUnderline {
@@ -39,6 +49,11 @@
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .subtitle {
+  color: #cbd5e0;
 }
 
 .mainContent {
@@ -54,6 +69,13 @@
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+:global(.dark-theme) .formContainer {
+  background-color: #2d3748;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  border-color: #4a5568;
 }
 
 .formTitle {
@@ -61,6 +83,11 @@
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 30px;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .formTitle {
+  color: #f7fafc;
 }
 
 .formGrid {
@@ -85,10 +112,19 @@
   font-weight: 600;
   color: #2c3e50;
   font-size: 0.95rem;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .label {
+  color: #e2e8f0;
 }
 
 .required {
   color: #e74c3c;
+}
+
+:global(.dark-theme) .required {
+  color: #fc8181;
 }
 
 .input {
@@ -101,16 +137,42 @@
   background-color: #fff;
   font-family: inherit;
   box-sizing: border-box;
+  color: #2c3e50;
 }
 
-.inputFocus {
+:global(.dark-theme) .input {
+  background-color: #4a5568;
+  border-color: #718096;
+  color: #f7fafc;
+}
+
+.input:focus {
   border-color: #3498db;
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  outline: none;
+}
+
+:global(.dark-theme) .input:focus {
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2);
+}
+
+.input::placeholder {
+  color: #a0aec0;
+}
+
+:global(.dark-theme) .input::placeholder {
+  color: #718096;
 }
 
 .inputError {
   border-color: #e74c3c;
   background-color: #fdf2f2;
+}
+
+:global(.dark-theme) .inputError {
+  border-color: #fc8181;
+  background-color: #742a2a;
 }
 
 .textarea {
@@ -125,6 +187,32 @@
   resize: vertical;
   min-height: 120px;
   box-sizing: border-box;
+  color: #2c3e50;
+}
+
+:global(.dark-theme) .textarea {
+  background-color: #4a5568;
+  border-color: #718096;
+  color: #f7fafc;
+}
+
+.textarea:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  outline: none;
+}
+
+:global(.dark-theme) .textarea:focus {
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2);
+}
+
+.textarea::placeholder {
+  color: #a0aec0;
+}
+
+:global(.dark-theme) .textarea::placeholder {
+  color: #718096;
 }
 
 .select {
@@ -143,6 +231,35 @@
   background-size: 16px;
   padding-right: 40px;
   box-sizing: border-box;
+  color: #2c3e50;
+}
+
+:global(.dark-theme) .select {
+  background-color: #4a5568;
+  border-color: #718096;
+  color: #f7fafc;
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 24 24' fill='none' stroke='%23cbd5e0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+.select:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  outline: none;
+}
+
+:global(.dark-theme) .select:focus {
+  border-color: #63b3ed;
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.2);
+}
+
+.select option {
+  background-color: #fff;
+  color: #2c3e50;
+}
+
+:global(.dark-theme) .select option {
+  background-color: #4a5568;
+  color: #f7fafc;
 }
 
 .checkboxContainer {
@@ -158,10 +275,19 @@
   accent-color: #3498db;
 }
 
+:global(.dark-theme) .checkbox {
+  accent-color: #63b3ed;
+}
+
 .checkboxLabel {
   font-size: 0.95rem;
   color: #2c3e50;
   cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .checkboxLabel {
+  color: #e2e8f0;
 }
 
 .errorMessage {
@@ -171,6 +297,10 @@
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+:global(.dark-theme) .errorMessage {
+  color: #fc8181;
 }
 
 .submitButton {
@@ -187,16 +317,25 @@
   margin-top: 10px;
 }
 
-.submitButtonHover {
+.submitButton:hover:not(:disabled) {
   background-color: #2980b9;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
 }
 
-.submitButtonDisabled {
+:global(.dark-theme) .submitButton:hover:not(:disabled) {
+  background-color: #4299e1;
+  box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
+}
+
+.submitButton:disabled {
   background-color: #bdc3c7;
   cursor: not-allowed;
   transform: none;
+}
+
+:global(.dark-theme) .submitButton:disabled {
+  background-color: #718096;
 }
 
 .successMessage {
@@ -208,6 +347,13 @@
   margin-bottom: 24px;
   text-align: center;
   font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+:global(.dark-theme) .successMessage {
+  background-color: #276749;
+  color: #9ae6b4;
+  border-color: #38a169;
 }
 
 .contactInfo {
@@ -219,6 +365,13 @@
   height: fit-content;
   position: sticky;
   top: 20px;
+  transition: all 0.3s ease;
+}
+
+:global(.dark-theme) .contactInfo {
+  background-color: #2d3748;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  border-color: #4a5568;
 }
 
 .contactInfoTitle {
@@ -226,6 +379,11 @@
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 30px;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .contactInfoTitle {
+  color: #f7fafc;
 }
 
 .contactItem {
@@ -237,6 +395,12 @@
   background-color: #f8f9fa;
   border-radius: 8px;
   border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+:global(.dark-theme) .contactItem {
+  background-color: #4a5568;
+  border-color: #718096;
 }
 
 .contactIcon {
@@ -253,12 +417,22 @@
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 5px;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .contactTitle {
+  color: #f7fafc;
 }
 
 .contactText {
   font-size: 0.9rem;
   color: #6c757d;
   line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .contactText {
+  color: #cbd5e0;
 }
 
 @media (max-width: 768px) {
@@ -279,6 +453,7 @@
   .contactInfo {
     position: relative;
     top: auto;
+    padding: 30px 20px;
   }
 
   .title {

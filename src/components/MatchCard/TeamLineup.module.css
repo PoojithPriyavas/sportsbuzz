@@ -3,6 +3,12 @@
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+:global(.dark-theme) .teamLineup {
+    background: #2d3748;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .teamLineup h4 {
@@ -10,6 +16,11 @@
     margin-bottom: 10px;
     font-size: 1.2em;
     color: #333;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .teamLineup h4 {
+    color: #e2e8f0;
 }
 
 .lineupFormation {
@@ -24,6 +35,10 @@
     width: 100%;
 }
 
+:global(.dark-theme) .lineupFormation {
+    background: linear-gradient(135deg, #0a0a1a 0%, #0d1426 50%, #061d38 100%);
+}
+
 .positionGroup {
     margin-bottom: 25px;
 }
@@ -36,6 +51,13 @@
     background: #f8f9fa;
     border-radius: 8px;
     border-left: 4px solid #667eea;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+:global(.dark-theme) .positionTitle {
+    color: #e2e8f0;
+    background: #1a202c;
+    border-left: 4px solid #90cdf4;
 }
 
 .playerLineup {
@@ -48,9 +70,17 @@
     transition: all 0.3s ease;
 }
 
+:global(.dark-theme) .playerLineup {
+    background: #4a5568;
+}
+
 .playerLineup:hover {
     background: #e3f2fd;
     transform: translateX(5px);
+}
+
+:global(.dark-theme) .playerLineup:hover {
+    background: #2b6cb0;
 }
 
 .jerseyNumber {
@@ -65,10 +95,19 @@
     margin-right: 15px;
 }
 
+:global(.dark-theme) .jerseyNumber {
+    background: linear-gradient(135deg, #0a0a1a 0%, #0d1426 50%, #061d38 100%);
+}
+
 .playerInfo {
     flex: 1;
     font-weight: 500;
     color: #333;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .playerInfo {
+    color: #e2e8f0;
 }
 
 .subIndicator {
@@ -84,6 +123,11 @@
     margin-top: 20px;
     padding-top: 20px;
     border-top: 2px solid #e9ecef;
+    transition: border-color 0.3s ease;
+}
+
+:global(.dark-theme) .substitutesSection {
+    border-top: 2px solid #4a5568;
 }
 
 .subsTitle {
@@ -94,6 +138,13 @@
     background: #fff3cd;
     border-radius: 8px;
     border-left: 4px solid #ffc107;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+:global(.dark-theme) .subsTitle {
+    color: #e2e8f0;
+    background: #2d2d48;
+    border-left: 4px solid #f6e05e;
 }
 
 .substituteList {
@@ -109,6 +160,11 @@
     background: #f8f9fa;
     border-radius: 6px;
     font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+:global(.dark-theme) .substituteItem {
+    background: #1a202c;
 }
 
 .substituteItem .jerseyNumber {
@@ -118,9 +174,18 @@
     font-size: 0.8em;
 }
 
+:global(.dark-theme) .substituteItem .jerseyNumber {
+    background: #4a5568;
+}
+
 .substituteItem .playerInfo {
     flex: 1;
     color: #666;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .substituteItem .playerInfo {
+    color: #a0aec0;
 }
 
 .subUsed {

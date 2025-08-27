@@ -884,3 +884,214 @@
         min-width: 280px;
     }
 }
+/* Add these dark theme styles to your BettingCard.module.css file */
+
+/* Dark theme styles - triggered when .dark-theme class is added to document root */
+:global(.dark-theme) .bettingContainer {
+    background: #1a1a1a;
+}
+
+:global(.dark-theme) .pageContainer {
+    background: #0f172a;
+}
+
+:global(.dark-theme) .pageContainer::before {
+    background: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+}
+
+:global(.dark-theme) .pageTitle {
+    color: #f1f5f9;
+}
+
+/* Dropdown styling for dark theme */
+:global(.dark-theme) .dropdownHeader {
+    background: #1e293b;
+    border-color: rgba(139, 92, 246, 0.2);
+    color: #f1f5f9;
+}
+
+:global(.dark-theme) .dropdownHeader:hover {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: #8b5cf6;
+}
+
+:global(.dark-theme) .dropdownOptions {
+    background: #1e293b;
+    border-color: rgba(139, 92, 246, 0.2);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark-theme) .dropdownOption {
+    color: #f1f5f9;
+    border-bottom-color: rgba(51, 65, 85, 0.5);
+}
+
+:global(.dark-theme) .dropdownOption:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.1));
+    color: #a78bfa;
+}
+
+:global(.dark-theme) .dropdownOption.selected {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.2));
+    color: #a78bfa;
+}
+
+/* Card styling for dark theme */
+:global(.dark-theme) .bettingCard {
+    background: #1e293b;
+    border-color: rgba(139, 92, 246, 0.2);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1),
+        0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+:global(.dark-theme) .bettingCard:hover {
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 8px 40px rgba(139, 92, 246, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark-theme) .providerHeader {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+:global(.dark-theme) .matchHeader {
+    background: linear-gradient(135deg, #334155, #475569);
+    color: #f1f5f9;
+    border-bottom-color: rgba(139, 92, 246, 0.2);
+}
+
+:global(.dark-theme) .matchType {
+    color: #a78bfa;
+}
+
+:global(.dark-theme) .matchInfo {
+    color: #94a3b8;
+}
+
+:global(.dark-theme) .teamsSection {
+    background: #1e293b;
+}
+
+:global(.dark-theme) .teamName {
+    color: #f1f5f9;
+}
+
+:global(.dark-theme) .vs {
+    color: #94a3b8;
+}
+
+:global(.dark-theme) .vs::before,
+:global(.dark-theme) .vs::after {
+    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent);
+}
+
+/* Odds section dark theme */
+:global(.dark-theme) .oddsSection {
+    background: #334155;
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+:global(.dark-theme) .oddsTitle {
+    color: #94a3b8;
+}
+
+:global(.dark-theme) .oddButton {
+    background: #475569;
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+:global(.dark-theme) .oddButton:hover {
+    border-color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.1);
+}
+
+:global(.dark-theme) .oddButton.selected {
+    background: #8b5cf6;
+    border-color: #8b5cf6;
+}
+
+:global(.dark-theme) .oddLabel {
+    color: #94a3b8;
+}
+
+:global(.dark-theme) .oddValue {
+    color: #f1f5f9;
+}
+
+/* Betting section dark theme */
+:global(.dark-theme) .betInput {
+    background: #475569;
+    border-color: rgba(139, 92, 246, 0.2);
+    color: #f1f5f9;
+}
+
+:global(.dark-theme) .betInput::placeholder {
+    color: #64748b;
+}
+
+:global(.dark-theme) .betInput:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+:global(.dark-theme) .placeBetBtn {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+:global(.dark-theme) .placeBetBtn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+}
+
+:global(.dark-theme) .placeBetBtn:disabled {
+    background: #475569;
+    color: #64748b;
+}
+
+:global(.dark-theme) .potentialWin {
+    background: linear-gradient(135deg, #059669, #047857);
+}
+
+:global(.dark-theme) .betHistory {
+    background: #334155;
+    border-top-color: rgba(139, 92, 246, 0.2);
+    color: #94a3b8;
+}
+
+:global(.dark-theme) .noDataMessage {
+    color: #94a3b8;
+}
+
+/* Skeleton loader dark theme */
+:global(.dark-theme) .skeleton {
+    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+}
+
+:global(.dark-theme) .skeletonCard {
+    background: #1e293b;
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+/* Scrollbar dark theme */
+:global(.dark-theme) .dropdownOptions::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+:global(.dark-theme) .dropdownOptions::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.6), rgba(124, 58, 237, 0.6));
+}
+
+:global(.dark-theme) .dropdownOptions::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(124, 58, 237, 0.8));
+}
+
+/* Responsive adjustments for dark theme */
+@media (max-width: 768px) {
+    :global(.dark-theme) .bettingContainer {
+        background: #1a1a1a;
+    }
+    
+    :global(.dark-theme) .bettingCard {
+        background: #1e293b;
+    }
+}

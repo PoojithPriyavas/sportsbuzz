@@ -1,4 +1,4 @@
-/* Enhanced Betting Apps Table Styling - Fully Responsive */
+/* Enhanced Betting Apps Table Styling - Fully Responsive with Dark Mode */
 
 /* Base wrapper styles */
 .wrapper {
@@ -8,6 +8,12 @@
   /* padding: 0 15px; */
 }
 
+/* Smooth transitions for theme changes - Applied to wrapper and children */
+.wrapper,
+.wrapper * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
 /* Table Container for horizontal scroll fallback */
 .tableContainer {
   width: 100%;
@@ -15,6 +21,11 @@
   -webkit-overflow-scrolling: touch;
   border-radius: 15px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark mode table container */
+:global(.dark-theme) .tableContainer {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
 /* Desktop Table Styles */
@@ -28,6 +39,12 @@
   border: none;
   margin-bottom: 0px;
   position: relative;
+}
+
+/* Dark mode table */
+:global(.dark-theme) .table {
+  background: #1a1a2e;
+  color: #e0e0e0;
 }
 
 .table::before {
@@ -44,6 +61,11 @@
 .table thead tr {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
+}
+
+/* Dark mode header */
+:global(.dark-theme) .table thead tr {
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
 }
 
 .table thead tr th {
@@ -65,16 +87,32 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
+/* Dark mode row borders */
+:global(.dark-theme) .table tbody tr {
+  border-bottom: 1px solid #2d3748;
+}
+
 .table tbody tr:hover {
   background: linear-gradient(135deg, #f8f9ff 0%, #e6f3ff 100%);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
+/* Dark mode row hover */
+:global(.dark-theme) .table tbody tr:hover {
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
 .table tbody tr td {
   padding: 20px 15px;
   vertical-align: middle;
   border-bottom: none;
+}
+
+/* Dark mode table cells */
+:global(.dark-theme) .table tbody tr td {
+  color: #e0e0e0;
 }
 
 /* Rank Cell Styling */
@@ -95,6 +133,12 @@
   background: linear-gradient(135deg, #FFD700, #FFA500);
   color: #333;
   font-size: 18px;
+}
+
+/* Dark mode rank badge */
+:global(.dark-theme) .rankBadge {
+  background: linear-gradient(135deg, #f6ad55, #ed8936);
+  color: #1a202c;
 }
 
 .rankBadge::before {
@@ -132,6 +176,11 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
+/* Dark mode site image hover */
+:global(.dark-theme) .site img:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
 /* Features Cell Styling */
 .features {
   font-size: 14px;
@@ -151,12 +200,22 @@
   position: relative;
 }
 
+/* Dark mode features */
+:global(.dark-theme) .features li {
+  color: #cbd5e0;
+}
+
 .features li::before {
   content: '✓';
   position: absolute;
   left: -20px;
   color: #4CAF50;
   font-weight: bold;
+}
+
+/* Dark mode checkmarks */
+:global(.dark-theme) .features li::before {
+  color: #68d391;
 }
 
 /* Bonus Cell Styling */
@@ -176,6 +235,12 @@
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
+/* Dark mode bonus amount */
+:global(.dark-theme) .bonus .amount {
+  color: #f7fafc !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
 .codeBtn {
   padding: 8px 16px;
   margin: 8px 0;
@@ -193,9 +258,19 @@
   width: 100%;
 }
 
+/* Dark mode code button */
+:global(.dark-theme) .codeBtn {
+  background: linear-gradient(135deg, #4a5568, #2d3748);
+}
+
 .codeBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Dark mode code button hover */
+:global(.dark-theme) .codeBtn:hover {
+  box-shadow: 0 5px 15px rgba(74, 85, 104, 0.6);
 }
 
 .stars {
@@ -205,6 +280,11 @@
   justify-content: center;
   gap: 2px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Dark mode stars */
+:global(.dark-theme) .stars {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
 /* Actions Cell Styling */
@@ -236,10 +316,22 @@
   text-align: center;
 }
 
+/* Dark mode get button */
+:global(.dark-theme) .getBtn {
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+  box-shadow: 0 4px 15px rgba(229, 62, 62, 0.4);
+}
+
 .getBtn:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
   background: linear-gradient(135deg, #ff5252, #e53935);
+}
+
+/* Dark mode get button hover */
+:global(.dark-theme) .getBtn:hover {
+  box-shadow: 0 8px 25px rgba(229, 62, 62, 0.6);
+  background: linear-gradient(135deg, #fc8181, #e53e3e);
 }
 
 .actions .codeBtn {
@@ -258,11 +350,25 @@
   transition: all 0.3s ease;
 }
 
+/* Dark mode actions code button */
+:global(.dark-theme) .actions .codeBtn {
+  border: 2px dotted #4fd1c7;
+  background: linear-gradient(135deg, #2d3748, #4a5568);
+  color: #4fd1c7;
+}
+
 .actions .codeBtn:hover {
   background: linear-gradient(135deg, #4ecdc4, #44b3a8);
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+}
+
+/* Dark mode actions code button hover */
+:global(.dark-theme) .actions .codeBtn:hover {
+  background: linear-gradient(135deg, #4fd1c7, #38b2ac);
+  color: #1a202c;
+  box-shadow: 0 5px 15px rgba(79, 209, 199, 0.4);
 }
 
 /* Mobile Card Layout */
@@ -281,9 +387,22 @@
   transition: all 0.3s ease;
 }
 
+/* Dark mode mobile card */
+:global(.dark-theme) .mobileCard {
+  background: #1a1a2e;
+  color: #e0e0e0;
+  border: 1px solid #2d3748;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
 .mobileCard:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark mode mobile card hover */
+:global(.dark-theme) .mobileCard:hover {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
 }
 
 .mobileHeader {
@@ -293,6 +412,11 @@
   margin-bottom: 15px;
   padding-bottom: 15px;
   border-bottom: 2px solid #f8f9fa;
+}
+
+/* Dark mode mobile header */
+:global(.dark-theme) .mobileHeader {
+  border-bottom: 2px solid #2d3748;
 }
 
 .mobileRank {
@@ -306,6 +430,12 @@
   text-align: center;
 }
 
+/* Dark mode mobile rank */
+:global(.dark-theme) .mobileRank {
+  background: linear-gradient(135deg, #f6ad55, #ed8936);
+  color: #1a202c;
+}
+
 .mobileLogo {
   max-width: 60px;
   height: auto;
@@ -316,6 +446,11 @@
 .mobileStars {
   font-size: 16px;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Dark mode mobile stars */
+:global(.dark-theme) .mobileStars {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
 .mobileContent {
@@ -335,6 +470,11 @@
   letter-spacing: 0.5px;
 }
 
+/* Dark mode mobile section headers */
+:global(.dark-theme) .mobileSection h4 {
+  color: #cbd5e0;
+}
+
 .mobileSection ul {
   margin: 0;
   padding-left: 20px;
@@ -348,12 +488,22 @@
   font-size: 13px;
 }
 
+/* Dark mode mobile section list items */
+:global(.dark-theme) .mobileSection li {
+  color: #a0aec0;
+}
+
 .mobileSection li::before {
   content: '✓';
   position: absolute;
   left: -20px;
   color: #4CAF50;
   font-weight: bold;
+}
+
+/* Dark mode mobile section checkmarks */
+:global(.dark-theme) .mobileSection li::before {
+  color: #68d391;
 }
 
 .mobileBonusAmount {
@@ -365,6 +515,12 @@
   background: linear-gradient(135deg, #fff5f5, #ffe5e5);
   border-radius: 8px;
   margin-bottom: 10px;
+}
+
+/* Dark mode mobile bonus amount */
+:global(.dark-theme) .mobileBonusAmount {
+  color: #f7fafc;
+  background: linear-gradient(135deg, #2d3748, #4a5568);
 }
 
 .mobileActions {
@@ -389,9 +545,20 @@
   box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
 }
 
+/* Dark mode mobile get button */
+:global(.dark-theme) .mobileGetBtn {
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+  box-shadow: 0 4px 15px rgba(229, 62, 62, 0.4);
+}
+
 .mobileGetBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+/* Dark mode mobile get button hover */
+:global(.dark-theme) .mobileGetBtn:hover {
+  box-shadow: 0 6px 20px rgba(229, 62, 62, 0.5);
 }
 
 .mobileCodeBtn {
@@ -408,10 +575,23 @@
   transition: all 0.3s ease;
 }
 
+/* Dark mode mobile code button */
+:global(.dark-theme) .mobileCodeBtn {
+  border: 2px dotted #4fd1c7;
+  background: linear-gradient(135deg, #2d3748, #4a5568);
+  color: #4fd1c7;
+}
+
 .mobileCodeBtn:hover {
   background: linear-gradient(135deg, #4ecdc4, #44b3a8);
   color: white;
   transform: translateY(-2px);
+}
+
+/* Dark mode mobile code button hover */
+:global(.dark-theme) .mobileCodeBtn:hover {
+  background: linear-gradient(135deg, #4fd1c7, #38b2ac);
+  color: #1a202c;
 }
 
 .mobileReviewBtn {
@@ -428,9 +608,19 @@
   transition: all 0.3s ease;
 }
 
+/* Dark mode mobile review button */
+:global(.dark-theme) .mobileReviewBtn {
+  background: linear-gradient(135deg, #4a5568, #2d3748);
+}
+
 .mobileReviewBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Dark mode mobile review button hover */
+:global(.dark-theme) .mobileReviewBtn:hover {
+  box-shadow: 0 4px 12px rgba(74, 85, 104, 0.4);
 }
 
 /* Heading Styling */
@@ -446,6 +636,11 @@
   padding-bottom: 15px;
 }
 
+/* Dark mode heading */
+:global(.dark-theme) .heading {
+  color: #f7fafc;
+}
+
 .heading::after {
   content: '';
   position: absolute;
@@ -458,8 +653,56 @@
   border-radius: 2px;
 }
 
+/* Dark mode heading underline */
+:global(.dark-theme) .heading::after {
+  background: linear-gradient(90deg, #e53e3e, #4fd1c7, #63b3ed);
+}
+
 .heading * {
   color: #333 !important;
+}
+
+/* Dark mode heading children */
+:global(.dark-theme) .heading * {
+  color: #f7fafc !important;
+}
+
+/* Description styling */
+.description {
+  color: #333;
+  line-height: 1.6;
+  margin-top: 20px;
+}
+
+/* Dark mode description */
+:global(.dark-theme) .description {
+  color: #cbd5e0;
+}
+
+.description * {
+  color: inherit;
+}
+
+/* Loading indicator for sport changes */
+.loadingIndicator {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* Additional dark mode improvements */
+:global(.dark-theme) .wrapper {
+  background-color: transparent;
+}
+
+/* Ensure proper text color inheritance in dark mode */
+:global(.dark-theme) .features,
+:global(.dark-theme) .mobileSection {
+  color: #cbd5e0;
+}
+
+:global(.dark-theme) .features *,
+:global(.dark-theme) .mobileSection * {
+  color: inherit;
 }
 
 /* Responsive Breakpoints */
@@ -594,4 +837,3 @@
     font-size: 11px;
   }
 }
-

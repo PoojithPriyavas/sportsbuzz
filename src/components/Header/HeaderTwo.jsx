@@ -53,6 +53,43 @@ const HeaderTwo = ({ animationStage }) => {
         upcomingMatches
     } = useGlobalData();
 
+    // Initialize dark mode from localStorage
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+            setDarkMode(savedDarkMode);
+            // Apply theme immediately
+            if (savedDarkMode) {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        }
+    }, []);
+
+    // Handle dark mode toggle
+    const toggleDarkMode = () => {
+        const newDarkMode = !darkMode;
+        setDarkMode(newDarkMode);
+        
+        // Save to localStorage
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('darkMode', newDarkMode.toString());
+        }
+        
+        // Apply theme to document
+        if (newDarkMode) {
+            document.documentElement.classList.add('dark-theme');
+        } else {
+            document.documentElement.classList.remove('dark-theme');
+        }
+        
+        // Close mobile menu if open
+        if (isMobile) {
+            setMobileMenuOpen(false);
+        }
+    };
+
     // Initialize client-side state and check localStorage
     useEffect(() => {
         setIsClient(true);
@@ -600,6 +637,18 @@ const HeaderTwo = ({ animationStage }) => {
                     >
                         {translatedText.contact}
                     </Link>
+
+                    {/* Dark Mode Toggle in Mobile Menu */}
+                    {/* <div
+                        className={styles.mobileNavItem}
+                        onClick={toggleDarkMode}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <span>
+                            {darkMode ? <FaSun /> : <FaMoon />}
+                            {darkMode ? ' Light Mode' : ' Dark Mode'}
+                        </span>
+                    </div> */}
                 </div>
 
                 {/* Mobile Dropdown-style Selectors */}
@@ -734,6 +783,14 @@ const HeaderTwo = ({ animationStage }) => {
                 <div className={styles.mobileTopRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <FeaturedButton />
+                        {/* Dark Mode Toggle Button for Mobile Top Row */}
+                        <button
+                            className={styles.darkModeButton}
+                            onClick={toggleDarkMode}
+                            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                        >
+                            {darkMode ? <FaSun /> : <FaMoon />}
+                        </button>
                         <button
                             className={styles.mobileMenuButton}
                             onClick={toggleMobileMenu}
@@ -820,6 +877,15 @@ const HeaderTwo = ({ animationStage }) => {
                             <option value="football">{translatedText.football}</option>
                         </select>
                     </div>
+
+                    {/* Dark Mode Toggle Button for Desktop */}
+                    <button
+                        className={styles.darkModeButton}
+                        onClick={toggleDarkMode}
+                        title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                    >
+                        {darkMode ? <FaSun /> : <FaMoon />}
+                    </button>
 
                     <Link href="/contact" className={`${styles.navItem} ${pathname === '/contact' ? styles.active : ''}`}>
                         {translatedText.contact}

@@ -6,6 +6,14 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     border: 1px solid #e5e7eb;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for container */
+:global(.dark-theme) .football-matches-container {
+    background: #1f2937;
+    border-color: #374151;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .football-matches-header {
@@ -15,6 +23,13 @@
     padding: 16px 20px;
     border-bottom: 1px solid #e5e7eb;
     background: #f9fafb;
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for header */
+:global(.dark-theme) .football-matches-header {
+    background: #111827;
+    border-bottom-color: #374151;
 }
 
 .football-matches-title {
@@ -22,6 +37,12 @@
     font-weight: 600;
     margin: 0;
     color: #1f2937;
+    transition: color 0.3s ease;
+}
+
+/* Dark theme for title */
+:global(.dark-theme) .football-matches-title {
+    color: #f9fafb;
 }
 
 .football-matches-view-all {
@@ -34,6 +55,15 @@
 
 .football-matches-view-all:hover {
     color: #374151;
+}
+
+/* Dark theme for view all link */
+:global(.dark-theme) .football-matches-view-all {
+    color: #9ca3af;
+}
+
+:global(.dark-theme) .football-matches-view-all:hover {
+    color: #d1d5db;
 }
 
 .football-matches-list {
@@ -53,6 +83,15 @@
 
 .football-match-item:last-child {
     border-bottom: none;
+}
+
+/* Dark theme for match items */
+:global(.dark-theme) .football-match-item {
+    border-bottom-color: #374151;
+}
+
+:global(.dark-theme) .football-match-item:hover {
+    background-color: #374151;
 }
 
 .football-league-section {
@@ -77,18 +116,38 @@
     font-size: 10px;
     color: #6b7280;
     border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for league icon */
+:global(.dark-theme) .football-league-icon {
+    background: #374151;
+    color: #9ca3af;
+    border-color: #4b5563;
 }
 
 .football-league-title {
     font-size: 13px;
     color: #374151;
     font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+/* Dark theme for league title */
+:global(.dark-theme) .football-league-title {
+    color: #e5e7eb;
 }
 
 .football-league-subtitle {
     font-size: 13px;
     color: #6b7280;
     font-weight: 400;
+    transition: color 0.3s ease;
+}
+
+/* Dark theme for league subtitle */
+:global(.dark-theme) .football-league-subtitle {
+    color: #9ca3af;
 }
 
 .football-match-row {
@@ -109,12 +168,19 @@
     font-size: 14px;
     color: #1f2937;
     font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+/* Dark theme for time */
+:global(.dark-theme) .football-time {
+    color: #f3f4f6;
 }
 
 .football-status {
     font-size: 11px;
     color: #6b7280;
     margin-top: 2px;
+    transition: color 0.3s ease;
 }
 
 .football-status.live {
@@ -125,6 +191,19 @@
 .football-status.finished {
     color: #059669;
     font-weight: 500;
+}
+
+/* Dark theme for status */
+:global(.dark-theme) .football-status {
+    color: #9ca3af;
+}
+
+:global(.dark-theme) .football-status.live {
+    color: #ef4444;
+}
+
+:global(.dark-theme) .football-status.finished {
+    color: #10b981;
 }
 
 .football-teams-section {
@@ -151,12 +230,26 @@
     color: #374151;
     font-weight: bold;
     border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for team logo */
+:global(.dark-theme) .football-team-logo {
+    background: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
 }
 
 .football-team-name {
     font-size: 14px;
     color: #1f2937;
     font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+/* Dark theme for team name */
+:global(.dark-theme) .football-team-name {
+    color: #f3f4f6;
 }
 
 .football-score-section {
@@ -170,6 +263,12 @@
     font-size: 16px;
     color: #1f2937;
     font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+/* Dark theme for score */
+:global(.dark-theme) .football-score {
+    color: #f3f4f6;
 }
 
 .football-favorite-icon {
@@ -191,6 +290,15 @@
     color: #f59e0b;
 }
 
+/* Dark theme for favorite icon */
+:global(.dark-theme) .football-favorite-icon {
+    color: #6b7280;
+}
+
+:global(.dark-theme) .football-favorite-icon:hover {
+    color: #fbbf24;
+}
+
 /* Scrollbar styling for webkit browsers */
 .football-matches-list::-webkit-scrollbar {
     width: 6px;
@@ -207,4 +315,17 @@
 
 .football-matches-list::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
+}
+
+/* Dark theme for scrollbar */
+:global(.dark-theme) .football-matches-list::-webkit-scrollbar-track {
+    background: #374151;
+}
+
+:global(.dark-theme) .football-matches-list::-webkit-scrollbar-thumb {
+    background: #6b7280;
+}
+
+:global(.dark-theme) .football-matches-list::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
 }

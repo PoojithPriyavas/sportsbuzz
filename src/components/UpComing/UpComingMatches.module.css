@@ -134,3 +134,112 @@
 .details {
     color: #444;
 }
+
+/* Add these dark theme styles to your UpComingMatches.module.css file */
+
+/* Dark theme styles for the section */
+:global(.dark-theme) .section {
+    background: #1e293b;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+/* Header and title dark theme */
+:global(.dark-theme) .cricketMatchesTitle {
+    color: #f1f5f9;
+}
+
+/* Filter button dark theme */
+:global(.dark-theme) .filterButton {
+    background: #8b5cf6;
+    color: white;
+}
+
+:global(.dark-theme) .filterButton:hover {
+    background: #7c3aed;
+}
+
+/* Dropdown dark theme */
+:global(.dark-theme) .dropdown {
+    background: #334155;
+    border-color: rgba(139, 92, 246, 0.3);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark-theme) .dropdownItem {
+    color: #f1f5f9;
+}
+
+:global(.dark-theme) .dropdownItem:hover {
+    background: #475569;
+}
+
+:global(.dark-theme) .dropdownItem.active {
+    background: #8b5cf6;
+    color: white;
+}
+
+/* Scrollbar dark theme */
+:global(.dark-theme) .matchesContainer::-webkit-scrollbar-track {
+    background: #334155;
+}
+
+:global(.dark-theme) .matchesContainer::-webkit-scrollbar-thumb {
+    background: #64748b;
+}
+
+:global(.dark-theme) .matchesContainer::-webkit-scrollbar-thumb:hover {
+    background: #8b5cf6;
+}
+
+/* Match cards dark theme */
+:global(.dark-theme) .card {
+    background: #334155;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+:global(.dark-theme) .card:hover {
+    background: #3f4b5f;
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+/* Label styling for dark theme */
+:global(.dark-theme) .card .intl {
+    color: #a78bfa;
+    background-color: rgba(139, 92, 246, 0.2);
+    border-color: #8b5cf6;
+}
+
+:global(.dark-theme) .labels .upcoming {
+    background-color: #dc2626 !important;
+    color: white;
+}
+
+/* Teams text dark theme */
+:global(.dark-theme) .teams {
+    color: #f1f5f9 !important;
+}
+
+/* Details text dark theme */
+:global(.dark-theme) .details {
+    color: #cbd5e1;
+}
+
+/* No matches message dark theme */
+:global(.dark-theme) .noMatches {
+    color: #94a3b8;
+}
+
+/* Icon colors in dark theme */
+:global(.dark-theme) .details svg {
+    color: #8b5cf6;
+}
+
+/* Additional hover effects for better UX in dark theme */
+:global(.dark-theme) .card {
+    transition: all 0.2s ease;
+}
+
+:global(.dark-theme) .filterButton {
+    transition: all 0.2s ease;
+}

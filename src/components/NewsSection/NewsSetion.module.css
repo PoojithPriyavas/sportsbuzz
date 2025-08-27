@@ -1,4 +1,3 @@
-
 .container {
     /* max-width: 64rem;
     margin: 0 auto; */
@@ -6,12 +5,23 @@
     border-radius: 0.75rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     overflow: hidden;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+:global(.dark-theme) .container {
+    background-color: #1e293b;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
 }
 
 .header {
     background: linear-gradient(to right, #2563eb, #16a34a);
     color: white;
     padding: 1.5rem;
+    transition: background 0.3s ease;
+}
+
+:global(.dark-theme) .header {
+    background: linear-gradient(to right, #1e40af, #15803d);
 }
 
 .headerContent {
@@ -29,18 +39,29 @@
     font-weight: bold;
     margin-bottom: 0.5rem;
     line-height: 1.2;
+    color: white;
 }
 
 .context {
     color: #dbeafe;
     font-size: 1.125rem;
     margin-bottom: 0;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .context {
+    color: #bfdbfe;
 }
 
 .intro {
     color: #bfdbfe;
     font-size: 0.875rem;
     margin-top: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .intro {
+    color: #93c5fd;
 }
 
 .headerRight {
@@ -52,6 +73,11 @@
     font-size: 0.875rem;
     color: #bfdbfe;
     margin-bottom: 0.25rem;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .publishLabel {
+    color: #93c5fd;
 }
 
 .publishDate {
@@ -63,6 +89,11 @@
     position: relative;
     height: 16rem;
     background-color: #f3f4f6;
+    transition: background-color 0.3s ease;
+}
+
+:global(.dark-theme) .coverImage {
+    background-color: #374151;
 }
 
 .imagePlaceholder {
@@ -72,6 +103,11 @@
     align-items: center;
     justify-content: center;
     background-color: #f9fafb;
+    transition: background-color 0.3s ease;
+}
+
+:global(.dark-theme) .imagePlaceholder {
+    background-color: #4b5563;
 }
 
 .imagePlaceholderContent {
@@ -89,23 +125,43 @@
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
+    transition: background-color 0.3s ease;
+}
+
+:global(.dark-theme) .imageIcon {
+    background-color: #6b7280;
 }
 
 .imageId {
     color: #4b5563;
     font-weight: 500;
     margin-bottom: 0.25rem;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .imageId {
+    color: #d1d5db;
 }
 
 .imageCaption {
     color: #6b7280;
     font-size: 0.875rem;
     margin-bottom: 0.25rem;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .imageCaption {
+    color: #9ca3af;
 }
 
 .imageSource {
     color: #9ca3af;
     font-size: 0.75rem;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .imageSource {
+    color: #6b7280;
 }
 
 .briefScores {
@@ -113,22 +169,43 @@
     border-left: 4px solid #3b82f6;
     padding: 1rem;
     margin: 1.5rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+:global(.dark-theme) .briefScores {
+    background-color: #374151;
+    border-left: 4px solid #60a5fa;
 }
 
 .briefScoresTitle {
     font-weight: bold;
     color: #1f2937;
     margin-bottom: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .briefScoresTitle {
+    color: #f1f5f9;
 }
 
 .briefScoresContent {
     color: #374151;
     line-height: 1.625;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .briefScoresContent {
+    color: #d1d5db;
 }
 
 .briefScoresBold {
     font-weight: bold;
     color: #1d4ed8;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .briefScoresBold {
+    color: #60a5fa;
 }
 
 .content {
@@ -144,6 +221,23 @@
     line-height: 1.625;
     margin-bottom: 1rem;
     text-align: justify;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .paragraph {
+    color: #d1d5db;
+}
+
+.noContent {
+    color: #6b7280;
+    font-style: italic;
+    text-align: center;
+    padding: 2rem;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .noContent {
+    color: #9ca3af;
 }
 
 .tagsSection {
@@ -154,6 +248,11 @@
     font-weight: 600;
     color: #1f2937;
     margin-bottom: 0.75rem;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .tagsTitle {
+    color: #f1f5f9;
 }
 
 .tagsContainer {
@@ -167,6 +266,7 @@
     border-radius: 9999px;
     font-size: 0.875rem;
     font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 .tagTeam {
@@ -174,9 +274,19 @@
     color: #1e40af;
 }
 
+:global(.dark-theme) .tagTeam {
+    background-color: #1e3a8a;
+    color: #93c5fd;
+}
+
 .tagSeries {
     background-color: #dcfce7;
     color: #166534;
+}
+
+:global(.dark-theme) .tagSeries {
+    background-color: #14532d;
+    color: #86efac;
 }
 
 .tagMatch {
@@ -184,10 +294,21 @@
     color: #7c3aed;
 }
 
+:global(.dark-theme) .tagMatch {
+    background-color: #581c87;
+    color: #c4b5fd;
+}
+
 .footer {
     background-color: #f9fafb;
     padding: 1rem 1.5rem;
     border-top: 1px solid #e5e7eb;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+:global(.dark-theme) .footer {
+    background-color: #374151;
+    border-top: 1px solid #4b5563;
 }
 
 .footerContent {
@@ -196,6 +317,11 @@
     align-items: center;
     font-size: 0.875rem;
     color: #6b7280;
+    transition: color 0.3s ease;
+}
+
+:global(.dark-theme) .footerContent {
+    color: #9ca3af;
 }
 
 .footerLeft {
@@ -212,6 +338,49 @@
     min-height: 100vh;
     background-color: #f3f4f6;
     padding: 2rem 0;
+    transition: background-color 0.3s ease;
+}
+
+:global(.dark-theme) .pageContainer {
+    background-color: #0f172a;
+}
+
+/* Loading, Error, and No Data states */
+.loading, .error, .noData {
+    padding: 2rem;
+    text-align: center;
+    font-size: 1.125rem;
+    transition: color 0.3s ease;
+}
+
+.loading {
+    color: #3b82f6;
+}
+
+:global(.dark-theme) .loading {
+    color: #60a5fa;
+}
+
+.error {
+    color: #dc2626;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+:global(.dark-theme) .error {
+    color: #fca5a5;
+    background-color: #7f1d1d;
+    border: 1px solid #dc2626;
+}
+
+.noData {
+    color: #6b7280;
+}
+
+:global(.dark-theme) .noData {
+    color: #9ca3af;
 }
 
 @media (max-width: 768px) {
