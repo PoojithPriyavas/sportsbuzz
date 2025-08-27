@@ -33,7 +33,7 @@
 }
 
 :global(.dark-theme) .filterBar h2 {
-  color: #f1f5f9;
+  color: #f1f5f9 !important;
 }
 
 .controls {

@@ -213,7 +213,7 @@ export default function BettingAppsTable({ sections }) {
                         {[...apps]
                             .sort((a, b) => a.order_by - b.order_by)
                             .map((app) => (
-                                <tr className={styles.bodyRow} key={app.id}>
+                                <tr className={styles.bodyRow} key={app.id}  onClick={() => window.open(app.referal_link, '_blank', 'noopener,noreferrer')} style={{cursor:'pointer'}}>
                                     <td className={styles.rankCell}>
                                         <div className={styles.rankBadge}>#{app.order_by}</div>
                                     </td>
