@@ -24,6 +24,7 @@ function getCookie(name) {
     }
     return null;
 }
+
 const HeaderThree = ({ animationStage }) => {
     const [darkMode, setDarkMode] = useState(false);
     const [headerFixed, setHeaderFixed] = useState(false);
@@ -75,14 +76,44 @@ const HeaderThree = ({ animationStage }) => {
         setHreflang,
         country,
         setCountry
-
-
-
     } = useGlobalData();
-    // const [country, setCountry] = useState('India');
-    // const [hreflang, setHreflang] = useState('en');
-    // const [locationData, setLocationData] = useState(null);
-    // const [countryData, setCountryData] = useState(null);
+
+    // Initialize dark mode from localStorage
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+            setDarkMode(savedDarkMode);
+            // Apply theme immediately
+            if (savedDarkMode) {
+                document.documentElement.classList.add('dark-theme');
+            } else {
+                document.documentElement.classList.remove('dark-theme');
+            }
+        }
+    }, []);
+
+    // Handle dark mode toggle
+    const toggleDarkMode = () => {
+        const newDarkMode = !darkMode;
+        setDarkMode(newDarkMode);
+        
+        // Save to localStorage
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('darkMode', newDarkMode.toString());
+        }
+        
+        // Apply theme to document
+        if (newDarkMode) {
+            document.documentElement.classList.add('dark-theme');
+        } else {
+            document.documentElement.classList.remove('dark-theme');
+        }
+        
+        // Close mobile menu if open
+        if (isMobile) {
+            setMobileMenuOpen(false);
+        }
+    };
 
     useEffect(() => {
         // Get data from cookies after component mounts
@@ -110,7 +141,8 @@ const HeaderThree = ({ animationStage }) => {
     // console.log(filteredLocations, "filtered locations");
     // console.log('countryCodeCookie:', countryCodeCookie);
     // console.log('hreflang:', hreflang);
-    // // Initialize GSAP animation
+    
+    // Initialize GSAP animation
     useEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
 
@@ -578,6 +610,18 @@ const HeaderThree = ({ animationStage }) => {
                     >
                         {translatedText.contact}
                     </Link>
+
+                    {/* Dark Mode Toggle in Mobile Menu - Commented out as in HeaderTwo */}
+                    {/* <div
+                        className={styles.mobileNavItem}
+                        onClick={toggleDarkMode}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <span>
+                            {darkMode ? <FaSun /> : <FaMoon />}
+                            {darkMode ? ' Light Mode' : ' Dark Mode'}
+                        </span>
+                    </div> */}
                 </div>
 
                 {/* Mobile Dropdown-style Selectors */}
@@ -694,6 +738,14 @@ const HeaderThree = ({ animationStage }) => {
                 <div className={styles.mobileTopRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <FeaturedButton />
+                        {/* Dark Mode Toggle Button for Mobile Top Row */}
+                        <button
+                            className={styles.darkModeButton}
+                            onClick={toggleDarkMode}
+                            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                        >
+                            {darkMode ? <FaSun /> : <FaMoon />}
+                        </button>
                         <button
                             className={styles.mobileMenuButton}
                             onClick={toggleMobileMenu}
@@ -774,6 +826,15 @@ const HeaderThree = ({ animationStage }) => {
                         <option value="cricket">{translatedText.cricket}</option>
                         <option value="football">{translatedText.football}</option>
                     </select>
+
+                    {/* Dark Mode Toggle Button for Desktop */}
+                    <button
+                        className={styles.darkModeButton}
+                        onClick={toggleDarkMode}
+                        title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                    >
+                        {darkMode ? <FaSun /> : <FaMoon />}
+                    </button>
 
                     <Link href={`/${hreflang}-${countryCodeCookie}/contact`} className={`${styles.navItem} ${pathname === `/${hreflang}-${countryCodeCookie}/contact` ? styles.active : ''}`}>
                         {translatedText.contact}
