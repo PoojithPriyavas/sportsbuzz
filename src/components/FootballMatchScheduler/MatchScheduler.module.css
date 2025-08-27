@@ -5,6 +5,12 @@
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
+    transition: background 0.3s ease;
+}
+
+/* Dark theme for container */
+:global(.dark-theme) .container {
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
 }
 
 .header {
@@ -18,11 +24,26 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for header h1 */
+:global(.dark-theme) .header h1 {
+    background: linear-gradient(45deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .header p {
     color: #718096;
     font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+/* Dark theme for header p */
+:global(.dark-theme) .header p {
+    color: #a0aec0;
 }
 
 .dateSliderContainer {
@@ -31,6 +52,12 @@
     overflow: hidden;
     border-radius: 15px;
     background: white;
+    transition: background 0.3s ease;
+}
+
+/* Dark theme for date slider container */
+:global(.dark-theme) .dateSliderContainer {
+    background: #2d3748;
 }
 
 .dateSlider {
@@ -54,10 +81,16 @@
     min-width: 120px;
     text-align: center;
     flex-shrink: 0;
-    transition: 0.3s;
+    transition: all 0.3s ease;
     border: 2px solid transparent;
     position: relative;
     color: black;
+}
+
+/* Dark theme for date card */
+:global(.dark-theme) .dateCard {
+    background: #4a5568;
+    color: #e2e8f0;
 }
 
 .dateCard:hover {
@@ -65,11 +98,21 @@
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
+/* Dark theme hover for date card */
+:global(.dark-theme) .dateCard:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
 .dateCard.active {
     border-color: #667eea;
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
     transform: translateY(-3px);
+}
+
+/* Dark theme active date card */
+:global(.dark-theme) .dateCard.active {
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
 }
 
 .day,
@@ -108,8 +151,15 @@
     font-size: 0.9rem;
     color: #2d3748;
     cursor: pointer;
-    transition: 0.3s;
+    transition: all 0.3s ease;
     font-weight: 500;
+}
+
+/* Dark theme for league chip */
+:global(.dark-theme) .leagueChip {
+    border-color: #4a5568;
+    background: #2d3748;
+    color: #e2e8f0;
 }
 
 .leagueChip.active {
@@ -118,10 +168,15 @@
     color: white;
 }
 
+/* Dark theme active league chip */
+:global(.dark-theme) .leagueChip.active {
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+}
+
 .matchesContainer {
     opacity: 0;
     transform: translateY(20px);
-    transition: 0.5s;
+    transition: all 0.5s ease;
 }
 
 .matchesContainer.visible {
@@ -135,6 +190,13 @@
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for competition section */
+:global(.dark-theme) .competitionSection {
+    background: #2d3748;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .competitionHeader {
@@ -144,12 +206,25 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for competition header */
+:global(.dark-theme) .competitionHeader {
+    background: linear-gradient(135deg, #1a202c, #2d3748);
+    border-bottom-color: #4a5568;
 }
 
 .competitionTitle {
     font-size: 1.3rem;
     font-weight: 600;
     color: #2d3748;
+    transition: color 0.3s ease;
+}
+
+/* Dark theme for competition title */
+:global(.dark-theme) .competitionTitle {
+    color: #e2e8f0;
 }
 
 .competitionStage {
@@ -158,12 +233,25 @@
     background: #e2e8f0;
     padding: 5px 12px;
     border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for competition stage */
+:global(.dark-theme) .competitionStage {
+    color: #a0aec0;
+    background: #4a5568;
 }
 
 .matchesGrid {
     display: grid;
     gap: 1px;
     background: #e2e8f0;
+    transition: background 0.3s ease;
+}
+
+/* Dark theme for matches grid */
+:global(.dark-theme) .matchesGrid {
+    background: #1a202c;
 }
 
 .matchRow {
@@ -174,11 +262,23 @@
     padding: 20px;
     position: relative;
     animation: fadeInUp 0.5s ease forwards;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for match row */
+:global(.dark-theme) .matchRow {
+    background: #2d3748;
 }
 
 .matchRow:hover {
     background: #f7fafc;
     transform: scale(1.02);
+}
+
+/* Dark theme hover for match row */
+:global(.dark-theme) .matchRow:hover {
+    background: #4a5568;
 }
 
 .team {
@@ -203,12 +303,24 @@
     color: white;
     font-weight: bold;
     font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for team flag */
+:global(.dark-theme) .teamFlag {
+    background: linear-gradient(45deg, #60a5fa, #a78bfa);
 }
 
 .teamName {
     font-weight: 600;
     color: #2d3748;
     font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+/* Dark theme for team name */
+:global(.dark-theme) .teamName {
+    color: #e2e8f0;
 }
 
 .matchScore {
@@ -218,6 +330,16 @@
     border-radius: 25px;
     font-weight: bold;
     font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for match score */
+:global(.dark-theme) .matchScore {
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+}
+
+.upcomingTime {
+    color: inherit;
 }
 
 .matchTime {
@@ -228,6 +350,12 @@
     font-size: 0.9rem;
     font-weight: 500;
     white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for match time */
+:global(.dark-theme) .matchTime {
+    background: #38a169;
 }
 
 .noMatches {
@@ -235,6 +363,12 @@
     padding: 60px 20px;
     color: #718096;
     font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+/* Dark theme for no matches */
+:global(.dark-theme) .noMatches {
+    color: #a0aec0;
 }
 
 .noMatchesIcon {
@@ -304,6 +438,13 @@
     border: 3px solid #f3f3f3;
     border-top: 3px solid #3498db;
     animation: spin 1s linear infinite;
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for spinner circle */
+:global(.dark-theme) .spinnerCircle {
+    border-color: #4a5568;
+    border-top-color: #60a5fa;
 }
 
 /* Spinner Sizes */
@@ -339,6 +480,12 @@
     font-size: 0.9rem;
     margin: 0;
     text-align: center;
+    transition: color 0.3s ease;
+}
+
+/* Dark theme for spinner text */
+:global(.dark-theme) .spinnerText {
+    color: #a0aec0;
 }
 
 /* Alternative spinner styles for better visual appeal */
@@ -346,6 +493,12 @@
     border: 3px solid rgba(52, 152, 219, 0.2);
     border-top: 3px solid #3498db;
     animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
+}
+
+/* Dark theme for pulsing spinner */
+:global(.dark-theme) .spinner.pulsing .spinnerCircle {
+    border: 3px solid rgba(96, 165, 250, 0.2);
+    border-top: 3px solid #60a5fa;
 }
 
 @keyframes pulse {
@@ -370,6 +523,14 @@
     animation: spin 1s linear infinite;
 }
 
+/* Dark theme for gradient spinner */
+:global(.dark-theme) .spinner.gradient .spinnerCircle {
+    border-top: 3px solid #60a5fa;
+    border-right: 3px solid #f56565;
+    border-bottom: 3px solid #ed8936;
+    border-left: 3px solid #48bb78;
+}
+
 /* Loading overlay for matches container */
 .matchesContainer.loading {
     position: relative;
@@ -386,6 +547,12 @@
     bottom: 0;
     background: rgba(255, 255, 255, 0.8);
     z-index: 1;
+    transition: background 0.3s ease;
+}
+
+/* Dark theme for loading overlay */
+:global(.dark-theme) .matchesContainer.loading::before {
+    background: rgba(45, 55, 72, 0.8);
 }
 
 .matchesContainer.loading .spinnerContainer {
@@ -397,6 +564,13 @@
     background: white;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Dark theme for loading spinner container */
+:global(.dark-theme) .matchesContainer.loading .spinnerContainer {
+    background: #2d3748;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Responsive adjustments */

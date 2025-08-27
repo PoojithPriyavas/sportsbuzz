@@ -47,6 +47,7 @@ const geistMono = Geist_Mono({
 
 import axios from 'axios';
 import HeaderThree from "@/components/Header/HeaderThree";
+import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 
 export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
@@ -301,6 +302,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                                     <UpcomingFootballMatches />
                                 )}
                                 <AutoSliderEven />
+                                 <SportsOdsMegaPari />
                             </div>
                         </div>
                     </div>

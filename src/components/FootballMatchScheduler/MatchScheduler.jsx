@@ -32,6 +32,7 @@ export default function MatchScheduler() {
     const [dates, setDates] = useState([]);
     const [isInitialized, setIsInitialized] = useState(false);
     const [isLoadingMatches, setIsLoadingMatches] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(false);
     const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
     const {
         matchSchedule,
@@ -44,8 +45,34 @@ export default function MatchScheduler() {
         fetchFootBallLineUp
     } = useGlobalData();
 
-    // console.log(matchSchedule, "match schedule")
     const router = useRouter();
+
+    // Theme detection hook
+    useEffect(() => {
+        const checkTheme = () => {
+            const isDark = document.documentElement.classList.contains('dark-theme');
+            setIsDarkMode(isDark);
+        };
+
+        // Initial check
+        checkTheme();
+
+        // Listen for theme changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    checkTheme();
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
+        return () => observer.disconnect();
+    }, []);
 
     const [translatedText, setTranslatedText] = useState({
         matchSchedule: 'Match Schedule',
@@ -240,15 +267,17 @@ export default function MatchScheduler() {
 
     if (currentTimezone === '+0.00' || !countryCode.country_code) {
         return (
-            <div className={styles.header}>
-                <h1>{translatedText.matchSchedule}</h1>
-                <Spinner size="large" text={translatedText.loadingTimezone} />
+            <div className={styles.container}>
+                <div className={styles.header}>
+                    <h1>{translatedText.matchSchedule}</h1>
+                    <Spinner size="large" text={translatedText.loadingTimezone} />
+                </div>
             </div>
         );
     }
 
     return (
-        <div>
+        <div className={styles.container}>
             <div className={styles.header}>
                 <h1>{translatedText.matchSchedule}</h1>
                 <p>{translatedText.selectDate}</p>
@@ -332,7 +361,7 @@ export default function MatchScheduler() {
                                             <div className={styles.teamName}>{match.away}</div>
                                         </div>
                                     </div>
-                                ))}
+                                                                    ))}
                             </div>
                         </div>
                     ))

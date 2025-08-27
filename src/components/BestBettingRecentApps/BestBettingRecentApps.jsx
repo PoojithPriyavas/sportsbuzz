@@ -7,8 +7,45 @@ import DynamicLink from '../Common/DynamicLink';
 
 export default function BestBettingRecentApps({ bestSections = [] }) {
     const [copiedId, setCopiedId] = useState(null);
+    const [darkMode, setDarkMode] = useState(false);
     const { translateText, language } = useGlobalData();
     const [translatedSections, setTranslatedSections] = useState([]);
+    
+    // Initialize dark mode from localStorage
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+            setDarkMode(savedDarkMode);
+        }
+    }, []);
+
+    // Listen for dark mode changes
+    useEffect(() => {
+        const handleStorageChange = (e) => {
+            if (e.key === 'darkMode') {
+                setDarkMode(e.newValue === 'true');
+            }
+        };
+
+        const handleClassChange = () => {
+            setDarkMode(document.documentElement.classList.contains('dark-theme'));
+        };
+
+        // Listen for localStorage changes
+        window.addEventListener('storage', handleStorageChange);
+        
+        // Listen for direct class changes on document
+        const observer = new MutationObserver(handleClassChange);
+        observer.observe(document.documentElement, { 
+            attributes: true, 
+            attributeFilter: ['class'] 
+        });
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            observer.disconnect();
+        };
+    }, []);
     
     // Translate sections
     useEffect(() => {
@@ -53,11 +90,12 @@ export default function BestBettingRecentApps({ bestSections = [] }) {
 
     // Use translated sections if available, otherwise fall back to original
     const displaySections = translatedSections.length > 0 ? translatedSections : bestSections;
-console.log(displaySections,"disp section")
+    console.log(displaySections,"disp section")
+    
     if (displaySections.length === 0) return null;
 
     return (
-        <>
+        <div className={`${styles.container} ${darkMode ? styles.darkMode : ''}`}>
             {/* SEO Meta from the first section */}
             {/* <Head>
                 <title>{displaySections[0]?.metatitle}</title>
@@ -85,7 +123,7 @@ console.log(displaySections,"disp section")
                     );
                 })}
             </div>
-        </>
+        </div>
     );
 }
 
