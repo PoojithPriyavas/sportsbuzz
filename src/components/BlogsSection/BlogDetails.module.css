@@ -20,6 +20,10 @@
   padding: 1rem;
 }
 
+:global(.dark-theme) .blogContent {
+  color: #cbd5e0 !important;
+}
+
 .title {
   font-size: 2rem;
   font-weight: bold;

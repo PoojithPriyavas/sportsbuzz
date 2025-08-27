@@ -75,7 +75,7 @@ export const DataProvider = ({ children }) => {
                 setCurrentTimezone(getTimezoneByCountryCode(validatedLocationData.country_code));
                 // console.log('Using validated location data:', validatedLocationData);
             } else {
-                const res = await CustomAxios.get('/get-country-code');
+                const res = await axios.get('https://admin.sportsbuz.com/api/get-country-code');
                 setCountryCode(res.data || {});
                 setCurrentTimezone(getTimezoneByCountryCode(res.data.country_code));
                 // console.log('Using API response:', res.data);
@@ -535,7 +535,7 @@ export const DataProvider = ({ children }) => {
 
             // console.log('Fetching blogs with params:', params); // Debug log
 
-            const response = await CustomAxios.get('/get-blogs', {
+            const response = await axios.get('https://admin.sportsbuz.com/api/get-blogs', {
                 params,
             });
 
