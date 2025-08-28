@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 // Mock components for demonstration
 const JoinTelegramButton = () => (
@@ -177,7 +178,7 @@ const ContactUsPage = () => {
             formDataToSend.append('subject', formData.subject);
             formDataToSend.append('message', formData.message);
 
-            const response = await CustomAxios.post('/contact-forms/', formDataToSend, {
+            const response = await axios.post('https://admin.sportsbuz.com/api/contact-forms/', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

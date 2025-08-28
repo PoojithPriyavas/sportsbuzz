@@ -71,19 +71,19 @@ const HeaderTwo = ({ animationStage }) => {
     const toggleDarkMode = () => {
         const newDarkMode = !darkMode;
         setDarkMode(newDarkMode);
-        
+
         // Save to localStorage
         if (typeof window !== 'undefined') {
             localStorage.setItem('darkMode', newDarkMode.toString());
         }
-        
+
         // Apply theme to document
         if (newDarkMode) {
             document.documentElement.classList.add('dark-theme');
         } else {
             document.documentElement.classList.remove('dark-theme');
         }
-        
+
         // Close mobile menu if open
         if (isMobile) {
             setMobileMenuOpen(false);
@@ -101,9 +101,9 @@ const HeaderTwo = ({ animationStage }) => {
     // Initialize GSAP animation
     useEffect(() => {
         if (!isClient) return; // Wait for client-side hydration
-        
+
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
-        
+
         if (hasPlayedAnimation) {
             // Animation already played - set final state immediately
             gsap.set(containerRef.current, {
@@ -114,7 +114,7 @@ const HeaderTwo = ({ animationStage }) => {
                 justifyContent: 'space-between',
                 padding: '0 1rem'
             });
-            
+
             // FIXED: Ensure loading animation is completely hidden
             if (loadingAnimationRef.current) {
                 gsap.set(loadingAnimationRef.current, {
@@ -126,7 +126,7 @@ const HeaderTwo = ({ animationStage }) => {
                 loadingAnimationRef.current.style.display = 'none';
                 loadingAnimationRef.current.style.visibility = 'hidden';
             }
-            
+
             gsap.set(logoRef.current, {
                 position: 'relative',
                 bottom: 'auto',
@@ -136,23 +136,23 @@ const HeaderTwo = ({ animationStage }) => {
                 y: 0,
                 visibility: 'visible'
             });
-            
+
             gsap.set(navigationRef.current, {
                 opacity: 1,
                 display: 'flex'
             });
-            
+
             // FIXED: Ensure states are set correctly
             setShouldShowAnimation(false);
             setAnimationComplete(true);
-            
+
             return; // Exit early if animation already played
         }
-        
+
         // Animation hasn't played yet - set initial states for animation
         setShouldShowAnimation(true);
         setAnimationComplete(false);
-        
+
         gsap.set(containerRef.current, {
             height: '100vh',
             overflow: 'hidden',
@@ -161,7 +161,7 @@ const HeaderTwo = ({ animationStage }) => {
             justifyContent: 'flex-start',
             padding: '0'
         });
-        
+
         if (loadingAnimationRef.current) {
             gsap.set(loadingAnimationRef.current, {
                 opacity: 1,
@@ -170,7 +170,7 @@ const HeaderTwo = ({ animationStage }) => {
                 visibility: 'visible'
             });
         }
-        
+
         gsap.set(logoRef.current, {
             position: 'absolute',
             bottom: '2rem',
@@ -180,19 +180,19 @@ const HeaderTwo = ({ animationStage }) => {
             y: 80,
             visibility: 'hidden'
         });
-        
+
         gsap.set(navigationRef.current, {
             opacity: 0,
             display: 'none'
         });
-        
+
         // Create the main timeline
         const tl = gsap.timeline({
             onComplete: () => {
                 setAnimationComplete(true);
                 setShouldShowAnimation(false); // FIXED: Hide animation on complete
                 localStorage.setItem('headerAnimationPlayed', 'true');
-                
+
                 // FIXED: Additional cleanup for loading animation
                 if (loadingAnimationRef.current) {
                     loadingAnimationRef.current.style.display = 'none';
@@ -203,69 +203,69 @@ const HeaderTwo = ({ animationStage }) => {
 
         // Step 1: Show loading animation (1 second)
         tl.to({}, { duration: 2 })
-        
-        // Step 2: Hide loading animation and show logo (0.5 seconds)
-        .to(loadingAnimationRef.current, {
-            opacity: 0,
-            scale: 0.75,
-            duration: 0.75,
-            ease: "power2.inOut"
-        })
-        .to(logoRef.current, {
-            opacity: 1,
-            y: 0,
-            visibility: 'visible',
-            duration: 0.75,
-            ease: "power2.out"
-        }, "-=0.3")
-        
-        // Step 3: Wait a moment then start transition (1 second wait)
-        .to({}, { duration: 1 })
-        
-        // Step 4: Shrink container and move logo to header position (1.5 seconds)
-        .to(containerRef.current, {
-            height: '5rem',
-            duration: 1.5,
-            ease: "power2.inOut"
-        })
-        .to(logoRef.current, {
-            bottom: '50%',
-            left: '1rem',
-            y: '50%',
-            duration: 1.5,
-            ease: "power2.inOut"
-        }, "-=1.5")
-        
-        // Step 5: Convert logo to relative positioning after animation
-        .set(logoRef.current, {
-            position: 'relative',
-            bottom: 'auto',
-            left: 'auto',
-            x: 0,
-            y: 0
-        })
-        
-        // Step 6: Show navigation and set final states
-        .set(containerRef.current, {
-            overflow: 'visible',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 1rem'
-        })
-        .set(navigationRef.current, {
-            display: 'flex'
-        })
-        .to(navigationRef.current, {
-            opacity: 1,
-            duration: 0.75,
-            ease: "power2.out"
-        })
-        // FIXED: Properly hide loading animation at the end
-        .set(loadingAnimationRef.current, {
-            display: 'none',
-            visibility: 'hidden'
-        });
+
+            // Step 2: Hide loading animation and show logo (0.5 seconds)
+            .to(loadingAnimationRef.current, {
+                opacity: 0,
+                scale: 0.75,
+                duration: 0.75,
+                ease: "power2.inOut"
+            })
+            .to(logoRef.current, {
+                opacity: 1,
+                y: 0,
+                visibility: 'visible',
+                duration: 0.75,
+                ease: "power2.out"
+            }, "-=0.3")
+
+            // Step 3: Wait a moment then start transition (1 second wait)
+            .to({}, { duration: 1 })
+
+            // Step 4: Shrink container and move logo to header position (1.5 seconds)
+            .to(containerRef.current, {
+                height: '5rem',
+                duration: 1.5,
+                ease: "power2.inOut"
+            })
+            .to(logoRef.current, {
+                bottom: '50%',
+                left: '1rem',
+                y: '50%',
+                duration: 1.5,
+                ease: "power2.inOut"
+            }, "-=1.5")
+
+            // Step 5: Convert logo to relative positioning after animation
+            .set(logoRef.current, {
+                position: 'relative',
+                bottom: 'auto',
+                left: 'auto',
+                x: 0,
+                y: 0
+            })
+
+            // Step 6: Show navigation and set final states
+            .set(containerRef.current, {
+                overflow: 'visible',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0 1rem'
+            })
+            .set(navigationRef.current, {
+                display: 'flex'
+            })
+            .to(navigationRef.current, {
+                opacity: 1,
+                duration: 0.75,
+                ease: "power2.out"
+            })
+            // FIXED: Properly hide loading animation at the end
+            .set(loadingAnimationRef.current, {
+                display: 'none',
+                visibility: 'hidden'
+            });
 
         timelineRef.current = tl;
 
@@ -470,23 +470,23 @@ const HeaderTwo = ({ animationStage }) => {
 
     // Optimized sport change handler with debouncing
     const [isChangingSport, setIsChangingSport] = useState(false);
-    
+
     const handleSportChange = (selectedSport) => {
         // Prevent multiple rapid sport changes
         if (isChangingSport) return;
-        
+
         // Set loading state
         setIsChangingSport(true);
-        
+
         // First update localStorage to ensure consistency
         localStorage.setItem('selectedSport', selectedSport);
-        
+
         // Close menus immediately for better UX
         setExpandedSportsSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);
         }
-        
+
         // Delay the actual sport change to prevent UI freezing
         setTimeout(() => {
             // Then update state
@@ -591,7 +591,7 @@ const HeaderTwo = ({ animationStage }) => {
                     </Link>
 
                     {/* Mobile Dropdown Categories */}
-                    {translatedCategories.map((cat) => (
+                    {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
                         <div key={cat.id} className={styles.mobileDropdown}>
                             <div
                                 className={styles.mobileDropdownHeader}
@@ -701,7 +701,7 @@ const HeaderTwo = ({ animationStage }) => {
                             >
                                 {isChangingSport && sport !== 'cricket' ? (
                                     <span className={styles.loadingIndicator}>
-                                    {/* Loading... */}
+                                        {/* Loading... */}
                                     </span>
                                 ) : (
                                     translatedText.cricket
@@ -713,7 +713,7 @@ const HeaderTwo = ({ animationStage }) => {
                             >
                                 {isChangingSport && sport !== 'football' ? (
                                     <span className={styles.loadingIndicator}>
-                                    {/* Loading... */}
+                                        {/* Loading... */}
                                     </span>
                                 ) : (
                                     translatedText.football
@@ -726,7 +726,7 @@ const HeaderTwo = ({ animationStage }) => {
                 {/* Debug button to reset animation (remove in production) */}
                 {process.env.NODE_ENV === 'development' && (
                     <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.2)', marginTop: '1rem' }}>
-                        <button 
+                        <button
                             onClick={resetAnimation}
                             style={{
                                 background: 'rgba(255,255,255,0.1)',
@@ -746,16 +746,16 @@ const HeaderTwo = ({ animationStage }) => {
     );
 
     return (
-        <div 
+        <div
             ref={containerRef}
             className={styles.loadingContainer}
         >
             {/* Loading Animation - FIXED: Only show when client-side and conditions are met */}
             {isClient && shouldShowAnimation && !animationComplete && (
-                <div 
+                <div
                     ref={loadingAnimationRef}
                     className={styles.loadingAnimation}
-                    style={{ 
+                    style={{
                         display: (isClient && shouldShowAnimation && !animationComplete) ? 'flex' : 'none',
                         visibility: (isClient && shouldShowAnimation && !animationComplete) ? 'visible' : 'hidden'
                     }}
@@ -819,7 +819,7 @@ const HeaderTwo = ({ animationStage }) => {
                             {translatedText.schedule}
                         </Link>
 
-                        {translatedCategories.map((cat) => (
+                        {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
                             <div key={cat.id} className={styles.dropdown}>
                                 <Link
                                     href={`/blogs/pages/all-blogs?category=${cat.id}`}

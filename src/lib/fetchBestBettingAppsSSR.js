@@ -1,9 +1,10 @@
 // lib/fetchBettingAppsSSR.js
 import CustomAxios from "../components/utilities/CustomAxios";
+import axios from "axios";
 
 export async function fetchBestBettingAppsSSR(countryCode) {
     try {
-        const response = await CustomAxios.get('/best-betting-headings', {
+        const response = await axios.get('https://admin.sportsbuz.com/api/best-betting-headings', {
             params: {
                 country_code: countryCode,
                 filter_by: 'previous_month',

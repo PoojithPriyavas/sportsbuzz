@@ -1,4 +1,5 @@
 import CustomAxios from '../components/utilities/CustomAxios';
+import axios from 'axios';
 
 export async function fetchBlogsSSR({ countryCode, search = '', category = null, subcategory = null }) {
   try {
@@ -10,7 +11,7 @@ export async function fetchBlogsSSR({ countryCode, search = '', category = null,
     if (category) params.category_id = category;
     if (subcategory) params.subcategory_id = subcategory;
 
-    const response = await CustomAxios.get('/get-blogs', { params });
+    const response = await axios.get('https://admin.sportsbuz.com/api/get-blogs', { params });
 
     return response.data?.results || [];
   } catch (error) {

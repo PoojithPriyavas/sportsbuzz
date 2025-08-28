@@ -1,5 +1,6 @@
 // src/middleware.js
 import { NextResponse } from 'next/server';
+import { sriLankaFallbackData, processCountryCodeResponse } from './utils/countryFallback';
 
 export async function middleware(request) {
   console.log('middle ware is being called.')
@@ -12,16 +13,32 @@ export async function middleware(request) {
 
     // Only fetch country data if it doesn't exist
     if (!existingCountryData) {
-      const countryRes = await fetch('https://admin.sportsbuz.com/api/get-country-code/');
-      const countryData = await countryRes.json();
+      try {
+        const countryRes = await fetch('https://admin.sportsbuz.com/api/get-country-code/');
+        const rawCountryData = await countryRes.json();
+        
+        // Process the response with fallback logic
+        const countryData = processCountryCodeResponse(rawCountryData);
 
-      response.cookies.set('countryData', JSON.stringify(countryData), {
-        path: '/',
-        maxAge: 60 * 60 * 24, // 1 day
-      });
+        response.cookies.set('countryData', JSON.stringify(countryData), {
+          path: '/',
+          maxAge: 60 * 60 * 24, // 1 day
+        });
 
-      // Extract country code from the fresh data
-      countryCode = countryData.country_code || countryData.countryCode;
+        // Extract country code from the processed data
+        countryCode = countryData.country_code || countryData.countryCode;
+      } catch (error) {
+        console.error('Failed to fetch country code in middleware:', error);
+        
+        // Use Sri Lankan data as fallback in case of any error
+        console.log('Using Sri Lanka as fallback due to error in middleware');
+        response.cookies.set('countryData', JSON.stringify(sriLankaFallbackData), {
+          path: '/',
+          maxAge: 60 * 60 * 24, // 1 day
+        });
+        
+        countryCode = sriLankaFallbackData.country_code;
+      }
     } else {
       // Extract country code from existing cookie
       const existingData = JSON.parse(existingCountryData.value);

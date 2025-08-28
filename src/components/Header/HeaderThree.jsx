@@ -78,6 +78,7 @@ const HeaderThree = ({ animationStage }) => {
         setCountry
     } = useGlobalData();
 
+    console.log(blogCategories,"blog categories")
     // Initialize dark mode from localStorage
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -564,7 +565,7 @@ const HeaderThree = ({ animationStage }) => {
                     </Link>
 
                     {/* Mobile Dropdown Categories */}
-                    {translatedCategories.map((cat) => (
+                    {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
                         <div key={cat.id} className={styles.mobileDropdown}>
                             <div
                                 className={styles.mobileDropdownHeader}
@@ -774,7 +775,7 @@ const HeaderThree = ({ animationStage }) => {
                             {translatedText.schedule}
                         </Link>
 
-                        {translatedCategories.map((cat) => (
+                        {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
                             <div key={cat.id} className={styles.dropdown}>
                                 <Link
                                     href={`/${hreflang}-${countryCodeCookie}/blogs/pages/all-blogs?category=${cat.id}`}

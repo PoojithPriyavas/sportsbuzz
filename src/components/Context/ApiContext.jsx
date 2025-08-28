@@ -12,6 +12,7 @@ import { countryTimezones } from '../utilities/CountryTimezones';
 import { useCallback } from 'react';
 import { parseUrlPath } from '../utilities/ParseUrl';
 import { usePathname } from 'next/navigation';
+import { sriLankaFallbackData, processCountryCodeResponse } from '@/utils/countryFallback';
 
 
 const DataContext = createContext();
@@ -67,6 +68,8 @@ export const DataProvider = ({ children }) => {
 
     const [countryCode, setCountryCode] = useState({});
 
+    
+    
     const getCountryCode = async () => {
         try {
             if (validatedLocationData && validatedLocationData.country_code) {
@@ -76,12 +79,20 @@ export const DataProvider = ({ children }) => {
                 // console.log('Using validated location data:', validatedLocationData);
             } else {
                 const res = await axios.get('https://admin.sportsbuz.com/api/get-country-code');
-                setCountryCode(res.data || {});
-                setCurrentTimezone(getTimezoneByCountryCode(res.data.country_code));
-                // console.log('Using API response:', res.data);
+                
+                // Process the response with fallback logic
+                const countryData = processCountryCodeResponse(res.data);
+                setCountryCode(countryData);
+                setCurrentTimezone(getTimezoneByCountryCode(countryData.country_code));
             }
         } catch (error) {
             console.error('Failed to fetch country code:', error);
+            
+            // Use Sri Lankan data as fallback in case of any error
+            console.log('Using Sri Lanka as fallback due to error:', error);
+            // Set both the country code and location data from the fallback
+            setCountryCode(sriLankaFallbackData);
+            setCurrentTimezone(getTimezoneByCountryCode(sriLankaFallbackData.country_code));
         }
     };
 
@@ -96,7 +107,7 @@ export const DataProvider = ({ children }) => {
 
     const fetchLocation = async () => {
         try {
-            const res = await CustomAxios.get('/locations');
+            const res = await axios.get('https://admin.sportsbuz.com/api/locations');
             setLocation(res.data || []);
         } catch (error) {
             console.error('Failed to fetch locations:', error);
@@ -222,7 +233,7 @@ export const DataProvider = ({ children }) => {
 
     const fetchSettings = async () => {
         try {
-            const response = await CustomAxios.get('/settings');
+            const response = await axios.get('https://admin.sportsbuz.com/api/settings');
             setSettings(response.data);
         } catch (error) {
             console.error('Error fetching blog categories:', error);
@@ -494,7 +505,7 @@ export const DataProvider = ({ children }) => {
 
     const fetchBlogCategories = async () => {
         try {
-            const response = await CustomAxios.get('/blog-categories');
+            const response = await axios.get('https://admin.sportsbuz.com/api/blog-categories');
             setBlogCategories(response.data);
         } catch (error) {
             console.error('Error fetching blog categories:', error);
@@ -503,7 +514,7 @@ export const DataProvider = ({ children }) => {
 
     const fetchRecentBlogs = async () => {
         try {
-            const response = await CustomAxios.get('/recent-posts');
+            const response = await axios.get('https://admin.sportsbuz.com/api/recent-posts');
             setrecentBlogs(response.data);
         } catch (error) {
             console.error('Error fetching recent blogs:', error);
@@ -559,7 +570,7 @@ export const DataProvider = ({ children }) => {
 
         try {
             // console.log('Fetching betting apps for country code:', countryCodeParam);
-            const response = await CustomAxios.get('/best-betting-headings', {
+            const response = await axios.get('https://admin.sportsbuz.com/api/best-betting-headings', {
                 params: {
                     country_code: countryCodeParam,
                     filter_by: 'current_month'
@@ -586,7 +597,7 @@ export const DataProvider = ({ children }) => {
         }
 
         try {
-            const response = await CustomAxios.get('/best-betting-headings', {
+            const response = await axios.get('https://admin.sportsbuz.com/api/best-betting-headings', {
                 params: {
                     country_code: countryCodeParam,
                     filter_by: 'previous_month'

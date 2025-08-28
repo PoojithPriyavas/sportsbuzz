@@ -44,6 +44,8 @@ import axios from 'axios';
 import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 
+import { sriLankaFallbackData, processCountryCodeResponse } from '@/utils/countryFallback';
+
 export async function getServerSideProps(context) {
   try {
     const [countryRes, locationRes] = await Promise.all([
@@ -51,7 +53,8 @@ export async function getServerSideProps(context) {
       axios.get('https://admin.sportsbuz.com/api/locations')
     ]);
 
-    const countryDataHome = countryRes.data;
+    // Process country code response with fallback logic
+    const countryDataHome = processCountryCodeResponse(countryRes.data);
     const locationDataHome = locationRes.data;
 
     return {
@@ -64,7 +67,8 @@ export async function getServerSideProps(context) {
     console.error("Error fetching data from APIs:", error.message);
     return {
       props: {
-        countryDataHome: null,
+        // Use Sri Lanka as fallback in case of any error
+        countryDataHome: sriLankaFallbackData,
         locationDataHome: null,
         isLocalhost: process.env.NODE_ENV === 'development'
       }

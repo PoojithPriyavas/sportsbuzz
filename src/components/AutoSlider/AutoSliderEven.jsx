@@ -7,6 +7,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import styles from './AutoSlider.module.css';
 import CustomAxios from '../utilities/CustomAxios';
+import axios from 'axios';
 
 export default function AutoSliderEven({countryCode}) {
   const [banners, setBanners] = useState([]);
@@ -14,7 +15,7 @@ export default function AutoSliderEven({countryCode}) {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await CustomAxios.get('/side-banners', {
+        const response = await axios.get('https://admin.sportsbuz.com/api/side-banners', {
           params: {
             country_code: countryCode?.location?.id
           }
