@@ -86,20 +86,21 @@ const NewsList = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h2>{translatedHeader.title}</h2>
-        <p>{translatedHeader.subtitle}</p>
-      </div>
+    <div className={styles.topnewsMain}>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h2>{translatedHeader.title}</h2>
+          <p>{translatedHeader.subtitle}</p>
+        </div>
 
-      <div className={styles.newsList}>
-        {translatedNews.map((item) => (
-          <div
-            key={item.id}
-            className={styles.newsItem}
-            onClick={() => openNews(item)}
-          >
-            {/* <div className={styles.thumbnail}>
+        <div className={styles.newsList}>
+          {translatedNews.map((item) => (
+            <div
+              key={item.id}
+              className={styles.newsItem}
+              onClick={() => openNews(item)}
+            >
+              {/* <div className={styles.thumbnail}>
               {item.coverImage?.id && (
                 <img
                   src={`https://your-image-base-url/${item.coverImage.id}`} // Update with your actual image base URL
@@ -109,32 +110,34 @@ const NewsList = () => {
               )}
             </div> */}
 
-            <div className={styles.newsInfo}>
-              <h3 className={styles.newsTitle}>{item.translatedTitle}</h3>
-              {item.translatedIntro && (
-                <p className={styles.newsIntro}>{item.translatedIntro}</p>
-              )}
-              <div className={styles.newsMeta}>
-                <span className={styles.newsDate}>
-                  📅 {formatTime(item.pubTime)}
-                </span>
-                <span className={styles.newsSource}>
-                  📰 {item.source}
-                </span>
-                <span className={styles.newsType}>
-                  🏷️ {item.storyType}
-                </span>
-                {item.context && (
-                  <span className={styles.newsContext}>
-                    🏏 {item.context}
-                  </span>
+              <div className={styles.newsInfo}>
+                <h3 className={styles.newsTitle}>{item.translatedTitle}</h3>
+                {item.translatedIntro && (
+                  <p className={styles.newsIntro}>{item.translatedIntro}</p>
                 )}
+                <div className={styles.newsMeta}>
+                  <span className={styles.newsDate}>
+                    📅 {formatTime(item.pubTime)}
+                  </span>
+                  <span className={styles.newsSource}>
+                    📰 {item.source}
+                  </span>
+                  <span className={styles.newsType}>
+                    🏷️ {item.storyType}
+                  </span>
+                  {item.context && (
+                    <span className={styles.newsContext}>
+                      🏏 {item.context}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
+
   );
 };
 
