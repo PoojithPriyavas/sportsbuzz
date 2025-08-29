@@ -396,25 +396,25 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
         if (selectedOdd && betAmount > 0) {
             setSuccess(true);
             onBetPlaced();
-            // setTimeout(() => {
-            //     setSelectedOdd(null);
-            //     setBetAmount('');
-            //     setWin('0.00');
-            //     setSuccess(false);
-            //     setShowBettingSection(false);
-            // }, 3000);
+            setTimeout(() => {
+                setSelectedOdd(null);
+                setBetAmount('');
+                setWin('0.00');
+                setSuccess(false);
+                setShowBettingSection(false);
+            }, 3000);
         }
     };
-    const potentialClick = () => {
-        navigate('/')
-        setTimeout(() => {
-            setSelectedOdd(null);
-            setBetAmount('');
-            setWin('0.00');
-            setSuccess(false);
-            setShowBettingSection(false);
-        }, 3000);
-    }
+    // const potentialClick = () => {
+    //     navigate('/')
+    //     setTimeout(() => {
+    //         setSelectedOdd(null);
+    //         setBetAmount('');
+    //         setWin('0.00');
+    //         setSuccess(false);
+    //         setShowBettingSection(false);
+    //     }, 3000);
+    // }
 
     const getOddLabel = (type) => {
         switch (type) {
@@ -495,10 +495,11 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                                 {translatedText.placeBet}
                             </button>
                         </div>
-                        
 
-                        {success && (
-                            <div className={styles.potentialWin} onClick={() => potentialClick()} style={{ cursor: 'pointer' }}>
+
+                        {betAmount && parseFloat(betAmount) > 0 && (
+                            <div className={styles.potentialWin}
+                                style={{ cursor: 'pointer' }}>
                                 <div className={styles.potentialWinLabel}>{translatedText.potentialWinnings}</div>
                                 <div className={styles.potentialWinAmount}>
                                     ₹{win}
