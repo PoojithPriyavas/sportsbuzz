@@ -113,9 +113,9 @@ export default function CricketMatchDetails() {
                     <div className={styles.leftSection}>
                         {/* Left section content */}
                     </div>
-                    <div className={styles.rightSection}>
+                    {/* <div className={styles.rightSection}>
                         <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <FooterTwo />

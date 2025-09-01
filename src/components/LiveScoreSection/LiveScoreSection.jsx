@@ -54,7 +54,6 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
     }
 
     const cards = [];
-    let matchCount = 0;
 
     typeMatch.seriesMatches?.forEach((series, seriesIndex) => {
       if (!series.seriesAdWrapper) return;
@@ -63,7 +62,6 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
       if (!matches) return;
 
       matches.forEach((match, matchIndex) => {
-        matchCount++;
         const info = match.matchInfo;
         const score = match.matchScore;
         const team1 = info.team1;
@@ -119,14 +117,6 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
             </div>
           </DynamicLink>
         );
-
-        if (matchCount % 2 === 0) {
-          cards.push(
-            <div key={`ad-${seriesIndex}-${matchIndex}`} className={styles.card}>
-              <div className={styles.ad}>Google Ads</div>
-            </div>
-          );
-        }
       });
     });
 

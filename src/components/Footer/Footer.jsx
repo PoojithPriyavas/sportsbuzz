@@ -18,9 +18,11 @@ import {
 import { useGlobalData } from '../Context/ApiContext';
 
 const FooterTwo = () => {
-    const { translateText, language, settings, sport, setSport } = useGlobalData();
+    const { translateText, language, settings, sport, setSport, blogCategories } = useGlobalData();
 
     const contact = settings?.[0] || {};
+    const [translatedBlogCategories, setTranslatedBlogCategories] = useState([]);
+    
     const handleSportChange = (newSport) => {
         setSport(newSport);
         localStorage.setItem('selectedSport', newSport);
@@ -56,6 +58,38 @@ const FooterTwo = () => {
         terms: 'Terms of Use',
         privacy: 'Privacy Policy',
     });
+
+    // Translate blog categories
+    useEffect(() => {
+        const translateBlogCategories = async () => {
+            if (!blogCategories || blogCategories.length === 0) return;
+            
+            try {
+                const translatedCategories = await Promise.all(
+                    blogCategories.map(async (cat) => {
+                        const translatedCatName = await translateText(cat.name, 'en', language);
+                        const translatedSubs = await Promise.all(
+                            (cat.subcategories || []).map(async (sub) => ({
+                                ...sub,
+                                name: await translateText(sub.name, 'en', language),
+                            }))
+                        );
+                        return {
+                            ...cat,
+                            name: translatedCatName,
+                            subcategories: translatedSubs,
+                        };
+                    })
+                );
+                setTranslatedBlogCategories(translatedCategories);
+            } catch (error) {
+                console.error('Error translating blog categories:', error);
+                setTranslatedBlogCategories(blogCategories || []);
+            }
+        };
+
+        translateBlogCategories();
+    }, [blogCategories, language, translateText]);
 
     useEffect(() => {
         const translateFooter = async () => {
@@ -151,10 +185,6 @@ const FooterTwo = () => {
                     {/* Column 3 - Sports Categories */}
                     <div className={styles.col}>
                         <h3 className={styles.title}>{translatedText.sports}</h3>
-                        {/* <ul className={styles.linkList}>
-                            <li><a href="/cricket">{translatedText.cricket}</a></li>
-                            <li><a href="/football">{translatedText.football}</a></li>
-                        </ul> */}
                         <ul className={styles.linkList}>
                             <li>
                                 <button className={styles.buttonLi} onClick={() => handleSportChange('cricket')}>
@@ -167,18 +197,39 @@ const FooterTwo = () => {
                                 </button>
                             </li>
                         </ul>
-
                     </div>
 
-                    {/* Column 4 - Blog Categories */}
+                    {/* Column 4 - Dynamic Blog Categories */}
                     <div className={styles.col}>
                         <h3 className={styles.title}>{translatedText.blogCategories}</h3>
                         <ul className={styles.linkList}>
-                            <li><a href="/blogs/pages/all-blogs?category=1">{translatedText.cricket}</a></li>
-                            <li><a href="/blogs/pages/all-blogs?category=2">{translatedText.football}</a></li>
-                            {/* <li><a href="/blogs/betting-tips">{translatedText.bettingTips}</a></li>
-                            <li><a href="/blogs/player-stats">{translatedText.playerStats}</a></li>
-                            <li><a href="/blogs/news">{translatedText.news}</a></li> */}
+                            {translatedBlogCategories && translatedBlogCategories.length > 0 ? (
+                                translatedBlogCategories.map((category) => (
+                                    <li key={category.id}>
+                                        <a href={`/blogs/pages/all-blogs?category=${category.id}`}>
+                                            {category.name}
+                                        </a>
+                                        {/* If you want to show subcategories as well, uncomment below */}
+                                        {/* {category.subcategories && category.subcategories.length > 0 && (
+                                            <ul className={styles.subCategoryList}>
+                                                {category.subcategories.map((sub) => (
+                                                    <li key={sub.id}>
+                                                        <a href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}>
+                                                            {sub.name}
+                                                        </a>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )} */}
+                                    </li>
+                                ))
+                            ) : (
+                                // Fallback to static categories if dynamic ones are not available
+                                <>
+                                    <li><a href="/blogs/pages/all-blogs?category=1">{translatedText.cricket}</a></li>
+                                    <li><a href="/blogs/pages/all-blogs?category=2">{translatedText.football}</a></li>
+                                </>
+                            )}
                         </ul>
                     </div>
 
@@ -193,43 +244,10 @@ const FooterTwo = () => {
                                 </div>
                             )}
 
-                            {/* {contact.whatsapp_number && (
-                                <div className={styles.contactItem}>
-                                    <FaPhoneAlt className={styles.contactIcon} />
-                                    <a
-                                        href={`tel:${contact.whatsapp_number}`}
-                                        className={styles.contactLink}
-                                    >
-                                        {contact.whatsapp_number}
-                                    </a>
-                                </div>
-                            )}
-
-                            {contact.whatsapp_number && (
-                                <div className={styles.contactItem}>
-                                    <FaWhatsapp className={styles.contactIcon} />
-                                    <a
-                                        href={`https://wa.me/${contact.whatsapp_number.replace(/[^\d]/g, '')}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={styles.contactLink}
-                                    >
-                                        {contact.whatsapp_number}
-                                    </a>
-                                </div>
-                            )} */}
-
                             <div className={styles.contactItem}>
                                 <FaClock className={styles.contactIcon} />
                                 <span>{translatedText.availability}</span>
                             </div>
-
-                            {/* {contact.address && (
-                                <div className={styles.contactItem}>
-                                    <FaMapMarkerAlt className={styles.contactIcon} />
-                                    <span>{contact.address}</span>
-                                </div>
-                            )} */}
                         </div>
                     </div>
                 </div>

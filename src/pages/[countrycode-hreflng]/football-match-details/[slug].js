@@ -170,7 +170,7 @@ export default function FootballMatchDetails({ countryDataHome, locationDataHome
                     <div className={styles.rightSection}>
 
                         {/* <UpcomingMatches /> */}
-                        <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
+                        {/* <div className={styles.bannerPlaceholder}>Multiple Banner Part</div> */}
 
                     </div>
                 </div>

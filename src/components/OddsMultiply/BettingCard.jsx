@@ -402,6 +402,9 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                 setWin('0.00');
                 setSuccess(false);
                 setShowBettingSection(false);
+                setTimeout(() => {
+                    window.location.href = 'https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=17&bid=1484';
+                }, 1000);
             }, 3000);
         }
     };

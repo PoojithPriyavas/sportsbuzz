@@ -139,6 +139,19 @@ const MatchCard = () => {
     const formation = teamData.Fo?.join('-') ;
     const substitutions = lineUp.Subs?.[teamNumber] || [];
 
+    // Try to get team name/country from various possible fields
+    const getTeamName = (teamData, teamNumber) => {
+      // Check for country name in team data
+      if (teamData.Cnm) return teamData.Cnm;
+      if (teamData.Country) return teamData.Country;
+      if (teamData.TeamCountry) return teamData.TeamCountry;
+      if (teamData.Tn) return teamData.Tn; // Team name
+      if (teamData.TeamName) return teamData.TeamName;
+      
+      // If no specific team country/name found, fallback to generic
+      return `Team ${teamNumber === 1 ? 'A' : 'B'}`;
+    };
+
     const getPlayerName = (player) => {
       if (player.Snm) return player.Snm;
       if (player.Fn && player.Ln) return `${player.Fn} ${player.Ln}`;
@@ -191,7 +204,7 @@ const MatchCard = () => {
       .filter(sub => sub.out !== 'Unknown Player' && sub.in !== 'Unknown Player');
 
     return {
-      name: `Team ${teamNumber === 1 ? 'A' : 'B'}`,
+      name: getTeamName(teamData, teamNumber),
       coach,
       color: teamNumber === 1 ? 'red' : 'blue',
       formation,

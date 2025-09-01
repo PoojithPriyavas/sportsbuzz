@@ -91,7 +91,7 @@ export default function SportsOdsMegaPari() {
         potentialWinnings: 'Potential Winnings',
         selectOdds: 'Select your odds and enter stake to place your bet',
         // betSuccess: '✓ Bet Placed Successfully!',
-             betSuccess: 'Play responsibly at your own risk',
+        betSuccess: 'Play responsibly at your own risk',
         team1Win: 'Team 1 Win',
         draw: 'Draw',
         team2Win: 'Team 2 Win',
@@ -393,6 +393,9 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                 setWin('0.00');
                 setSuccess(false);
                 setShowBettingSection(false);
+                setTimeout(() => {
+                    window.location.href = 'https://sportsbuzww.megapari-600325.net/';
+                }, 1000);
             }, 3000);
         }
     };

@@ -44,8 +44,6 @@ import axios from 'axios';
 import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 
-import { sriLankaFallbackData, processCountryCodeResponse } from '@/utils/countryFallback';
-
 export async function getServerSideProps(context) {
   try {
     const [countryRes, locationRes] = await Promise.all([
@@ -53,8 +51,7 @@ export async function getServerSideProps(context) {
       axios.get('https://admin.sportsbuz.com/api/locations')
     ]);
 
-    // Process country code response with fallback logic
-    const countryDataHome = processCountryCodeResponse(countryRes.data);
+    const countryDataHome = countryRes.data;
     const locationDataHome = locationRes.data;
 
     return {
@@ -67,8 +64,7 @@ export async function getServerSideProps(context) {
     console.error("Error fetching data from APIs:", error.message);
     return {
       props: {
-        // Use Sri Lanka as fallback in case of any error
-        countryDataHome: sriLankaFallbackData,
+        countryDataHome: null,
         locationDataHome: null,
         isLocalhost: process.env.NODE_ENV === 'development'
       }
@@ -90,7 +86,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
     stages,
     news
   } = useGlobalData();
-  const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
+  const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
 
   console.log(locationDataHome, "location home");
   console.log(countryDataHome, "country data home")
@@ -162,7 +158,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
         <meta name="author" content="Sportsbuz" />
 
         {/* Canonical */}
-        {locationDataHome?.map(({ hreflang, country_code }) => {
+        {locationDataHome.map(({ hreflang, country_code }) => {
           console.log(hreflang, "href lan home")
           const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/`;
           const fullHrefLang = `${hreflang}-${country_code}`;

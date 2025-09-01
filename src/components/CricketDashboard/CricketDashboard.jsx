@@ -2,8 +2,18 @@ import styles from './CricketDashboard.module.css';
 
 const CricketDashboard = ({ cricketDetails }) => {
   // console.log(cricketDetails,"crick")
-  if (!cricketDetails || !cricketDetails.matchInfo) {
-    return <div>Loading match data...</div>;
+  
+  // Check if there's no data at all
+  if (!cricketDetails || !cricketDetails.matchInfo || Object.keys(cricketDetails.matchInfo).length === 0) {
+    return (
+      <div className={styles.noDataContainer}>
+        <div className={styles.noDataContent}>
+          <div className={styles.noDataIcon}>🏏</div>
+          <div className={styles.noDataText}>No data found</div>
+          <div className={styles.noDataSubtext}>Cricket match information is not available</div>
+        </div>
+      </div>
+    );
   }
 
   const {
