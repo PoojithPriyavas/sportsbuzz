@@ -393,10 +393,10 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                 setWin('0.00');
                 setSuccess(false);
                 setShowBettingSection(false);
-                setTimeout(() => {
-                    window.location.href = 'https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=1119&bid=1650';
-                }, 1000);
-            }, 3000);
+                // setTimeout(() => {
+                window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=1119&bid=1650');
+                // }, 1000);
+            }, 500);
         }
     };
 

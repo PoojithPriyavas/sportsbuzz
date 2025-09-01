@@ -396,16 +396,17 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
         if (selectedOdd && betAmount > 0) {
             setSuccess(true);
             onBetPlaced();
+
+
             setTimeout(() => {
                 setSelectedOdd(null);
                 setBetAmount('');
                 setWin('0.00');
                 setSuccess(false);
                 setShowBettingSection(false);
-                setTimeout(() => {
-                    window.location.href = 'https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=17&bid=1484';
-                }, 1000);
-            }, 3000);
+                window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=17&bid=1484', '_blank');
+
+            }, 500);
         }
     };
     // const potentialClick = () => {

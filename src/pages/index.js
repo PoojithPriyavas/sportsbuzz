@@ -158,7 +158,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
         <meta name="author" content="Sportsbuz" />
 
         {/* Canonical */}
-        {locationDataHome.map(({ hreflang, country_code }) => {
+        {locationDataHome?.map(({ hreflang, country_code }) => {
           console.log(hreflang, "href lan home")
           const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/`;
           const fullHrefLang = `${hreflang}-${country_code}`;

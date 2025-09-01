@@ -639,16 +639,16 @@ const HeaderTwo = ({ animationStage }) => {
                     </Link>
 
                     {/* Dark Mode Toggle in Mobile Menu */}
-                    {/* <div
+                    <div
                         className={styles.mobileNavItem}
                         onClick={toggleDarkMode}
                         style={{ cursor: 'pointer' }}
                     >
-                        <span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             {darkMode ? <FaSun /> : <FaMoon />}
-                            {darkMode ? ' Light Mode' : ' Dark Mode'}
+                            {darkMode ? 'Light Mode' : 'Dark Mode'}
                         </span>
-                    </div> */}
+                    </div>
                 </div>
 
                 {/* Mobile Dropdown-style Selectors */}
@@ -783,14 +783,6 @@ const HeaderTwo = ({ animationStage }) => {
                 <div className={styles.mobileTopRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <FeaturedButton />
-                        {/* Dark Mode Toggle Button for Mobile Top Row */}
-                        <button
-                            className={styles.darkModeButton}
-                            onClick={toggleDarkMode}
-                            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                        >
-                            {darkMode ? <FaSun /> : <FaMoon />}
-                        </button>
                         <button
                             className={styles.mobileMenuButton}
                             onClick={toggleMobileMenu}

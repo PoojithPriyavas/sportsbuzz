@@ -393,10 +393,10 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                 setWin('0.00');
                 setSuccess(false);
                 setShowBettingSection(false);
-                setTimeout(() => {
-                    window.location.href = 'https://sportsbuzww.megapari-600325.net/';
-                }, 1000);
-            }, 3000);
+                // setTimeout(() => {
+                window.open('https://sportsbuzww.megapari-600325.net/');
+                // }, 1000);
+            }, 500);
         }
     };
 

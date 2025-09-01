@@ -135,7 +135,7 @@ export default function BlogPages({
                 <meta name="keywords" content="sports blogs, football news, cricket updates, match analysis, sports buzz" />
                 <meta name="author" content="Sports Buzz" />
 
-                {locationDataHome.map(({ hreflang, country_code }) => {
+                {locationDataHome?.map(({ hreflang, country_code }) => {
                     {/* console.log(hreflang,"href lan g") */ }
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
