@@ -33,7 +33,7 @@ export const DataProvider = ({ children }) => {
         }
     });
     const [initialDataLoaded, setInitialDataLoaded] = useState(false);
-    
+
     const [blogCategories, setBlogCategories] = useState([]);
     const [recentBlogs, setrecentBlogs] = useState([]);
     const [blogs, setBlogs] = useState([]);
@@ -47,7 +47,7 @@ export const DataProvider = ({ children }) => {
     const [countryData, setCountryData] = useState(null);
     const [validatedLocationData, setValidatedLocationData] = useState(null);
     // console.log(validatedLocationData, "validated location data")
-
+    const [matchTeams, setMatchTeams] = useState(null);
     const pathname = usePathname();
     // console.log(pathname, "path name")
     // const isUrlCountryPresent = pathname?.replace(/^,?\//, '').split('-');
@@ -68,18 +68,18 @@ export const DataProvider = ({ children }) => {
 
     const [countryCode, setCountryCode] = useState({});
 
-    
-    
+
+
     const getCountryCode = async () => {
         try {
             if (validatedLocationData && validatedLocationData.country_code) {
-                console.log("calls the validation country code" ,validatedLocationData);
+                console.log("calls the validation country code", validatedLocationData);
                 setCountryCode(validatedLocationData);
                 setCurrentTimezone(getTimezoneByCountryCode(validatedLocationData.country_code));
                 // console.log('Using validated location data:', validatedLocationData);
             } else {
                 const res = await axios.get('https://admin.sportsbuz.com/api/get-country-code');
-                
+
                 // Process the response with fallback logic
                 const countryData = processCountryCodeResponse(res.data);
                 setCountryCode(countryData);
@@ -87,7 +87,7 @@ export const DataProvider = ({ children }) => {
             }
         } catch (error) {
             console.error('Failed to fetch country code:', error);
-            
+
             // Use Sri Lankan data as fallback in case of any error
             console.log('Using Sri Lanka as fallback due to error:', error);
             // Set both the country code and location data from the fallback
@@ -192,7 +192,7 @@ export const DataProvider = ({ children }) => {
         if (countryCode?.location?.sports) {
             const apiSport = countryCode.location.sports.toLowerCase();
             const userSelectedSport = localStorage.getItem('selectedSport');
-            
+
             // Only update sport based on country if user hasn't manually selected a sport
             // or if this is the first load (no user selection yet)
             if (!userSelectedSport && apiSport !== sport) {
@@ -201,13 +201,13 @@ export const DataProvider = ({ children }) => {
             }
         }
     }, [countryCode]);
-    
+
     // Handle sport changes and load sport-specific data
     useEffect(() => {
         if (!initialDataLoaded) return; // Skip during initial load
-        
+
         console.log(`Sport changed to: ${sport}`);
-        
+
         // Load sport-specific data based on current sport
         if (sport === 'cricket') {
             // Check if we have cached data
@@ -634,7 +634,7 @@ export const DataProvider = ({ children }) => {
                 setTeamImages(dataCache.cricket.matches.teamImages);
                 return;
             }
-            
+
             const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live', {
                 headers: { 'X-RapidAPI-Key': rapidApiKey },
             });
@@ -677,20 +677,20 @@ export const DataProvider = ({ children }) => {
                 })
             );
             setTeamImages(newTeamImages);
-            
+
             // Cache the data
-             setDataCache(prev => ({
-                 ...prev,
-                 cricket: {
-                     ...prev.cricket,
-                     matches: {
-                         apiResponse: res.data,
-                         matchTypes: filterTypes,
-                         teamImages: newTeamImages
-                     }
-                 }
-             }));
-            
+            setDataCache(prev => ({
+                ...prev,
+                cricket: {
+                    ...prev.cricket,
+                    matches: {
+                        apiResponse: res.data,
+                        matchTypes: filterTypes,
+                        teamImages: newTeamImages
+                    }
+                }
+            }));
+
             // console.log('Cricket matches data fetched and cached');
         } catch (error) {
             console.error('Failed to fetch live matches:', error);
@@ -723,7 +723,7 @@ export const DataProvider = ({ children }) => {
                 setUpcomingMatches(dataCache.cricket.upcomingMatches);
                 return;
             }
-            
+
             const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/upcoming', {
                 headers: {
                     'X-RapidAPI-Key': rapidApiKey,
@@ -760,7 +760,7 @@ export const DataProvider = ({ children }) => {
             });
 
             setUpcomingMatches(upcoming);
-            
+
             // Cache the data
             setDataCache(prev => ({
                 ...prev,
@@ -769,7 +769,7 @@ export const DataProvider = ({ children }) => {
                     upcomingMatches: upcoming
                 }
             }));
-            
+
             // console.log('Upcoming cricket matches data fetched and cached');
         } catch (error) {
             console.error('Failed to fetch upcoming matches:', error);
@@ -782,7 +782,7 @@ export const DataProvider = ({ children }) => {
         // console.log('Fetching live football matches...');
         const today = new Date();
         const formattedDate = today.toISOString().split('T')[0].replace(/-/g, '');
-        
+
         try {
             // Check if we already have cached data
             if (dataCache.football.liveMatches) {
@@ -790,7 +790,7 @@ export const DataProvider = ({ children }) => {
                 setStages(dataCache.football.liveMatches);
                 return;
             }
-            
+
             const options = {
                 method: 'GET',
                 url: 'https://livescore6.p.rapidapi.com/matches/v2/list-by-date',
@@ -806,7 +806,7 @@ export const DataProvider = ({ children }) => {
 
             const response = await axios.request(options);
             setStages(response.data);
-            
+
             // Cache the data
             setDataCache(prev => ({
                 ...prev,
@@ -815,7 +815,7 @@ export const DataProvider = ({ children }) => {
                     liveMatches: response.data
                 }
             }));
-            
+
             // console.log('Live football matches data fetched and cached');
         } catch (error) {
             console.error('Error fetching football matches:', error);
@@ -834,7 +834,7 @@ export const DataProvider = ({ children }) => {
                 setUpcoming(dataCache.football.upcomingMatches);
                 return;
             }
-            
+
             const today = new Date();
             const tomorrow = new Date(today);
             tomorrow.setDate(today.getDate() + 1);
@@ -856,7 +856,7 @@ export const DataProvider = ({ children }) => {
 
             const response = await axios.request(options);
             setUpcoming(response.data);
-            
+
             // Cache the data
             setDataCache(prev => ({
                 ...prev,
@@ -865,7 +865,7 @@ export const DataProvider = ({ children }) => {
                     upcomingMatches: response.data
                 }
             }));
-            
+
             // console.log('Upcoming football matches data fetched and cached');
         } catch (error) {
             console.error('Error fetching upcoming football matches:', error);
@@ -935,7 +935,7 @@ export const DataProvider = ({ children }) => {
     // }, []);
 
     // Initial data loading effect
-    
+
     // Load initial data only once
     useEffect(() => {
         if (!initialDataLoaded) {
@@ -945,7 +945,7 @@ export const DataProvider = ({ children }) => {
             fetchLocation();
             getCountryCode();
             fetchSettings();
-            
+
             // Load sport-specific data based on current sport
             if (sport === 'cricket') {
                 fetchMatches();
@@ -954,7 +954,7 @@ export const DataProvider = ({ children }) => {
                 liveFootBall();
                 upcomingFootBall();
             }
-            
+
             setInitialDataLoaded(true);
         }
     }, [initialDataLoaded]);
@@ -1035,7 +1035,9 @@ export const DataProvider = ({ children }) => {
                 setHreflang,
                 country,
                 setCountry,
-                setValidatedLocationData
+                setValidatedLocationData,
+                matchTeams,
+                setMatchTeams,
             }}>
             {children}
         </DataContext.Provider>

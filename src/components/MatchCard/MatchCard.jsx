@@ -7,7 +7,7 @@ import TeamLineup from './TeamLineup';
 import { useGlobalData } from '../Context/ApiContext';
 
 const MatchCard = () => {
-  const { footBallMatchDetails, lineUp, translateText, language } = useGlobalData();
+  const { footBallMatchDetails, lineUp, translateText, language, matchTeams } = useGlobalData();
 
   const [translatedText, setTranslatedText] = useState({
     stadium: 'Stadium',
@@ -139,19 +139,6 @@ const MatchCard = () => {
     const formation = teamData.Fo?.join('-') ;
     const substitutions = lineUp.Subs?.[teamNumber] || [];
 
-    // Try to get team name/country from various possible fields
-    const getTeamName = (teamData, teamNumber) => {
-      // Check for country name in team data
-      if (teamData.Cnm) return teamData.Cnm;
-      if (teamData.Country) return teamData.Country;
-      if (teamData.TeamCountry) return teamData.TeamCountry;
-      if (teamData.Tn) return teamData.Tn; // Team name
-      if (teamData.TeamName) return teamData.TeamName;
-      
-      // If no specific team country/name found, fallback to generic
-      return `Team ${teamNumber === 1 ? 'A' : 'B'}`;
-    };
-
     const getPlayerName = (player) => {
       if (player.Snm) return player.Snm;
       if (player.Fn && player.Ln) return `${player.Fn} ${player.Ln}`;
@@ -203,8 +190,13 @@ const MatchCard = () => {
       })
       .filter(sub => sub.out !== 'Unknown Player' && sub.in !== 'Unknown Player');
 
+    // Use passed team names or fall back to default
+    const teamName = teamNumber === 1 
+      ? matchTeams?.team1 || `Team A`
+      : matchTeams?.team2 || `Team B`;
+
     return {
-      name: getTeamName(teamData, teamNumber),
+      name: teamName,
       coach,
       color: teamNumber === 1 ? 'red' : 'blue',
       formation,
@@ -250,13 +242,13 @@ const MatchCard = () => {
           <div className={styles.teamsScore}>
             <div className={styles.team}>
               <div className={styles.teamBadge}>🔴</div>
-              <div className={styles.teamName}>Team A</div>
+              <div className={styles.teamName}>{matchTeams?.team1 || 'Team A'}</div>
               <div>{translatedText.coach}: Unknown Coach</div>
             </div>
             <div className={styles.vs}>{translatedText.vs}</div>
             <div className={styles.team}>
               <div className={styles.teamBadge}>🔵</div>
-              <div className={styles.teamName}>Team B</div>
+              <div className={styles.teamName}>{matchTeams?.team2 || 'Team B'}</div>
               <div>{translatedText.coach}: Unknown Coach</div>
             </div>
           </div>

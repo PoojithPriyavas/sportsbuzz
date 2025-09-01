@@ -167,7 +167,7 @@ function SkeletonFilterBar() {
 }
 
 export default function TestLive() {
-    const { stages, language, translateText, fetchFootballDetails, fetchFootBallLineUp } = useGlobalData();
+    const { stages, language, translateText, fetchFootballDetails, fetchFootBallLineUp, setMatchTeams } = useGlobalData();
     const [selectedLeague, setSelectedLeague] = useState('All');
     const [translatedStages, setTranslatedStages] = useState([]);
     const [dateLabels, setDateLabels] = useState({ today: 'Today', tomorrow: 'Tomorrow' });
@@ -180,8 +180,16 @@ export default function TestLive() {
     // Keep track of what's been translated
     const [translationProgress, setTranslationProgress] = useState({});
 
-    // ✅ Updated handleMatchClick to use dynamic routing
-    const handleMatchClick = async (eid) => {
+    // ✅ Updated handleMatchClick to pass team names to the global context
+    const handleMatchClick = async (eid, team1Name, team2Name) => {
+        // Set the team names in the global context before navigation
+        if (setMatchTeams) {
+            setMatchTeams({
+                team1: team1Name,
+                team2: team2Name
+            });
+        }
+
         await Promise.all([
             fetchFootballDetails(eid),
             fetchFootBallLineUp(eid)
@@ -363,7 +371,7 @@ export default function TestLive() {
                                 <div
                                     key={`${stageIdx}-${eventIdx}`}
                                     className={styles.matchCard}
-                                    onClick={() => handleMatchClick(event.Eid)}
+                                    onClick={() => handleMatchClick(event.Eid, event.translatedTeam1, event.translatedTeam2)}
                                     style={{ cursor: 'pointer' }}
                                 >
                                     {/* League info */}
