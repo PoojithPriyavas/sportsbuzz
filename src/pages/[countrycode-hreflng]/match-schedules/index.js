@@ -20,6 +20,9 @@ import JoinTelegramButton from "@/components/JoinTelegram/JoinTelegramButton";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
 import HeaderThree from "@/components/Header/HeaderThree";
+import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
+import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
+import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
     // console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
@@ -70,7 +73,7 @@ export async function getServerSideProps(context) {
 export default function MatchSchedulerScreen({ countryDataHome, locationDataHome, resolvedUrl, }) {
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
 
-    const { sport, apiResponse, teamImages, matchTypes } = useGlobalData();
+    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -141,16 +144,25 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                     <div className={styles.leftThreeColumns}>
                         <MatchScheduler />
                     </div>
-                    <div className={styles.fourthColumn} >
+                    <div className={styles.fourthColumn}>
                         <div className={styles.fourthColumnTwoColumns}>
                             <div className={styles.fourthColumnLeft}>
-                                {/* <BettingCard /> */}
+                                <BettingCard />
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
                                 <AutoSlider />
                             </div>
                         </div>
+                        {sport === 'cricket' ? (
+                            <>
+                                <UpcomingMatches upcomingMatches={upcomingMatches} />
+                            </>
+                        ) : (
+                            <UpcomingFootballMatches />
+                        )}
+                        <AutoSliderEven />
+                        <SportsOdsMegaPari />
                     </div>
                 </div>
                 <div className={styles.mainContent}>

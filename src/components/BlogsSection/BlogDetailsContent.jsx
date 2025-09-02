@@ -71,6 +71,7 @@ export default function BlogDetailContent({ blog }) {
           className={styles.description}
           dangerouslySetInnerHTML={{ __html: translatedBlog.text_editor_1 }}
         />
+        <div><JoinTelegramButton /></div>
         <div
           className={styles.description}
           dangerouslySetInnerHTML={{ __html: translatedBlog.text_editor_2 }}

@@ -38,13 +38,14 @@ export default function BlogDetailsPage({ blog }) {
                                 </div>
 
                             </div>
-
+                            <JoinTelegramButton />
                             <UpcomingFootballMatches />
                         </div>
                         <div className={styles.fourthColumnRight}>
                             <AutoSlider />
-                            
+
                         </div>
+
                         <SportsOddsList />
 
                     </div>

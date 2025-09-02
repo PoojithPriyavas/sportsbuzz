@@ -17,10 +17,13 @@ import FooterTwo from "@/components/Footer/Footer";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import HeaderTwo from "@/components/Header/HeaderTwo";
 import JoinTelegramButton from "@/components/JoinTelegram/JoinTelegramButton";
+import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
+import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
+import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 
 export default function MatchSchedulerScreen() {
 
-    const { sport, apiResponse, teamImages, matchTypes } = useGlobalData();
+    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -91,16 +94,25 @@ export default function MatchSchedulerScreen() {
                     <div className={styles.leftThreeColumns}>
                         <MatchScheduler />
                     </div>
-                    <div className={styles.fourthColumn} >
+                    <div className={styles.fourthColumn}>
                         <div className={styles.fourthColumnTwoColumns}>
                             <div className={styles.fourthColumnLeft}>
-                                {/* <BettingCard /> */}
+                                <BettingCard />
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
                                 <AutoSlider />
                             </div>
                         </div>
+                        {sport === 'cricket' ? (
+                            <>
+                                <UpcomingMatches upcomingMatches={upcomingMatches} />
+                            </>
+                        ) : (
+                            <UpcomingFootballMatches />
+                        )}
+                        <AutoSliderEven />
+                        <SportsOdsMegaPari />
                     </div>
                 </div>
                 <div className={styles.mainContent}>
