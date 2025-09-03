@@ -16,15 +16,47 @@ import { useParams } from "next/navigation";
 import HeaderThree from "@/components/Header/HeaderThree";
 
 export async function getServerSideProps(context) {
-    const { resolvedUrl } = context.resolvedUrl;
+    const { resolvedUrl } = context;
     const slug = context.params.slug;
-    const [countryRes, locationRes] = await Promise.all([
-        axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
-        axios.get('https://admin.sportsbuz.com/api/locations/')
-    ]);
 
-    let countryDataHome = countryRes.data;
-    let locationDataHome = locationRes.data;
+    let countryDataHome = null;
+    let locationDataHome = null;
+
+    try {
+        const [countryRes, locationRes] = await Promise.all([
+            fetch('https://admin.sportsbuz.com/api/get-country-code/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('Error fetching country data:', error);
+                    return null; // Return null on error
+                }),
+            
+            fetch('https://admin.sportsbuz.com/api/locations/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('Error fetching location data:', error);
+                    return null; // Return null on error
+                })
+        ]);
+
+        countryDataHome = countryRes;
+        locationDataHome = locationRes;
+
+    } catch (error) {
+        console.error('Error in Promise.all:', error);
+        // Continue with null values if both APIs fail
+    }
+
     try {
         const res = await fetch(`https://admin.sportsbuz.com/api/blog-detail/${slug}`);
         if (!res.ok) {
@@ -36,9 +68,8 @@ export async function getServerSideProps(context) {
         return {
             props: {
                 blog,
+                countryDataHome,
                 locationDataHome,
-
-
             },
         };
     } catch (error) {

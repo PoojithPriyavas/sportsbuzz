@@ -47,12 +47,24 @@ import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 export async function getServerSideProps(context) {
   try {
     const [countryRes, locationRes] = await Promise.all([
-      axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
-      axios.get('https://admin.sportsbuz.com/api/locations')
+      fetch('https://admin.sportsbuz.com/api/get-country-code/')
+        .then(async (response) => {
+          if (!response.ok) {
+            throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
+          }
+          return response.json();
+        }),
+      fetch('https://admin.sportsbuz.com/api/locations')
+        .then(async (response) => {
+          if (!response.ok) {
+            throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
+          }
+          return response.json();
+        })
     ]);
 
-    const countryDataHome = countryRes.data;
-    const locationDataHome = locationRes.data;
+    const countryDataHome = countryRes;
+    const locationDataHome = locationRes;
 
     return {
       props: {
@@ -88,8 +100,8 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
   } = useGlobalData();
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
 
-  console.log(locationDataHome, "location home");
-  console.log(countryDataHome, "country data home")
+  // console.log(locationDataHome, "location home");
+  // console.log(countryDataHome, "country data home")
 
 
   // if (countryCode && countryCode.country_code) {
@@ -159,10 +171,10 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
         {/* Canonical */}
         {locationDataHome?.map(({ hreflang, country_code }) => {
-          console.log(hreflang, "href lan home")
+          {/* console.log(hreflang, "href lan home") */ }
           const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/`;
           const fullHrefLang = `${hreflang}-${country_code}`;
-          console.log('Generated link:', { href, fullHrefLang });
+          {/* console.log('Generated link:', { href, fullHrefLang }); */ }
 
           return (
             <link

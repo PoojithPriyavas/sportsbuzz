@@ -363,7 +363,7 @@ async function fetchMarketData(token, sportEventId) {
 }
 
 function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced }) {
-    console.log("card name", card);
+    // console.log("card name", card);
     const [selectedOdd, setSelectedOdd] = useState(null);
     const [betAmount, setBetAmount] = useState('');
     const [win, setWin] = useState('0.00');

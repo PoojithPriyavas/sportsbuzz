@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useGlobalData } from '@/components/Context/ApiContext';
 
 export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
-    console.log(locationDataHome,"loc in lang val")
+    // console.log(locationDataHome,"loc in lang val")
     const router = useRouter();
     const [isValidating, setIsValidating] = useState(false);
     const {setLanguage, setValidatedLocationData} = useGlobalData(); // Added setValidatedLocationData

@@ -7,8 +7,8 @@ import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/router';
 
 export default function RecentAppsDetails({ bestSections = [], sectionId }) {
-    console.log(sectionId, "best sections id")
-    console.log("called the recent id betting apps :",bestSections)
+    // console.log(sectionId, "best sections id")
+    // console.log("called the recent id betting apps :",bestSections)
     // const router = useRouter();
     // const sectionId = router.query.id;
     const [isMobile, setIsMobile] = useState(false);

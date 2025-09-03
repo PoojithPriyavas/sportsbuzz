@@ -30,17 +30,53 @@ export async function getServerSideProps({ req, resolvedUrl }) {
     const countryCode = countryData?.country_code || 'IN';
     const hrefLanCookie = req.cookies.lanTagValues;
     const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
-    const [countryRes, locationRes] = await Promise.all([
-        axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
-        axios.get('https://admin.sportsbuz.com/api/locations/')
-    ]);
 
-    let countryDataHome = countryRes.data;
-    let locationDataHome = locationRes.data;
+    let countryDataHome = null;
+    let locationDataHome = null;
 
+    try {
+        const [countryRes, locationRes] = await Promise.all([
+            fetch('https://admin.sportsbuz.com/api/get-country-code/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('Error fetching country data:', error);
+                    return null; // Return null on error
+                }),
+            
+            fetch('https://admin.sportsbuz.com/api/locations/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('Error fetching location data:', error);
+                    return null; // Return null on error
+                })
+        ]);
+
+        countryDataHome = countryRes;
+        locationDataHome = locationRes;
+
+    } catch (error) {
+        console.error('Error in Promise.all:', error);
+        // Continue with null values if both APIs fail
+    }
 
     // Fetch betting apps data based on country code
-    const sections = await fetchBettingAppsSSR(countryCode);
+    let sections = null;
+    try {
+        sections = await fetchBettingAppsSSR(countryCode);
+    } catch (error) {
+        console.error('Error fetching betting apps:', error);
+        sections = null; // or provide a default value
+    }
 
     return {
         props: {

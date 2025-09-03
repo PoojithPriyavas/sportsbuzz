@@ -73,15 +73,23 @@ export const DataProvider = ({ children }) => {
     const getCountryCode = async () => {
         try {
             if (validatedLocationData && validatedLocationData.country_code) {
-                console.log("calls the validation country code", validatedLocationData);
+                // console.log("calls the validation country code", validatedLocationData);
                 setCountryCode(validatedLocationData);
                 setCurrentTimezone(getTimezoneByCountryCode(validatedLocationData.country_code));
                 // console.log('Using validated location data:', validatedLocationData);
             } else {
-                const res = await axios.get('https://admin.sportsbuz.com/api/get-country-code');
+                const response = await fetch('https://admin.sportsbuz.com/api/get-country-code');
+
+                // Check if the response is successful
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+                }
+
+                // Parse the JSON response
+                const data = await response.json();
 
                 // Process the response with fallback logic
-                const countryData = processCountryCodeResponse(res.data);
+                const countryData = processCountryCodeResponse(data);
                 setCountryCode(countryData);
                 setCurrentTimezone(getTimezoneByCountryCode(countryData.country_code));
             }

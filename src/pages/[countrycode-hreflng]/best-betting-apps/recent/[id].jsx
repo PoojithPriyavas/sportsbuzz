@@ -28,14 +28,44 @@ export async function getServerSideProps(context) {
     // console.log(context, "contexxt")
     const { req, query, params, resolvedUrl } = context;
 
-    const [countryRes, locationRes] = await Promise.all([
-        axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
-        axios.get('https://admin.sportsbuz.com/api/locations/')
-    ]);
+    let countryDataHome = null;
+    let locationDataHome = null;
 
-    let countryDataHome = countryRes.data;
-    let locationDataHome = locationRes.data;
+    try {
+        // Fetch country and location data with proper error handling
+        const [countryRes, locationRes] = await Promise.all([
+            fetch('https://admin.sportsbuz.com/api/get-country-code/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('Error fetching country data:', error);
+                    return null; // Return null on error
+                }),
 
+            fetch('https://admin.sportsbuz.com/api/locations/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('Error fetching location data:', error);
+                    return null; // Return null on error
+                })
+        ]);
+
+        countryDataHome = countryRes;
+        locationDataHome = locationRes;
+
+    } catch (error) {
+        console.error('Error in Promise.all:', error);
+        // Continue with null values if both APIs fail
+    }
 
     // Parse the cookie to get country code
     const countryCookie = req.cookies.countryData;
@@ -45,8 +75,15 @@ export async function getServerSideProps(context) {
     const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
 
     const sectionId = params.id;
+
     // Fetch betting apps data based on country code
-    const bestSections = await fetchBestBettingAppsSSR(countryCodes);
+    let bestSections = null;
+    try {
+        bestSections = await fetchBestBettingAppsSSR(countryCodes);
+    } catch (error) {
+        console.error('Error fetching best sections:', error);
+        bestSections = null; // or provide a default value
+    }
 
     return {
         props: {
@@ -62,14 +99,14 @@ export async function getServerSideProps(context) {
 }
 
 
-export default function BestBettingApps({ bestSections, sectionId, countryCodes, hrefLanData, resolvedUrl, isLocalhost ,locationDataHome}) {
+export default function BestBettingApps({ bestSections, sectionId, countryCodes, hrefLanData, resolvedUrl, isLocalhost, locationDataHome }) {
 
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
     // const countryCode = countryData?.country_code || 'IN';
-  const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
-  console.log(resolvedUrl,"resolvsed url")
-//   const splitUrl = resolvedUrl.replace(/^,?\//,'').split('-');
-//   console.log(splitUrl,"split  url")
+    const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
+    //   console.log(resolvedUrl,"resolvsed url")
+    //   const splitUrl = resolvedUrl.replace(/^,?\//,'').split('-');
+    //   console.log(splitUrl,"split  url")
     const [loading, setLoading] = useState(true);
     const {
         blogCategories,
@@ -84,7 +121,7 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
         // bestSections,
 
     } = useGlobalData();
-  
+
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false
         const timer1 = setTimeout(() => setLoading(false), 3000);
@@ -167,23 +204,23 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
                 {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
                     <>
-                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages}  countryCode={countryCode}/>
+                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} countryCode={countryCode} />
                     </>
                 ) : (
-                    <TestLive countryCode={countryCode}/>
+                    <TestLive countryCode={countryCode} />
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
-                        <RecentAppsDetails bestSections={bestSections} sectionId={sectionId} countryCode={countryCode}/>
+                        <RecentAppsDetails bestSections={bestSections} sectionId={sectionId} countryCode={countryCode} />
                     </div>
                     <div className={styles.fourthColumn} >
                         <div className={styles.fourthColumnTwoColumns}>
                             <div className={styles.fourthColumnLeft}>
-                                <BettingCard countryCode={countryCode}/>
-                                <JoinTelegramButton countryCode={countryCode}/>
+                                <BettingCard countryCode={countryCode} />
+                                <JoinTelegramButton countryCode={countryCode} />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider countryCode={countryCode}/>
+                                <AutoSlider countryCode={countryCode} />
                             </div>
                         </div>
                         {sport === 'cricket' ? (
@@ -200,7 +237,7 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
                 <BettingAppsRecentTable bestSections={bestSections} countryCode={countryCode} />
 
             </div>
-            <FooterTwo countryCode={countryCode}/>
+            <FooterTwo countryCode={countryCode} />
         </>
     )
 }

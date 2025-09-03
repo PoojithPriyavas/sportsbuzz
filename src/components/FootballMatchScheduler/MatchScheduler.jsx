@@ -45,6 +45,8 @@ export default function MatchScheduler() {
         fetchFootBallLineUp
     } = useGlobalData();
 
+    // console.log(matchSchedule,"match schedule")
+
     const router = useRouter();
 
     // Theme detection hook
@@ -238,6 +240,8 @@ export default function MatchScheduler() {
 
     const matchData = transformMatchData();
 
+    console.log(matchData,"match DAta")
+
     const displayMatches = useCallback((date) => {
         if (!date) return [];
         let matches = matchData[date] || [];
@@ -258,6 +262,7 @@ export default function MatchScheduler() {
     }, [matchSchedule, translatedText.allLeagues]);
 
     const handleMatchClick = async (eid) => {
+        
         await Promise.all([
             fetchFootballDetails(eid),
             fetchFootBallLineUp(eid)

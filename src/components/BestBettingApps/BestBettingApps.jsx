@@ -5,7 +5,7 @@ import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/router';
 
 export default function BettingAppsTable({ sections }) {
-    console.log(sections, "section in the bettingapps table")
+    // console.log(sections, "section in the bettingapps table")
     const [copiedId, setCopiedId] = useState(null);
     const route = useRouter();
     const { translateText, language } = useGlobalData();

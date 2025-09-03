@@ -90,7 +90,7 @@ export default function BestBettingRecentApps({ bestSections = [] }) {
 
     // Use translated sections if available, otherwise fall back to original
     const displaySections = translatedSections.length > 0 ? translatedSections : bestSections;
-    console.log(displaySections,"disp section")
+    // console.log(displaySections,"disp section")
     
     if (displaySections.length === 0) return null;
 

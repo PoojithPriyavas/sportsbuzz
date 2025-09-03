@@ -18,12 +18,35 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
 
     try {
         const [countryRes, locationRes] = await Promise.all([
-            axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
-            axios.get('https://admin.sportsbuz.com/api/locations/')
+            fetch('https://admin.sportsbuz.com/api/get-country-code/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    return { data, headers: response.headers, status: response.status, url: response.url };
+                })
+                .catch((error) => {
+                    console.error('Error fetching country data:', error);
+                    return null;
+                }),
+            
+            fetch('https://admin.sportsbuz.com/api/locations/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    return { data, headers: response.headers, status: response.status, url: response.url };
+                })
+                .catch((error) => {
+                    console.error('Error fetching location data:', error);
+                    return null;
+                })
         ]);
 
-        countryDataHome = countryRes.data;
-        locationDataHome = locationRes.data;
+        countryDataHome = countryRes?.data || null;
+        locationDataHome = locationRes?.data || null;
 
         const {
             category: categoryIdParam,
@@ -31,27 +54,29 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
             search: searchTerm = ''
         } = query;
 
-        blogs = await fetchBlogsSSR({
-            countryCode: countryDataHome?.country_code || 'IN',
-            search: searchTerm,
-            category: categoryIdParam ? parseInt(categoryIdParam, 10) : null,
-            subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam, 10) : null,
-        });
+        try {
+            blogs = await fetchBlogsSSR({
+                countryCode: countryDataHome?.country_code || 'IN',
+                search: searchTerm,
+                category: categoryIdParam ? parseInt(categoryIdParam, 10) : null,
+                subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam, 10) : null,
+            });
+        } catch (blogError) {
+            console.error('Error fetching blogs:', blogError);
+            blogs = []; // Keep empty array as fallback
+        }
 
         // Debug logs (remove in production)
         // console.log('=== API RESPONSE DATA ===');
         // console.log('Country Data:', JSON.stringify(countryDataHome, null, 2));
         // console.log('Location Data:', JSON.stringify(locationDataHome, null, 2));
-        // console.log('Country Response Headers:', countryRes.headers);
-        // console.log('Location Response Headers:', locationRes.headers);
+        // console.log('Country Response Headers:', countryRes ? Object.fromEntries(countryRes.headers) : 'N/A');
+        // console.log('Location Response Headers:', locationRes ? Object.fromEntries(locationRes.headers) : 'N/A');
 
     } catch (error) {
         console.error("API Error Details:", {
             message: error.message,
-            url: error.config?.url,
-            status: error.response?.status,
-            data: error.response?.data,
-            headers: error.response?.headers,
+            name: error.name,
             stack: error.stack
         });
     }
@@ -66,7 +91,6 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
         }
     };
 }
-
 export default function BlogPages({
     // blogs,
     countryDataHome,

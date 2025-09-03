@@ -42,11 +42,12 @@ export default function HeroCarousal({countryCode}) {
 
   // Force restart autoplay after banners are loaded
   useEffect(() => {
-    if (!isLoading && banners.length > 1 && swiperRef.current) {
+    if (!isLoading && banners.length > 1 && swiperRef.current?.swiper) {
       const timer = setTimeout(() => {
-        if (swiperRef.current?.swiper) {
-          swiperRef.current.swiper.autoplay.stop();
-          swiperRef.current.swiper.autoplay.start();
+        const swiper = swiperRef.current?.swiper;
+        if (swiper && swiper.autoplay) {
+          swiper.autoplay.stop();
+          swiper.autoplay.start();
         }
       }, 100);
 
@@ -59,32 +60,35 @@ export default function HeroCarousal({countryCode}) {
     return <div className={styles.carouselWrapper} style={{ marginTop: '20px', height: '200px' }} />;
   }
 
+  // Helper function to safely handle autoplay
+  const handleAutoplayStart = (swiper) => {
+    if (banners.length > 1 && swiper && swiper.autoplay) {
+      swiper.autoplay.start();
+    }
+  };
+
   return (
     <div className={styles.carouselWrapper} style={{ marginTop: '20px' }}>
       <Swiper
         ref={swiperRef}
         modules={[Autoplay, Navigation, Pagination]}
-        autoplay={{
+        autoplay={banners.length > 1 ? {
           delay: 4000,
           disableOnInteraction: false,
           pauseOnMouseEnter: false,
-        }}
+        } : false} // Only enable autoplay if more than 1 banner
         loop={banners.length > 1} // Only enable loop if more than 1 banner
         pagination={{ clickable: true }}
         className={styles.swiperContainer}
         onSwiper={(swiper) => {
           // Ensure autoplay starts after swiper is initialized
           setTimeout(() => {
-            if (banners.length > 1) {
-              swiper.autoplay.start();
-            }
+            handleAutoplayStart(swiper);
           }, 100);
         }}
         onAfterInit={(swiper) => {
           // Additional fallback to start autoplay
-          if (banners.length > 1) {
-            swiper.autoplay.start();
-          }
+          handleAutoplayStart(swiper);
         }}
       >
         {banners.map((banner, index) => (

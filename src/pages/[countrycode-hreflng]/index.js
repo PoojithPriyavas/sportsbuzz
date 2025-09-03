@@ -55,8 +55,22 @@ export async function getServerSideProps(context) {
     try {
         const { req } = context;
         const [countryRes, locationRes] = await Promise.all([
-            axios.get('https://admin.sportsbuz.com/api/get-country-code/'),
-            axios.get('https://admin.sportsbuz.com/api/locations/')
+            fetch('https://admin.sportsbuz.com/api/get-country-code/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    return { data, headers: response.headers, status: response.status, url: response.url };
+                }),
+            fetch('https://admin.sportsbuz.com/api/locations/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    return { data, headers: response.headers, status: response.status, url: response.url };
+                })
         ]);
 
         const countryDataHome = countryRes.data;
@@ -66,30 +80,28 @@ export async function getServerSideProps(context) {
         // console.log('=== API RESPONSE DATA ===');
         // console.log('Country Data in the props:', JSON.stringify(countryRes.data, null, 2));
         // console.log('Location Data in the props:', JSON.stringify(locationRes.data, null, 2));
-        // console.log('Response Headers - Country in the props:', countryRes.headers);
-        // console.log('Response Headers - Location: in the props', locationRes.headers);
+        // console.log('Response Headers - Country in the props:', Object.fromEntries(countryRes.headers));
+        // console.log('Response Headers - Location: in the props', Object.fromEntries(locationRes.headers));
 
         return {
             props: {
                 countryDataHome,
                 locationDataHome,
-
             }
         };
     } catch (error) {
         // console.error("Error fetching data from APIs:", error.message);
         console.error("API Error Details: in the props", {
-            url: error.config?.url,
-            status: error.response?.status,
-            data: error.response?.data,
-            headers: error.response?.headers,
+            url: error.url || 'Unknown URL',
+            status: error.status || 'Unknown Status',
+            message: error.message,
+            name: error.name,
             stack: error.stack
         });
         return {
             props: {
                 countryDataHome: null,
                 locationDataHome: null,
-
                 isLocalhost: process.env.NODE_ENV === 'development'
             }
         };
