@@ -8,8 +8,10 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import styles from './Carousal.module.css';
 import { useMediaQuery } from 'react-responsive';
+import { useGlobalData } from '../Context/ApiContext';
 
-export default function HeroCarousal({ countryCode }) {
+export default function HeroCarousal() {
+  const { countryCode } = useGlobalData()
   console.log(countryCode, "carousal country")
   const [banners, setBanners] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -8,11 +8,13 @@ import 'swiper/css/pagination';
 import styles from './AutoSlider.module.css';
 import CustomAxios from '../utilities/CustomAxios';
 import axios from 'axios';
+import { useGlobalData } from '../Context/ApiContext';
 
-export default function AutoSlider({ countryCode }) {
+export default function AutoSlider() {
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const swiperRef = useRef(null);
+  const { countryCode } = useGlobalData()
 
   useEffect(() => {
     const fetchBanners = async () => {
