@@ -152,7 +152,7 @@ export default function BestBettingApps({ sectionsTab }) {
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider />
+                                <AutoSlider countryCode={countryCode} />
                             </div>
                         </div>
                         {sport === 'cricket' ? (
@@ -162,7 +162,7 @@ export default function BestBettingApps({ sectionsTab }) {
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                        <AutoSliderEven countryCode={countryCode}/>
+                        <AutoSliderEven countryCode={countryCode} />
                         {/* <TopNewsSection /> */}
                     </div>
                 </div>

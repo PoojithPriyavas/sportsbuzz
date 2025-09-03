@@ -10,10 +10,12 @@ import styles from '../../styles/Home.module.css';
 import BettingCards from "@/components/OddsMultiply/BettingCard";
 import JoinTelegramButton from "@/components/JoinTelegram/JoinTelegramButton";
 import AutoSlider from "@/components/AutoSlider/AutoSlider";
+import { useGlobalData } from "@/components/Context/ApiContext";
 
 
 export default function blogDetailsMain() {
     const [loading, setLoading] = useState(true);
+    const { countryCode } = useGlobalData();
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false
         const timer1 = setTimeout(() => setLoading(false), 3000);
@@ -82,7 +84,7 @@ export default function blogDetailsMain() {
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider />
+                                <AutoSlider countryCode={countryCode} />
                             </div>
                         </div>
                         {/* {sport === 'cricket' ? (

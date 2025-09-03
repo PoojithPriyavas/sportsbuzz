@@ -23,6 +23,7 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 
 
 export default function FootballMatchDetails() {
+    const { countryCode } = useGlobalData();
 
     const [loading, setLoading] = useState(true);
 
@@ -109,7 +110,7 @@ export default function FootballMatchDetails() {
                     </div>
                     <div className={styles.fourthColumn} >
                         <BettingCard />
-                        <AutoSlider />
+                        <AutoSlider countryCode={countryCode} />
                         <TopNewsSection />
                     </div>
                 </div>

@@ -149,7 +149,7 @@ export default function blogDetailsMain({ countryDataHome, locationDataHome, res
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider />
+                                <AutoSlider countryCode={countryDataHome}/>
                             </div>
                         </div>
                         {/* {sport === 'cricket' ? (

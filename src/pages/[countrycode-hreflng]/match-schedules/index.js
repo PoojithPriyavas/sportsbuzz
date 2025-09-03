@@ -165,7 +165,7 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider />
+                                <AutoSlider countryCode={countryDataHome}/>
                             </div>
                         </div>
                         {sport === 'cricket' ? (
@@ -175,7 +175,7 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                        <AutoSliderEven />
+                        <AutoSliderEven countryCode={countryDataHome}/>
                         <SportsOdsMegaPari />
                     </div>
                 </div>

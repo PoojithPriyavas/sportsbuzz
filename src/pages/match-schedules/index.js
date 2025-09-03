@@ -23,7 +23,7 @@ import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 
 export default function MatchSchedulerScreen() {
 
-    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches } = useGlobalData();
+    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches, countryCode } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -101,7 +101,7 @@ export default function MatchSchedulerScreen() {
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider />
+                                <AutoSlider  countryCode={countryCode}/>
                             </div>
                         </div>
                         {sport === 'cricket' ? (
@@ -111,7 +111,7 @@ export default function MatchSchedulerScreen() {
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                        <AutoSliderEven />
+                        <AutoSliderEven countryCode={countryCode}/>
                         <SportsOdsMegaPari />
                     </div>
                 </div>

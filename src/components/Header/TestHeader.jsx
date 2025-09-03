@@ -589,7 +589,7 @@ function TestHeader({ onFinish }) {
 
                                     <BettingCard />
                                     <JoinTelegramButton />
-                                    <AutoSlider />
+                                    <AutoSlider countryCode={countryCode} />
                                     {sport === 'cricket' ? (
                                         <>
                                             <UpcomingMatches upcomingMatches={upcomingMatches} />

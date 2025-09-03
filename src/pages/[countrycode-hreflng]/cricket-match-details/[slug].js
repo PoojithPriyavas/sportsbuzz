@@ -23,7 +23,7 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 import HeaderThree from "@/components/Header/HeaderThree";
 
 export default function CricketMatchDetails() {
-    const { getCricketDetails, cricketDetails, location } = useGlobalData();
+    const { getCricketDetails, cricketDetails, location, countryCode } = useGlobalData();
     const [loading, setLoading] = useState(true);
     const [animationStage, setAnimationStage] = useState('loading');
     const [showOtherDivs, setShowOtherDivs] = useState(false);
@@ -38,15 +38,15 @@ export default function CricketMatchDetails() {
     // Get cricket details when matchId is available and router is ready
     useEffect(() => {
         if (!router.isReady) return; // Wait for router to be ready
-        
+
         if (!matchId) {
             console.error("Match ID is missing");
             return;
         }
         getCricketDetails(matchId);
-    }, [router.isReady, matchId, getCricketDetails]); 
+    }, [router.isReady, matchId, getCricketDetails]);
 
-   
+
     useEffect(() => {
         // Check if animation has been played before
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
@@ -105,7 +105,7 @@ export default function CricketMatchDetails() {
                     </div>
                     <div className={styles.fourthColumn}>
                         <BettingCard />
-                        <AutoSlider />
+                        <AutoSlider countryCode={countryCode} />
                         <TopNewsSection />
                     </div>
                 </div>

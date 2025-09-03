@@ -259,7 +259,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                     <JoinTelegramButton />
                   </div>
                   <div className={styles.fourthColumnRight}>
-                    <AutoSlider />
+                    <AutoSlider countryCode={countryDataHome} />
                   </div>
                 </div>
                 {sport === 'cricket' ? (
@@ -269,7 +269,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                 ) : (
                   <UpcomingFootballMatches />
                 )}
-                <AutoSliderEven />
+                <AutoSliderEven countryCode={countryDataHome} />
                 <SportsOdsMegaPari />
               </div>
             </div>

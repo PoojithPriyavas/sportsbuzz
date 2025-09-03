@@ -173,7 +173,7 @@ export default function FootballMatchDetails({ countryDataHome, locationDataHome
                     </div>
                     <div className={styles.fourthColumn} >
                         <BettingCard />
-                        <AutoSlider />
+                        <AutoSlider countryCode={countryDataHome}/>
                         <TopNewsSection />
                     </div>
                 </div>

@@ -14,11 +14,11 @@ import JoinTelegramButton from '../JoinTelegram/JoinTelegramButton';
 import AutoSliderEven from '../AutoSlider/AutoSliderEven';
 import AutoSlider from '../AutoSlider/AutoSlider';
 import SportsOddsList from '../SportsOdds/SportsOdsList';
-
+import { useGlobalData } from '../Context/ApiContext';
 
 
 export default function BlogDetailsPage({ blog }) {
-
+    const { countryCode } = useGlobalData()
     return (
         <div >
 
@@ -34,7 +34,7 @@ export default function BlogDetailsPage({ blog }) {
                             <div className={styles.bettingCardWrapper}>
                                 <BettingCard />
                                 <div style={{ margin: '10px 0' }}>
-                                    <AutoSliderEven />
+                                    <AutoSliderEven countryCode={countryCode} />
                                 </div>
 
                             </div>
@@ -42,7 +42,7 @@ export default function BlogDetailsPage({ blog }) {
                             <UpcomingFootballMatches />
                         </div>
                         <div className={styles.fourthColumnRight}>
-                            <AutoSlider />
+                            <AutoSlider countryCode={countryCode} />
 
                         </div>
 
