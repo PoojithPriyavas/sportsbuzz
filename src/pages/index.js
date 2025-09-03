@@ -85,7 +85,7 @@ export async function getServerSideProps(context) {
 }
 
 export default function Home({ countryDataHome, locationDataHome, isLocalhost }) {
-  console.log(countryDataHome,"country data home")
+  console.log(countryDataHome, "country data home")
   const {
     blogCategories,
     blogs,
@@ -228,12 +228,12 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
               </>
 
             )}
-            <HeroCarousal />
+            <HeroCarousal countryCode={countryDataHome} />
 
             <div className={styles.fourColumnRow}>
               <div className={styles.leftThreeColumns}>
                 {/* {countryDataHome?.location?.betting_apps == 'Active' && ( */}
-                  <BonusTable sections={sections} />
+                <BonusTable sections={sections} />
                 {/* )} */}
                 <div className={styles.twoSplitRow}>
                   <div className={styles.leftSplit}>

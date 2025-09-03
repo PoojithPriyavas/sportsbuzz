@@ -557,7 +557,7 @@ function TestHeader({ onFinish }) {
                             ) : (
                                 <TestLive />
                             )}
-                            <HeroCarousal />
+                            <HeroCarousal countryCode={countryCode}  />
 
                             <div className={styles.fourColumnRow}>
                                 <div className={styles.leftThreeColumns}>

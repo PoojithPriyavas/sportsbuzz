@@ -145,7 +145,7 @@ export default function ContactUs({ countryDataHome, locationDataHome, resolvedU
       <HeaderThree animationStage={animationStage} />
       {/* <TestHeader /> */}
 
-      <Hero />
+      <Hero countryCode={countryDataHome} />
       <div className='container'>
         {/* <LiveScores /> */}
         {/* <TestLive /> */}

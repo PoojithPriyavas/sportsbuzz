@@ -20,13 +20,13 @@ import Contact from '@/components/Contact/Contact';
 import Hero from '@/components/Hero/Hero';
 import TestHeader from "@/components/Header/TestHeader";
 import FooterTwo from "@/components/Footer/Footer";
-
+import { useGlobalData } from "@/components/Context/ApiContext";
 
 
 
 
 export default function ContactUs() {
-
+  const { countryCode } = useGlobalData();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function ContactUs() {
       <HeaderTwo animationStage={animationStage} />
       {/* <TestHeader /> */}
 
-      <Hero />
+      <Hero countryCode={countryCode} />
       <div className='container'>
         {/* <LiveScores /> */}
         {/* <TestLive /> */}

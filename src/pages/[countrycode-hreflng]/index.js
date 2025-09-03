@@ -267,7 +267,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                             <TestLive />
                         )}
 
-                        <HeroCarousal />
+                        <HeroCarousal countryCode={countryDataHome} />
 
                         <div className={styles.fourColumnRow}>
                             <div className={styles.leftThreeColumns}>
