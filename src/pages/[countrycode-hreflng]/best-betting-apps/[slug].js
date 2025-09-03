@@ -47,7 +47,7 @@ export async function getServerSideProps({ req, resolvedUrl }) {
                     console.error('Error fetching country data:', error);
                     return null; // Return null on error
                 }),
-            
+
             fetch('https://admin.sportsbuz.com/api/locations/')
                 .then(async (response) => {
                     if (!response.ok) {
@@ -107,7 +107,8 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, is
         upcomingMatches,
         sport,
         countryCode,
-        bestSections
+        bestSections,
+        stages
     } = useGlobalData();
     // console.log(sections, "shgdfs")
     const router = useRouter();
@@ -224,10 +225,13 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, is
                 {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
                     <>
-                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} countryCode={countryCode} />
+                        {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
                     </>
                 ) : (
-                    <TestLive countryCode={countryCode} />
+                    <>
+                        {stages && <TestLive />}
+                    </>
+
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>

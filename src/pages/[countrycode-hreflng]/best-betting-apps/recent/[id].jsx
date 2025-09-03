@@ -118,6 +118,7 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
         upcomingMatches,
         sport,
         countryCode,
+        stages
         // bestSections,
 
     } = useGlobalData();
@@ -204,10 +205,13 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
                 {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
                     <>
-                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} countryCode={countryCode} />
+                        {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
                     </>
                 ) : (
-                    <TestLive countryCode={countryCode} />
+                    <>
+                        {stages && <TestLive />}
+                    </>
+
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>

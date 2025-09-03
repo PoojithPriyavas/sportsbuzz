@@ -271,9 +271,9 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
                         <div className={styles.fourColumnRow}>
                             <div className={styles.leftThreeColumns}>
-                                {countryDataHome?.location?.betting_apps == 'Active' && (
-                                    <BonusTable sections={sections} />
-                                )}
+                                {/* {countryDataHome?.location?.betting_apps == 'Active' && ( */}
+                                <BonusTable sections={sections} />
+                                {/* )} */}
                                 <div className={styles.twoSplitRow}>
                                     <div className={styles.leftSplit}>
                                         {/* {sport === 'cricket' ? (
@@ -313,8 +313,8 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                                 ) : (
                                     <UpcomingFootballMatches />
                                 )}
-                                <AutoSliderEven countryCode={countryDataHome}/>
-                                 <SportsOdsMegaPari />
+                                <AutoSliderEven countryCode={countryDataHome} />
+                                <SportsOdsMegaPari />
                             </div>
                         </div>
                     </div>

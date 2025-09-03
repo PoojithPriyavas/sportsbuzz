@@ -58,6 +58,7 @@ export default function BestBettingApps({ bestSectionsTab, sectionId }) {
         sport,
         countryCode,
         bestSections,
+        stages
 
     } = useGlobalData();
     useEffect(() => {
@@ -127,10 +128,13 @@ export default function BestBettingApps({ bestSectionsTab, sectionId }) {
                 {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
                     <>
-                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+                        {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
                     </>
                 ) : (
-                    <TestLive />
+                    <>
+                        {stages && <TestLive />}
+                    </>
+
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>

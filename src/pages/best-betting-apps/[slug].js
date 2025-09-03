@@ -53,7 +53,8 @@ export default function BestBettingApps({ sectionsTab }) {
         upcomingMatches,
         sport,
         countryCode,
-        bestSections
+        bestSections,
+        stages
     } = useGlobalData();
     // console.log(sections, "shgdfs")
 
@@ -132,10 +133,13 @@ export default function BestBettingApps({ sectionsTab }) {
                 {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
                     <>
-                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+                        {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
                     </>
                 ) : (
-                    <TestLive />
+                    <>
+                        {stages && <TestLive />}
+                    </>
+
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>

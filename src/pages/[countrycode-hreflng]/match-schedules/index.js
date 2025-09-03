@@ -87,7 +87,7 @@ export async function getServerSideProps(context) {
 export default function MatchSchedulerScreen({ countryDataHome, locationDataHome, resolvedUrl, }) {
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
 
-    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches } = useGlobalData();
+    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches, stages } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -149,10 +149,13 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
             <div className='container'>
                 {sport === 'cricket' ? (
                     <>
-                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+                        {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
                     </>
                 ) : (
-                    <TestLive />
+                    <>
+                        {stages && <TestLive />}
+                    </>
+
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
@@ -165,7 +168,7 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider countryCode={countryDataHome}/>
+                                <AutoSlider countryCode={countryDataHome} />
                             </div>
                         </div>
                         {sport === 'cricket' ? (
@@ -175,7 +178,7 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                        <AutoSliderEven countryCode={countryDataHome}/>
+                        <AutoSliderEven countryCode={countryDataHome} />
                         <SportsOdsMegaPari />
                     </div>
                 </div>

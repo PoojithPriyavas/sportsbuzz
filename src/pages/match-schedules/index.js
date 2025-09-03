@@ -23,7 +23,7 @@ import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 
 export default function MatchSchedulerScreen() {
 
-    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches, countryCode } = useGlobalData();
+    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches, countryCode, stages } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -85,10 +85,13 @@ export default function MatchSchedulerScreen() {
             <div className='container'>
                 {sport === 'cricket' ? (
                     <>
-                        <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />
+                        {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
                     </>
                 ) : (
-                    <TestLive />
+                    <>
+                        {stages && <TestLive />}
+                    </>
+
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
@@ -101,7 +104,7 @@ export default function MatchSchedulerScreen() {
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider  countryCode={countryCode}/>
+                                <AutoSlider countryCode={countryCode} />
                             </div>
                         </div>
                         {sport === 'cricket' ? (
@@ -111,7 +114,7 @@ export default function MatchSchedulerScreen() {
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                        <AutoSliderEven countryCode={countryCode}/>
+                        <AutoSliderEven countryCode={countryCode} />
                         <SportsOdsMegaPari />
                     </div>
                 </div>
