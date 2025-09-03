@@ -409,16 +409,18 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
             }, 500);
         }
     };
-    // const potentialClick = () => {
-    //     navigate('/')
-    //     setTimeout(() => {
-    //         setSelectedOdd(null);
-    //         setBetAmount('');
-    //         setWin('0.00');
-    //         setSuccess(false);
-    //         setShowBettingSection(false);
-    //     }, 3000);
-    // }
+    const potentialClick = () => {
+        window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=17&bid=1484', '_blank');
+
+        setTimeout(() => {
+            setSelectedOdd(null);
+            setBetAmount('');
+            setWin('0.00');
+            setSuccess(false);
+            setShowBettingSection(false);
+        }, 500)
+
+    }
 
     const getOddLabel = (type) => {
         switch (type) {
@@ -504,7 +506,8 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                         {betAmount && parseFloat(betAmount) > 0 && (
                             <div className={styles.potentialWin}
                                 style={{ cursor: 'pointer' }}>
-                                <div className={styles.potentialWinLabel}>{translatedText.potentialWinnings}</div>
+
+                                <div className={styles.potentialWinLabel} onClick={() => potentialClick()}>{translatedText.potentialWinnings}</div>
                                 <div className={styles.potentialWinAmount}>
                                     ₹{win}
                                 </div>

@@ -484,7 +484,7 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
 
                         {selectedOdd && betAmount && (
                             <div className={styles.potentialWin}>
-                                <div className={styles.potentialWinLabel}>{translatedText.potentialWinnings}</div>
+                                <div className={styles.potentialWinLabel} onClick={()=>window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=1119&bid=1650')}>{translatedText.potentialWinnings}</div>
                                 <div className={styles.potentialWinAmount}>
                                     ₹{win}
                                 </div>
