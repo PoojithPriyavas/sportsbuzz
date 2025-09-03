@@ -9,7 +9,8 @@ import 'swiper/css/pagination';
 import styles from './Carousal.module.css';
 import { useMediaQuery } from 'react-responsive';
 
-export default function HeroCarousal({countryCode}) {
+export default function HeroCarousal({ countryCode }) {
+  console.log(countryCode, "carousal country")
   const [banners, setBanners] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const swiperRef = useRef(null);
@@ -24,11 +25,13 @@ export default function HeroCarousal({countryCode}) {
         if (countryCode?.location?.id) {
           url.searchParams.append('country_code', countryCode.location.id);
         }
-        
+
         const res = await fetch(url.toString());
         const data = await res.json();
-        
-        const activeBanners = data.filter(b => b.is_active === 'Active');
+        const countryWiseBanner = data.filter(b => b.location === countryCode?.location?.id)
+        console.log(countryWiseBanner, "countrywise banner")
+        console.log(data, "carousal responses")
+        const activeBanners = countryWiseBanner.filter(b => b.is_active === 'Active');
         setBanners(activeBanners.sort((a, b) => a.order_by - b.order_by));
       } catch (error) {
         console.error('Failed to fetch banners:', error);
@@ -94,10 +97,10 @@ export default function HeroCarousal({countryCode}) {
         {banners.map((banner, index) => (
           <SwiperSlide key={banner.id}>
             <a href={banner.url} target="_blank" rel="noopener noreferrer">
-              <img 
-                src={isMobile ? banner.mobile_image : banner.image} 
-                className={styles.slideImage} 
-                alt={`Banner ${index + 1}`} 
+              <img
+                src={isMobile ? banner.mobile_image : banner.image}
+                className={styles.slideImage}
+                alt={`Banner ${index + 1}`}
                 style={{ aspectRatio: isMobile ? '3/1' : 'auto' }}
                 loading={index === 0 ? 'eager' : 'lazy'} // Load first image immediately
               />

@@ -9,7 +9,7 @@ import styles from './AutoSlider.module.css';
 import CustomAxios from '../utilities/CustomAxios';
 import axios from 'axios';
 
-export default function AutoSliderEven({countryCode}) {
+export default function AutoSliderEven({ countryCode }) {
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
   const swiperRef = useRef(null);
@@ -24,7 +24,8 @@ export default function AutoSliderEven({countryCode}) {
           }
         });
         const data = response.data;
-        setBanners(data);
+        const countryWiseSideBanner = data.filter(data => data.location === countryCode?.location?.id)
+        setBanners(countryWiseSideBanner);
       } catch (error) {
         console.error('Error fetching side banners:', error);
         throw error;
@@ -46,7 +47,7 @@ export default function AutoSliderEven({countryCode}) {
     }
   }, [loading, banners]);
 
-  const oddBanners = banners.filter((item,i)=>(item.order_by %2 ==0));
+  const oddBanners = banners.filter((item, i) => (item.order_by % 2 == 0));
 
   // Don't render Swiper until we have data
   if (loading || oddBanners.length === 0) {
@@ -64,8 +65,8 @@ export default function AutoSliderEven({countryCode}) {
       <Swiper
         ref={swiperRef}
         modules={[Autoplay, Pagination]}
-        autoplay={{ 
-          delay: 3000, 
+        autoplay={{
+          delay: 3000,
           disableOnInteraction: false,
           pauseOnMouseEnter: false
         }}
