@@ -100,7 +100,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
   } = useGlobalData();
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.codhatch.com';
 
-  // console.log(locationDataHome, "location home");
+  console.log(sections, "best betting apps console");
   // console.log(countryDataHome, "country data home")
 
 
