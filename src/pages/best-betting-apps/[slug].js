@@ -41,6 +41,7 @@ export async function getServerSideProps({ req }) {
 
 
 export default function BestBettingApps({ sectionsTab }) {
+
     console.log(sectionsTab, "sections tab")
 
     const [loading, setLoading] = useState(true);

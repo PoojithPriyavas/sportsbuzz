@@ -114,7 +114,10 @@ export default function BestBettingApps({ bestSectionsTab, sectionId }) {
 
     const metaTitle = matchedSection?.metatitle || 'Best Betting Apps';
     const metaDescription = matchedSection?.meta_description?.replace(/<[^>]+>/g, '') || 'Discover top-rated betting apps with secure payments, live odds, and exclusive bonuses. Compare features, user reviews, and promotional offers to find your perfect mobile betting experience.';
+    console.log("meta title betting apps id:", metaTitle);
+    console.log("meta desc betting apps id:", metaDescription);
     return (
+
         <>
             <Head>
                 <title>{metaTitle}</title>

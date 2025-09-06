@@ -30,6 +30,7 @@ export async function getServerSideProps(context) {
 
 
 export default function BlogDetailsMain({ blog }) {
+    console.log("blog deatails meta data : ",blog)
 
     // console.log(blog,"blog details")
     const [animationStage, setAnimationStage] = useState('loading');
