@@ -24,20 +24,23 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 export default function CricketMatchDetails() {
 
     const { getCricketDetails, cricketDetails, countryCode } = useGlobalData();
+    console.log(cricketDetails,"matc details")
 
     const [loading, setLoading] = useState(true);
 
     const params = useParams();
     const matchId = params?.slug;
-    // console.log(matchId, "matchid")
 
     useEffect(() => {
-        if (!matchId) {
-            console.error("Match ID is missing");
+        // Don't run the effect if params is null or matchId is missing
+        if (!params || !matchId) {
+            console.log("Waiting for params to load...", params);
             return;
         }
+
+        console.log("Running getCricketDetails with matchId:", matchId);
         getCricketDetails(matchId);
-    }, [matchId]);
+    }, [params, matchId]); // Depend on both params and matchId
 
     useEffect(() => {
         const timer1 = setTimeout(() => setLoading(false), 3000);

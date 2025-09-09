@@ -80,6 +80,7 @@ export async function getServerSideProps(context) {
 
 
 export default function BlogDetailsMain({ blog, locationDataHome }) {
+    console.log("blog in country :",blog)
     const { countryCode } = useGlobalData();
     const { "countrycode-hreflng": countryLang } = useParams();
     const languageValidation = useLanguageValidation(locationDataHome, countryLang);

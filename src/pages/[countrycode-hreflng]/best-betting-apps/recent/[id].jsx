@@ -176,6 +176,9 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
 
     const metaTitle = matchedSection?.metatitle || 'Best Betting Apps';
     const metaDescription = matchedSection?.meta_description?.replace(/<[^>]+>/g, '') || 'Discover the best betting apps available in India.';
+
+    console.log("meta title in country :", metaTitle);
+    console.log("meta desc in country :", metaDescription);
     return (
         <>
             <Head>
