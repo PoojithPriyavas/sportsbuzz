@@ -133,6 +133,8 @@
   align-items: center;
   gap: 0.4rem;
   font-weight: 600;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .liveDot {
@@ -143,6 +145,28 @@
   border-radius: 50%;
   position: relative;
   animation: livePulse 2s infinite;
+}
+
+.matchTime {
+  font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: auto;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.timezone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.6rem, 1.4vw, 0.7rem);
+  color: #3498db;
+  cursor: help;
 }
 
 .liveDot::after {

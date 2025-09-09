@@ -1,4 +1,5 @@
 import styles from './CricketDashboard.module.css';
+import { convertToVenueTime, formatMatchTime } from '../../utils/TimeZoneUtils';
 
 const CricketDashboard = ({ cricketDetails }) => {
   console.log(cricketDetails, "cricket data")
@@ -41,14 +42,15 @@ const CricketDashboard = ({ cricketDetails }) => {
     daynight = false
   } = cricketDetails;
 
-  // Format date with fallback
-  const matchDate = startdate 
-    ? new Date(startdate).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
+  // Format date with fallback using timezone conversion
+  const venueTimezone = venueinfo?.timezone || '+00:00';
+  const matchDateObj = startdate ? convertToVenueTime(startdate, venueTimezone) : null;
+  const matchDate = matchDateObj 
+    ? formatMatchTime(matchDateObj, { dateFormat: 'long', showTime: true, timeFormat: '12h' })
     : "Date not available";
+    
+  // Add timezone information to display
+  const timezoneInfo = venueinfo?.timezone ? `(${venueinfo.timezone})` : '';
 
   // Determine match status
   const isMatchComplete = state === 'Complete' || shortstatus === 'Complete';
@@ -89,6 +91,10 @@ const CricketDashboard = ({ cricketDetails }) => {
         <div className={styles.seriesTitle}>{seriesname}</div>
         <div className={styles.matchTitle}>
           {matchdesc} - {matchformat}
+        </div>
+        <div className={styles.matchDateTime}>
+          <span className={styles.calendarIcon}>🗓️</span> {matchDate}
+          {timezoneInfo && <span className={styles.timezoneInfo} title={`Venue timezone: ${venueinfo.timezone}`}>{timezoneInfo}</span>}
         </div>
         <div className={styles.statusContainer}>
           <span className={styles.statusIndicator}></span>

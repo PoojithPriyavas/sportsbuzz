@@ -5,6 +5,7 @@ import styles from './LiveScoreSection.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 import Link from 'next/link';
 import DynamicLink from '../Common/DynamicLink';
+import { convertToVenueTime, formatMatchTime, getMatchStateDisplay } from '../../utils/TimeZoneUtils';
 
 export default function LiveScores({ apiResponse = [], matchTypes = [], teamImages = [] }) {
   const [activeType, setActiveType] = useState('');
@@ -66,6 +67,20 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
         const score = match.matchScore;
         const team1 = info.team1;
         const team2 = info.team2;
+        const venueInfo = info.venueInfo;
+
+        // Convert match time to venue timezone
+        const matchDate = info.startDate ? 
+          convertToVenueTime(info.startDate, venueInfo?.timezone || '+00:00') : 
+          null;
+        
+        // Format match time
+        const formattedMatchTime = matchDate ? 
+          formatMatchTime(matchDate, { dateFormat: 'medium', timeFormat: '12h' }) : 
+          '';
+          
+        // Get match state display
+        const matchState = getMatchStateDisplay(info.state || 'Unknown');
 
         const team1Img = teamImages[team1.imageId];
         const team2Img = teamImages[team2.imageId];
@@ -75,8 +90,16 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
             <div className={styles.card}>
               <div className={styles.status}>
                 <span className={styles.liveDot}></span>
-                <span style={{ color: 'red' }}><strong>Live </strong></span>
+                <span style={matchState.style}><strong>{matchState.text} </strong></span>
                 <strong>{activeType}</strong>
+                {formattedMatchTime && (
+                  <span className={styles.matchTime}>
+                    {venueInfo?.timezone && (
+                      <span className={styles.timezone} title={`Venue timezone: ${venueInfo.timezone}`}>🕒</span>
+                    )}
+                    {formattedMatchTime}
+                  </span>
+                )}
               </div>
               <div className={styles.title}>{seriesName} - {info.matchDesc}</div>
 
