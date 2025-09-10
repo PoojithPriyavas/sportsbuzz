@@ -86,6 +86,7 @@ export async function getServerSideProps(context) {
 
 export default function Home({ countryDataHome, locationDataHome, isLocalhost }) {
   console.log(countryDataHome, "country data home")
+  console.log(locationDataHome,"location data home")
   const {
     blogCategories,
     blogs,
@@ -172,10 +173,10 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
         {/* Canonical */}
         {locationDataHome?.map(({ hreflang, country_code }) => {
-          {/* console.log(hreflang, "href lan home") */ }
+          console.log(hreflang, "href lan home")
           const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/`;
           const fullHrefLang = `${hreflang}-${country_code}`;
-          {/* console.log('Generated link:', { href, fullHrefLang }); */ }
+          console.log('Generated link:', { href, fullHrefLang });
 
           return (
             <link

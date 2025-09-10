@@ -50,54 +50,35 @@ import HeaderThree from "@/components/Header/HeaderThree";
 import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 
 export async function getServerSideProps(context) {
-    // Log the request origin (helpful for debugging)
-    // console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
     try {
-        const { req } = context;
         const [countryRes, locationRes] = await Promise.all([
             fetch('https://admin.sportsbuz.com/api/get-country-code/')
                 .then(async (response) => {
                     if (!response.ok) {
                         throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
                     }
-                    const data = await response.json();
-                    return { data, headers: response.headers, status: response.status, url: response.url };
+                    return response.json();
                 }),
-            fetch('https://admin.sportsbuz.com/api/locations/')
+            fetch('https://admin.sportsbuz.com/api/locations')
                 .then(async (response) => {
                     if (!response.ok) {
                         throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
                     }
-                    const data = await response.json();
-                    return { data, headers: response.headers, status: response.status, url: response.url };
+                    return response.json();
                 })
         ]);
 
-        const countryDataHome = countryRes.data;
-        const locationDataHome = locationRes.data;
-
-        // Detailed logging
-        // console.log('=== API RESPONSE DATA ===');
-        // console.log('Country Data in the props:', JSON.stringify(countryRes.data, null, 2));
-        // console.log('Location Data in the props:', JSON.stringify(locationRes.data, null, 2));
-        // console.log('Response Headers - Country in the props:', Object.fromEntries(countryRes.headers));
-        // console.log('Response Headers - Location: in the props', Object.fromEntries(locationRes.headers));
+        const countryDataHome = countryRes;
+        const locationDataHome = locationRes;
 
         return {
             props: {
                 countryDataHome,
-                locationDataHome,
+                locationDataHome
             }
         };
     } catch (error) {
-        // console.error("Error fetching data from APIs:", error.message);
-        console.error("API Error Details: in the props", {
-            url: error.url || 'Unknown URL',
-            status: error.status || 'Unknown Status',
-            message: error.message,
-            name: error.name,
-            stack: error.stack
-        });
+        console.error("Error fetching data from APIs:", error.message);
         return {
             props: {
                 countryDataHome: null,
@@ -207,10 +188,10 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
                 {/* Canonical */}
                 {locationDataHome?.map(({ hreflang, country_code }) => {
-                    {/* console.log(hreflang, "href lan home") */ }
+                    console.log(hreflang, "href lan sp-home");
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    {/* console.log('Generated link:', { href, fullHrefLang }); */ }
+                    console.log('sp-Generated link:', { href, fullHrefLang });
 
                     return (
                         <link
