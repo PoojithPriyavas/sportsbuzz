@@ -159,7 +159,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
         {/* Canonical */}
         {locationDataHome?.map(({ hreflang, country_code }) => {
           console.log(hreflang, "href lan home")
-          const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/`;
+          const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
           const fullHrefLang = `${hreflang}-${country_code}`;
           console.log('Generated link:', { href, fullHrefLang });
 

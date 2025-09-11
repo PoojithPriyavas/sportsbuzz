@@ -51,45 +51,30 @@ import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 
 export async function getServerSideProps(context) {
     try {
-        const [countryRes, locationRes] = await Promise.all([
-            fetch('https://admin.sportsbuz.com/api/get-country-code/')
-                .then(async (response) => {
-                    if (!response.ok) {
-                        throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json();
-                }),
-            fetch('https://admin.sportsbuz.com/api/locations')
-                .then(async (response) => {
-                    if (!response.ok) {
-                        throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-        ]);
+        const locationRes = await fetch('https://admin.sportsbuz.com/api/locations');
 
-        const countryDataHome = countryRes;
-        const locationDataHome = locationRes;
+        if (!locationRes.ok) {
+            throw new Error(`Location API failed: ${locationRes.status} ${locationRes.statusText}`);
+        }
+
+        const locationDataHome = await locationRes.json();
 
         return {
             props: {
-                countryDataHome,
                 locationDataHome
             }
         };
     } catch (error) {
-        console.error("Error fetching data from APIs:", error.message);
+        console.error("Error fetching data from location API:", error.message);
         return {
             props: {
-                countryDataHome: null,
                 locationDataHome: null,
                 isLocalhost: process.env.NODE_ENV === 'development'
             }
         };
     }
 }
-
-export default function Home({ countryDataHome, locationDataHome, isLocalhost }) {
+export default function Home({ locationDataHome, isLocalhost }) {
 
     const {
         blogCategories,
@@ -100,7 +85,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
         teamImages,
         upcomingMatches,
         sport,
-        // countryCode,
+        countryCode,
         stages,
         news,
         fetchBettingApps
@@ -116,7 +101,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
     // console.log(slug.countrycode-hreflng,"slug in index")
 
     // console.log(locationDataHome, "location home");
-    // console.log(countryDataHome, "country data home")
+    // console.log(countryCode, "country data home")
 
 
     // if (countryCode && countryCode.country_code) {
@@ -229,7 +214,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
 
             <>
 
-                {/* {showOtherDivs && <RegionSelector countryDataHome={countryDataHome} locationDataHome={locationDataHome} />} */}
+                {/* {showOtherDivs && <RegionSelector countryCode={countryCode} locationDataHome={locationDataHome} />} */}
                 <HeaderThree animationStage={animationStage} />
                 {showOtherDivs && (
                     <div
@@ -248,11 +233,11 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                             <TestLive />
                         )}
 
-                        <HeroCarousal countryCode={countryDataHome} />
+                        <HeroCarousal countryCode={countryCode} />
 
                         <div className={styles.fourColumnRow}>
                             <div className={styles.leftThreeColumns}>
-                                {/* {countryDataHome?.location?.betting_apps == 'Active' && ( */}
+                                {/* {countryCode?.location?.betting_apps == 'Active' && ( */}
                                 <BonusTable sections={sections} />
                                 {/* )} */}
                                 <div className={styles.twoSplitRow}>
@@ -284,7 +269,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                                         <JoinTelegramButton />
                                     </div>
                                     <div className={styles.fourthColumnRight}>
-                                        <AutoSlider countryCode={countryDataHome} />
+                                        <AutoSlider countryCode={countryCode} />
                                     </div>
                                 </div>
                                 {sport === 'cricket' ? (
@@ -294,7 +279,7 @@ export default function Home({ countryDataHome, locationDataHome, isLocalhost })
                                 ) : (
                                     <UpcomingFootballMatches />
                                 )}
-                                <AutoSliderEven countryCode={countryDataHome} />
+                                <AutoSliderEven countryCode={countryCode} />
                                 <SportsOdsMegaPari />
                             </div>
                         </div>
