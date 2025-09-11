@@ -49,13 +49,17 @@ function getTime(esd) {
     const hour = parseInt(raw.slice(8, 10));
     const minute = raw.slice(10, 12);
 
-    return `${hour.toString().padStart(2, '0')}:${minute}`;
-}
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 === 0 ? 12 : hour % 12;
 
+    return `${hour12}:${minute} ${period}`;
+}
 export default function UpcomingFootballMatches() {
     const { upcoming, fetchFootBallLineUp, fetchFootballDetails } = useGlobalData();
+
+    console.log(upcoming, "upcoming values")
     const [selectedLeague, setSelectedLeague] = useState('All');
-      const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
+    const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
     // console.log(upcoming, "up ckaskjdjsd")
     // Prepare league names
     const allLeagues = upcoming?.Stages?.map(stage => stage?.Cnm).filter(Boolean) || [];

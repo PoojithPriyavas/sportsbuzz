@@ -59,7 +59,7 @@ export const DataProvider = ({ children }) => {
     const [currentTimezone, setCurrentTimezone] = useState('+0.00');
 
     const getTimezoneByCountryCode = (code) => {
-        console.log(code,"code in country data")
+        console.log(code, "code in country data")
         const country = countryTimezones.find(item => item[0] === code);
         console.log(country, "countrydfdfgdfgd")
         return country ? country[1] : '+0.00';
@@ -711,7 +711,7 @@ export const DataProvider = ({ children }) => {
     const [cricketDetails, setCricketDetails] = useState([]);
 
     const getCricketDetails = async (id) => {
-        console.log(id,"getting match id ")
+        console.log(id, "getting match id ")
         try {
             const response = await axios.get(`/api/get-cricket-match-details?matchId=${id}`)
             setCricketDetails(response.data)
@@ -807,7 +807,7 @@ export const DataProvider = ({ children }) => {
                 params: {
                     Category: 'soccer',
                     Date: formattedDate,
-                    Timezone: '-5'
+                    Timezone: currentTimezone
                 },
                 headers: {
                     'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
@@ -857,7 +857,7 @@ export const DataProvider = ({ children }) => {
                 params: {
                     Category: 'soccer',
                     Date: formattedDate,
-                    Timezone: '-5'
+                    Timezone: currentTimezone
                 },
                 headers: {
                     'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',

@@ -70,15 +70,15 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
         const venueInfo = info.venueInfo;
 
         // Convert match time to venue timezone
-        const matchDate = info.startDate ? 
-          convertToVenueTime(info.startDate, venueInfo?.timezone || '+00:00') : 
+        const matchDate = info.startDate ?
+          convertToVenueTime(info.startDate, venueInfo?.timezone || '+00:00') :
           null;
-        
+
         // Format match time
-        const formattedMatchTime = matchDate ? 
-          formatMatchTime(matchDate, { dateFormat: 'medium', timeFormat: '12h' }) : 
+        const formattedMatchTime = matchDate ?
+          formatMatchTime(matchDate, { dateFormat: 'medium', timeFormat: '12h' }) :
           '';
-          
+
         // Get match state display
         const matchState = getMatchStateDisplay(info.state || 'Unknown');
 
@@ -89,8 +89,8 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
           <DynamicLink href={`/cricket-match-details/${info.matchId}`} key={`match-${info.matchId}`}>
             <div className={styles.card}>
               <div className={styles.status}>
-                <span className={styles.liveDot}></span>
-                <span style={matchState.style}><strong>{matchState.text} </strong></span>
+
+                <span style={matchState.style}> <span className={styles.liveDot}></span><strong style={{paddingLeft:'5px'}}>{matchState.text} </strong></span>
                 <strong>{activeType}</strong>
                 {formattedMatchTime && (
                   <span className={styles.matchTime}>
