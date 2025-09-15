@@ -48,7 +48,7 @@ export default function BlogsPage({
   const [filterValue, setFilterValue] = useState('all');
   const [currentPage, setCurrentPage] = useState(initialPage); // Use initialPage here
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-  const { language, translateText, fetchBlogs, countryCode } = useGlobalData();
+  const { language, translateText, fetchBlogs, countryCode, sport, upcomingMatches } = useGlobalData();
   const searchParams = useSearchParams();
 
   // Get category and subcategory from URL params
@@ -354,7 +354,13 @@ export default function BlogsPage({
 
               </div>
               <div className={styles.fourthColumnRight}>
-                <UpcomingFootballMatches />
+                {sport === 'cricket' ? (
+                  <>
+                    <UpcomingMatches upcomingMatches={upcomingMatches} />
+                  </>
+                ) : (
+                  <UpcomingFootballMatches />
+                )}
               </div>
             </div>
 
