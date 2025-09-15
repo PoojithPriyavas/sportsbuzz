@@ -888,7 +888,7 @@
 
 /* Tablet and Mobile Responsive Design */
 /* Tablet and Mobile Responsive Design */
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     .loadingContainer {
         padding: 0 1rem;
         justify-content: space-between;

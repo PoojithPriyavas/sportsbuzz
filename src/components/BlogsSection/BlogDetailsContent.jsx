@@ -66,12 +66,12 @@ export default function BlogDetailContent({ blog }) {
           className={styles.description}
           dangerouslySetInnerHTML={{ __html: translatedBlog.text_editor }}
         />
-        <div><JoinTelegramButton /></div>
+        <div style={{padding:'10px 0px'}}><JoinTelegramButton /></div>
         <div
           className={styles.description}
           dangerouslySetInnerHTML={{ __html: translatedBlog.text_editor_1 }}
         />
-        <div><JoinTelegramButton /></div>
+        <div style={{padding:'10px 0px'}}><JoinTelegramButton /></div>
         <div
           className={styles.description}
           dangerouslySetInnerHTML={{ __html: translatedBlog.text_editor_2 }}
