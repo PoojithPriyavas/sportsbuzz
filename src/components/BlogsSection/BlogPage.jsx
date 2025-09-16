@@ -93,7 +93,20 @@ export default function BlogsPage({
   
   const hasActiveFilters =
     selectedCategoryId || selectedSubcategoryId || filterValue !== 'all' || searchTerm !== '';
-  const showPagination = totalBlogs > ITEMS_PER_PAGE;
+  
+  // Show pagination if we have next/prev URLs or if there are multiple pages
+  const showPagination = nextUrl || prevUrl || totalBlogs > ITEMS_PER_PAGE;
+
+  // Helper function to extract page number from URL
+  const getPageFromUrl = (url) => {
+    if (!url) return null;
+    const urlParams = new URLSearchParams(url.split('?')[1]);
+    return parseInt(urlParams.get('page')) || 1;
+  };
+
+  // Get next and previous page numbers
+  const nextPageNumber = getPageFromUrl(nextUrl);
+  const prevPageNumber = getPageFromUrl(prevUrl);
 
   // Initialize component and sync with URL params
   useEffect(() => {
@@ -219,7 +232,7 @@ export default function BlogsPage({
 
     return () => clearTimeout(timeoutId);
   }, [
-    isInitialized, // Add this as dependency
+    isInitialized,
     searchTerm,
     selectedCategoryId,
     selectedSubcategoryId,
@@ -262,10 +275,11 @@ export default function BlogsPage({
     router.replace('/blogs/pages/all-blogs', { scroll: false });
   };
 
+  // Updated pagination handlers to use API next/prev URLs
   const handlePageChange = (pageNumber) => {
     if (!isMountedRef.current || !pageNumber) return;
     
-    if (pageNumber >= 1 && pageNumber <= totalPages && pageNumber !== currentPage) {
+    if (pageNumber !== currentPage) {
       console.log('BlogsPage: Changing page to:', pageNumber);
       setCurrentPage(pageNumber);
       updateURL(pageNumber, searchTerm, selectedCategoryId, selectedSubcategoryId);
@@ -286,14 +300,14 @@ export default function BlogsPage({
   };
 
   const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      handlePageChange(currentPage - 1);
+    if (prevUrl && prevPageNumber) {
+      handlePageChange(prevPageNumber);
     }
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      handlePageChange(currentPage + 1);
+    if (nextUrl && nextPageNumber) {
+      handlePageChange(nextPageNumber);
     }
   };
 
@@ -310,6 +324,7 @@ export default function BlogsPage({
     }
   };
 
+  // Updated page numbers generation based on current page and total pages
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
@@ -350,9 +365,13 @@ export default function BlogsPage({
       countryCode: countryCode?.country_code,
       hasActiveFilters,
       showPagination,
-      isInitialized
+      isInitialized,
+      nextUrl,
+      prevUrl,
+      nextPageNumber,
+      prevPageNumber
     });
-  }, [blogs, isLoading, totalBlogs, currentPage, searchTerm, selectedCategoryId, selectedSubcategoryId, countryCode?.country_code, hasActiveFilters, showPagination, isInitialized]);
+  }, [blogs, isLoading, totalBlogs, currentPage, searchTerm, selectedCategoryId, selectedSubcategoryId, countryCode?.country_code, hasActiveFilters, showPagination, isInitialized, nextUrl, prevUrl, nextPageNumber, prevPageNumber]);
 
   return (
     <>
@@ -451,12 +470,13 @@ export default function BlogsPage({
               )}
             </div>
 
-            {showPagination && totalPages > 1 && !isLoading && (
+            {/* Updated pagination section to use API-based navigation */}
+            {showPagination && !isLoading && (
               <div className={styles.pagination}>
                 <button
                   onClick={handlePreviousPage}
-                  disabled={currentPage === 1}
-                  className={`${styles.paginationButton} ${styles.prevNext} ${currentPage === 1 ? styles.disabled : ''}`}
+                  disabled={!prevUrl}
+                  className={`${styles.paginationButton} ${styles.prevNext} ${!prevUrl ? styles.disabled : ''}`}
                   aria-label="Previous page"
                 >
                   <FaChevronLeft className={styles.paginationIcon} />
@@ -485,8 +505,8 @@ export default function BlogsPage({
 
                 <button
                   onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  className={`${styles.paginationButton} ${styles.prevNext} ${currentPage === totalPages ? styles.disabled : ''}`}
+                  disabled={!nextUrl}
+                  className={`${styles.paginationButton} ${styles.prevNext} ${!nextUrl ? styles.disabled : ''}`}
                   aria-label="Next page"
                 >
                   {translations.next}

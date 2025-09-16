@@ -53,7 +53,7 @@ const HeaderTwo = ({ animationStage }) => {
         teamImages,
         upcomingMatches
     } = useGlobalData();
-
+    console.log(countryCode, "country code value in header")
     // Initialize dark mode from localStorage
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -802,7 +802,7 @@ const HeaderTwo = ({ animationStage }) => {
                             {translatedText.home}
                         </Link>
 
-                        {countryCode?.location?.betting_apps === 'Active' && (
+                        {countryCode?.location?.betting_apps == 'Active' && (
                             <Link href="/best-betting-apps/current" className={`${styles.navItem} ${pathname === '/best-betting-apps/current' ? styles.active : ''}`}>
                                 {translatedText.apps}
                             </Link>

@@ -218,9 +218,9 @@ export default function Home({ locationDataHome, isLocalhost }) {
 
             <div className={styles.fourColumnRow}>
               <div className={styles.leftThreeColumns}>
-                {/* {countryCode?.location?.betting_apps == 'Active' && ( */}
+                {countryCode?.location?.betting_apps == 'Active' && (
                 <BonusTable sections={sections} />
-                {/* )} */}
+                )}
                 <div className={styles.twoSplitRow}>
                   <div className={styles.leftSplit}>
                     {/* {sport === 'cricket' ? (

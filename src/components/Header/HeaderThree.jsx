@@ -546,7 +546,7 @@ console.log(countryCode,"counrty cod")
                         {translatedText.home}
                     </Link>
 
-                    {countryCode?.location?.betting_apps == 'Active' && (
+                    {countryCode?.location?.betting_apps == 'inactive' && (
                         <Link
                             href={`/${hreflang}-${countryCodeCookie}/best-betting-apps/current`}
                             className={`${styles.mobileNavItem} ${pathname === `/${hreflang}-${countryCodeCookie}/best-betting-apps/current` ? styles.active : ''}`}
