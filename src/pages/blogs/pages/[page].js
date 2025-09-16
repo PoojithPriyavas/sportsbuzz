@@ -102,6 +102,7 @@ export default function BlogPages({
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     const countryCode = countryDataHome?.country_code || 'IN';
     const { blogs } = useGlobalData();
+    console.log(blogs,"blogs data")
     // console.log(resolvedUrl, "rshdhasd")
     // console.log(blogs, "blogs hhh")
     // const { blogs, } = useGlobalData()   

@@ -37,6 +37,10 @@ export const DataProvider = ({ children }) => {
     const [blogCategories, setBlogCategories] = useState([]);
     const [recentBlogs, setrecentBlogs] = useState([]);
     const [blogs, setBlogs] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [totalBlogs, setTotalBlogs] = useState(0);
+    const [nextUrl, setNextUrl] = useState(null);
+    const [prevUrl, setPrevUrl] = useState(null);
     const [sections, setSections] = useState([]);
     const [bestSections, setBestSections] = useState([]);
     // const [sport, setSport] = useState('cricket');
@@ -534,15 +538,25 @@ export const DataProvider = ({ children }) => {
         countryCodeParam = countryCode?.country_code,
         search = '',
         category = null,
-        subcategory = null
-    } = {}) => { // Add default empty object
+        subcategory = null,
+        page = 1
+    } = {}) => {
+        // Don't fetch if no country code
+        if (!countryCodeParam) {
+            console.warn('No country code available for fetching blogs');
+            return;
+        }
+
+        setIsLoading(true);
+
         try {
             const params = {
                 country_code: countryCodeParam,
+                // page: page
             };
 
-            if (search) {
-                params.search = search;
+            if (search && search.trim()) {
+                params.search = search.trim();
             }
 
             if (category) {
@@ -553,18 +567,32 @@ export const DataProvider = ({ children }) => {
                 params.subcategory_id = subcategory;
             }
 
-            // console.log('Fetching blogs with params:', params); // Debug log
+            console.log('ApiContext: Fetching blogs with params:', params);
 
             const response = await axios.get('https://admin.sportsbuz.com/api/get-blogs', {
                 params,
             });
 
-            setBlogs(response.data.results || []);
+            // Update all blog-related state
+            const data = response.data;
+            setBlogs(data.results || []);
+            setTotalBlogs(data.count || 0);
+            setNextUrl(data.next || null);
+            setPrevUrl(data.previous || null);
+
+            console.log('ApiContext: Blogs fetched successfully:', data.results?.length || 0, 'blogs');
+
         } catch (error) {
             console.error('Failed to fetch blogs:', error);
+            // Reset state on error
+            setBlogs([]);
+            setTotalBlogs(0);
+            setNextUrl(null);
+            setPrevUrl(null);
+        } finally {
+            setIsLoading(false);
         }
     }, [countryCode?.country_code]);
-
 
 
     // BETTING TABLE DATA - API IMPLEMENTATIONS
@@ -977,21 +1005,25 @@ export const DataProvider = ({ children }) => {
 
 
     useEffect(() => {
-        if (countryCode.country_code) {
-            // console.log('Country code available, fetching dependent data:', countryCode.country_code);
-            fetchBlogs({ countryCodeParam: countryCode.country_code }); // Pass as object
+        if (countryCode?.country_code) {
+            console.log('Country code available, fetching initial blogs:', countryCode.country_code);
+            // fetchBlogs({ countryCodeParam: countryCode.country_code });
             fetchBettingApps(countryCode.country_code);
             fetchBestBettingAppsPrevious(countryCode.country_code);
         }
-    }, [countryCode.country_code, fetchBlogs]);
-
+    }, [countryCode?.country_code]);
     return (
         <DataContext.Provider
             value={{
                 blogCategories,
                 recentBlogs,
-                fetchBlogs,
                 blogs,
+                setBlogs,
+                isLoading,
+                totalBlogs,
+                nextUrl,
+                prevUrl,
+                fetchBlogs,
                 fetchBettingApps,
                 sections,
                 setSections,

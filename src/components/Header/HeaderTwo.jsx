@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useGlobalData } from '../Context/ApiContext';
 import { FaMoon, FaSun, FaChevronDown, FaBars, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
+import DynamicLink from '../Common/DynamicLink';
 import axios from 'axios';
 
 import FeaturedButton from '../FeaturedButton/FeaturedButton';
@@ -597,12 +598,12 @@ const HeaderTwo = ({ animationStage }) => {
                                 className={styles.mobileDropdownHeader}
                                 onClick={() => toggleCategory(cat.id)}
                             >
-                                <Link
+                                <DynamicLink
                                     href={`/blogs/pages/all-blogs?category=${cat.id}`}
                                     onClick={handleNavItemClick}
                                 >
                                     {capitalizeFirstLetter(cat.name)}
-                                </Link>
+                                </DynamicLink>
                                 {cat.subcategories?.length > 0 && (
                                     <FaChevronDown
                                         style={{
@@ -616,14 +617,14 @@ const HeaderTwo = ({ animationStage }) => {
                             {cat.subcategories?.length > 0 && (
                                 <div className={`${styles.mobileSubmenu} ${expandedCategory === cat.id ? styles.open : ''}`}>
                                     {cat.subcategories.map((sub) => (
-                                        <Link
+                                        <DynamicLink
                                             key={sub.id}
                                             href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}
                                             className={styles.mobileSubmenuItem}
                                             onClick={handleNavItemClick}
                                         >
                                             {sub.name}
-                                        </Link>
+                                        </DynamicLink>
                                     ))}
                                 </div>
                             )}
@@ -813,23 +814,23 @@ const HeaderTwo = ({ animationStage }) => {
 
                         {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
                             <div key={cat.id} className={styles.dropdown}>
-                                <Link
+                                <DynamicLink
                                     href={`/blogs/pages/all-blogs?category=${cat.id}`}
                                     className={styles.navItem}
                                 >
                                     {capitalizeFirstLetter(cat.name)} <FaChevronDown />
-                                </Link>
+                                </DynamicLink>
 
                                 {cat.subcategories?.length > 0 && (
                                     <ul className={styles.submenu}>
                                         {cat.subcategories.map((sub) => (
                                             <li key={sub.id}>
-                                                <Link
+                                                <DynamicLink
                                                     href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}
                                                     className={styles.submenuItem}
                                                 >
                                                     {sub.name}
-                                                </Link>
+                                                </DynamicLink>
                                             </li>
                                         ))}
                                     </ul>

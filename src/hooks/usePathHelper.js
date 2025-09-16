@@ -28,14 +28,22 @@ export const usePathHelper = () => {
   }, [router.asPath, router.query]);
   
   const buildPath = (path) => {
+    // Check if path is undefined or null
+    if (path === undefined || path === null) {
+      console.warn('DynamicLink received undefined or null path');
+      return '/';
+    }
+    
     // If the path already includes the language-country code, return it as is
-    if (path.match(/^\/[a-z]{2}-[A-Z]{2}\//)) {
+    if (path.match && path.match(/^\/[a-z]{2}-[A-Z]{2}\//)) {
       // console.log('Path already contains language-country code:', path);
       return path;
     }
     
     // Ensure path starts with /
-    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    const cleanPath = typeof path === 'string' && path.startsWith ? 
+      (path.startsWith('/') ? path : `/${path}`) : 
+      '/';
     const fullPath = `${pathPrefix}${cleanPath}`;
     
     // console.log('Built path with prefix:', fullPath);
