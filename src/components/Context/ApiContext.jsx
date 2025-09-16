@@ -979,7 +979,7 @@ export const DataProvider = ({ children }) => {
         if (!initialDataLoaded) {
             // Load non-sport specific data
             fetchBlogCategories();
-            fetchRecentBlogs();
+            // fetchRecentBlogs();
             fetchLocation();
             getCountryCode();
             fetchSettings();
@@ -1007,11 +1007,13 @@ export const DataProvider = ({ children }) => {
     useEffect(() => {
         if (countryCode?.country_code) {
             console.log('Country code available, fetching initial blogs:', countryCode.country_code);
-            // fetchBlogs({ countryCodeParam: countryCode.country_code });
+            fetchBlogs({ countryCodeParam: countryCode.country_code });
             fetchBettingApps(countryCode.country_code);
             fetchBestBettingAppsPrevious(countryCode.country_code);
         }
     }, [countryCode?.country_code]);
+
+    
     return (
         <DataContext.Provider
             value={{

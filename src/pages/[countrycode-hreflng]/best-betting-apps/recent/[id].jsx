@@ -7,7 +7,7 @@ import UpcomingMatches from "@/components/UpComing/UpComingMatches";
 import styles from '../../../../styles/Home.module.css';
 import AutoSlider from "@/components/AutoSlider/AutoSlider";
 import TopNewsSection from "@/components/NewsSection/TopNews";
-import BlogSlider from "@/components/BlogsSection/BlogSlider";
+// import BlogSlider from "@/components/BlogsSection/BlogSlider";
 import LoadingScreen from "@/components/Loader/Loader";
 import { useEffect, useState } from "react";
 import TestLive from "@/components/LiveScoreSection/TestLive";
