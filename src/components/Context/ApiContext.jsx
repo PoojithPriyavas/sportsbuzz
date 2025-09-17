@@ -78,11 +78,12 @@ export const DataProvider = ({ children }) => {
     const getCountryCode = async () => {
         try {
             if (validatedLocationData && validatedLocationData.country_code) {
-                // console.log("calls the validation country code", validatedLocationData);
+                console.log("calls the validation country code", validatedLocationData);
                 setCountryCode(validatedLocationData);
                 setCurrentTimezone(getTimezoneByCountryCode(validatedLocationData.country_code));
                 // console.log('Using validated location data:', validatedLocationData);
             } else {
+                console.log('enters the country code else condition')
                 const response = await fetch('https://admin.sportsbuz.com/api/get-country-code');
 
                 // Check if the response is successful
@@ -598,8 +599,8 @@ export const DataProvider = ({ children }) => {
     // BETTING TABLE DATA - API IMPLEMENTATIONS
 
     const fetchBettingApps = async (countryCodeParam = countryCode.country_code) => {
-        // console.log(countryCodeParam, "c param")
-        // console.log("called the betting apps")
+        console.log(countryCodeParam, "c param")
+        console.log("called the betting apps")
         if (!countryCodeParam) {
             console.error('No country code available for fetching betting apps');
             return;

@@ -10,7 +10,6 @@ import UpcomingMatches from "@/components/UpComing/UpComingMatches";
 import AutoSlider from "@/components/AutoSlider/AutoSlider";
 import PredictionSection from "@/components/Prediction/Prediction";
 import SmallAdBox from "@/components/SmallAds/SmallAdsBox";
-// import TopNewsSection from "@/components/NewsSection/TopNews";
 import NewsList from "@/components/NewsSection/TopNews";
 import MultiBannerSlider from "@/components/Multibanner/MultiBannerSlider";
 import BlogSection from "@/components/BlogsSection/BlogsSection";
@@ -29,6 +28,15 @@ import Footer from '@/components/Footer/Footer';
 import TestHeader from "@/components/Header/TestHeader";
 import HeaderTwo from "@/components/Header/HeaderTwo";
 import RegionSelector from "@/components/RegionSelector/RegionSelector";
+import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
+import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
+
+// Import hreflang helper utilities
+import { 
+  hasHreflangTags, 
+  hasLanguageCountryFormat, 
+  logHreflangStatus 
+} from "@/utils/hreflangHelper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,8 +49,6 @@ const geistMono = Geist_Mono({
 });
 
 import axios from 'axios';
-import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
-import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 
 export async function getServerSideProps(context) {
   try {
@@ -85,21 +91,45 @@ export default function Home({ locationDataHome, isLocalhost }) {
     stages,
     news
   } = useGlobalData();
+  
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
 
   console.log(sections, "best betting apps console");
-  // console.log(countryCode, "country data home")
-
-
-  // if (countryCode && countryCode.country_code) {
-  //   console.log("Valid country code:", countryCode.country_code);
-  // }
 
   const [loading, setLoading] = useState(true);
   const [animationStage, setAnimationStage] = useState('loading');
   const [showOtherDivs, setShowOtherDivs] = useState(false);
   const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
+  const [hreflangDetected, setHreflangDetected] = useState(false);
 
+  // Check for hreflang tags and URL format on component mount
+  useEffect(() => {
+    const checkHreflangStatus = () => {
+      const hasHreflang = hasHreflangTags();
+      const hasValidFormat = hasLanguageCountryFormat(window.location.pathname);
+      
+      setHreflangDetected(hasHreflang);
+      
+      // Log the scenario being used
+      if (hasHreflang && hasValidFormat) {
+        logHreflangStatus('2', { 
+          pathname: window.location.pathname,
+          hasHreflang,
+          hasValidFormat 
+        });
+      } else {
+        logHreflangStatus('1', { 
+          pathname: window.location.pathname,
+          hasHreflang,
+          hasValidFormat 
+        });
+      }
+    };
+
+    // Check after a small delay to ensure DOM is ready
+    const timer = setTimeout(checkHreflangStatus, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     // Check if animation has been played before
@@ -110,7 +140,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
       const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
       const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
       const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
-      const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); // Show content after transition completes
+      const timer4 = setTimeout(() => setShowOtherDivs(true), 6500);
 
       return () => {
         clearTimeout(timer1);
@@ -134,13 +164,33 @@ export default function Home({ locationDataHome, isLocalhost }) {
 
   useEffect(() => {
     if (showOtherDivs) {
-      const timeout = setTimeout(() => setHasAnimatedIn(true), 50); // slight delay triggers transition
+      const timeout = setTimeout(() => setHasAnimatedIn(true), 50);
       return () => clearTimeout(timeout);
     }
   }, [showOtherDivs]);
 
+  // Generate hreflang links only if locationDataHome is available
+  const generateHreflangLinks = () => {
+    if (!locationDataHome || !Array.isArray(locationDataHome)) {
+      console.warn('No location data available for hreflang generation');
+      return [];
+    }
 
-  // console.log("enters this condition", countryCode?.location?.betting_apps?.trim() === 'Active');
+    return locationDataHome.map(({ hreflang, country_code }) => {
+      console.log(hreflang, "href lang home")
+      const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
+      const fullHrefLang = `${hreflang}-${country_code}`;
+      console.log('Generated hreflang link:', { href, fullHrefLang });
+
+      return {
+        key: fullHrefLang,
+        hreflang: fullHrefLang,
+        href: href
+      };
+    });
+  };
+
+  const hreflangLinks = generateHreflangLinks();
 
   return (
     <>
@@ -156,22 +206,19 @@ export default function Home({ locationDataHome, isLocalhost }) {
         />
         <meta name="author" content="Sportsbuz" />
 
-        {/* Canonical */}
-        {locationDataHome?.map(({ hreflang, country_code }) => {
-          console.log(hreflang, "href lan home")
-          const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
-          const fullHrefLang = `${hreflang}-${country_code}`;
-          console.log('Generated link:', { href, fullHrefLang });
+        {/* Hreflang links - Critical for Scenario 2 */}
+        {hreflangLinks.map(({ key, hreflang, href }) => (
+          <link
+            key={key}
+            rel="alternate"
+            href={href}
+            hrefLang={hreflang}
+          />
+        ))}
 
-          return (
-            <link
-              key={fullHrefLang}
-              rel="alternate"
-              href={href}
-              hreflang={fullHrefLang}
-            />
-          );
-        })}
+        {/* Canonical URL */}
+        <link rel="canonical" href={`${baseUrl}${typeof window !== 'undefined' ? window.location.pathname : ''}`} />
+
         {/* Open Graph (for Facebook, LinkedIn, etc.) */}
         <meta property="og:title" content="Sportsbuz | Live Scores & Betting Tips" />
         <meta
@@ -195,15 +242,35 @@ export default function Home({ locationDataHome, isLocalhost }) {
 
         {/* Favicon */}
         <link rel="icon" href="/favicon.ico" />
+
+        {/* Additional meta for location-based handling */}
+        <meta name="hreflang-detected" content={hreflangDetected ? 'true' : 'false'} />
       </Head>
 
       <>
-        {/* <RegionSelector countryCode={countryCode} locationDataHome={locationDataHome} /> */}
+        {/* Debug info in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            right: 0,
+            background: 'rgba(0,0,0,0.8)',
+            color: 'white',
+            padding: '10px',
+            fontSize: '12px',
+            zIndex: 9999
+          }}>
+            <div>Hreflang Tags: {hreflangDetected ? '✅' : '❌'}</div>
+            <div>URL Format: {hasLanguageCountryFormat(typeof window !== 'undefined' ? window.location.pathname : '') ? '✅' : '❌'}</div>
+            <div>Scenario: {hreflangDetected && hasLanguageCountryFormat(typeof window !== 'undefined' ? window.location.pathname : '') ? '2' : '1'}</div>
+          </div>
+        )}
+
         <HeaderTwo animationStage={animationStage} />
         {showOtherDivs && (
           <div
-            // style={{marginTop:'9.5rem'}}
-            className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
+            className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter} ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
+            
             {sport === 'cricket' ? (
               <>
                 {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
@@ -212,24 +279,17 @@ export default function Home({ locationDataHome, isLocalhost }) {
               <>
                 {stages && <TestLive />}
               </>
-
             )}
+            
             <HeroCarousal countryCode={countryCode} />
 
             <div className={styles.fourColumnRow}>
               <div className={styles.leftThreeColumns}>
                 {countryCode?.location?.betting_apps == 'Active' && (
-                <BonusTable sections={sections} />
+                  <BonusTable sections={sections} />
                 )}
                 <div className={styles.twoSplitRow}>
                   <div className={styles.leftSplit}>
-                    {/* {sport === 'cricket' ? (
-                      <>
-                        <UpcomingMatches upcomingMatches={upcomingMatches} />
-                      </>
-                    ) : (
-                      <UpcomingFootballMatches />
-                    )} */}
                     <SportsOdsList />
                     {news && <NewsList />}
                   </div>

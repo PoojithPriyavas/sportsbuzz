@@ -4,36 +4,60 @@ import { useRouter } from 'next/router';
 import { useGlobalData } from '@/components/Context/ApiContext';
 
 export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
-    // console.log(locationDataHome,"loc in lang val")
     const router = useRouter();
     const [isValidating, setIsValidating] = useState(false);
-    const {setLanguage, setValidatedLocationData} = useGlobalData(); // Added setValidatedLocationData
+    const [hasHreflangTags, setHasHreflangTags] = useState(false);
+    const {setLanguage, setValidatedLocationData} = useGlobalData();
 
-    // Extract language and country from URL (now in format: languagecode-countrycode)
+    // Check if current page has hreflang tags (Scenario 2)
+    const checkHreflangTags = () => {
+        if (typeof window === 'undefined') return false;
+        
+        const hreflangLinks = document.querySelectorAll('link[rel="alternate"][hreflang]');
+        return hreflangLinks.length > 0;
+    };
+
+    // Extract language and country from URL (format: languagecode-countrycode)
     const getUrlParts = () => {
         if (!resolvedUrl) return { countryPart: null, langPart: null };
         
         const locationParts = resolvedUrl.replace(/^,?\//, '').split('/');
-        const [langPart, countryPart] = locationParts[0].split('-'); // Swapped order
+        const [langPart, countryPart] = locationParts[0].split('-');
         return { countryPart, langPart };
     };
 
     const { countryPart, langPart } = getUrlParts();
 
+    // Function to get user's location from API
+    const getUserLocation = async () => {
+        try {
+            const response = await fetch('https://admin.sportsbuz.com/api/get-country-code/');
+            if (!response.ok) {
+                throw new Error(`API call failed: ${response.status}`);
+            }
+            const data = await response.json();
+            return data.country_code || data.countryCode;
+        } catch (error) {
+            console.error('Failed to get user location:', error);
+            // Return fallback location (Sri Lanka)
+            return 'LK';
+        }
+    };
+
     // Function to get default language for a country
     const getDefaultLanguageForCountry = (countryCode) => {
         if (!locationDataHome || !Array.isArray(locationDataHome)) {
-            return null;
+            return 'en'; // fallback language
         }
 
         const countryLanguages = locationDataHome.filter(location => 
             location.country_code?.toLowerCase() === countryCode?.toLowerCase()
         );
 
-        return countryLanguages.length > 0 ? countryLanguages[0].hreflang : null;
+        return countryLanguages.length > 0 ? countryLanguages[0].hreflang : 'en';
     };
 
-    // NEW: Function to check if language code exists anywhere in the response
+    // Function to check if language code exists in the system
     const isLanguageCodeAvailable = (languageCode) => {
         if (!locationDataHome || !Array.isArray(locationDataHome)) {
             return false;
@@ -51,7 +75,6 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
             return false;
         }
 
-        // First check if country code exists
         const countryExists = locationDataHome.some(location => 
             location.country_code?.toLowerCase() === countryCode?.toLowerCase()
         );
@@ -61,7 +84,6 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
             return false;
         }
 
-        // Then check if the language is supported for that country
         const isLanguageSupported = locationDataHome.some(location => 
             location.country_code?.toLowerCase() === countryCode?.toLowerCase() && 
             location.hreflang?.toLowerCase() === languageTag?.toLowerCase()
@@ -70,10 +92,10 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
         return isLanguageSupported;
     };
 
-    // Function to construct new path (now in format: languagecode-countrycode)
+    // Function to construct new path (format: languagecode-countrycode)
     const constructNewPath = (countryCode, newLanguageTag, currentUrl) => {
         const pathParts = currentUrl.replace(/^\//, '').split('/');
-        pathParts[0] = `${newLanguageTag.toLowerCase()}-${countryCode.toLowerCase()}`; // Swapped order
+        pathParts[0] = `${newLanguageTag.toLowerCase()}-${countryCode.toLowerCase()}`;
         return '/' + pathParts.join('/');
     };
 
@@ -83,7 +105,6 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
             return;
         }
 
-        // Find the matching location data
         const matchingLocation = locationDataHome.find(location => 
             location.country_code?.toLowerCase() === countryCode?.toLowerCase() && 
             location.hreflang?.toLowerCase() === languageTag?.toLowerCase()
@@ -95,119 +116,124 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
                 location: matchingLocation
             };
 
-            // console.log('✅ Created validated location data:', validatedLocationObject);
-            
-            // Store it in the global context
             setValidatedLocationData(validatedLocationObject);
-            
             return validatedLocationObject;
         }
 
         return null;
     };
 
+    // SCENARIO 1: Handle URLs without hreflang tags
+    const handleUrlWithoutHreflang = async () => {
+        console.log('🔄 Scenario 1: URL without hreflang tags - calling location API');
+        
+        try {
+            // Get user's current location from API
+            const detectedCountryCode = await getUserLocation();
+            const defaultLanguage = getDefaultLanguageForCountry(detectedCountryCode);
+            
+            // Extract remaining path after the first part
+            const pathParts = resolvedUrl.replace(/^\//, '').split('/');
+            pathParts.shift(); // Remove the first part (which might be incomplete)
+            const remainingPath = pathParts.length > 0 ? '/' + pathParts.join('/') : '';
+            
+            // Construct the new URL with detected location
+            const newUrl = `/${defaultLanguage}-${detectedCountryCode.toLowerCase()}${remainingPath}`;
+            
+            console.log(`📍 Detected location: ${detectedCountryCode}, redirecting to: ${newUrl}`);
+            
+            // Perform 302 temporary redirect
+            router.replace(newUrl);
+            
+        } catch (error) {
+            console.error('Error in Scenario 1:', error);
+            // Fallback to default en-in
+            const pathParts = resolvedUrl.replace(/^\//, '').split('/');
+            pathParts.shift();
+            const remainingPath = pathParts.length > 0 ? '/' + pathParts.join('/') : '';
+            router.replace(`/en-in${remainingPath}`);
+        }
+    };
+
+    // SCENARIO 2: Handle URLs with hreflang tags
+    const handleUrlWithHreflang = () => {
+        console.log('✅ Scenario 2: URL with hreflang tags - using existing implementation');
+        
+        // Validate the hreflang format (languagecode-countrycode)
+        if (!countryPart || !langPart) {
+            console.error('Invalid hreflang format in URL');
+            return false;
+        }
+
+        // Validate if the language-country combination exists in our data
+        const isValid = validateLanguageForCountry(countryPart, langPart);
+        
+        if (isValid) {
+            console.log(`✅ Valid hreflang combination: ${langPart}-${countryPart}`);
+            setLanguage(langPart);
+            createAndStoreValidatedLocationData(countryPart, langPart);
+            return true;
+        } else {
+            console.error(`❌ Invalid hreflang combination: ${langPart}-${countryPart}`);
+            return false;
+        }
+    };
+
     // Main validation effect
     useEffect(() => {
-        const validateCurrentLanguage = () => {
+        const validateCurrentLanguage = async () => {
             if (!locationDataHome || isValidating) {
-                return;
-            }
-
-            // Add a guard to prevent processing if already on en-in
-            const currentPath = resolvedUrl.replace(/^\//, '');
-            if (currentPath.startsWith('en-in') && (!countryPart || !langPart)) {
-                return; // Don't process if we're already on the default path
-            }
-
-            // If no country or language parts, redirect to default
-            if (!countryPart || !langPart) {
-                // console.log('Missing country or language part, redirecting to default');
-                
-                // Extract remaining path after the first part
-                const pathParts = resolvedUrl.replace(/^\//, '').split('/');
-                pathParts.shift(); // Remove the first part (which might be incomplete)
-                const remainingPath = pathParts.length > 0 ? '/' + pathParts.join('/') : '';
-                
-                router.replace('/en-in' + remainingPath);
                 return;
             }
 
             setIsValidating(true);
 
-            // First check if country exists in our data
-            const countryExists = locationDataHome.some(location => 
-                location.country_code?.toLowerCase() === countryPart?.toLowerCase()
-            );
+            // Check if page has hreflang tags
+            const hasHreflang = checkHreflangTags();
+            setHasHreflangTags(hasHreflang);
 
-            if (!countryExists) {
-                console.error(`❌ Country code '${countryPart}' not found. Redirecting to default country 'in'.`);
-                // alert(`Error: Country '${countryPart.toUpperCase()}' is not supported. Redirecting to India (IN) with English.`);
-                
-                // Extract remaining path after the language-country part
-                const pathParts = resolvedUrl.replace(/^\//, '').split('/');
-                pathParts.shift(); // Remove the first part (language-country)
-                const remainingPath = pathParts.length > 0 ? '/' + pathParts.join('/') : '';
-                
-                router.replace('/en-in' + remainingPath);
-                setIsValidating(false);
-                return;
-            }
-
-            // UPDATED: Check if language code exists anywhere in the response
-            const languageExists = isLanguageCodeAvailable(langPart);
+            // Get current path without leading slash
+            const currentPath = resolvedUrl.replace(/^\//, '');
             
-            if (languageExists) {
-                // console.log('✅ Language code validation successful:', langPart);
-                
-                // Set the language using the provided language code
-                setLanguage(langPart);
-                
-                // Try to create validated location data if the combination exists
-                const matchingLocation = locationDataHome.find(location => 
-                    location.country_code?.toLowerCase() === countryPart?.toLowerCase() && 
-                    location.hreflang?.toLowerCase() === langPart?.toLowerCase()
-                );
-                
-                if (matchingLocation) {
-                    createAndStoreValidatedLocationData(countryPart, langPart);
-                }
-                
-                // Optionally show success alert only in development
-                if (process.env.NODE_ENV === 'development') {
-                    // console.log(`Success: Language '${langPart}' is available in the system.`)
+            // Check if URL already has language-country format
+            const hasLanguageCountryFormat = /^[a-z]{2}-[a-z]{2}/.test(currentPath);
+
+            if (hasHreflang && hasLanguageCountryFormat) {
+                // SCENARIO 2: Has hreflang tags and proper format
+                const isValid = handleUrlWithHreflang();
+                if (!isValid) {
+                    // If validation fails, fall back to Scenario 1
+                    await handleUrlWithoutHreflang();
                 }
             } else {
-                console.error('❌ Language code not found in system:', langPart, 'Using default "en"');
-                console.error(`Error: Language '${langPart}' is not available in the system. Using default language "en".`)
-                
-                // Use "en" as default and redirect with the same country
-                const newPath = constructNewPath(countryPart, 'en', resolvedUrl);
-                router.replace(newPath);
+                // SCENARIO 1: No hreflang tags or improper format
+                await handleUrlWithoutHreflang();
             }
 
             setIsValidating(false);
         };
 
-        validateCurrentLanguage();
-    }, [router.asPath, countryPart, langPart, locationDataHome]);
+        // Add a small delay to ensure DOM is ready for hreflang tag checking
+        const timer = setTimeout(validateCurrentLanguage, 100);
+        return () => clearTimeout(timer);
+        
+    }, [router.asPath, locationDataHome]);
 
     // Helper functions for manual changes
     const handleLanguageChange = (newLanguageTag) => {
-        // UPDATED: Check if language exists anywhere in the system
         const languageExists = isLanguageCodeAvailable(newLanguageTag);
         
         if (languageExists) {
             const newPath = constructNewPath(countryPart, newLanguageTag, resolvedUrl);
             router.push(newPath);
         } else {
-            // console.log(`Error: Language '${newLanguageTag}' is not available in the system. Using default "en".`)
-            // Use "en" as fallback
+            console.log(`Error: Language '${newLanguageTag}' is not available. Using default "en".`);
             const newPath = constructNewPath(countryPart, 'en', resolvedUrl);
             router.push(newPath);
         }
     };
 
-    const handleCountryChange = (newCountryCode) => {
+    const handleCountryChange = async (newCountryCode) => {
         const countryExists = locationDataHome?.some(location => 
             location.country_code?.toLowerCase() === newCountryCode?.toLowerCase()
         );
@@ -219,7 +245,6 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
                 router.push(newPath);
             }
         } else {
-            // alert(`Error: Country '${newCountryCode.toUpperCase()}' is not supported.`);
             console.error(`Error: Country '${newCountryCode.toUpperCase()}' is not supported.`);
         }
     };
@@ -238,7 +263,7 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
             }));
     };
 
-    // NEW: Get all available languages in the system
+    // Get all available languages in the system
     const getAllAvailableLanguages = () => {
         if (!locationDataHome || !Array.isArray(locationDataHome)) {
             return [];
@@ -282,14 +307,16 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
         countryPart,
         langPart,
         isValidating,
+        hasHreflangTags,
         handleLanguageChange,
         handleCountryChange,
         getSupportedLanguagesForCountry: getSupportedLanguagesForCountry(),
         getAllAvailableCountries: getAllAvailableCountries(),
-        getAllAvailableLanguages: getAllAvailableLanguages(), // NEW: Added this
+        getAllAvailableLanguages: getAllAvailableLanguages(),
         validateLanguageForCountry,
         constructNewPath,
         createAndStoreValidatedLocationData,
-        isLanguageCodeAvailable // NEW: Expose this function
+        isLanguageCodeAvailable,
+        getUserLocation // Expose for external use if needed
     };
 };
