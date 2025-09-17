@@ -78,12 +78,11 @@ export const DataProvider = ({ children }) => {
     const getCountryCode = async () => {
         try {
             if (validatedLocationData && validatedLocationData.country_code) {
-                console.log("calls the validation country code", validatedLocationData);
+                // console.log("calls the validation country code", validatedLocationData);
                 setCountryCode(validatedLocationData);
                 setCurrentTimezone(getTimezoneByCountryCode(validatedLocationData.country_code));
                 // console.log('Using validated location data:', validatedLocationData);
             } else {
-                console.log('enters the country code else condition')
                 const response = await fetch('https://admin.sportsbuz.com/api/get-country-code');
 
                 // Check if the response is successful
@@ -535,72 +534,86 @@ export const DataProvider = ({ children }) => {
         }
     };
 
-    const fetchBlogs = useCallback(async ({
-        countryCodeParam = countryCode?.country_code,
-        search = '',
-        category = null,
-        subcategory = null,
-        page = 1
-    } = {}) => {
-        // Don't fetch if no country code
-        if (!countryCodeParam) {
-            console.warn('No country code available for fetching blogs');
-            return;
+ // ... existing code ...
+
+const fetchBlogs = useCallback(async ({
+    countryCodeParam = countryCode?.country_code,
+    search = '',
+    category = null,
+    subcategory = null,
+    page = 1
+} = {}) => {
+    // Don't fetch if no country code
+    if (!countryCodeParam) {
+        console.warn('No country code available for fetching blogs');
+        return;
+    }
+
+    // Add a check to prevent using outdated country code
+    if (validatedLocationData && 
+        validatedLocationData.country_code && 
+        validatedLocationData.country_code !== countryCodeParam) {
+        console.log('ApiContext: Skipping fetch with outdated country code', {
+            requested: countryCodeParam,
+            current: validatedLocationData.country_code
+        });
+        return;
+    }
+
+    setIsLoading(true);
+
+    try {
+        const params = {
+            country_code: countryCodeParam,
+            // page: page
+        };
+
+        if (search && search.trim()) {
+            params.search = search.trim();
         }
 
-        setIsLoading(true);
-
-        try {
-            const params = {
-                country_code: countryCodeParam,
-                // page: page
-            };
-
-            if (search && search.trim()) {
-                params.search = search.trim();
-            }
-
-            if (category) {
-                params.category_id = category;
-            }
-
-            if (subcategory) {
-                params.subcategory_id = subcategory;
-            }
-
-            console.log('ApiContext: Fetching blogs with params:', params);
-
-            const response = await axios.get('https://admin.sportsbuz.com/api/get-blogs', {
-                params,
-            });
-
-            // Update all blog-related state
-            const data = response.data;
-            setBlogs(data.results || []);
-            setTotalBlogs(data.count || 0);
-            setNextUrl(data.next || null);
-            setPrevUrl(data.previous || null);
-
-            console.log('ApiContext: Blogs fetched successfully:', data.results?.length || 0, 'blogs');
-
-        } catch (error) {
-            console.error('Failed to fetch blogs:', error);
-            // Reset state on error
-            setBlogs([]);
-            setTotalBlogs(0);
-            setNextUrl(null);
-            setPrevUrl(null);
-        } finally {
-            setIsLoading(false);
+        if (category) {
+            params.category_id = category;
         }
-    }, [countryCode?.country_code]);
+
+        if (subcategory) {
+            params.subcategory_id = subcategory;
+        }
+
+        console.log('ApiContext: Fetching blogs with params:', params);
+
+        const response = await axios.get('https://admin.sportsbuz.com/api/get-blogs', {
+            params,
+        });
+
+        // Update all blog-related state
+        const data = response.data;
+        setBlogs(data.results || []);
+        setTotalBlogs(data.count || 0);
+        setNextUrl(data.next || null);
+        setPrevUrl(data.previous || null);
+
+        console.log('ApiContext: Blogs fetched successfully:', data.results?.length || 0, 'blogs');
+
+    } catch (error) {
+        console.error('Failed to fetch blogs:', error);
+        // Reset state on error
+        setBlogs([]);
+        setTotalBlogs(0);
+        setNextUrl(null);
+        setPrevUrl(null);
+    } finally {
+        setIsLoading(false);
+    }
+}, [countryCode?.country_code, validatedLocationData]);
+
 
 
     // BETTING TABLE DATA - API IMPLEMENTATIONS
 
     const fetchBettingApps = async (countryCodeParam = countryCode.country_code) => {
-        console.log(countryCodeParam, "c param")
-        console.log("called the betting apps")
+        // console.log(countryCodeParam, "c param")
+        // console.log("called the betting apps")
         if (!countryCodeParam) {
             console.error('No country code available for fetching betting apps');
             return;

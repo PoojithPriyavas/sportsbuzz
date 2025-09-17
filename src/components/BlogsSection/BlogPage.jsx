@@ -31,25 +31,25 @@ export default function BlogsPage({
 }) {
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
   const router = useRouter();
-  
+
   // Local state
   const [filterValue, setFilterValue] = useState('all');
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [isInitialized, setIsInitialized] = useState(false);
-  
+
   // Add ref to track if component is mounted
   const isMountedRef = useRef(false);
   const lastFetchParamsRef = useRef(null);
   const isInitialLoadRef = useRef(true);
-  
+
   // Get data from context
-  const { 
-    language, 
-    translateText, 
-    fetchBlogs, 
-    countryCode, 
-    sport, 
+  const {
+    language,
+    translateText,
+    fetchBlogs,
+    countryCode,
+    sport,
     upcomingMatches,
     blogs,
     isLoading,
@@ -57,7 +57,8 @@ export default function BlogsPage({
     nextUrl,
     prevUrl,
   } = useGlobalData();
-  
+  console.log(countryCode, "country code in blog")
+
   const searchParams = useSearchParams();
 
   // Get category and subcategory from URL params
@@ -90,10 +91,10 @@ export default function BlogsPage({
 
   // Calculate pagination based on total count from API
   const totalPages = Math.ceil(totalBlogs / ITEMS_PER_PAGE);
-  
+
   const hasActiveFilters =
     selectedCategoryId || selectedSubcategoryId || filterValue !== 'all' || searchTerm !== '';
-  
+
   // Show pagination if we have next/prev URLs or if there are multiple pages
   const showPagination = nextUrl || prevUrl || totalBlogs > ITEMS_PER_PAGE;
 
@@ -111,7 +112,7 @@ export default function BlogsPage({
   // Initialize component and sync with URL params
   useEffect(() => {
     isMountedRef.current = true;
-    
+
     // Set initial state from URL params
     if (urlPage !== currentPage) {
       setCurrentPage(urlPage);
@@ -124,7 +125,7 @@ export default function BlogsPage({
     if (!isInitialized) {
       setIsInitialized(true);
     }
-    
+
     return () => {
       isMountedRef.current = false;
     };
@@ -177,6 +178,7 @@ export default function BlogsPage({
   }, [language, translateText]);
 
   // SINGLE MAIN EFFECT FOR FETCHING BLOGS - PREVENTS DUPLICATE CALLS
+
   useEffect(() => {
     // Only proceed if:
     // 1. Component is mounted
@@ -209,12 +211,15 @@ export default function BlogsPage({
 
     // Create a unique key for this set of parameters
     const currentParamsKey = `${fetchParams.countryCodeParam}-${fetchParams.page}-${fetchParams.search || ''}-${fetchParams.category || ''}-${fetchParams.subcategory || ''}`;
-    
+
     // Check if this exact same call was already made
     if (lastFetchParamsRef.current === currentParamsKey) {
       console.log('BlogsPage: Skipping duplicate fetch with same params:', currentParamsKey);
       return;
     }
+
+    // Store current params for future comparison
+    lastFetchParamsRef.current = currentParamsKey;
 
     // Debounce search inputs, but not other parameter changes
     const isSearchChange = searchTerm !== urlSearchTerm;
@@ -225,8 +230,7 @@ export default function BlogsPage({
 
       console.log('BlogsPage: Fetching blogs with params:', fetchParams);
       console.log('BlogsPage: Params key:', currentParamsKey);
-      
-      lastFetchParamsRef.current = currentParamsKey;
+
       fetchBlogs(fetchParams);
     }, debounceTime);
 
@@ -242,35 +246,36 @@ export default function BlogsPage({
     urlSearchTerm
   ]);
 
+
   // Function to update URL without page reload
   const updateURL = (page, search, category, subcategory) => {
     if (!isMountedRef.current) return;
-    
+
     const params = new URLSearchParams();
-    
+
     if (search && search.trim()) params.set('search', search);
     if (category) params.set('category', category.toString());
     if (subcategory) params.set('subcategory', subcategory.toString());
     if (page > 1) params.set('page', page.toString());
 
     const newURL = `/blogs/pages/${page === 1 ? 'all-blogs' : `page-${page}`}${params.toString() ? `?${params.toString()}` : ''}`;
-    
+
     router.push(newURL, { scroll: false });
   };
 
   const handleClearFilters = async () => {
     if (!isMountedRef.current) return;
-    
+
     console.log('BlogsPage: Clearing filters');
-    
+
     // Clear local state
     setFilterValue('all');
     setSearchTerm('');
     setCurrentPage(1);
-    
+
     // Reset last fetch params to force a new fetch
     lastFetchParamsRef.current = null;
-    
+
     // Update URL immediately
     router.replace('/blogs/pages/all-blogs', { scroll: false });
   };
@@ -278,12 +283,12 @@ export default function BlogsPage({
   // Updated pagination handlers to use API next/prev URLs
   const handlePageChange = (pageNumber) => {
     if (!isMountedRef.current || !pageNumber) return;
-    
+
     if (pageNumber !== currentPage) {
       console.log('BlogsPage: Changing page to:', pageNumber);
       setCurrentPage(pageNumber);
       updateURL(pageNumber, searchTerm, selectedCategoryId, selectedSubcategoryId);
-      
+
       // Scroll to blog grid
       setTimeout(() => {
         if (isMountedRef.current) {
@@ -313,11 +318,11 @@ export default function BlogsPage({
 
   const handleSearchChange = (e) => {
     if (!isMountedRef.current) return;
-    
+
     const newSearchTerm = e.target.value;
     console.log('BlogsPage: Search term changed to:', newSearchTerm);
     setSearchTerm(newSearchTerm);
-    
+
     // Reset page to 1 when searching
     if (currentPage !== 1) {
       setCurrentPage(1);
@@ -386,15 +391,15 @@ export default function BlogsPage({
             <div className={styles.filterBar}>
               <div className={styles.controls}>
                 <h2 style={{ color: 'black' }}>{translations.latestBlogs}</h2>
-                
+
                 <div className={styles.heading}>
                   {/* Your heading content goes here */}
                 </div>
 
                 <div className={styles.rightControls}>
                   {hasActiveFilters && (
-                    <button 
-                      onClick={handleClearFilters} 
+                    <button
+                      onClick={handleClearFilters}
                       className={styles.clearFilterButton}
                       disabled={isLoading}
                     >
@@ -432,9 +437,9 @@ export default function BlogsPage({
                     style={{ cursor: 'pointer' }}
                   >
                     <div className={styles.blogImage}>
-                      <img 
-                        src={blog?.image} 
-                        alt={blog?.alt || blog?.title} 
+                      <img
+                        src={blog?.image}
+                        alt={blog?.alt || blog?.title}
                         loading="lazy"
                         onError={(e) => {
                           e.target.style.display = 'none';
@@ -454,7 +459,7 @@ export default function BlogsPage({
                 <div className={styles.noBlogsMessage}>
                   <p>No blogs found matching your criteria.</p>
                   {hasActiveFilters && (
-                    <button 
+                    <button
                       onClick={handleClearFilters}
                       className={styles.clearFilterButton}
                       style={{ marginTop: '10px' }}
@@ -515,7 +520,7 @@ export default function BlogsPage({
               </div>
             )}
           </div>
-          
+
           <div className={styles.fourthColumn}>
             <div className={styles.fourthColumnTwoColumns}>
               <div className={styles.fourthColumnLeft}>

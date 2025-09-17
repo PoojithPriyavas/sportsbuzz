@@ -91,7 +91,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
         fetchBettingApps
 
     } = useGlobalData();
-    // console.log(sections, "sections")
+    console.log(blogs, "blogs in country home")
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     const router = useRouter();
     const { "countrycode-hreflng": countryLang } = useParams();

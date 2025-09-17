@@ -91,6 +91,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
     stages,
     news
   } = useGlobalData();
+  console.log(blogs,"blogs in index")
   
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
 

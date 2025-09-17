@@ -31,6 +31,7 @@ export default function BlogSection({ blogs = [] }) {
 
   const featuredBlog = translatedBlogs[0];
   const otherBlogs = translatedBlogs.slice(1);
+  
 
   return (
     <div className={styles.wrapper}>
