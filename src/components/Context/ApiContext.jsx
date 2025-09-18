@@ -1021,6 +1021,11 @@ const fetchBlogs = useCallback(async ({
     useEffect(() => {
         if (countryCode?.country_code) {
             console.log('Country code available, fetching initial blogs:', countryCode.country_code);
+            // Clear existing blog data before fetching new data
+            setBlogs([]);
+            setTotalBlogs(0);
+            setNextUrl(null);
+            setPrevUrl(null);
             fetchBlogs({ countryCodeParam: countryCode.country_code });
             fetchBettingApps(countryCode.country_code);
             fetchBestBettingAppsPrevious(countryCode.country_code);

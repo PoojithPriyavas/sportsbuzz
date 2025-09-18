@@ -274,7 +274,13 @@ const handleClearFilters = async () => {
   setCurrentPage(1);
 
   // Reset last fetch params to force a new fetch
-  lastFetchParamsRef.current = null;
+  // Add this effect to reset lastFetchParamsRef when country code changes
+  useEffect(() => {
+    if (countryCode?.country_code) {
+      // Reset the cache when country code changes
+      lastFetchParamsRef.current = null;
+    }
+  }, [countryCode?.country_code]);
 
   // Get current pathname to extract the language prefix
   const currentPath = window.location.pathname;
