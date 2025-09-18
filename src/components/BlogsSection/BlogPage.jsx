@@ -263,22 +263,30 @@ export default function BlogsPage({
     router.push(newURL, { scroll: false });
   };
 
-  const handleClearFilters = async () => {
-    if (!isMountedRef.current) return;
+const handleClearFilters = async () => {
+  if (!isMountedRef.current) return;
 
-    console.log('BlogsPage: Clearing filters');
+  console.log('BlogsPage: Clearing filters');
 
-    // Clear local state
-    setFilterValue('all');
-    setSearchTerm('');
-    setCurrentPage(1);
+  // Clear local state
+  setFilterValue('all');
+  setSearchTerm('');
+  setCurrentPage(1);
 
-    // Reset last fetch params to force a new fetch
-    lastFetchParamsRef.current = null;
+  // Reset last fetch params to force a new fetch
+  lastFetchParamsRef.current = null;
 
-    // Update URL immediately
-    router.replace('/blogs/pages/all-blogs', { scroll: false });
-  };
+  // Get current pathname to extract the language prefix
+  const currentPath = window.location.pathname;
+  const pathParts = currentPath.split('/');
+  const languagePrefix = pathParts[1]; // e.g., 'en-in'
+  
+  // Construct the correct URL with language prefix
+  const newURL = `/${languagePrefix}/blogs/pages/all-blogs`;
+  
+  // Update URL immediately
+  router.replace(newURL, { scroll: false });
+};
 
   // Updated pagination handlers to use API next/prev URLs
   const handlePageChange = (pageNumber) => {

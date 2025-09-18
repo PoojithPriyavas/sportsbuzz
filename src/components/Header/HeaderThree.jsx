@@ -6,6 +6,7 @@ import { useGlobalData } from '../Context/ApiContext';
 import { FaMoon, FaSun, FaChevronDown, FaBars, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
 import axios from 'axios';
+import { usePathHelper } from '@/hooks/usePathHelper';
 
 import FeaturedButton from '../FeaturedButton/FeaturedButton';
 
@@ -31,7 +32,10 @@ const HeaderThree = ({ animationStage }) => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState(null);
-
+    
+    // Add this line to use the usePathHelper hook
+    const { pathPrefix } = usePathHelper();
+    
     // Mobile dropdown states
     const [expandedLanguageSelector, setExpandedLanguageSelector] = useState(false);
     const [expandedSportsSelector, setExpandedSportsSelector] = useState(false);
@@ -710,7 +714,7 @@ console.log(countryCode,"counrty cod")
     return (
         <div
             ref={containerRef}
-            className={styles.loadingContainer}
+            className={`${styles.loadingContainer} ${styles[animationStage]} ${headerFixed ? styles.fixedHeader : ''}`}
         >
             {/* Loading Animation - Only show during initial animation */}
             <div
@@ -724,9 +728,9 @@ console.log(countryCode,"counrty cod")
                 </div>
             </div>
 
-            {/* SportsBuzz Logo - Now wrapped with Link for navigation */}
+            {/* SportsBuzz Logo */}
             <div ref={logoRef} className={styles.logo}>
-                <Link href={`/${hreflang}-${countryCodeCookie}/`} className={styles.logoContent}>
+                <Link href={`${pathPrefix}/`} className={styles.logoContent}>
                     <div className={styles.logoIcon}>
                         <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                     </div>
@@ -761,24 +765,24 @@ console.log(countryCode,"counrty cod")
                     <div className={styles.divider}></div>
                     {/* Navigation Links */}
                     <div className={styles.navLinks}>
-                        <Link href={`/${hreflang}-${countryCodeCookie}/`} className={`${styles.navItem} ${pathname === `/${hreflang}-${countryCodeCookie}/` ? styles.active : ''}`}>
+                        <Link href={`${pathPrefix}/`} className={`${styles.navItem} ${pathname === `${pathPrefix}/` ? styles.active : ''}`}>
                             {translatedText.home}
                         </Link>
 
                         {countryCode?.location?.betting_apps === 'Active' && (
-                            <Link href={`/${hreflang}-${countryCodeCookie}/best-betting-apps/current`} className={`${styles.navItem} ${pathname === `/${hreflang}-${countryCodeCookie}/best-betting-apps/current` ? styles.active : ''}`}>
+                            <Link href={`${pathPrefix}/best-betting-apps/current`} className={`${styles.navItem} ${pathname === `${pathPrefix}/best-betting-apps/current` ? styles.active : ''}`}>
                                 {translatedText.apps}
                             </Link>
                         )}
 
-                        <Link href={`/${hreflang}-${countryCodeCookie}/match-schedules`} className={`${styles.navItem} ${pathname === `/${hreflang}-${countryCodeCookie}/match-schedules` ? styles.active : ''}`}>
+                        <Link href={`${pathPrefix}/match-schedules`} className={`${styles.navItem} ${pathname === `${pathPrefix}/match-schedules` ? styles.active : ''}`}>
                             {translatedText.schedule}
                         </Link>
 
                         {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
                             <div key={cat.id} className={styles.dropdown}>
                                 <Link
-                                    href={`/${hreflang}-${countryCodeCookie}/blogs/pages/all-blogs?category=${cat.id}`}
+                                    href={`${pathPrefix}/blogs/pages/all-blogs?category=${cat.id}`}
                                     className={styles.navItem}
                                 >
                                     {capitalizeFirstLetter(cat.name)} <FaChevronDown />
@@ -789,7 +793,7 @@ console.log(countryCode,"counrty cod")
                                         {cat.subcategories.map((sub) => (
                                             <li key={sub.id}>
                                                 <Link
-                                                    href={`/${hreflang}-${countryCodeCookie}/blogs/pages/all-blogs?subcategory=${sub.id}`}
+                                                    href={`${pathPrefix}/blogs/pages/all-blogs?subcategory=${sub.id}`}
                                                     className={styles.submenuItem}
                                                 >
                                                     {sub.name}
@@ -837,7 +841,7 @@ console.log(countryCode,"counrty cod")
                         {darkMode ? <FaSun /> : <FaMoon />}
                     </button>
 
-                    <Link href={`/${hreflang}-${countryCodeCookie}/contact`} className={`${styles.navItem} ${pathname === `/${hreflang}-${countryCodeCookie}/contact` ? styles.active : ''}`}>
+                    <Link href={`${pathPrefix}/contact`} className={`${styles.navItem} ${pathname === `${pathPrefix}/contact` ? styles.active : ''}`}>
                         {translatedText.contact}
                     </Link>
                 </div>
