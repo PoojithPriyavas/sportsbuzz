@@ -573,7 +573,7 @@ const HeaderTwo = ({ animationStage }) => {
                         {translatedText.home}
                     </Link>
 
-                    {countryCode?.location?.betting_apps === 'Active' && (
+                    {countryCode?.location?.betting_apps == 'Active' && (
                         <Link
                             href="/best-betting-apps/current"
                             className={`${styles.mobileNavItem} ${pathname === '/best-betting-apps/current' ? styles.active : ''}`}

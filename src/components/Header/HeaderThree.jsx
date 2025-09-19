@@ -550,7 +550,7 @@ console.log(countryCode,"counrty cod")
                         {translatedText.home}
                     </Link>
 
-                    {countryCode?.location?.betting_apps == 'inactive' && (
+                    {countryCode?.location?.betting_apps == 'Active' && (
                         <Link
                             href={`/${hreflang}-${countryCodeCookie}/best-betting-apps/current`}
                             className={`${styles.mobileNavItem} ${pathname === `/${hreflang}-${countryCodeCookie}/best-betting-apps/current` ? styles.active : ''}`}
@@ -769,7 +769,7 @@ console.log(countryCode,"counrty cod")
                             {translatedText.home}
                         </Link>
 
-                        {countryCode?.location?.betting_apps === 'Active' && (
+                        {countryCode?.location?.betting_apps == 'Active' && (
                             <Link href={`${pathPrefix}/best-betting-apps/current`} className={`${styles.navItem} ${pathname === `${pathPrefix}/best-betting-apps/current` ? styles.active : ''}`}>
                                 {translatedText.apps}
                             </Link>

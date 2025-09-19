@@ -105,7 +105,7 @@ export default function BlogPages({
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
     const router = useRouter();
     const [isValidating, setIsValidating] = useState(false);
-    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
+    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     const countryCode = countryDataHome?.country_code || 'IN';
 
     const locationParts = resolvedUrl.replace(/^,?\//, '').split('/');
@@ -357,14 +357,14 @@ export default function BlogPages({
                 <meta property="og:title" content="Sports Buzz | Blogs" />
                 <meta property="og:description" content="Stay updated with the latest sports blogs and match breakdowns from around the world." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://www.sportsbuzz.com/blogs/pages/all-blogs" />
-                <meta property="og:image" content="https://www.sportsbuzz.com/images/social-preview.jpg" />
+                <meta property="og:url" content="https://www.sportsbuz.com/blogs/pages/all-blogs" />
+                <meta property="og:image" content="https://www.sportsbuz.com/images/social-preview.jpg" />
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Sports Buzz | Blogs" />
                 <meta name="twitter:description" content="Latest sports blogs, news and insights — only on Sports Buzz." />
-                <meta name="twitter:image" content="https://www.sportsbuzz.com/images/social-preview.jpg" />
+                <meta name="twitter:image" content="https://www.sportsbuz.com/images/social-preview.jpg" />
 
                 <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
             </Head>

@@ -182,14 +182,14 @@ export default function BlogPages({
                 <meta property="og:title" content="Sports Buzz | Blogs" />
                 <meta property="og:description" content="Stay updated with the latest sports blogs and match breakdowns from around the world." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://www.sportsbuzz.com/blogs/pages/all-blogs" />
-                <meta property="og:image" content="https://www.sportsbuzz.com/images/social-preview.jpg" /> {/* Update this path */}
+                <meta property="og:url" content="https://www.sportsbuz.com/blogs/pages/all-blogs" />
+                <meta property="og:image" content="https://www.sportsbuz.com/images/social-preview.jpg" /> {/* Update this path */}
 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Sports Buzz | Blogs" />
                 <meta name="twitter:description" content="Latest sports blogs, news and insights — only on Sports Buzz." />
-                <meta name="twitter:image" content="https://www.sportsbuzz.com/images/social-preview.jpg" /> {/* Update this path */}
+                <meta name="twitter:image" content="https://www.sportsbuz.com/images/social-preview.jpg" /> {/* Update this path */}
                 <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
             </Head>
 

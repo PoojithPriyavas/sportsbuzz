@@ -29,7 +29,7 @@ export default function BlogsPage({
   subcategoryId: initialSubcategoryId = null,
   isLocalhost = false,
 }) {
-  const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
+  const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
   const router = useRouter();
 
   // Local state

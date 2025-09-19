@@ -95,7 +95,7 @@ export async function getServerSideProps({ req, resolvedUrl }) {
 export default function BestBettingApps({ sections,countryCode, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome }) {
     console.log(locationDataHome,"href lan data in bset bettingapps")
     console.log(countryCode,"country code from cookie")
-    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
+    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     console.log(sections,"sections in country page")
     // const countryCode = countryData?.country_code || 'IN';
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
