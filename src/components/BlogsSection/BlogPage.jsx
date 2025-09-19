@@ -263,18 +263,7 @@ export default function BlogsPage({
     router.push(newURL, { scroll: false });
   };
 
-const handleClearFilters = async () => {
-  if (!isMountedRef.current) return;
 
-  console.log('BlogsPage: Clearing filters');
-
-  // Clear local state
-  setFilterValue('all');
-  setSearchTerm('');
-  setCurrentPage(1);
-
-  // Reset last fetch params to force a new fetch
-  // Add this effect to reset lastFetchParamsRef when country code changes
   useEffect(() => {
     if (countryCode?.country_code) {
       // Reset the cache when country code changes
@@ -282,17 +271,30 @@ const handleClearFilters = async () => {
     }
   }, [countryCode?.country_code]);
 
-  // Get current pathname to extract the language prefix
-  const currentPath = window.location.pathname;
-  const pathParts = currentPath.split('/');
-  const languagePrefix = pathParts[1]; // e.g., 'en-in'
-  
-  // Construct the correct URL with language prefix
-  const newURL = `/${languagePrefix}/blogs/pages/all-blogs`;
-  
-  // Update URL immediately
-  router.replace(newURL, { scroll: false });
-};
+  const handleClearFilters = async () => {
+    if (!isMountedRef.current) return;
+
+    console.log('BlogsPage: Clearing filters');
+
+    // Clear local state
+    setFilterValue('all');
+    setSearchTerm('');
+    setCurrentPage(1);
+
+    // Reset last fetch params to force a new fetch
+    lastFetchParamsRef.current = null;
+
+    // Get current pathname to extract the language prefix
+    const currentPath = window.location.pathname;
+    const pathParts = currentPath.split('/');
+    const languagePrefix = pathParts[1]; // e.g., 'en-in'
+
+    // Construct the correct URL with language prefix
+    const newURL = `/${languagePrefix}/blogs/pages/all-blogs`;
+
+    // Update URL immediately
+    router.replace(newURL, { scroll: false });
+  };
 
   // Updated pagination handlers to use API next/prev URLs
   const handlePageChange = (pageNumber) => {
@@ -472,7 +474,7 @@ const handleClearFilters = async () => {
               ) : countryCode?.country_code ? (
                 <div className={styles.noBlogsMessage}>
                   <p>No blogs found matching your criteria.</p>
-                  {hasActiveFilters && (
+                  {/* {hasActiveFilters && (
                     <button
                       onClick={handleClearFilters}
                       className={styles.clearFilterButton}
@@ -480,7 +482,7 @@ const handleClearFilters = async () => {
                     >
                       {translations.clearFilter}
                     </button>
-                  )}
+                  )} */}
                 </div>
               ) : (
                 <div className={styles.loadingMessage}>

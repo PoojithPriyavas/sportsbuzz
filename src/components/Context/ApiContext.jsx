@@ -534,78 +534,77 @@ export const DataProvider = ({ children }) => {
         }
     };
 
- // ... existing code ...
 
-const fetchBlogs = useCallback(async ({
-    countryCodeParam = countryCode?.country_code,
-    search = '',
-    category = null,
-    subcategory = null,
-    page = 1
-} = {}) => {
-    // Don't fetch if no country code
-    if (!countryCodeParam) {
-        console.warn('No country code available for fetching blogs');
-        return;
-    }
-
-    // Add a check to prevent using outdated country code
-    if (validatedLocationData && 
-        validatedLocationData.country_code && 
-        validatedLocationData.country_code !== countryCodeParam) {
-        console.log('ApiContext: Skipping fetch with outdated country code', {
-            requested: countryCodeParam,
-            current: validatedLocationData.country_code
-        });
-        return;
-    }
-
-    setIsLoading(true);
-
-    try {
-        const params = {
-            country_code: countryCodeParam,
-            // page: page
-        };
-
-        if (search && search.trim()) {
-            params.search = search.trim();
+    const fetchBlogs = useCallback(async ({
+        countryCodeParam = countryCode?.country_code,
+        search = '',
+        category = null,
+        subcategory = null,
+        page = 1
+    } = {}) => {
+        // Don't fetch if no country code
+        if (!countryCodeParam) {
+            console.warn('No country code available for fetching blogs');
+            return;
         }
 
-        if (category) {
-            params.category_id = category;
+        // Add a check to prevent using outdated country code
+        if (validatedLocationData &&
+            validatedLocationData.country_code &&
+            validatedLocationData.country_code !== countryCodeParam) {
+            console.log('ApiContext: Skipping fetch with outdated country code', {
+                requested: countryCodeParam,
+                current: validatedLocationData.country_code
+            });
+            return;
         }
 
-        if (subcategory) {
-            params.subcategory_id = subcategory;
+        setIsLoading(true);
+
+        try {
+            const params = {
+                country_code: countryCodeParam,
+                // page: page
+            };
+
+            if (search && search.trim()) {
+                params.search = search.trim();
+            }
+
+            if (category) {
+                params.category_id = category;
+            }
+
+            if (subcategory) {
+                params.subcategory_id = subcategory;
+            }
+
+            console.log('ApiContext: Fetching blogs with params:', params);
+
+            const response = await axios.get('https://admin.sportsbuz.com/api/get-blogs', {
+                params,
+            });
+
+            // Update all blog-related state
+            const data = response.data;
+            setBlogs(data.results || []);
+            setTotalBlogs(data.count || 0);
+            setNextUrl(data.next || null);
+            setPrevUrl(data.previous || null);
+
+            console.log('ApiContext: Blogs fetched successfully:', data.results?.length || 0, 'blogs');
+
+        } catch (error) {
+            console.error('Failed to fetch blogs:', error);
+            // Reset state on error
+            setBlogs([]);
+            setTotalBlogs(0);
+            setNextUrl(null);
+            setPrevUrl(null);
+        } finally {
+            setIsLoading(false);
         }
-
-        console.log('ApiContext: Fetching blogs with params:', params);
-
-        const response = await axios.get('https://admin.sportsbuz.com/api/get-blogs', {
-            params,
-        });
-
-        // Update all blog-related state
-        const data = response.data;
-        setBlogs(data.results || []);
-        setTotalBlogs(data.count || 0);
-        setNextUrl(data.next || null);
-        setPrevUrl(data.previous || null);
-
-        console.log('ApiContext: Blogs fetched successfully:', data.results?.length || 0, 'blogs');
-
-    } catch (error) {
-        console.error('Failed to fetch blogs:', error);
-        // Reset state on error
-        setBlogs([]);
-        setTotalBlogs(0);
-        setNextUrl(null);
-        setPrevUrl(null);
-    } finally {
-        setIsLoading(false);
-    }
-}, [countryCode?.country_code, validatedLocationData]);
+    }, [countryCode?.country_code, validatedLocationData]);
 
 
 
@@ -1021,18 +1020,13 @@ const fetchBlogs = useCallback(async ({
     useEffect(() => {
         if (countryCode?.country_code) {
             console.log('Country code available, fetching initial blogs:', countryCode.country_code);
-            // Clear existing blog data before fetching new data
-            setBlogs([]);
-            setTotalBlogs(0);
-            setNextUrl(null);
-            setPrevUrl(null);
             fetchBlogs({ countryCodeParam: countryCode.country_code });
             fetchBettingApps(countryCode.country_code);
             fetchBestBettingAppsPrevious(countryCode.country_code);
         }
     }, [countryCode?.country_code]);
 
-    
+
     return (
         <DataContext.Provider
             value={{

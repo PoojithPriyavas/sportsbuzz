@@ -27,7 +27,7 @@ export async function getServerSideProps({ req, resolvedUrl }) {
     // Parse the cookie to get country code
     const countryCookie = req.cookies.countryData;
     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    const countryCode = countryData?.country_code || 'IN';
+    const countryCode = countryData?.country_code || 'LK';
     const hrefLanCookie = req.cookies.lanTagValues;
     const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
 
@@ -81,7 +81,7 @@ export async function getServerSideProps({ req, resolvedUrl }) {
     return {
         props: {
             sections,
-            // countryCode,
+            countryCode,
             hrefLanData,
             resolvedUrl,
             isLocalhost: process.env.NODE_ENV === 'development',
@@ -92,7 +92,9 @@ export async function getServerSideProps({ req, resolvedUrl }) {
 }
 
 
-export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome }) {
+export default function BestBettingApps({ sections,countryCode, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome }) {
+    console.log(locationDataHome,"href lan data in bset bettingapps")
+    console.log(countryCode,"country code from cookie")
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuzz.com';
     console.log(sections,"sections in country page")
     // const countryCode = countryData?.country_code || 'IN';
@@ -107,7 +109,7 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, is
         teamImages,
         upcomingMatches,
         sport,
-        countryCode,
+        // countryCode,
         bestSections,
         stages
     } = useGlobalData();
@@ -199,8 +201,8 @@ export default function BestBettingApps({ sections, hrefLanData, resolvedUrl, is
                             : 'Explore the best betting apps in India for July 2025.'
                     }
                 />
-                {hrefLanData.map(({ hreflang, country_code }) => {
-                    const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/blogs/pages/all-blogs`;
+                {locationDataHome.map(({ hreflang, country_code }) => {
+                    const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/best-betting-apps/current`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
                     return (
                         <link
