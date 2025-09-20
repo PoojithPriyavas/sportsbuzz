@@ -21,12 +21,16 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
     const getUrlParts = () => {
         if (!resolvedUrl) return { countryPart: null, langPart: null };
         
+        console.log("🔍 DEBUG - getUrlParts resolvedUrl:", resolvedUrl);
         const locationParts = resolvedUrl.replace(/^,?\//, '').split('/');
+        console.log("🔍 DEBUG - locationParts:", locationParts);
         const [langPart, countryPart] = locationParts[0].split('-');
+        console.log("🔍 DEBUG - extracted parts:", { langPart, countryPart });
         return { countryPart, langPart };
     };
 
     const { countryPart, langPart } = getUrlParts();
+    console.log("🔍 DEBUG - Final URL parts:", { countryPart, langPart });
 
     // Function to get user's location from API
     const getUserLocation = async () => {
@@ -158,15 +162,17 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
     // SCENARIO 2: Handle URLs with hreflang tags
     const handleUrlWithHreflang = () => {
         console.log('✅ Scenario 2: URL with hreflang tags - using existing implementation');
+        console.log('🔍 DEBUG - countryPart:', countryPart, 'langPart:', langPart);
         
         // Validate the hreflang format (languagecode-countrycode)
         if (!countryPart || !langPart) {
-            console.error('Invalid hreflang format in URL');
+            console.error('🔍 DEBUG - Invalid hreflang format in URL - missing parts');
             return false;
         }
 
         // Validate if the language-country combination exists in our data
         const isValid = validateLanguageForCountry(countryPart, langPart);
+        console.log('🔍 DEBUG - validateLanguageForCountry result:', isValid);
         
         if (isValid) {
             console.log(`✅ Valid hreflang combination: ${langPart}-${countryPart}`);
@@ -183,36 +189,61 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
     useEffect(() => {
         const validateCurrentLanguage = async () => {
             if (!locationDataHome || isValidating) {
+                console.log("🔍 DEBUG - Skipping validation:", { locationDataHome: !!locationDataHome, isValidating });
                 return;
             }
-
+    
             setIsValidating(true);
-
+            console.log("🔍 DEBUG - Starting validation for resolvedUrl:", resolvedUrl);
+    
             // Check if page has hreflang tags
             const hasHreflang = checkHreflangTags();
             setHasHreflangTags(hasHreflang);
-
+            console.log("🔍 DEBUG - hasHreflang:", hasHreflang);
+    
             // Get current path without leading slash
             const currentPath = resolvedUrl.replace(/^\//, '');
+            console.log("🔍 DEBUG - currentPath:", currentPath);
+            
+            // Special handling for blog-details URLs
+            const isBlogDetailsUrl = currentPath.includes('/blog-details/');
+            console.log("🔍 DEBUG - isBlogDetailsUrl:", isBlogDetailsUrl);
             
             // Check if URL already has language-country format
-            const hasLanguageCountryFormat = /^[a-z]{2}-[a-z]{2}/.test(currentPath);
-
+            // For blog-details, be more lenient with the format check
+            let hasLanguageCountryFormat;
+            if (isBlogDetailsUrl) {
+                // More specific regex for blog-details URLs
+                hasLanguageCountryFormat = /^[a-z]{2}-[a-z]{2}\/blog-details\//.test(currentPath);
+                console.log("🔍 DEBUG - Blog details format check:", hasLanguageCountryFormat);
+            } else {
+                hasLanguageCountryFormat = /^[a-z]{2}-[a-z]{2}/.test(currentPath);
+                console.log("🔍 DEBUG - Regular format check:", hasLanguageCountryFormat);
+            }
+    
+            console.log("🔍 DEBUG - Final hasLanguageCountryFormat:", hasLanguageCountryFormat);
+    
             if (hasHreflang && hasLanguageCountryFormat) {
                 // SCENARIO 2: Has hreflang tags and proper format
+                console.log("🔍 DEBUG - Scenario 2: Has hreflang and proper format");
                 const isValid = handleUrlWithHreflang();
-                if (!isValid) {
-                    // If validation fails, fall back to Scenario 1
+                console.log("🔍 DEBUG - handleUrlWithHreflang result:", isValid);
+                if (!isValid && !isBlogDetailsUrl) {
+                    // Only redirect if it's not a blog-details URL
+                    console.log("🔍 DEBUG - Invalid URL, redirecting (not blog-details)");
                     await handleUrlWithoutHreflang();
                 }
-            } else {
-                // SCENARIO 1: No hreflang tags or improper format
+            } else if (!isBlogDetailsUrl) {
+                // SCENARIO 1: Only redirect non-blog-details URLs
+                console.log("🔍 DEBUG - Scenario 1: Missing format, redirecting (not blog-details)");
                 await handleUrlWithoutHreflang();
+            } else {
+                console.log("🔍 DEBUG - Blog details URL, skipping redirect");
             }
-
+    
             setIsValidating(false);
         };
-
+    
         // Add a small delay to ensure DOM is ready for hreflang tag checking
         const timer = setTimeout(validateCurrentLanguage, 100);
         return () => clearTimeout(timer);

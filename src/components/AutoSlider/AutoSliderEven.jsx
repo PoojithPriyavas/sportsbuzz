@@ -39,20 +39,29 @@ export default function AutoSliderEven() {
     fetchBanners();
   }, [countryCode]);
 
-  // Restart autoplay when banners are loaded
-  useEffect(() => {
-    if (!loading && banners.length > 0 && swiperRef.current) {
-      // Small delay to ensure Swiper is fully initialized
-      setTimeout(() => {
-        swiperRef.current.swiper.autoplay.start();
-      }, 100);
-    }
-  }, [loading, banners]);
+  // Remove manual autoplay control - let Swiper handle it automatically
+  // useEffect(() => {
+  //   if (!loading && banners.length > 0 && swiperRef.current?.swiper) {
+  //     const swiper = swiperRef.current.swiper;
+  //     
+  //     if (swiper && swiper.autoplay && swiper.autoplay.start) {
+  //       try {
+  //         setTimeout(() => {
+  //           if (swiper.autoplay && swiper.autoplay.start) {
+  //             swiper.autoplay.start();
+  //           }
+  //         }, 200);
+  //       } catch (error) {
+  //         console.warn('Failed to start autoplay:', error);
+  //       }
+  //     }
+  //   }
+  // }, [loading, banners]);
 
-  const oddBanners = banners.filter((item, i) => (item.order_by % 2 == 0));
+  const evenBanners = banners.filter((item, i) => (item.order_by % 2 === 0));
 
   // Don't render Swiper until we have data
-  if (loading || oddBanners.length === 0) {
+  if (loading || evenBanners.length === 0) {
     return (
       <div className={styles.sliderWrapper}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
@@ -72,15 +81,21 @@ export default function AutoSliderEven() {
           disableOnInteraction: false,
           pauseOnMouseEnter: false
         }}
-        loop={oddBanners.length > 1} // Only enable loop if more than 1 slide
+        loop={evenBanners.length > 1} // Only enable loop if more than 1 slide
         pagination={{ clickable: true }}
         className={styles.slider}
-        onSwiper={(swiper) => {
-          // Ensure autoplay starts immediately after initialization
-          swiper.autoplay.start();
-        }}
+        // Remove onSwiper callback - autoplay should work automatically
+        // onSwiper={(swiper) => {
+        //   try {
+        //     if (swiper && swiper.autoplay && swiper.autoplay.start) {
+        //       swiper.autoplay.start();
+        //     }
+        //   } catch (error) {
+        //     console.warn('Failed to initialize autoplay:', error);
+        //   }
+        // }}
       >
-        {oddBanners.map(banner => (
+        {evenBanners.map(banner => (
           <SwiperSlide key={banner.id}>
             <a href={banner.url} target="_blank" rel="noopener noreferrer">
               <img src={banner.image} alt="Banner" className={styles.slideImage} />

@@ -7,7 +7,23 @@ export async function middleware(request) {
   console.log('🚀 Middleware: Location-based URL handling started');
   
   const url = request.nextUrl.clone();
-  const pathname = url.pathname;
+  let pathname = url.pathname;
+  
+  // Special handling for blog-details URLs to preserve special characters
+  const isBlogDetailsUrl = pathname.includes('/blog-details/');
+  
+  // Only decode pathname for non-blog-details URLs
+  if (!isBlogDetailsUrl) {
+    try {
+      pathname = decodeURIComponent(pathname);
+      console.log('📝 Decoded pathname:', pathname);
+    } catch (error) {
+      console.warn('⚠️ Failed to decode pathname:', error);
+      // Continue with original pathname if decoding fails
+    }
+  } else {
+    console.log('📰 Blog details URL detected, preserving original encoding:', pathname);
+  }
   
   // Skip middleware for API routes, static files, and other excluded paths
   if (
@@ -19,12 +35,25 @@ export async function middleware(request) {
     return NextResponse.next();
   }
 
-  // Check if URL already has language-country format (e.g., /en-in/...)
-  const hasLanguageCountryFormat = /^\/[a-z]{2}-[a-z]{2}(\/|$)/.test(pathname);
+  // Enhanced regex to check if URL already has language-country format
+  // For blog-details URLs, use the original pathname to avoid decoding issues
+  const pathToCheck = isBlogDetailsUrl ? url.pathname : pathname;
+  const hasLanguageCountryFormat = /^\/[a-z]{2}-[a-z]{2}(\/|$)/i.test(pathToCheck);
   
   // SCENARIO 2: URL already has proper hreflang format
   if (hasLanguageCountryFormat) {
     console.log('✅ Scenario 2: URL has language-country format, proceeding normally');
+    console.log('🔗 Processing path:', pathToCheck);
+    
+    // Check if this is a blog-details route with potentially problematic characters
+    const blogDetailsMatch = pathToCheck.match(/^\/([a-z]{2}-[a-z]{2})\/blog-details\/(.+)$/i);
+    if (blogDetailsMatch) {
+      const [, langCountry, blogSlug] = blogDetailsMatch;
+      console.log('📰 Blog details route detected:', { langCountry, blogSlug });
+      
+      // For blog details, don't decode the slug to preserve special characters
+      console.log('🔄 Preserving original blog slug encoding');
+    }
     
     // Set cookies but don't redirect
     const response = NextResponse.next();
@@ -48,10 +77,10 @@ export async function middleware(request) {
     console.log('🌐 Default language for country:', defaultLanguage);
     
     // Construct new URL with language-country format
-    const newPathname = `/${defaultLanguage}-${countryCode.toLowerCase()}${pathname}`;
+    const newPathname = `/${defaultLanguage}-${countryCode.toLowerCase()}${pathToCheck}`;
     url.pathname = newPathname;
     
-    console.log(`🔄 Redirecting from ${pathname} to ${newPathname}`);
+    console.log(`🔄 Redirecting from ${pathToCheck} to ${newPathname}`);
     
     // Perform 302 temporary redirect
     const response = NextResponse.redirect(url, 302);
@@ -65,10 +94,10 @@ export async function middleware(request) {
     console.error('❌ Middleware error:', error);
     
     // Fallback: redirect to en-in
-    const newPathname = `/en-in${pathname}`;
+    const newPathname = `/en-in${pathToCheck}`;
     url.pathname = newPathname;
     
-    console.log(`🔄 Fallback redirect from ${pathname} to ${newPathname}`);
+    console.log(`🔄 Fallback redirect from ${pathToCheck} to ${newPathname}`);
     
     const response = NextResponse.redirect(url, 302);
     

@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
@@ -36,19 +35,20 @@ export default function AutoSlider() {
         setLoading(false);
       }
     };
-
     fetchBanners();
   }, [countryCode]);
 
-  // Restart autoplay when banners are loaded
-  useEffect(() => {
-    if (!loading && banners.length > 0 && swiperRef.current) {
-      // Small delay to ensure Swiper is fully initialized
-      setTimeout(() => {
-        swiperRef.current.swiper.autoplay.start();
-      }, 100);
-    }
-  }, [loading, banners]);
+  // Optional: Restart autoplay when banners are loaded (usually not needed)
+  // useEffect(() => {
+  //   if (!loading && banners.length > 0 && swiperRef.current?.swiper) {
+  //     const swiper = swiperRef.current.swiper;
+  //     if (swiper.autoplay && typeof swiper.autoplay.start === 'function') {
+  //       setTimeout(() => {
+  //         swiper.autoplay.start();
+  //       }, 100);
+  //     }
+  //   }
+  // }, [loading, banners]);
 
   const oddBanners = banners.filter((item, i) => (item.order_by % 2 !== 0));
 
@@ -76,10 +76,12 @@ export default function AutoSlider() {
         loop={oddBanners.length > 1} // Only enable loop if more than 1 slide
         pagination={{ clickable: true }}
         className={styles.slider}
-        onSwiper={(swiper) => {
-          // Ensure autoplay starts immediately after initialization
-          swiper.autoplay.start();
-        }}
+        // onSwiper callback is usually not needed for autoplay
+        // onSwiper={(swiper) => {
+        //   if (swiper.autoplay && typeof swiper.autoplay.start === 'function') {
+        //     swiper.autoplay.start();
+        //   }
+        // }}
       >
         {oddBanners.map(banner => (
           <SwiperSlide key={banner.id}>

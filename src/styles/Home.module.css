@@ -15,19 +15,18 @@
   margin-top: 2rem;
   width: 100%;
   min-height: 500px;
-  overflow: hidden;
   /* Ensure minimum height */
 }
 
-/* Left 3 columns combined */
+/* FIXED: Left 3 columns combined - removed problematic scroll properties */
 .leftThreeColumns {
   flex: 3;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   min-width: 0;
-  scroll-behavior: smooth;
-  overflow-x: auto;
+  /* REMOVED: scroll-behavior: smooth; */
+  /* REMOVED: overflow-x: auto; */
   /* Prevent flex item from overflowing */
 }
 
@@ -66,7 +65,8 @@
   flex-direction: column;
   gap: 1rem;
   min-width: 0;
-  overflow: auto;
+  /* CHANGED: Only apply overflow to specific content areas if needed */
+  overflow: visible;
 }
 
 /* Column 4: AutoSlider + BettingCard, etc. */
@@ -136,10 +136,6 @@
   .fourthColumn {
     min-width: auto;
   }
-
-  /* .offHeader {
-    margin-top: 5rem !important;
-  } */
 }
 
 /* Fixed media query with proper constraints */
@@ -161,7 +157,6 @@
     gap: 1rem;
     min-width: 0;
     /* Prevent flex shrinking issues */
-    /* No height constraints - let content determine height */
   }
 
   .fourthColumnRight {
@@ -193,18 +188,7 @@
   .fourthColumnTwoColumns {
     flex-direction: column;
   }
-
-  .fourthColumnLeft,
-  .fourthColumnRight {
-    /* Remove height constraints on mobile - let content flow naturally */
-  }
 }
-
-/* @media(max-width:640px) {
-  .offHeader {
-    margin-top: 5.5rem !important;
-  }
-} */
 
 @media (max-width: 480px) {
   .fourColumnRow {
@@ -220,11 +204,6 @@
   .fourthColumn {
     gap: 0.5rem;
   }
-
-  /* 
-  .offHeader {
-    margin-top: 5rem !important;
-  } */
 }
 
 .fadeUpEnter {
@@ -245,7 +224,6 @@
   left: 0;
   right: 0;
   z-index: 9998;
-  /* Below HeaderTwo but above other content */
   background: #f8f9fa;
   border-bottom: 1px solid #e9ecef;
   opacity: 0;
@@ -264,7 +242,6 @@
 /* Adjust HeaderTwo positioning when region selector is visible */
 .headerWithRegion {
   margin-top: 60px;
-  /* Adjust this value based on your region selector height */
 }
 
 /* Content offset when both headers are visible */
@@ -307,7 +284,6 @@
 
   .offHeader {
     margin-top: 4rem;
-    /* Reduced for mobile */
   }
 }
 
@@ -326,4 +302,3 @@
     display: none !important;
   }
 }
-

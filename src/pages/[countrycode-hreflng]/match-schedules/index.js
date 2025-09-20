@@ -62,7 +62,7 @@ export async function getServerSideProps(context) {
             props: {
                 countryDataHome,
                 locationDataHome,
-                resolvedUrl,
+                resolvedUrl, // This should work now
             }
         };
     } catch (error) {
@@ -74,11 +74,15 @@ export async function getServerSideProps(context) {
             name: error.name,
             stack: error.stack
         });
+        
+        // FIXED: Make sure resolvedUrl is available in the error case too
+        const { resolvedUrl } = context;
+        
         return {
             props: {
                 countryDataHome: null,
                 locationDataHome: null,
-                resolvedUrl,
+                resolvedUrl, // Now properly defined
                 isLocalhost: process.env.NODE_ENV === 'development'
             }
         };

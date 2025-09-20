@@ -70,6 +70,7 @@ export async function getServerSideProps(context) {
                 blog,
                 countryDataHome,
                 locationDataHome,
+                resolvedUrl, // Add resolvedUrl to props
             },
         };
     } catch (error) {
@@ -79,11 +80,16 @@ export async function getServerSideProps(context) {
 }
 
 
-export default function BlogDetailsMain({ blog, locationDataHome }) {
+export default function BlogDetailsMain({ blog, locationDataHome, resolvedUrl }) {
     console.log("blog in country :",blog)
+    console.log("🔍 DEBUG - resolvedUrl:", resolvedUrl);
+    console.log("🔍 DEBUG - locationDataHome:", locationDataHome);
+    
     const { countryCode } = useGlobalData();
     const { "countrycode-hreflng": countryLang } = useParams();
-    const languageValidation = useLanguageValidation(locationDataHome, countryLang);
+    console.log("🔍 DEBUG - countryLang from useParams:", countryLang);
+    
+    const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl); // Use resolvedUrl instead of countryLang
     const [animationStage, setAnimationStage] = useState('loading');
     const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
