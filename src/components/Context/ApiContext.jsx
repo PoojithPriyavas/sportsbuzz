@@ -18,7 +18,7 @@ import { sriLankaFallbackData, processCountryCodeResponse } from '@/utils/countr
 const DataContext = createContext();
 
 
-export const DataProvider = ({ children }) => {
+export const DataProvider = ({ children, countryDataHome }) => {
     // Data caching state
     const [dataCache, setDataCache] = useState({
         cricket: {
@@ -111,8 +111,17 @@ export const DataProvider = ({ children }) => {
 
     // useEffect to call getCountryCode when validatedLocationData changes
     useEffect(() => {
-        getCountryCode();
-    }, [validatedLocationData]);
+        // Only call API if no country data is available from props or cache
+        if (!validatedLocationData && !countryDataHome) {
+            getCountryCode();
+        } else if (validatedLocationData) {
+            setCountryCode(validatedLocationData);
+            setCurrentTimezone(getTimezoneByCountryCode(validatedLocationData.country_code));
+        } else if (countryDataHome) {
+            setCountryCode(countryDataHome);
+            setCurrentTimezone(getTimezoneByCountryCode(countryDataHome.country_code));
+        }
+    }, [validatedLocationData, countryDataHome]);
 
     // FETCH LOCATION
 
@@ -1023,8 +1032,13 @@ export const DataProvider = ({ children }) => {
             fetchBlogs({ countryCodeParam: countryCode.country_code });
             fetchBettingApps(countryCode.country_code);
             fetchBestBettingAppsPrevious(countryCode.country_code);
+        } else if (countryDataHome?.country_code) {
+            console.log('Country code available from SSR, fetching initial blogs:', countryDataHome.country_code);
+            fetchBlogs({ countryCodeParam: countryDataHome.country_code });
+            fetchBettingApps(countryDataHome.country_code);
+            fetchBestBettingAppsPrevious(countryDataHome.country_code);
         }
-    }, [countryCode?.country_code]);
+    }, [countryCode?.country_code, countryDataHome?.country_code]);
 
 
     return (

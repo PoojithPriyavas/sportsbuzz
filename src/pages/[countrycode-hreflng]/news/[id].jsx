@@ -15,11 +15,13 @@ import axios from "axios";
 import HeaderThree from "@/components/Header/HeaderThree";
 
 export async function getServerSideProps(context) {
+    // Extract resolvedUrl at the top level, outside the try block
+    const { resolvedUrl } = context;
+    
     // Log the request origin (helpful for debugging)
     // console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
     
     try {
-        const { resolvedUrl, req } = context;
         const [countryRes, locationRes] = await Promise.all([
             fetch('https://admin.sportsbuz.com/api/get-country-code/')
                 .then(async (response) => {
@@ -69,7 +71,7 @@ export async function getServerSideProps(context) {
             props: {
                 countryDataHome: null,
                 locationDataHome: null,
-                resolvedUrl,
+                resolvedUrl, // Now this will be available in the catch block too
                 isLocalhost: process.env.NODE_ENV === 'development'
             }
         };

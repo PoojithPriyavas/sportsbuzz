@@ -34,6 +34,12 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
 
     // Function to get user's location from API
     const getUserLocation = async () => {
+        // Check if data is already available before making API call
+        if (countryDataHome?.country_code) {
+            return countryDataHome.country_code;
+        }
+        
+        // Check cookies/cache before API call
         try {
             const response = await fetch('https://admin.sportsbuz.com/api/get-country-code/');
             if (!response.ok) {
