@@ -51,6 +51,7 @@ export default function AutoSlider() {
   // }, [loading, banners]);
 
   const oddBanners = banners.filter((item, i) => (item.order_by % 2 !== 0));
+  const activeBanners = oddBanners.filter(i => i.is_active === 'Active')
 
   // Don't render Swiper until we have data
   if (loading || oddBanners.length === 0) {
@@ -73,17 +74,17 @@ export default function AutoSlider() {
           disableOnInteraction: false,
           pauseOnMouseEnter: false
         }}
-        loop={oddBanners.length > 1} // Only enable loop if more than 1 slide
+        loop={activeBanners.length > 1} // Only enable loop if more than 1 slide
         pagination={{ clickable: true }}
         className={styles.slider}
-        // onSwiper callback is usually not needed for autoplay
-        // onSwiper={(swiper) => {
-        //   if (swiper.autoplay && typeof swiper.autoplay.start === 'function') {
-        //     swiper.autoplay.start();
-        //   }
-        // }}
+      // onSwiper callback is usually not needed for autoplay
+      // onSwiper={(swiper) => {
+      //   if (swiper.autoplay && typeof swiper.autoplay.start === 'function') {
+      //     swiper.autoplay.start();
+      //   }
+      // }}
       >
-        {oddBanners.map(banner => (
+        {activeBanners.map(banner => (
           <SwiperSlide key={banner.id}>
             <a href={banner.url} target="_blank" rel="noopener noreferrer">
               <img src={banner.image} alt="Banner" className={styles.slideImage} />

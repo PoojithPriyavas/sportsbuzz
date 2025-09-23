@@ -59,6 +59,7 @@ export default function AutoSliderEven() {
   // }, [loading, banners]);
 
   const evenBanners = banners.filter((item, i) => (item.order_by % 2 === 0));
+  const activeBanners = evenBanners.filter(i => i.is_active === 'Active')
 
   // Don't render Swiper until we have data
   if (loading || evenBanners.length === 0) {
@@ -81,21 +82,22 @@ export default function AutoSliderEven() {
           disableOnInteraction: false,
           pauseOnMouseEnter: false
         }}
-        loop={evenBanners.length > 1} // Only enable loop if more than 1 slide
+        loop={activeBanners.length > 1} // Only enable loop if more than 1 slide
         pagination={{ clickable: true }}
         className={styles.slider}
-        // Remove onSwiper callback - autoplay should work automatically
-        // onSwiper={(swiper) => {
-        //   try {
-        //     if (swiper && swiper.autoplay && swiper.autoplay.start) {
-        //       swiper.autoplay.start();
-        //     }
-        //   } catch (error) {
-        //     console.warn('Failed to initialize autoplay:', error);
-        //   }
-        // }}
+      // Remove onSwiper callback - autoplay should work automatically
+      // onSwiper={(swiper) => {
+      //   try {
+      //     if (swiper && swiper.autoplay && swiper.autoplay.start) {
+      //       swiper.autoplay.start();
+      //     }
+      //   } catch (error) {
+      //     console.warn('Failed to initialize autoplay:', error);
+      //   }
+      // }}
       >
-        {evenBanners.map(banner => (
+        {activeBanners.map(banner => (
+
           <SwiperSlide key={banner.id}>
             <a href={banner.url} target="_blank" rel="noopener noreferrer">
               <img src={banner.image} alt="Banner" className={styles.slideImage} />
