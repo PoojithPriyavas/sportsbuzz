@@ -78,6 +78,7 @@ export default function MatchSchedulerScreen() {
             <Head>
                 <title>Match Schedules</title>
                 <meta name="description" content="Your site description here" />
+                 <link rel="alternate" href="https://sportsbuz.com/match-schedules/" hreflang="x-default" />
             </Head>
             {/* <Header /> */}
             {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}

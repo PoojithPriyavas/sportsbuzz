@@ -140,6 +140,7 @@ export default function ContactUs({ countryDataHome, locationDataHome, resolvedU
       <Head>
         <title>Sportbuz | contact us</title>
         <meta name="description" content="Your site description here" />
+        <link rel="alternate" href="https://sportsbuz.com/contact/" hreflang="x-default" />
       </Head>
       {/* <Header /> */}
       <HeaderThree animationStage={animationStage} />

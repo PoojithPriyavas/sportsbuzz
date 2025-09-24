@@ -218,6 +218,7 @@ export default function BestBettingApps({ sections,countryCode, hrefLanData, res
                 <meta name="twitter:title" content={sections?.[0]?.metatitle || 'Best Betting Apps'} />
                 <meta name="twitter:description" content={sections?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
                 <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
+                <link rel="alternate" href="https://sportsbuz.com/best-betting-apps/current/" hreflang="x-default" />
             </Head>
 
             {/* <Header /> */}

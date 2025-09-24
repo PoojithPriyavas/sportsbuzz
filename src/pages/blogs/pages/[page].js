@@ -191,6 +191,7 @@ export default function BlogPages({
                 <meta name="twitter:description" content="Latest sports blogs, news and insights — only on Sports Buzz." />
                 <meta name="twitter:image" content="https://www.sportsbuz.com/images/social-preview.jpg" /> {/* Update this path */}
                 <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
+                 <link rel="alternate" href="https://sportsbuz.com/blogs/pages/1" hreflang="x-default" />
             </Head>
 
             {/* <Header /> */}

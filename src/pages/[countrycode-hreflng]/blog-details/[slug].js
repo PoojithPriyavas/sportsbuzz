@@ -141,6 +141,7 @@ export default function BlogDetailsMain({ blog, locationDataHome, resolvedUrl })
                 <meta property="og:title" content={blog.meta_title} />
                 <meta property="og:description" content={blog.meta_desc} />
                 <meta property="og:image" content={blog.image_big || blog.image} />
+                
             </Head>
             {/* <Header /> */}
             <HeaderThree animationStage={animationStage} />

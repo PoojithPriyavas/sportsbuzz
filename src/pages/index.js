@@ -32,10 +32,10 @@ import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 
 // Import hreflang helper utilities
-import { 
-  hasHreflangTags, 
-  hasLanguageCountryFormat, 
-  logHreflangStatus 
+import {
+  hasHreflangTags,
+  hasLanguageCountryFormat,
+  logHreflangStatus
 } from "@/utils/hreflangHelper";
 
 const geistSans = Geist({
@@ -53,11 +53,11 @@ import axios from 'axios';
 export async function getServerSideProps(context) {
   try {
     const locationRes = await fetch('https://admin.sportsbuz.com/api/locations');
-    
+
     if (!locationRes.ok) {
       throw new Error(`Location API failed: ${locationRes.status} ${locationRes.statusText}`);
     }
-    
+
     const locationDataHome = await locationRes.json();
 
     return {
@@ -91,8 +91,8 @@ export default function Home({ locationDataHome, isLocalhost }) {
     stages,
     news
   } = useGlobalData();
-  console.log(blogs,"blogs in index")
-  
+  console.log(blogs, "blogs in index")
+
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
 
   console.log(sections, "best betting apps console");
@@ -108,21 +108,21 @@ export default function Home({ locationDataHome, isLocalhost }) {
     const checkHreflangStatus = () => {
       const hasHreflang = hasHreflangTags();
       const hasValidFormat = hasLanguageCountryFormat(window.location.pathname);
-      
+
       setHreflangDetected(hasHreflang);
-      
+
       // Log the scenario being used
       if (hasHreflang && hasValidFormat) {
-        logHreflangStatus('2', { 
+        logHreflangStatus('2', {
           pathname: window.location.pathname,
           hasHreflang,
-          hasValidFormat 
+          hasValidFormat
         });
       } else {
-        logHreflangStatus('1', { 
+        logHreflangStatus('1', {
           pathname: window.location.pathname,
           hasHreflang,
-          hasValidFormat 
+          hasValidFormat
         });
       }
     };
@@ -246,6 +246,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
 
         {/* Additional meta for location-based handling */}
         <meta name="hreflang-detected" content={hreflangDetected ? 'true' : 'false'} />
+        <link rel="alternate" href="https://sportsbuz.com/" hreflang="x-default" />
       </Head>
 
       <>
@@ -271,7 +272,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
         {showOtherDivs && (
           <div
             className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter} ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
-            
+
             {sport === 'cricket' ? (
               <>
                 {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
@@ -281,7 +282,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                 {stages && <TestLive />}
               </>
             )}
-            
+
             <HeroCarousal countryCode={countryCode} />
 
             <div className={styles.fourColumnRow}>

@@ -81,6 +81,7 @@ export default function ContactUs() {
       <Head>
         <title>Sportsbuz | contact us</title>
         <meta name="description" content="Your site description here" />
+         <link rel="alternate" href="https://sportsbuz.com/contact/" hreflang="x-default" />
       </Head>
       {/* <Header /> */}
       <HeaderTwo animationStage={animationStage} />

@@ -125,6 +125,7 @@ export default function BestBettingApps({ sectionsTab }) {
                 <meta property="og:description" content={sectionsTab?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
                 <meta name="twitter:title" content={sectionsTab?.[0]?.metatitle || 'Best Betting Apps'} />
                 <meta name="twitter:description" content={sectionsTab?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
+                <link rel="alternate" href="https://sportsbuz.com/best-betting-apps/current/" hreflang="x-default" />
             </Head>
 
             {/* <Header /> */}

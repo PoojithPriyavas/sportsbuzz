@@ -10,6 +10,26 @@ import styles from './Carousal.module.css';
 import { useMediaQuery } from 'react-responsive';
 import { useGlobalData } from '../Context/ApiContext';
 
+// Skeleton Loading Component
+const CarouselSkeleton = ({ isMobile }) => {
+  return (
+    <div className={styles.carouselWrapper} style={{ marginTop: '20px' }}>
+      <div className={styles.skeletonContainer}>
+        <div className={`${styles.skeletonSlide} ${styles.shimmer}`}>
+          <div className={styles.skeletonImage} />
+        </div>
+        
+        {/* Skeleton pagination dots */}
+        <div className={styles.skeletonPagination}>
+          <div className={styles.skeletonDot} />
+          <div className={styles.skeletonDot} />
+          <div className={styles.skeletonDot} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function HeroCarousal() {
   const { countryCode } = useGlobalData()
   console.log(countryCode, "carousal country")
@@ -60,8 +80,13 @@ export default function HeroCarousal() {
     }
   }, [banners, isLoading]);
 
-  // Don't render if loading or no banners
-  if (isLoading || banners.length === 0) {
+  // Show skeleton loading when loading
+  if (isLoading) {
+    return <CarouselSkeleton isMobile={isMobile} />;
+  }
+
+  // Don't render if no banners after loading
+  if (banners.length === 0) {
     return <div className={styles.carouselWrapper} style={{ marginTop: '20px', height: '200px' }} />;
   }
 
@@ -104,7 +129,7 @@ export default function HeroCarousal() {
                 className={styles.slideImage}
                 alt={`Banner ${index + 1}`}
                 style={{ aspectRatio: isMobile ? '3/1' : 'auto' }}
-                loading={index === 0 ? 'eager' : 'lazy'} // Load first image immediately
+                loading={index === 0 ? 'eager' : 'lazy'} 
               />
             </a>
           </SwiperSlide>
