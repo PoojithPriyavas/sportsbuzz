@@ -206,7 +206,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
           content="sports news, live scores, cricket scores, football matches, betting tips, match predictions, Sportsbuz"
         />
         <meta name="author" content="Sportsbuz" />
-
+        <link rel="alternate" href="https://sportsbuz.com/" hreflang="x-default" />
         {/* Hreflang links - Critical for Scenario 2 */}
         {hreflangLinks.map(({ key, hreflang, href }) => (
           <link
@@ -246,7 +246,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
 
         {/* Additional meta for location-based handling */}
         <meta name="hreflang-detected" content={hreflangDetected ? 'true' : 'false'} />
-        <link rel="alternate" href="https://sportsbuz.com/" hreflang="x-default" />
+
       </Head>
 
       <>

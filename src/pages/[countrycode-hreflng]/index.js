@@ -170,7 +170,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                     content="sports news, live scores, cricket scores, football matches, betting tips, match predictions, Sportsbuz"
                 />
                 <meta name="author" content="Sportsbuz" />
-
+                <link rel="alternate" href="https://sportsbuz.com/" hreflang="x-default" />
                 {/* Canonical */}
                 {locationDataHome?.map(({ hreflang, country_code }) => {
                     console.log(hreflang, "href lan sp-home");
@@ -238,7 +238,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                         <div className={styles.fourColumnRow}>
                             <div className={styles.leftThreeColumns}>
                                 {countryCode?.location?.betting_apps == 'Active' && (
-                                <BonusTable sections={sections} />
+                                    <BonusTable sections={sections} />
                                 )}
                                 <div className={styles.twoSplitRow}>
                                     <div className={styles.leftSplit}>

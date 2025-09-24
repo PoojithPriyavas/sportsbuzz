@@ -92,11 +92,11 @@ export async function getServerSideProps({ req, resolvedUrl }) {
 }
 
 
-export default function BestBettingApps({ sections,countryCode, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome }) {
-    console.log(locationDataHome,"href lan data in bset bettingapps")
-    console.log(countryCode,"country code from cookie")
+export default function BestBettingApps({ sections, countryCode, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome }) {
+    console.log(locationDataHome, "href lan data in bset bettingapps")
+    console.log(countryCode, "country code from cookie")
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
-    console.log(sections,"sections in country page")
+    console.log(sections, "sections in country page")
     // const countryCode = countryData?.country_code || 'IN';
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
     const [loading, setLoading] = useState(true);
@@ -201,6 +201,8 @@ export default function BestBettingApps({ sections,countryCode, hrefLanData, res
                             : 'Explore the best betting apps in India for July 2025.'
                     }
                 />
+                <link rel="alternate" href="https://sportsbuz.com/best-betting-apps/current/" hreflang="x-default" />
+
                 {locationDataHome.map(({ hreflang, country_code }) => {
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/best-betting-apps/current`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
@@ -218,7 +220,6 @@ export default function BestBettingApps({ sections,countryCode, hrefLanData, res
                 <meta name="twitter:title" content={sections?.[0]?.metatitle || 'Best Betting Apps'} />
                 <meta name="twitter:description" content={sections?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
                 <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
-                <link rel="alternate" href="https://sportsbuz.com/best-betting-apps/current/" hreflang="x-default" />
             </Head>
 
             {/* <Header /> */}
