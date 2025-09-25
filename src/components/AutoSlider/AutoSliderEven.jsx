@@ -10,34 +10,35 @@ import CustomAxios from '../utilities/CustomAxios';
 import axios from 'axios';
 import { useGlobalData } from '../Context/ApiContext';
 
-export default function AutoSliderEven() {
-  const [banners, setBanners] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function AutoSliderEven({activeEvenBanners, bannerLoading}) {
+  console.log(bannerLoading,"banner loading state")
+  // const [banners, setBanners] = useState([]);
+  // const [loading, setLoading] = useState(true);
   const swiperRef = useRef(null);
-  const { countryCode } = useGlobalData()
+  // const { countryCode } = useGlobalData()
 
-  useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('https://admin.sportsbuz.com/api/side-banners', {
-          params: {
-            country_code: countryCode?.location?.id
-          }
-        });
-        const data = response.data;
-        const countryWiseSideBanner = data.filter(data => data.location === countryCode?.location?.id)
-        setBanners(countryWiseSideBanner);
-      } catch (error) {
-        console.error('Error fetching side banners:', error);
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchBanners = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const response = await axios.get('https://admin.sportsbuz.com/api/side-banners', {
+  //         params: {
+  //           country_code: countryCode?.location?.id
+  //         }
+  //       });
+  //       const data = response.data;
+  //       const countryWiseSideBanner = data.filter(data => data.location === countryCode?.location?.id)
+  //       setBanners(countryWiseSideBanner);
+  //     } catch (error) {
+  //       console.error('Error fetching side banners:', error);
+  //       throw error;
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchBanners();
-  }, [countryCode]);
+  //   fetchBanners();
+  // }, [countryCode]);
 
   // Remove manual autoplay control - let Swiper handle it automatically
   // useEffect(() => {
@@ -58,11 +59,11 @@ export default function AutoSliderEven() {
   //   }
   // }, [loading, banners]);
 
-  const evenBanners = banners.filter((item, i) => (item.order_by % 2 === 0));
-  const activeBanners = evenBanners.filter(i => i.is_active === 'Active')
+  // const evenBanners = banners.filter((item, i) => (item.order_by % 2 === 0));
+  // const activeBanners = evenBanners.filter(i => i.is_active === 'Active')
 
   // Don't render Swiper until we have data
-  if (loading || evenBanners.length === 0) {
+  if (bannerLoading || activeEvenBanners.length === 0) {
     return (
       <div className={styles.sliderWrapper}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
@@ -82,7 +83,7 @@ export default function AutoSliderEven() {
           disableOnInteraction: false,
           pauseOnMouseEnter: false
         }}
-        loop={activeBanners.length > 1} // Only enable loop if more than 1 slide
+        loop={activeEvenBanners.length > 1} // Only enable loop if more than 1 slide
         pagination={{ clickable: true }}
         className={styles.slider}
       // Remove onSwiper callback - autoplay should work automatically
@@ -96,7 +97,7 @@ export default function AutoSliderEven() {
       //   }
       // }}
       >
-        {activeBanners.map(banner => (
+        {activeEvenBanners.map(banner => (
 
           <SwiperSlide key={banner.id}>
             <a href={banner.url} target="_blank" rel="noopener noreferrer">

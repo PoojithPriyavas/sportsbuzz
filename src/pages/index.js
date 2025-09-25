@@ -89,7 +89,9 @@ export default function Home({ locationDataHome, isLocalhost }) {
     sport,
     countryCode,
     stages,
-    news
+    news,
+    activeOddBanners,
+    activeEvenBanners
   } = useGlobalData();
   console.log(blogs, "blogs in index")
 
@@ -308,7 +310,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                     <JoinTelegramButton />
                   </div>
                   <div className={styles.fourthColumnRight}>
-                    <AutoSlider countryCode={countryCode} />
+                    {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                   </div>
                 </div>
                 {sport === 'cricket' ? (
@@ -318,7 +320,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                 ) : (
                   <UpcomingFootballMatches />
                 )}
-                <AutoSliderEven countryCode={countryCode} />
+                {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
                 <SportsOdsMegaPari />
               </div>
             </div>

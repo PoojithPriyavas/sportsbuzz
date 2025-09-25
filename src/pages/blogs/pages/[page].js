@@ -56,7 +56,7 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
 
         try {
             blogs = await fetchBlogsSSR({
-                countryCode: countryDataHome?.country_code || 'IN',
+                countryCode: countryDataHome?.country_code || 'LK',
                 search: searchTerm,
                 category: categoryIdParam ? parseInt(categoryIdParam, 10) : null,
                 subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam, 10) : null,
@@ -100,7 +100,7 @@ export default function BlogPages({
     resolvedUrl,
     isLocalhost, }) {
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
-    const countryCode = countryDataHome?.country_code || 'IN';
+    const countryCode = countryDataHome?.country_code || 'LK';
     const { blogs } = useGlobalData();
     console.log(blogs,"blogs data")
     // console.log(resolvedUrl, "rshdhasd")

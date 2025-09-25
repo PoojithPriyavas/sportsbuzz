@@ -111,6 +111,8 @@ export default function BestBettingApps({ sections, countryCode, hrefLanData, re
         sport,
         // countryCode,
         bestSections,
+        activeOddBanners,
+        activeEvenBanners,
         stages
     } = useGlobalData();
     // console.log(sections, "shgdfs")
@@ -253,7 +255,7 @@ export default function BestBettingApps({ sections, countryCode, hrefLanData, re
                                 <JoinTelegramButton countryCode={countryCode} />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider countryCode={countryCode} />
+                                {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                             </div>
                         </div>
                         {sport === 'cricket' ? (

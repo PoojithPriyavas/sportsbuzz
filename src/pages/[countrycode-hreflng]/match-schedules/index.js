@@ -91,7 +91,7 @@ export async function getServerSideProps(context) {
 export default function MatchSchedulerScreen({ countryDataHome, locationDataHome, resolvedUrl, }) {
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
 
-    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches, stages } = useGlobalData();
+    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches, stages, activeOddBanners, activeEvenBanners, bannerLoading } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -173,7 +173,7 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider countryCode={countryDataHome} />
+                                {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                             </div>
                         </div>
                         {sport === 'cricket' ? (
@@ -183,7 +183,7 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                        <AutoSliderEven countryCode={countryDataHome} />
+                         {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
                         <SportsOdsMegaPari />
                     </div>
                 </div>

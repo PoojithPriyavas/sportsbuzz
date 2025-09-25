@@ -27,7 +27,7 @@ export async function getServerSideProps(context) {
     // Parse the cookie to get country code
     const countryCookie = req.cookies.countryData;
     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    const countryCode = countryData?.country_code || 'IN';
+    const countryCode = countryData?.country_code || 'LK';
 
     const sectionId = params.id;
     // Fetch betting apps data based on country code
@@ -58,7 +58,10 @@ export default function BestBettingApps({ bestSectionsTab, sectionId }) {
         sport,
         countryCode,
         bestSections,
-        stages
+        stages,
+        activeOddBanners,
+        activeEvenBanners,
+        bannerLoading,
 
     } = useGlobalData();
     useEffect(() => {
@@ -150,7 +153,7 @@ export default function BestBettingApps({ bestSectionsTab, sectionId }) {
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider countryCode={countryCode} />
+                               {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                             </div>
                         </div>
                         {sport === 'cricket' ? (

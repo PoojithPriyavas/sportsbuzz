@@ -26,7 +26,7 @@ export async function getServerSideProps({ req }) {
     // Parse the cookie to get country code
     const countryCookie = req.cookies.countryData;
     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    const countryCode = countryData?.country_code || 'IN';
+    const countryCode = countryData?.country_code || 'LK';
 
     // Fetch betting apps data based on country code
     const sectionsTab = await fetchBettingAppsSSR(countryCode);
@@ -56,7 +56,10 @@ export default function BestBettingApps({ sectionsTab }) {
         sport,
         countryCode,
         bestSections,
-        stages
+        stages,
+        activeOddBanners,
+        activeEvenBanners,
+        bannerLoading,
     } = useGlobalData();
     // console.log(sections, "shgdfs")
 
@@ -159,7 +162,7 @@ export default function BestBettingApps({ sectionsTab }) {
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider countryCode={countryCode} />
+                                {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                             </div>
                         </div>
                         {sport === 'cricket' ? (
@@ -169,7 +172,7 @@ export default function BestBettingApps({ sectionsTab }) {
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                        <AutoSliderEven countryCode={countryCode} />
+                        {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
                         {/* <TopNewsSection /> */}
                     </div>
                 </div>

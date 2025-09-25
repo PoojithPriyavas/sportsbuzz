@@ -87,7 +87,7 @@ export async function getServerSideProps(context) {
 
 export default function FootballMatchDetails({ countryDataHome, locationDataHome, resolvedUrl, }) {
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
-
+    const { activeOddBanners, bannerLoading } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     const params = useParams();
@@ -173,7 +173,7 @@ export default function FootballMatchDetails({ countryDataHome, locationDataHome
                     </div>
                     <div className={styles.fourthColumn} >
                         <BettingCard />
-                        <AutoSlider countryCode={countryDataHome}/>
+                        {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                         <TopNewsSection />
                     </div>
                 </div>

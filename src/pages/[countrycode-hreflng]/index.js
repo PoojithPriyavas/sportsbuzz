@@ -88,7 +88,10 @@ export default function Home({ locationDataHome, isLocalhost }) {
         countryCode,
         stages,
         news,
-        fetchBettingApps
+        activeOddBanners,
+        activeEvenBanners,
+        fetchBettingApps,
+        bannerLoading,
 
     } = useGlobalData();
     console.log(blogs, "blogs in country home")
@@ -215,7 +218,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
             <>
 
                 {/* {showOtherDivs && <RegionSelector countryCode={countryCode} locationDataHome={locationDataHome} />} */}
-                <HeaderThree animationStage={animationStage} />
+                <HeaderThree animationStage={animationStage} languageValidation={languageValidation} />
                 {showOtherDivs && (
                     <div
                         // style={{marginTop:'9.5rem'}}
@@ -269,7 +272,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                                         <JoinTelegramButton />
                                     </div>
                                     <div className={styles.fourthColumnRight}>
-                                        <AutoSlider countryCode={countryCode} />
+                                        {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                                     </div>
                                 </div>
                                 {sport === 'cricket' ? (
@@ -279,7 +282,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                                 ) : (
                                     <UpcomingFootballMatches />
                                 )}
-                                <AutoSliderEven countryCode={countryCode} />
+                               {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
                                 <SportsOdsMegaPari />
                             </div>
                         </div>

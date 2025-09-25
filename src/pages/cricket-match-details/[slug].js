@@ -23,7 +23,7 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 
 export default function CricketMatchDetails() {
 
-    const { getCricketDetails, cricketDetails, countryCode } = useGlobalData();
+    const { getCricketDetails, cricketDetails, countryCode, activeOddBanners, bannerLoading } = useGlobalData();
     console.log(cricketDetails,"matc details")
 
     const [loading, setLoading] = useState(true);
@@ -107,7 +107,7 @@ export default function CricketMatchDetails() {
                     </div>
                     <div className={styles.fourthColumn} >
                         <BettingCard />
-                        <AutoSlider countryCode={countryCode} />
+                         {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                         <TopNewsSection />
                     </div>
                 </div>

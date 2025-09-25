@@ -1,5 +1,5 @@
 // hooks/useLanguageValidation.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useGlobalData } from '@/components/Context/ApiContext';
 
@@ -7,7 +7,12 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
     const router = useRouter();
     const [isValidating, setIsValidating] = useState(false);
     const [hasHreflangTags, setHasHreflangTags] = useState(false);
-    const {setLanguage, setValidatedLocationData} = useGlobalData();
+    const {language, setLanguage, setValidatedLocationData} = useGlobalData();
+    
+    // Add a ref to track user-initiated navigation
+    const isUserInitiatedNavigation = useRef(false);
+    const navigationTimeout = useRef(null);
+    const previousLanguage = useRef(language);
 
     // Check if current page has hreflang tags (Scenario 2)
     const checkHreflangTags = () => {
@@ -31,6 +36,13 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
 
     const { countryPart, langPart } = getUrlParts();
     console.log("🔍 DEBUG - Final URL parts:", { countryPart, langPart });
+
+    // Function to check if user is accessing from root domain (sportsbuz.com/)
+    const isRootDomainAccess = () => {
+        const currentPath = resolvedUrl.replace(/^\//, '');
+        // Check if it's exactly root or has no language-country format
+        return currentPath === '' || !(/^[a-z]{2}-[a-z]{2}/.test(currentPath));
+    };
 
     // Function to get user's location from API
     const getUserLocation = async () => {
@@ -102,6 +114,21 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
         return isLanguageSupported;
     };
 
+    // NEW: Function to validate hreflang against location API response
+    const validateHreflangInLocationData = (languageTag) => {
+        if (!locationDataHome || !Array.isArray(locationDataHome)) {
+            console.error('Location data is not available for hreflang validation');
+            return false;
+        }
+
+        const isHreflangSupported = locationDataHome.some(location => 
+            location.hreflang?.toLowerCase() === languageTag?.toLowerCase()
+        );
+
+        console.log(`🔍 Validating hreflang '${languageTag}' against location API:`, isHreflangSupported);
+        return isHreflangSupported;
+    };
+
     // Function to construct new path (format: languagecode-countrycode)
     const constructNewPath = (countryCode, newLanguageTag, currentUrl) => {
         const pathParts = currentUrl.replace(/^\//, '').split('/');
@@ -133,7 +160,7 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
         return null;
     };
 
-    // SCENARIO 1: Handle URLs without hreflang tags
+    // SCENARIO 1: Handle URLs without hreflang tags (only for root domain access)
     const handleUrlWithoutHreflang = async () => {
         console.log('🔄 Scenario 1: URL without hreflang tags - calling location API');
         
@@ -157,18 +184,20 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
             
         } catch (error) {
             console.error('Error in Scenario 1:', error);
-            // Fallback to default en-in
+            // Fallback to default en-lk (Sri Lanka)
             const pathParts = resolvedUrl.replace(/^\//, '').split('/');
             pathParts.shift();
             const remainingPath = pathParts.length > 0 ? '/' + pathParts.join('/') : '';
-            router.replace(`/en-in${remainingPath}`);
+            router.replace(`/en-lk${remainingPath}`);
         }
     };
 
-    // SCENARIO 2: Handle URLs with hreflang tags
+    // SCENARIO 2: Handle URLs with hreflang tags (validate against location API)
     const handleUrlWithHreflang = () => {
-        console.log('✅ Scenario 2: URL with hreflang tags - using existing implementation');
+        console.log('✅ Scenario 2: URL with hreflang tags - validating against location API');
         console.log('🔍 DEBUG - countryPart:', countryPart, 'langPart:', langPart);
+        console.log('🔍 DEBUG - isUserInitiatedNavigation:', isUserInitiatedNavigation.current);
+        console.log('🔍 DEBUG - previousLanguage:', previousLanguage.current, 'currentLanguage:', language);
         
         // Validate the hreflang format (languagecode-countrycode)
         if (!countryPart || !langPart) {
@@ -176,7 +205,51 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
             return false;
         }
 
-        // Validate if the language-country combination exists in our data
+        // Check if this is a language change initiated from HeaderThree
+        // by comparing the URL language with the global language state
+        const isLanguageChangeFromHeader = langPart === language && previousLanguage.current !== language;
+        
+        if (isLanguageChangeFromHeader) {
+            console.log('🔍 Language change detected from HeaderThree, allowing to proceed');
+            previousLanguage.current = language;
+            return true;
+        }
+
+        // NEW: First check if the hreflang exists in location API response
+        const isHreflangInLocationData = validateHreflangInLocationData(langPart);
+        
+        if (!isHreflangInLocationData) {
+            // Only revert if this is NOT a user-initiated navigation
+            if (!isUserInitiatedNavigation.current) {
+                console.warn(`⚠️ Hreflang '${langPart}' not found in location API response, reverting to previous value`);
+                
+                // Get the previous language value from global context
+                const revertLanguage = previousLanguage.current || 'en'; // fallback to 'en' if no previous language
+                
+                // Construct new path with previous language
+                const pathParts = resolvedUrl.replace(/^\//, '').split('/');
+                pathParts[0] = `${revertLanguage}-${countryPart.toLowerCase()}`;
+                const newPath = '/' + pathParts.join('/');
+                
+                console.log(`🔄 Reverting to previous language '${revertLanguage}': ${newPath}`);
+                router.replace(newPath);
+                return false;
+            } else {
+                console.log(`🔍 User-initiated navigation detected, allowing invalid hreflang '${langPart}' to proceed`);
+                // Reset the flag after processing
+                isUserInitiatedNavigation.current = false;
+                // Clear any pending timeout
+                if (navigationTimeout.current) {
+                    clearTimeout(navigationTimeout.current);
+                    navigationTimeout.current = null;
+                }
+            }
+        }
+
+        // Update previous language reference
+        previousLanguage.current = langPart;
+
+        // Then validate if the language-country combination exists in our data
         const isValid = validateLanguageForCountry(countryPart, langPart);
         console.log('🔍 DEBUG - validateLanguageForCountry result:', isValid);
         
@@ -186,9 +259,34 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
             createAndStoreValidatedLocationData(countryPart, langPart);
             return true;
         } else {
-            console.error(`❌ Invalid hreflang combination: ${langPart}-${countryPart}`);
-            return false;
+            // Only revert if this is NOT a user-initiated navigation
+            if (!isUserInitiatedNavigation.current && !isLanguageChangeFromHeader) {
+                console.error(`❌ Invalid hreflang combination: ${langPart}-${countryPart}`);
+                
+                // Get the previous language value from global context
+                const revertLanguage = previousLanguage.current || 'en'; // fallback to 'en' if no previous language
+                
+                // Construct new path with previous language
+                const pathParts = resolvedUrl.replace(/^\//, '').split('/');
+                pathParts[0] = `${revertLanguage}-${countryPart.toLowerCase()}`;
+                const newPath = '/' + pathParts.join('/');
+                
+                console.log(`🔄 Reverting to previous language '${revertLanguage}': ${newPath}`);
+                router.replace(newPath);
+                return false;
+            } else {
+                console.log(`🔍 User-initiated navigation or header change detected, allowing invalid combination to proceed`);
+                // Reset the flag after processing
+                isUserInitiatedNavigation.current = false;
+                // Clear any pending timeout
+                if (navigationTimeout.current) {
+                    clearTimeout(navigationTimeout.current);
+                    navigationTimeout.current = null;
+                }
+            }
         }
+
+        return true;
     };
 
     // Main validation effect
@@ -201,6 +299,10 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
     
             setIsValidating(true);
             console.log("🔍 DEBUG - Starting validation for resolvedUrl:", resolvedUrl);
+    
+            // Check if this is a root domain access
+            const isRootAccess = isRootDomainAccess();
+            console.log("🔍 DEBUG - isRootAccess:", isRootAccess);
     
             // Check if page has hreflang tags
             const hasHreflang = checkHreflangTags();
@@ -229,22 +331,20 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
     
             console.log("🔍 DEBUG - Final hasLanguageCountryFormat:", hasLanguageCountryFormat);
     
-            if (hasHreflang && hasLanguageCountryFormat) {
-                // SCENARIO 2: Has hreflang tags and proper format
-                console.log("🔍 DEBUG - Scenario 2: Has hreflang and proper format");
+            // NEW LOGIC: Only apply location-based redirection for root domain access
+            if (isRootAccess && !hasLanguageCountryFormat && !isBlogDetailsUrl) {
+                // SCENARIO 1: Root domain access without hreflang format - use location API
+                console.log("🔍 DEBUG - Scenario 1: Root access without format, using location API");
+                await handleUrlWithoutHreflang();
+            } else if (hasLanguageCountryFormat) {
+                // SCENARIO 2: Has hreflang format - validate against location API
+                console.log("🔍 DEBUG - Scenario 2: Has hreflang format, validating against location API");
                 const isValid = handleUrlWithHreflang();
                 console.log("🔍 DEBUG - handleUrlWithHreflang result:", isValid);
-                if (!isValid && !isBlogDetailsUrl) {
-                    // Only redirect if it's not a blog-details URL
-                    console.log("🔍 DEBUG - Invalid URL, redirecting (not blog-details)");
-                    await handleUrlWithoutHreflang();
-                }
-            } else if (!isBlogDetailsUrl) {
-                // SCENARIO 1: Only redirect non-blog-details URLs
-                console.log("🔍 DEBUG - Scenario 1: Missing format, redirecting (not blog-details)");
-                await handleUrlWithoutHreflang();
+            } else if (isBlogDetailsUrl) {
+                console.log("🔍 DEBUG - Blog details URL, skipping validation");
             } else {
-                console.log("🔍 DEBUG - Blog details URL, skipping redirect");
+                console.log("🔍 DEBUG - Non-root access without proper format, allowing to proceed");
             }
     
             setIsValidating(false);
@@ -256,8 +356,34 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
         
     }, [router.asPath, locationDataHome]);
 
+    // Track language changes to detect HeaderThree initiated changes
+    useEffect(() => {
+        if (language && language !== previousLanguage.current) {
+            console.log('🔍 Language changed in global context:', previousLanguage.current, '->', language);
+        }
+    }, [language]);
+
     // Helper functions for manual changes
     const handleLanguageChange = (newLanguageTag) => {
+        // Set flag to indicate this is a user-initiated navigation
+        isUserInitiatedNavigation.current = true;
+        
+        // Set a timeout to reset the flag in case navigation doesn't happen
+        navigationTimeout.current = setTimeout(() => {
+            isUserInitiatedNavigation.current = false;
+            navigationTimeout.current = null;
+        }, 2000); // Reset after 2 seconds
+        
+        // NEW: Validate against location API response first
+        const isHreflangInLocationData = validateHreflangInLocationData(newLanguageTag);
+        
+        if (!isHreflangInLocationData) {
+            console.log(`Error: Language '${newLanguageTag}' is not available in location API response. Using default "en".`);
+            const newPath = constructNewPath(countryPart, 'en', resolvedUrl);
+            router.push(newPath);
+            return;
+        }
+
         const languageExists = isLanguageCodeAvailable(newLanguageTag);
         
         if (languageExists) {
@@ -354,6 +480,7 @@ export const useLanguageValidation = (locationDataHome, resolvedUrl) => {
         constructNewPath,
         createAndStoreValidatedLocationData,
         isLanguageCodeAvailable,
-        getUserLocation // Expose for external use if needed
+        getUserLocation, // Expose for external use if needed
+        validateHreflangInLocationData // NEW: Expose the new validation function
     };
 };

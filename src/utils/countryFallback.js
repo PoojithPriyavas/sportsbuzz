@@ -24,7 +24,13 @@ export const sriLankaFallbackData = {
 export const processCountryCodeResponse = (response) => {
   // Check if the response contains an error about location not found
   if (response && response.error && response.error.includes("Location not found")) {
-    console.log('Using Sri Lanka as fallback due to location not found');
+    console.log('🇱🇰 Using Sri Lanka as fallback due to location not found');
+    return sriLankaFallbackData;
+  }
+  
+  // Check if response is empty or invalid
+  if (!response || !response.country_code) {
+    console.log('🇱🇰 Using Sri Lanka as fallback due to invalid response');
     return sriLankaFallbackData;
   }
   
@@ -39,6 +45,6 @@ export const processCountryCodeResponse = (response) => {
  */
 export const handleCountryCodeError = (error) => {
   console.error('Failed to fetch country code:', error);
-  console.log('Using Sri Lanka as fallback due to error');
+  console.log('🇱🇰 Using Sri Lanka as fallback due to error');
   return sriLankaFallbackData;
 };

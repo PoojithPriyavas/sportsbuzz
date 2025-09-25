@@ -15,7 +15,7 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 
 export default function blogDetailsMain() {
     const [loading, setLoading] = useState(true);
-    const { countryCode } = useGlobalData();
+    const { countryCode, activeOddBanners, bannerLoading } = useGlobalData();
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false
         const timer1 = setTimeout(() => setLoading(false), 3000);
@@ -84,7 +84,7 @@ export default function blogDetailsMain() {
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider countryCode={countryCode} />
+                                {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                             </div>
                         </div>
                         {/* {sport === 'cricket' ? (

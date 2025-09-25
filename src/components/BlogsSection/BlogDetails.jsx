@@ -18,7 +18,7 @@ import { useGlobalData } from '../Context/ApiContext';
 
 
 export default function BlogDetailsPage({ blog }) {
-    const { countryCode } = useGlobalData()
+    const { countryCode, activeOddBanners, activeEvenBanners, bannerLoading } = useGlobalData()
     return (
         <div >
 
@@ -34,7 +34,7 @@ export default function BlogDetailsPage({ blog }) {
                             <div className={styles.bettingCardWrapper}>
                                 <BettingCard />
                                 <div style={{ margin: '10px 0' }}>
-                                    <AutoSliderEven countryCode={countryCode} />
+                                    {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
                                 </div>
 
                             </div>
@@ -42,7 +42,7 @@ export default function BlogDetailsPage({ blog }) {
                             <UpcomingFootballMatches />
                         </div>
                         <div className={styles.fourthColumnRight}>
-                            <AutoSlider countryCode={countryCode} />
+                            {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
 
                         </div>
 

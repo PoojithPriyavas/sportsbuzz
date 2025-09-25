@@ -23,7 +23,7 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 import HeaderThree from "@/components/Header/HeaderThree";
 
 export default function CricketMatchDetails() {
-    const { getCricketDetails, cricketDetails, location, countryCode } = useGlobalData();
+    const { getCricketDetails, cricketDetails, location, countryCode, activeOddBanners, bannerLoading } = useGlobalData();
     const [loading, setLoading] = useState(true);
     const [animationStage, setAnimationStage] = useState('loading');
     const [showOtherDivs, setShowOtherDivs] = useState(false);
@@ -105,7 +105,7 @@ export default function CricketMatchDetails() {
                     </div>
                     <div className={styles.fourthColumn}>
                         <BettingCard />
-                        <AutoSlider countryCode={countryCode} />
+                        {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                         <TopNewsSection />
                     </div>
                 </div>

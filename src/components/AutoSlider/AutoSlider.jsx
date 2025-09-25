@@ -9,34 +9,33 @@ import CustomAxios from '../utilities/CustomAxios';
 import axios from 'axios';
 import { useGlobalData } from '../Context/ApiContext';
 
-export default function AutoSlider() {
-  const [banners, setBanners] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function AutoSlider({activeOddBanners, bannerLoading}) {
+
   const swiperRef = useRef(null);
   const { countryCode } = useGlobalData()
 
-  useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('https://admin.sportsbuz.com/api/side-banners', {
-          params: {
-            country_code: countryCode?.location?.id
-          }
-        });
-        const data = response.data;
-        const countryWiseSideBanner = data.filter(data => data.location === countryCode?.location?.id)
-        console.log(countryWiseSideBanner, "country wise side banner")
-        setBanners(countryWiseSideBanner);
-      } catch (error) {
-        console.error('Error fetching side banners:', error);
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBanners();
-  }, [countryCode]);
+  // useEffect(() => {
+  //   const fetchBanners = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const response = await axios.get('https://admin.sportsbuz.com/api/side-banners', {
+  //         params: {
+  //           country_code: countryCode?.location?.id
+  //         }
+  //       });
+  //       const data = response.data;
+  //       const countryWiseSideBanner = data.filter(data => data.location === countryCode?.location?.id)
+  //       console.log(countryWiseSideBanner, "country wise side banner")
+  //       setBanners(countryWiseSideBanner);
+  //     } catch (error) {
+  //       console.error('Error fetching side banners:', error);
+  //       throw error;
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchBanners();
+  // }, [countryCode]);
 
   // Optional: Restart autoplay when banners are loaded (usually not needed)
   // useEffect(() => {
@@ -50,48 +49,60 @@ export default function AutoSlider() {
   //   }
   // }, [loading, banners]);
 
-  const oddBanners = banners.filter((item, i) => (item.order_by % 2 !== 0));
-  const activeBanners = oddBanners.filter(i => i.is_active === 'Active')
+  // const oddBanners = banners.filter((item, i) => (item.order_by % 2 !== 0));
+  // const activeBanners = oddBanners.filter(i => i.is_active === 'Active')
 
   // Don't render Swiper until we have data
-  if (loading || oddBanners.length === 0) {
-    return (
-      <div className={styles.sliderWrapper}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-          Loading banners...
-        </div>
-      </div>
-    );
-  }
+  // if (bannerLoading) {
+  //   return (
+  //     <div className={styles.sliderWrapper}>
+  //       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+  //         Loading banners...
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
-    <div className={styles.sliderWrapper}>
-      <Swiper
-        ref={swiperRef}
-        modules={[Autoplay, Pagination]}
-        autoplay={{
-          delay: 3000,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: false
-        }}
-        loop={activeBanners.length > 1} // Only enable loop if more than 1 slide
-        pagination={{ clickable: true }}
-        className={styles.slider}
-      // onSwiper callback is usually not needed for autoplay
-      // onSwiper={(swiper) => {
-      //   if (swiper.autoplay && typeof swiper.autoplay.start === 'function') {
-      //     swiper.autoplay.start();
-      //   }
-      // }}
-      >
-        {activeBanners.map(banner => (
-          <SwiperSlide key={banner.id}>
-            <a href={banner.url} target="_blank" rel="noopener noreferrer">
-              <img src={banner.image} alt="Banner" className={styles.slideImage} />
-            </a>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
+    <>
+      {bannerLoading ? (
+        <div className={styles.sliderWrapper}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            Loading banners...
+          </div>
+        </div>
+      ) : (
+        < div className={styles.sliderWrapper}>
+          <Swiper
+            ref={swiperRef}
+            modules={[Autoplay, Pagination]}
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: false
+            }}
+            loop={activeOddBanners.length > 1} // Only enable loop if more than 1 slide
+            pagination={{ clickable: true }}
+            className={styles.slider}
+          // onSwiper callback is usually not needed for autoplay
+          // onSwiper={(swiper) => {
+          //   if (swiper.autoplay && typeof swiper.autoplay.start === 'function') {
+          //     swiper.autoplay.start();
+          //   }
+          // }}
+          >
+            {activeOddBanners.map(banner => (
+              <SwiperSlide key={banner.id}>
+                <a href={banner.url} target="_blank" rel="noopener noreferrer">
+                  <img src={banner.image} alt="Banner" className={styles.slideImage} />
+                </a>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div >
+      )
+      }
+    </>
+
   );
 }

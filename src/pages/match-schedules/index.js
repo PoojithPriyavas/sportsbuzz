@@ -23,7 +23,7 @@ import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 
 export default function MatchSchedulerScreen() {
 
-    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches, countryCode, stages } = useGlobalData();
+    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches, countryCode, stages, activeOddBanners, activeEvenBanners, bannerLoading } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -78,7 +78,7 @@ export default function MatchSchedulerScreen() {
             <Head>
                 <title>Match Schedules</title>
                 <meta name="description" content="Your site description here" />
-                 <link rel="alternate" href="https://sportsbuz.com/match-schedules/" hreflang="x-default" />
+                <link rel="alternate" href="https://sportsbuz.com/match-schedules/" hreflang="x-default" />
             </Head>
             {/* <Header /> */}
             {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
@@ -105,7 +105,7 @@ export default function MatchSchedulerScreen() {
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider countryCode={countryCode} />
+                                {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                             </div>
                         </div>
                         {sport === 'cricket' ? (
@@ -115,7 +115,7 @@ export default function MatchSchedulerScreen() {
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                        <AutoSliderEven countryCode={countryCode} />
+                        {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
                         <SportsOdsMegaPari />
                     </div>
                 </div>

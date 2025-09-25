@@ -13,14 +13,14 @@ import AutoSlider from "@/components/AutoSlider/AutoSlider";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
 import HeaderThree from "@/components/Header/HeaderThree";
-
+import { useGlobalData } from "@/components/Context/ApiContext";
 export async function getServerSideProps(context) {
     // Extract resolvedUrl at the top level, outside the try block
     const { resolvedUrl } = context;
-    
+
     // Log the request origin (helpful for debugging)
     // console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
-    
+
     try {
         const [countryRes, locationRes] = await Promise.all([
             fetch('https://admin.sportsbuz.com/api/get-country-code/')
@@ -81,7 +81,7 @@ export async function getServerSideProps(context) {
 
 export default function blogDetailsMain({ countryDataHome, locationDataHome, resolvedUrl, }) {
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
-
+    const { activeOddBanners, bannerLoading } = useGlobalData();
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false
@@ -151,7 +151,7 @@ export default function blogDetailsMain({ countryDataHome, locationDataHome, res
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                                <AutoSlider countryCode={countryDataHome}/>
+                             {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                             </div>
                         </div>
                         {/* {sport === 'cricket' ? (

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, use } from 'react';
 import { gsap } from 'gsap';
 import styles from './HeaderTwo.module.css';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useGlobalData } from '../Context/ApiContext';
 import { FaMoon, FaSun, FaChevronDown, FaBars, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
@@ -26,13 +26,13 @@ function getCookie(name) {
     return null;
 }
 
-const HeaderThree = ({ animationStage }) => {
+const HeaderThree = ({ animationStage, languageValidation }) => {
     const [darkMode, setDarkMode] = useState(false);
     const [headerFixed, setHeaderFixed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState(null);
-    
+    const router = useRouter();
     // Add this line to use the usePathHelper hook
     const { pathPrefix } = usePathHelper();
     
@@ -462,6 +462,22 @@ console.log(countryCode,"counrty cod")
         setExpandedLanguageSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);
+        }
+
+        // Use the languageValidation hook's handleLanguageChange if available
+        if (languageValidation && languageValidation.handleLanguageChange) {
+            languageValidation.handleLanguageChange(selectedLanguage);
+        } else {
+            // Fallback to the original logic
+            const { countryCode: currentCountryCode } = parseUrlPath(pathname);
+            if (currentCountryCode) {
+                const pathParts = pathname.split('/');
+                const pathAfterPrefix = pathParts.slice(2).join('/');
+                const newPath = `/${selectedLanguage}-${currentCountryCode.toLowerCase()}${pathAfterPrefix ? '/' + pathAfterPrefix : ''}`;
+                
+                console.log('🔄 Navigating to new language path:', newPath);
+                router.push(newPath);
+            }
         }
     };
 

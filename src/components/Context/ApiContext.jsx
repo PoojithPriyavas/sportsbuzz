@@ -58,7 +58,8 @@ export const DataProvider = ({ children, countryDataHome }) => {
     // console.log(isUrlCountryPresent[1], "is url")
 
     //  TIME ZONE IMPLEMENTATION
-
+    const [banners, setBanners] = useState([]);
+    const [bannerLoading, setBannerLoading] = useState(true);
 
     const [currentTimezone, setCurrentTimezone] = useState('+0.00');
 
@@ -164,6 +165,36 @@ export const DataProvider = ({ children, countryDataHome }) => {
         }
     };
 
+    //Fetch side banners
+
+    useEffect(() => {
+        const fetchBanners = async () => {
+            try {
+                setBannerLoading(true);
+                const response = await axios.get('https://admin.sportsbuz.com/api/side-banners', {
+                    params: {
+                        country_code: countryCode?.location?.id
+                    }
+                });
+                const data = response.data;
+                const countryWiseSideBanner = data.filter(data => data.location === countryCode?.location?.id)
+                console.log(countryWiseSideBanner, "country wise side banner")
+                setBanners(countryWiseSideBanner);
+            } catch (error) {
+                console.error('Error fetching side banners:', error);
+                throw error;
+            } finally {
+                setBannerLoading(false);
+            }
+        };
+        fetchBanners();
+    }, [countryCode]);
+
+    const oddBanners = banners.filter((item, i) => (item.order_by % 2 !== 0));
+    const activeOddBanners = oddBanners.filter(i => i.is_active === 'Active');
+
+    const evenBanners = banners.filter((item, i) => (item.order_by % 2 === 0));
+    const activeEvenBanners = evenBanners.filter(i => i.is_active === 'Active')
 
     // // LANGUAGE BASED ON THE URL
 
@@ -1109,6 +1140,9 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 setValidatedLocationData,
                 matchTeams,
                 setMatchTeams,
+                activeOddBanners,
+                activeEvenBanners,
+                bannerLoading
             }}>
             {children}
         </DataContext.Provider>

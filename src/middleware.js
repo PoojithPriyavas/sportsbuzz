@@ -1,7 +1,7 @@
 // src/middleware.js
 
 import { NextResponse } from 'next/server';
-import { sriLankaFallbackData, processCountryCodeResponse } from './utils/countryFallback';
+import { sriLankaFallbackData, processCountryCodeResponse, handleCountryCodeError } from './utils/countryFallback';
 
 export async function middleware(request) {
   console.log('🚀 Middleware: Location-based URL handling started');
@@ -93,16 +93,20 @@ export async function middleware(request) {
   } catch (error) {
     console.error('❌ Middleware error:', error);
     
-    // Fallback: redirect to en-in
-    const newPathname = `/en-in${pathToCheck}`;
+    // Fallback: redirect to Sri Lanka (en-lk) instead of India
+    const fallbackCountryData = handleCountryCodeError(error);
+    const fallbackCountryCode = fallbackCountryData.country_code;
+    const fallbackLanguage = fallbackCountryData.location.hreflang;
+    
+    const newPathname = `/${fallbackLanguage}-${fallbackCountryCode.toLowerCase()}${pathToCheck}`;
     url.pathname = newPathname;
     
-    console.log(`🔄 Fallback redirect from ${pathToCheck} to ${newPathname}`);
+    console.log(`🔄 Fallback redirect from ${pathToCheck} to ${newPathname} (Sri Lanka)`);
     
     const response = NextResponse.redirect(url, 302);
     
-    // Set fallback cookies
-    await setCookies(request, response, 'IN', null);
+    // Set fallback cookies with Sri Lanka data
+    await setCookies(request, response, fallbackCountryCode, null);
     
     return response;
   }
@@ -144,11 +148,12 @@ async function getUserLocation(request) {
     const rawCountryData = await countryRes.json();
     const countryData = processCountryCodeResponse(rawCountryData);
     
-    return countryData.country_code || countryData.countryCode || 'IN';
+    return countryData.country_code || countryData.countryCode || sriLankaFallbackData.country_code;
     
   } catch (error) {
     console.error('Failed to fetch country code:', error);
-    return 'IN'; // Default to India
+    // Use Sri Lanka fallback instead of India
+    return sriLankaFallbackData.country_code;
   }
 }
 

@@ -57,7 +57,7 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
 
         try {
             blogs = await fetchBlogsSSR({
-                countryCode: countryDataHome?.country_code || 'IN',
+                countryCode: countryDataHome?.country_code || 'LK',
                 search: searchTerm,
                 category: categoryIdParam ? parseInt(categoryIdParam, 10) : null,
                 subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam, 10) : null,
@@ -106,7 +106,7 @@ export default function BlogPages({
     const router = useRouter();
     const [isValidating, setIsValidating] = useState(false);
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
-    const countryCode = countryDataHome?.country_code || 'IN';
+    const countryCode = countryDataHome?.country_code || 'LK';
 
     const locationParts = resolvedUrl.replace(/^,?\//, '').split('/');
     const [countryPart, langPart] = locationParts[0].split('-'); // Fixed: country comes first, then language
