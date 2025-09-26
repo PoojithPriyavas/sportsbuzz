@@ -35,6 +35,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     const router = useRouter();
     // Add this line to use the usePathHelper hook
     const { pathPrefix } = usePathHelper();
+    console.log(pathPrefix,"path prefix")
     
     // Mobile dropdown states
     const [expandedLanguageSelector, setExpandedLanguageSelector] = useState(false);

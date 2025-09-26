@@ -754,7 +754,7 @@ const ContactUsPage = () => {
             </div>
 
             {/* Demo controls for testing */}
-            <div style={{
+            {/* <div style={{
                 position: 'fixed',
                 bottom: '20px',
                 right: '20px',
@@ -795,7 +795,7 @@ const ContactUsPage = () => {
                 }}>
                     Demo: {isDarkMode ? 'Dark' : 'Light'} Mode
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };

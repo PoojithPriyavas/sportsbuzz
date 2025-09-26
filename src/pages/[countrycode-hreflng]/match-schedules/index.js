@@ -144,9 +144,10 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
     return (
         <>
             <Head>
-                <title>Match Schedules</title>
-                <meta name="description" content="Your site description here" />
-                 <link rel="alternate" href="https://sportsbuz.com/match-schedules/" hreflang="x-default" />
+                <title>Match Schedules – Live Cricket, Football and Betting Odds</title>
+                <meta name="description" content="Stay ahead with the latest match schedules, betting odds, and sports predictions. Bet on your favorite games with expert insights and top gambling odds. Never miss a game" />
+                <meta name="keywords" content="Today Match schedule, Upcoming matches Cricket, Tomorrow Match schedule, La liga Match schedule, upcoming match schedules, Spanish leauge match schedules, FIFA match schedules, match schedule, upcoming matches, upcoming match detail, list of upcoming matches, match results, match reports, statistics, match scorecards, upcoming football matches, football today, football fixtures, football results today, yesterday's football results" />
+                <link rel="alternate" href="https://sportsbuz.com/match-schedules/" hreflang="x-default" />
             </Head>
             {/* <Header /> */}
             {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}

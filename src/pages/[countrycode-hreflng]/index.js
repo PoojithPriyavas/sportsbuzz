@@ -170,7 +170,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                 />
                 <meta
                     name="keywords"
-                    content="sports news, live scores, cricket scores, football matches, betting tips, match predictions, Sportsbuz"
+                    content="sportsbuz, sports news, live scores, betting tips, match predictions, best betting sites, best betting app, best betting app for football, best betting app for cricket, best betting website, best betting sites with instant withdrawal, Top 10 online betting sites, Top 10 betting apps, Best betting app for football, Best sports betting app to make money"
                 />
                 <meta name="author" content="Sportsbuz" />
                 <link rel="alternate" href="https://sportsbuz.com/" hreflang="x-default" />

@@ -138,8 +138,9 @@ export default function ContactUs({ countryDataHome, locationDataHome, resolvedU
   return (
     <>
       <Head>
-        <title>Sportbuz | contact us</title>
-        <meta name="description" content="Your site description here" />
+        <title>Contact Us - SportsBuz | Reach Out for Support or Inquiries</title>
+        <meta name="description" content="Get in touch with the SportsBuz team for support, inquiries, or feedback. We're here to assist you with all your sports-related questions. Contact us now!" />
+        <meta name="keywords" content="contact sportsbuz, sportsbuz support, sports inquiries, sports customer service, reach sportsbuz, sports help, sports feedback, contact page, sportsbuz contact form" />
         <link rel="alternate" href="https://sportsbuz.com/contact/" hreflang="x-default" />
       </Head>
       {/* <Header /> */}
