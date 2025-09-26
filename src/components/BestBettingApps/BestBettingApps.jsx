@@ -5,13 +5,16 @@ import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/router';
 
 export default function BettingAppsTable({ sections }) {
-    // console.log(sections, "section in the bettingapps table")
     const [copiedId, setCopiedId] = useState(null);
     const route = useRouter();
-    const { translateText, language } = useGlobalData();
+    const { language } = useGlobalData();
     const [isMobile, setIsMobile] = useState(false);
-    const [translatedSections, setTranslatedSections] = useState([]);
-    const [staticLabels, setStaticLabels] = useState({
+    
+    // Using sections directly without translation
+    const translatedSections = sections;
+    
+    // Static labels without translation
+    const staticLabels = {
         Rank: 'Rank',
         Site: 'Site',
         Features: 'Features',
@@ -20,7 +23,7 @@ export default function BettingAppsTable({ sections }) {
         'Read Review': 'Read Review',
         'GET BONUS': 'GET BONUS',
         'Copied!': 'Copied!'
-    });
+    };
 
     // Check if mobile view
     useEffect(() => {
@@ -32,80 +35,6 @@ export default function BettingAppsTable({ sections }) {
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
-
-    // Translate static UI labels
-    useEffect(() => {
-        const translateStaticLabels = async () => {
-            if (language === 'en') {
-                setStaticLabels({
-                    Rank: 'Rank',
-                    Site: 'Site',
-                    Features: 'Features',
-                    'Welcome Bonus': 'Welcome Bonus',
-                    'Bet Now': 'Bet Now',
-                    'Read Review': 'Read Review',
-                    'GET BONUS': 'GET BONUS',
-                    'Copied!': 'Copied!'
-                });
-                return;
-            }
-
-            const keys = Object.keys(staticLabels);
-
-            const translations = await Promise.all(
-                keys.map(key => translateText(key, 'en', language))
-            );
-
-            const updatedLabels = {};
-            keys.forEach((key, index) => {
-                updatedLabels[key] = translations[index];
-            });
-
-            setStaticLabels(updatedLabels);
-        };
-
-        translateStaticLabels();
-    }, [language, translateText]);
-
-    // Translate dynamic content from sections
-    useEffect(() => {
-        const translateSections = async () => {
-            const translated = await Promise.all(
-                sections.map(async (section) => {
-                    const translatedHeading = await translateText(section.heading || '', 'en', language);
-                    const translatedDescription = await translateText(section.description || '', 'en', language, true); // HTML
-
-                    const translatedApps = await Promise.all(
-                        (section.best_betting_apps || [])
-                            .sort((a, b) => a.order_by - b.order_by)
-                            .map(async (app) => {
-                                const translatedFeatures = await translateText(app.features || '', 'en', language, true); // HTML
-                                const translatedBonus = await translateText(app.welcome_bonus || '', 'en', language, true); // HTML
-
-                                return {
-                                    ...app,
-                                    features: translatedFeatures,
-                                    welcome_bonus: translatedBonus,
-                                };
-                            })
-                    );
-
-                    return {
-                        ...section,
-                        heading: translatedHeading,
-                        description: translatedDescription,
-                        best_betting_apps: translatedApps,
-                    };
-                })
-            );
-
-            setTranslatedSections(translated);
-        };
-
-        if (sections.length > 0) {
-            translateSections();
-        }
-    }, [sections, language, translateText]);
 
     const handleCopy = (code, id) => {
         navigator.clipboard.writeText(code).then(() => {

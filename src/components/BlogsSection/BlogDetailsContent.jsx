@@ -7,74 +7,40 @@ import Head from 'next/head';
 import JoinTelegramButton from '../JoinTelegram/JoinTelegramButton';
 
 export default function BlogDetailContent({ blog }) {
-  const { translateText, language } = useGlobalData();
-  const [translatedBlog, setTranslatedBlog] = useState(null);
-
-  useEffect(() => {
-    const translateBlog = async () => {
-      if (!blog || !translateText) return;
-
-      const [title, metaTitle, metaDesc, textEditor] = await Promise.all([
-        translateText(blog.title),
-        translateText(blog.meta_title),
-        translateText(blog.meta_desc),
-        translateText(blog.text_editor, 'en', language, 'html'),
-      ]);
-
-      const translatedTags = await Promise.all(
-        (blog.tags || []).map((tag) => translateText(tag))
-      );
-
-      setTranslatedBlog({
-        ...blog,
-        title,
-        meta_title: metaTitle,
-        meta_desc: metaDesc,
-        tags: translatedTags,
-        text_editor: textEditor,
-      });
-    };
-
-    translateBlog();
-  }, [blog, translateText, language]);
-
+  // Removed translation functionality - using blog directly
+  
   if (!blog) {
     return <div className={styles.blogContent}>Blog not found.</div>;
-  }
-
-  if (!translatedBlog) {
-    return <div className={styles.blogContent}>Translating blog...</div>;
   }
 
   return (
     <>
       <div className={styles.blogContent}>
-        <h1 className={styles.title}>{translatedBlog.title}</h1>
+        <h1 className={styles.title}>{blog.title}</h1>
 
-        {translatedBlog.image_big && (
+        {blog.image_big && (
           <div className={styles.thumbnail}>
             <img
-              src={translatedBlog.image_big}
-              alt={translatedBlog.alt_big || 'Blog thumbnail'}
+              src={blog.image_big}
+              alt={blog.alt_big || 'Blog thumbnail'}
               className={styles.thumbnailImg}
             />
           </div>
-
         )}
 
         <div
           className={styles.description}
-          dangerouslySetInnerHTML={{ __html: translatedBlog.text_editor }}
+          dangerouslySetInnerHTML={{ __html: blog.text_editor }}
         />
         <div style={{padding:'10px 0px'}}><JoinTelegramButton /></div>
         <div
           className={styles.description}
-          dangerouslySetInnerHTML={{ __html: translatedBlog.text_editor_1 }}
+          dangerouslySetInnerHTML={{ __html: blog.text_editor_1 }}
         />
         <div style={{padding:'10px 0px'}}><JoinTelegramButton /></div>
         <div
           className={styles.description}
-          dangerouslySetInnerHTML={{ __html: translatedBlog.text_editor_2 }}
+          dangerouslySetInnerHTML={{ __html: blog.text_editor_2 }}
         />
       </div>
     </>

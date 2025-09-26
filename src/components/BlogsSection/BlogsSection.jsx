@@ -6,37 +6,18 @@ import { useGlobalData } from '../Context/ApiContext';
 import DynamicLink from '../Common/DynamicLink';
 
 export default function BlogSection({ blogs = [] }) {
-  const { translateText, language } = useGlobalData();
-  const [translatedBlogs, setTranslatedBlogs] = useState([]);
-
-  useEffect(() => {
-    const translateBlogs = async () => {
-      if (blogs.length === 0) return;
-
-      const updated = await Promise.all(
-        blogs.map(async (blog) => ({
-          ...blog,
-          title: await translateText(blog.title),
-          author: await translateText(blog.author),
-        }))
-      );
-
-      setTranslatedBlogs(updated);
-    };
-
-    translateBlogs();
-  }, [blogs, translateText, language]);
-
-  if (translatedBlogs.length === 0) return null;
-
-  const featuredBlog = translatedBlogs[0];
-  const otherBlogs = translatedBlogs.slice(1);
+  const { language } = useGlobalData();
+  // Using blogs directly without translation
   
+  if (blogs.length === 0) return null;
 
+  const featuredBlog = blogs[0];
+  const otherBlogs = blogs.slice(1);
+  
   return (
     <div className={styles.wrapper}>
       <div className={styles.headingRow}>
-        <h3>{translateText && typeof translateText === 'function' ? 'Highlights' : 'Highlights'}</h3>
+        <h3>Highlights</h3>
         <DynamicLink href="/blogs/pages/all-blogs" className={styles.viewAll}>
           View All
         </DynamicLink>

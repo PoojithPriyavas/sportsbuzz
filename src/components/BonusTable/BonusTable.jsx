@@ -5,12 +5,12 @@ import Head from 'next/head';
 import { useGlobalData } from '../Context/ApiContext';
 
 export default function BonusTable({ sections }) {
-  // console.log(sections,"sec tion")
   const [copiedId, setCopiedId] = useState(null);
-  const [translatedSections, setTranslatedSections] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [translatedHeaders, setTranslatedHeaders] = useState({
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Using static headers instead of translated ones
+  const translatedHeaders = {
     rank: 'Rank',
     site: 'Site',
     features: 'Features',
@@ -18,9 +18,11 @@ export default function BonusTable({ sections }) {
     betNow: 'Bet Now',
     getBonus: 'GET BONUS',
     readReview: 'Read Review',
-  });
-  const { translateText, language } = useGlobalData();
-
+  };
+  
+  // Using sections directly without translation
+  const translatedSections = sections;
+  
   // Check if mobile view
   useEffect(() => {
     const checkMobile = () => {
@@ -31,74 +33,6 @@ export default function BonusTable({ sections }) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  // Translate table headers when language changes
-  useEffect(() => {
-    const translateHeaders = async () => {
-      try {
-        const headers = {
-          rank: await translateText('Rank'),
-          site: await translateText('Site'),
-          features: await translateText('Features'),
-          welcomeBonus: await translateText('Welcome Bonus'),
-          betNow: await translateText('Bet Now'),
-          getBonus: await translateText('GET BONUS'),
-          readReview: await translateText('Read Review'),
-        };
-        setTranslatedHeaders(headers);
-      } catch (error) {
-        console.error('Header translation error:', error);
-      }
-    };
-
-    translateHeaders();
-  }, [translateText, language]);
-
-  // Translate content when sections or language changes
-  useEffect(() => {
-    const translateSections = async () => {
-      if (!sections || sections.length === 0) {
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-
-      try {
-        const updated = await Promise.all(
-          sections.map(async (section) => {
-            const translatedHeading = await translateText(section.heading);
-            const translatedMetaTitle = await translateText(section.metatitle);
-            const translatedMetaDesc = await translateText(section.meta_description);
-
-            const translatedApps = await Promise.all(
-              (section.best_betting_apps || []).map(async (app) => ({
-                ...app,
-                features: await translateText(app.features),
-                welcome_bonus: await translateText(app.welcome_bonus),
-              }))
-            );
-
-            return {
-              ...section,
-              heading: translatedHeading,
-              metatitle: translatedMetaTitle,
-              meta_description: translatedMetaDesc,
-              best_betting_apps: translatedApps,
-            };
-          })
-        );
-
-        setTranslatedSections(updated);
-      } catch (error) {
-        console.error('Translation error:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    translateSections();
-  }, [sections, translateText, language]);
 
   const handleCopy = (code, id) => {
     navigator.clipboard.writeText(code).then(() => {
@@ -193,8 +127,8 @@ export default function BonusTable({ sections }) {
     );
   }
 
-  // Show nothing if no translated sections
-  if (translatedSections.length === 0) return null;
+  // Show nothing if no sections
+  if (!translatedSections || translatedSections.length === 0) return null;
 
   // Mobile Card View
   const renderMobileCards = (apps) => (
@@ -202,7 +136,7 @@ export default function BonusTable({ sections }) {
       {[...apps]
         .sort((a, b) => a.order_by - b.order_by)
         .map((app) => (
-          <div className={styles.mobileCard} key={app.id}   onClick={() => window.open(app.referal_link, '_blank', 'noopener,noreferrer')} style={{cursor:'pointer'}}>
+          <div className={styles.mobileCard} key={app.id} onClick={() => window.open(app.referal_link, '_blank', 'noopener,noreferrer')} style={{cursor:'pointer'}}>
             <div className={styles.mobileHeader}>
               <div className={styles.mobileRank}>#{app.order_by}</div>
               <img
@@ -241,15 +175,19 @@ export default function BonusTable({ sections }) {
               </a>
               <button
                 className={styles.mobileCodeBtn}
-                onClick={() => handleCopy(app.referall_code, app.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCopy(app.referall_code, app.id);
+                }}
               >
                 {copiedId === app.id ? 'Copied!' : app.referall_code}
               </button>
               <button
                 className={styles.mobileReviewBtn}
-                onClick={() =>
-                  window.open(app.review_link, '_blank', 'noopener,noreferrer')
-                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.open(app.review_link, '_blank', 'noopener,noreferrer');
+                }}
               >
                 {translatedHeaders.readReview}
               </button>
@@ -276,7 +214,7 @@ export default function BonusTable({ sections }) {
           {[...apps]
             .sort((a, b) => a.order_by - b.order_by)
             .map((app) => (
-              <tr className={styles.bodyRow} key={app.id}   onClick={() => window.open(app.referal_link, '_blank', 'noopener,noreferrer')} style={{cursor:'pointer'}}>
+              <tr className={styles.bodyRow} key={app.id} onClick={() => window.open(app.referal_link, '_blank', 'noopener,noreferrer')} style={{cursor:'pointer'}}>
                 <td className={styles.rankCell}>
                   <div className={styles.rankBadge}>#{app.order_by}</div>
                 </td>
@@ -297,9 +235,10 @@ export default function BonusTable({ sections }) {
                   />
                   <button
                     className={styles.codeBtn}
-                    onClick={() =>
-                      window.open(app.review_link, '_blank', 'noopener,noreferrer')
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(app.review_link, '_blank', 'noopener,noreferrer');
+                    }}
                   >
                     {translatedHeaders.readReview}
                   </button>
@@ -311,12 +250,16 @@ export default function BonusTable({ sections }) {
                     href={app.referal_link}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     {translatedHeaders.getBonus}
                   </a>
                   <button
                     className={styles.codeBtn}
-                    onClick={() => handleCopy(app.referall_code, app.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopy(app.referall_code, app.id);
+                    }}
                   >
                     {copiedId === app.id ? 'Copied!' : app.referall_code}
                   </button>
@@ -330,19 +273,8 @@ export default function BonusTable({ sections }) {
 
   return (
     <>
-      {/* <Head>
-        <title>{translatedSections[0]?.metatitle}</title>
-        <meta
-          name="description"
-          content={stripHtml(translatedSections[0]?.meta_description)}
-        />
-      </Head> */}
-
       {translatedSections.map((section) => (
         <div className={styles.wrapper} key={section.id}>
-          {/* Uncomment to show heading if needed */}
-          {/* <h2 className={styles.heading}>{section.heading}</h2> */}
-
           {section.best_betting_apps?.length > 0 && (
             <>
               {isMobile 

@@ -206,7 +206,7 @@ export default function BestBettingApps({ sections, countryCode, hrefLanData, re
                 />
                 <link rel="alternate" href="https://sportsbuz.com/best-betting-apps/current/" hreflang="x-default" />
 
-                {locationDataHome.map(({ hreflang, country_code }) => {
+                {locationDataHome?.map(({ hreflang, country_code }) => {
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/best-betting-apps/current`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
                     return (

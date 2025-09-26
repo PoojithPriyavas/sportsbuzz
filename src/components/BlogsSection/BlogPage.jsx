@@ -76,7 +76,8 @@ export default function BlogsPage({
   const searchParam = searchParams.get('search');
   const urlSearchTerm = searchParam || initialSearchTerm;
 
-  const [translations, setTranslations] = useState({
+  // Using static translations instead of dynamic ones
+  const [translations] = useState({
     latestBlogs: 'Latest Blogs',
     all: 'All',
     latest: 'Latest',
@@ -131,51 +132,51 @@ export default function BlogsPage({
     };
   }, [urlPage, urlSearchTerm, isInitialized]);
 
-  // Translation effect
-  useEffect(() => {
-    const fetchTranslations = async () => {
-      if (!isMountedRef.current) return;
-
-      try {
-        const [
-          latestBlogs,
-          all,
-          latest,
-          searchPlaceholder,
-          readMore,
-          clearFilter,
-          previous,
-          next,
-        ] = await Promise.all([
-          translateText('Latest Blogs', 'en', language),
-          translateText('All', 'en', language),
-          translateText('Latest', 'en', language),
-          translateText('Search Blogs', 'en', language),
-          translateText('Read More', 'en', language),
-          translateText('Clear Filter', 'en', language),
-          translateText('Previous', 'en', language),
-          translateText('Next', 'en', language),
-        ]);
-
-        if (isMountedRef.current) {
-          setTranslations({
-            latestBlogs,
-            all,
-            latest,
-            searchPlaceholder,
-            readMore,
-            clearFilter,
-            previous,
-            next,
-          });
-        }
-      } catch (error) {
-        console.error('Translation error:', error);
-      }
-    };
-
-    fetchTranslations();
-  }, [language, translateText]);
+  // Remove the translation effect
+  // useEffect(() => {
+  //   const fetchTranslations = async () => {
+  //     if (!isMountedRef.current) return;
+  //
+  //     try {
+  //       const [
+  //         latestBlogs,
+  //         all,
+  //         latest,
+  //         searchPlaceholder,
+  //         readMore,
+  //         clearFilter,
+  //         previous,
+  //         next,
+  //       ] = await Promise.all([
+  //         translateText('Latest Blogs', 'en', language),
+  //         translateText('All', 'en', language),
+  //         translateText('Latest', 'en', language),
+  //         translateText('Search Blogs', 'en', language),
+  //         translateText('Read More', 'en', language),
+  //         translateText('Clear Filter', 'en', language),
+  //         translateText('Previous', 'en', language),
+  //         translateText('Next', 'en', language),
+  //       ]);
+  //
+  //       if (isMountedRef.current) {
+  //         setTranslations({
+  //           latestBlogs,
+  //           all,
+  //           latest,
+  //           searchPlaceholder,
+  //           readMore,
+  //           clearFilter,
+  //           previous,
+  //           next,
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.error('Translation error:', error);
+  //     }
+  //   };
+  //
+  //   fetchTranslations();
+  // }, [language, translateText]);
 
   // SINGLE MAIN EFFECT FOR FETCHING BLOGS - PREVENTS DUPLICATE CALLS
 

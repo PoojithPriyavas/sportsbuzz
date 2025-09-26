@@ -8,45 +8,20 @@ import { useGlobalData } from '../Context/ApiContext';
 import DynamicLink from '../Common/DynamicLink';
 
 export default function BlogCard({ blogs = [] }) {
-  const { translateText, language } = useGlobalData();
+  const { language } = useGlobalData();
   const [filterValue, setFilterValue] = useState('all');
 
-  const [translated, setTranslated] = useState({
+  // Using static translations instead of dynamic ones
+  const translated = {
     latestBlogs: 'Latest Blogs',
     all: 'All',
     latest: 'Latest',
     searchPlaceholder: 'Search Blogs',
     readMore: 'Read More',
-  });
+  };
 
   const featuredBlog = blogs[0];
   const otherBlogs = blogs.slice(1);
-
-  useEffect(() => {
-    const translateLabels = async () => {
-      try {
-        const [latestBlogs, all, latest, searchPlaceholder, readMore] = await Promise.all([
-          translateText('Latest Blogs', 'en', language),
-          translateText('All', 'en', language),
-          translateText('Latest', 'en', language),
-          translateText('Search Blogs', 'en', language),
-          translateText('Read More', 'en', language),
-        ]);
-
-        setTranslated({
-          latestBlogs,
-          all,
-          latest,
-          searchPlaceholder,
-          readMore,
-        });
-      } catch (err) {
-        console.error('Failed to translate blog labels:', err);
-      }
-    };
-
-    translateLabels();
-  }, [language]);
 
   return (
     <>
