@@ -91,7 +91,8 @@ export default function Home({ locationDataHome, isLocalhost }) {
     stages,
     news,
     activeOddBanners,
-    activeEvenBanners
+    activeEvenBanners,
+    bannerLoading
   } = useGlobalData();
   console.log(blogs, "blogs in index")
 

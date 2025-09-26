@@ -113,6 +113,7 @@ export default function BestBettingApps({ sections, countryCode, hrefLanData, re
         bestSections,
         activeOddBanners,
         activeEvenBanners,
+        bannerLoading,
         stages
     } = useGlobalData();
     // console.log(sections, "shgdfs")
