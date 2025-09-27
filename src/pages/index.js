@@ -27,6 +27,7 @@ import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
 import Footer from '@/components/Footer/Footer';
 import TestHeader from "@/components/Header/TestHeader";
 import HeaderTwo from "@/components/Header/HeaderTwo";
+import HeaderThree from "@/components/Header/HeaderThree";
 import RegionSelector from "@/components/RegionSelector/RegionSelector";
 import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
@@ -271,7 +272,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
           </div>
         )} */}
 
-        <HeaderTwo animationStage={animationStage} />
+        <HeaderThree animationStage={animationStage} />
         {showOtherDivs && (
           <div
             className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter} ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
