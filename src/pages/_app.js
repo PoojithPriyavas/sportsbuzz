@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Script from "next/script";
 import { DataProvider } from "@/components/Context/ApiContext";
+import RedirectHandler from "@/components/Context/RedirectHandler";
 import * as gtag from "@/lib/gtag"; 
 import "@/styles/globals.css";
 
@@ -21,6 +22,9 @@ export default function App({ Component, pageProps }) {
 
   return (
     <DataProvider>
+      {/* Client-side redirect handler */}
+      <RedirectHandler />
+      
       {/* Load GA script */}
       <Script
         strategy="afterInteractive"

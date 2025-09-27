@@ -218,7 +218,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
 
             <>
                 {/* Add the DebugPanel component here */}
-                <DebugPanel />
+                {/* <DebugPanel /> */}
 
                 {/* {showOtherDivs && <RegionSelector countryCode={countryCode} locationDataHome={locationDataHome} />} */}
                 <HeaderThree animationStage={animationStage} languageValidation={languageValidation} />
