@@ -2,11 +2,8 @@
 
 import { NextResponse } from 'next/server';
 
-// Helper function to add delay
-const delay = (ms) => new Promise(resolve => setTimeout(resolve));
-
 export async function middleware(request) {
-  console.log('🚀 Middleware: Fetching location data and setting cookies');
+  console.log('🚀 Middleware: Processing request');
   
   const url = request.nextUrl.clone();
   let pathname = url.pathname;
@@ -22,27 +19,7 @@ export async function middleware(request) {
   }
 
   try {
-    // Step 1: Get country code from API
-    console.log('📡 Fetching country code...');
-    const countryRes = await fetch('https://admin.sportsbuz.com/api/get-country-code/');
-    
-    let countryData;
-    if (countryRes.ok) {
-      countryData = await countryRes.json();
-      console.log('📌 Country API response:', JSON.stringify(countryData));
-    } else {
-      console.error('❌ Country API failed with status:', countryRes.status);
-      // Set fallback values when API fails
-      console.log('🔄 Using fallback values: en-lk');
-      countryData = {
-        country_code: 'LK',
-        location: {
-          hreflang: 'en'
-        }
-      };
-    }
-    
-    // Step 2: Get locations data
+    // Step 1: Get locations data only (not country code)
     console.log('📡 Fetching locations data...');
     const locationsRes = await fetch('https://admin.sportsbuz.com/api/locations');
     
@@ -57,18 +34,7 @@ export async function middleware(request) {
     // Create response (continue with normal request processing)
     const response = NextResponse.next();
     
-    // Step 3: Set cookies with fetched data
-    if (countryData) {
-      response.cookies.set('countryData', JSON.stringify(countryData), {
-        path: '/',
-        maxAge: 60 * 60 * 24, // 1 day
-        httpOnly: false, // Important: Set to false so client-side JS can access it
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
-      });
-      console.log('✅ Country data cookie set');
-    }
-    
+    // Step 2: Set only locations data cookie
     if (locationsData.length > 0) {
       // Store all location data
       response.cookies.set('lanTagValues', JSON.stringify(locationsData), {
@@ -79,30 +45,6 @@ export async function middleware(request) {
         sameSite: 'lax'
       });
       console.log('✅ Locations data cookie set');
-      
-      // If we have country data, also set filtered location data
-      if (countryData && countryData.country_code) {
-        const countryInfo = locationsData.find(location => 
-          location.country_code === countryData.country_code
-        );
-        
-        if (countryInfo) {
-          const locationData = {
-            country_code: countryData.country_code,
-            filtered_locations: [countryInfo],
-            hreflang_tags: [countryInfo.hreflang]
-          };
-          
-          response.cookies.set('locationData', JSON.stringify(locationData), {
-            path: '/',
-            maxAge: 60 * 60 * 24, // 1 day
-            httpOnly: false, // Important: Set to false so client-side JS can access it
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax'
-          });
-          console.log('✅ Filtered location data cookie set');
-        }
-      }
     }
     
     return response;
