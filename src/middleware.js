@@ -1,29 +1,13 @@
 // src/middleware.js
 
 import { NextResponse } from 'next/server';
-import { sriLankaFallbackData, processCountryCodeResponse, handleCountryCodeError } from './utils/countryFallback';
+import { processCountryCodeResponseSync, handleCountryCodeErrorSync } from './utils/countryFallback';
 
 export async function middleware(request) {
   console.log('🚀 Middleware: Location-based URL handling started');
   
   const url = request.nextUrl.clone();
   let pathname = url.pathname;
-  
-  // Special handling for blog-details URLs to preserve special characters
-  const isBlogDetailsUrl = pathname.includes('/blog-details/');
-  
-  // Only decode pathname for non-blog-details URLs
-  if (!isBlogDetailsUrl) {
-    try {
-      pathname = decodeURIComponent(pathname);
-      console.log('📝 Decoded pathname:', pathname);
-    } catch (error) {
-      console.warn('⚠️ Failed to decode pathname:', error);
-      // Continue with original pathname if decoding fails
-    }
-  } else {
-    console.log('📰 Blog details URL detected, preserving original encoding:', pathname);
-  }
   
   // Skip middleware for API routes, static files, and other excluded paths
   if (
@@ -35,249 +19,251 @@ export async function middleware(request) {
     return NextResponse.next();
   }
 
-  // Enhanced regex to check if URL already has language-country format
-  // For blog-details URLs, use the original pathname to avoid decoding issues
-  const pathToCheck = isBlogDetailsUrl ? url.pathname : pathname;
-  const hasLanguageCountryFormat = /^\/[a-z]{2}-[a-z]{2}(\/|$)/i.test(pathToCheck);
+  // Check if URL already has language-country format
+  const hasLanguageCountryFormat = /^\/[a-z]{2}-[a-z]{2}(\/|$)/i.test(pathname);
   
-  // SCENARIO 2: URL already has proper hreflang format
-  if (hasLanguageCountryFormat) {
-    console.log('✅ Scenario 2: URL has language-country format, proceeding normally');
-    console.log('🔗 Processing path:', pathToCheck);
+  // Check for language change in the request
+  const languageParam = url.searchParams.get('setLanguage');
+  
+  // If there's a language change request and URL has proper format
+  if (languageParam && hasLanguageCountryFormat) {
+    console.log(`🔄 Language change requested to: ${languageParam}`);
     
-    // Check if this is a blog-details route with potentially problematic characters
-    const blogDetailsMatch = pathToCheck.match(/^\/([a-z]{2}-[a-z]{2})\/blog-details\/(.+)$/i);
-    if (blogDetailsMatch) {
-      const [, langCountry, blogSlug] = blogDetailsMatch;
-      console.log('📰 Blog details route detected:', { langCountry, blogSlug });
+    // Extract current country code from URL
+    const match = pathname.match(/^\/([a-z]{2})-([a-z]{2})(\/|$)/i);
+    if (match) {
+      const currentCountryCode = match[2];
       
-      // For blog details, don't decode the slug to preserve special characters
-      console.log('🔄 Preserving original blog slug encoding');
-    }
-    
-    // Set cookies but don't redirect
-    const response = NextResponse.next();
-    await setCookies(request, response);
-    return response;
-  }
-
-  // SCENARIO 1: URL doesn't have hreflang format - need location detection
-  console.log('🔄 Scenario 1: URL missing language-country format, detecting location');
-  
-  try {
-    // Get user's location
-    const countryCode = await getUserLocation(request);
-    console.log('📍 Detected country code:', countryCode);
-    
-    // Get available locations data
-    const locationsData = await getLocationsData();
-    
-    // Find default language for detected country
-    const defaultLanguage = getDefaultLanguageForCountry(countryCode, locationsData);
-    console.log('🌐 Default language for country:', defaultLanguage);
-    
-    // Construct new URL with language-country format
-    const newPathname = `/${defaultLanguage}-${countryCode.toLowerCase()}${pathToCheck}`;
-    url.pathname = newPathname;
-    
-    console.log(`🔄 Redirecting from ${pathToCheck} to ${newPathname}`);
-    
-    // Perform 302 temporary redirect
-    const response = NextResponse.redirect(url, 302);
-    
-    // Set cookies for the redirected response
-    await setCookies(request, response, countryCode, locationsData);
-    
-    return response;
-    
-  } catch (error) {
-    console.error('❌ Middleware error:', error);
-    
-    // Fallback: redirect to Sri Lanka (en-lk) instead of India
-    const fallbackCountryData = handleCountryCodeError(error);
-    const fallbackCountryCode = fallbackCountryData.country_code;
-    const fallbackLanguage = fallbackCountryData.location.hreflang;
-    
-    const newPathname = `/${fallbackLanguage}-${fallbackCountryCode.toLowerCase()}${pathToCheck}`;
-    url.pathname = newPathname;
-    
-    console.log(`🔄 Fallback redirect from ${pathToCheck} to ${newPathname} (Sri Lanka)`);
-    
-    const response = NextResponse.redirect(url, 302);
-    
-    // Set fallback cookies with Sri Lanka data
-    await setCookies(request, response, fallbackCountryCode, null);
-    
-    return response;
-  }
-}
-
-// Helper function to get user's location
-async function getUserLocation(request) {
-  // Check if country data already exists in cookies
-  const existingCountryData = request.cookies.get('countryData');
-  
-  if (existingCountryData) {
-    try {
-      const parsedData = JSON.parse(existingCountryData.value);
-      const countryCode = parsedData.country_code || parsedData.countryCode;
-      if (countryCode) {
-        console.log('📦 Using cached country code:', countryCode);
-        return countryCode;
-      }
-    } catch (error) {
-      console.error('Error parsing cached country data:', error);
+      // Split the path to get the part after the language-country prefix
+      const pathParts = pathname.split('/');
+      
+      // Remove the first element (empty string before first slash)
+      pathParts.shift();
+      
+      // Remove the language-country part (first segment)
+      pathParts.shift();
+      
+      // Reconstruct the path after the prefix
+      const pathAfterPrefix = pathParts.length > 0 ? '/' + pathParts.join('/') : '';
+      
+      // Create the new URL with updated language
+      const newPath = `/${languageParam}-${currentCountryCode}${pathAfterPrefix}`;
+      
+      console.log(`🔄 Redirecting to new language path: ${newPath}`);
+      
+      // Remove the setLanguage parameter
+      url.searchParams.delete('setLanguage');
+      url.pathname = newPath;
+      
+      const response = NextResponse.redirect(url, 302);
+      
+      // Store the selected language in a cookie
+      response.cookies.set('selectedLanguage', languageParam, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      });
+      
+      return response;
     }
   }
+  
+  // If URL already has proper format and no language change, proceed normally
+  if (hasLanguageCountryFormat) {
+    return NextResponse.next();
+  }
 
-  // Fetch from API if not cached
+  // If it's the root path or doesn't have language-country format, redirect to API-determined location
   try {
-    console.log('🌍 Fetching country code from API...');
+    // First fetch locations data to have it available for fallback
+    console.log('📡 Fetching locations data...');
+    const locationsRes = await fetch('https://admin.sportsbuz.com/api/locations', {
+      cache: 'no-store'
+    });
+    
+    let locationsData = [];
+    if (locationsRes.ok) {
+      locationsData = await locationsRes.json();
+      console.log('✅ Locations API success, found', locationsData.length, 'locations');
+    } else {
+      console.error('❌ Locations API failed:', locationsRes.status);
+    }
+    
+    // Now fetch country code
+    console.log('📡 Fetching country code...');
     const countryRes = await fetch('https://admin.sportsbuz.com/api/get-country-code/', {
       headers: {
         'User-Agent': request.headers.get('user-agent') || '',
         'X-Forwarded-For': request.headers.get('x-forwarded-for') || '',
         'X-Real-IP': request.headers.get('x-real-ip') || '',
       },
+      cache: 'no-store'
     });
     
-    if (!countryRes.ok) {
-      throw new Error(`Country API failed: ${countryRes.status}`);
+    let countryData;
+    let usingSriLankaFallback = false;
+    
+    if (countryRes.ok) {
+      const data = await countryRes.json();
+      console.log('📌 Country API response:', JSON.stringify(data));
+      
+      // Check if the response has valid country_code
+      if (data && data.country_code) {
+        console.log('✅ Valid country code found in API response:', data.country_code);
+        countryData = data;
+      } else {
+        console.log('⚠️ Invalid or missing country code in API response, using Sri Lanka fallback');
+        usingSriLankaFallback = true;
+        
+        // Find Sri Lanka in locations data
+        const sriLankaLocation = locationsData.find(location => 
+          location.country_code === "LK"
+        );
+        
+        if (sriLankaLocation) {
+          console.log('✅ Found Sri Lanka in locations data:', JSON.stringify(sriLankaLocation));
+          
+          // Format Sri Lanka data to match get-country-code API response
+          countryData = {
+            country_code: sriLankaLocation.country_code,
+            location: { ...sriLankaLocation }
+          };
+        } else {
+          console.log('⚠️ Sri Lanka not found in locations data, using hardcoded fallback');
+          
+          // Hardcoded fallback as last resort
+          countryData = {
+            country_code: "LK",
+            location: {
+              id: 17,
+              country: "Sri Lanka",
+              language: "English",
+              hreflang: "en",
+              country_code: "LK",
+              betting_apps: "Inactive",
+              sports: "Cricket"
+            }
+          };
+        }
+      }
+    } else {
+      console.error('❌ Country API failed:', countryRes.status);
+      console.log('⚠️ Country API failed, using Sri Lanka fallback');
+      usingSriLankaFallback = true;
+      
+      // Find Sri Lanka in locations data
+      const sriLankaLocation = locationsData.find(location => 
+        location.country_code === "LK"
+      );
+      
+      if (sriLankaLocation) {
+        console.log('✅ Found Sri Lanka in locations data:', JSON.stringify(sriLankaLocation));
+        
+        // Format Sri Lanka data to match get-country-code API response
+        countryData = {
+          country_code: sriLankaLocation.country_code,
+          location: { ...sriLankaLocation }
+        };
+      } else {
+        console.log('⚠️ Sri Lanka not found in locations data, using hardcoded fallback');
+        
+        // Hardcoded fallback as last resort
+        countryData = {
+          country_code: "LK",
+          location: {
+            id: 17,
+            country: "Sri Lanka",
+            language: "English",
+            hreflang: "en",
+            country_code: "LK",
+            betting_apps: "Inactive",
+            sports: "Cricket"
+          }
+        };
+      }
     }
     
-    const rawCountryData = await countryRes.json();
-    const countryData = processCountryCodeResponse(rawCountryData);
+    const countryCode = countryData.country_code;
+    console.log('📌 Final country code to use:', countryCode);
+    console.log('📌 Using Sri Lanka fallback:', usingSriLankaFallback);
     
-    return countryData.country_code || countryData.countryCode || sriLankaFallbackData.country_code;
+    // Check for stored language preference
+    const storedLanguage = request.cookies.get('selectedLanguage')?.value;
     
-  } catch (error) {
-    console.error('Failed to fetch country code:', error);
-    // Use Sri Lanka fallback instead of India
-    return sriLankaFallbackData.country_code;
-  }
-}
-
-// Helper function to get locations data
-async function getLocationsData() {
-  try {
-    console.log('🗺️ Fetching locations data...');
-    const locationsRes = await fetch('https://admin.sportsbuz.com/api/locations');
+    // Find default language for the country
+    const countryInfo = locationsData.find(location => 
+      location.country_code === countryCode
+    );
     
-    if (!locationsRes.ok) {
-      throw new Error(`Locations API failed: ${locationsRes.status}`);
-    }
+    // Use stored language if available, otherwise use default language for the country
+    const defaultLanguage = storedLanguage || (countryInfo ? countryInfo.hreflang : 'en');
+    console.log('📌 Language to use:', defaultLanguage);
     
-    return await locationsRes.json();
+    // Construct new URL with language-country format
+    const newPathname = `/${defaultLanguage}-${countryCode.toLowerCase()}${pathname === '/' ? '/' : pathname}`;
+    url.pathname = newPathname;
     
-  } catch (error) {
-    console.error('Failed to fetch locations data:', error);
-    return null;
-  }
-}
-
-// Helper function to get default language for country
-function getDefaultLanguageForCountry(countryCode, locationsData) {
-  if (!locationsData || !Array.isArray(locationsData)) {
-    return 'en'; // fallback language
-  }
-
-  const countryLanguages = locationsData.filter(location => 
-    location.country_code?.toLowerCase() === countryCode?.toLowerCase()
-  );
-
-  return countryLanguages.length > 0 ? countryLanguages[0].hreflang : 'en';
-}
-
-// Helper function to set cookies
-async function setCookies(request, response, countryCode = null, locationsData = null) {
-  const existingCountryData = request.cookies.get('countryData');
-  const existingLocationData = request.cookies.get('locationData');
-
-  try {
-    let finalCountryCode = countryCode;
-    let finalCountryData = null;
-
-    // Handle country data cookie
-    if (!existingCountryData && countryCode) {
-      // Create country data object
-      finalCountryData = {
+    console.log(`🔄 Redirecting from ${pathname} to ${newPathname}`);
+    console.log(`📌 Is this a Sri Lanka fallback URL? ${countryCode === 'LK' && usingSriLankaFallback ? 'YES' : 'NO'}`);
+    
+    // Create response with redirect
+    const response = NextResponse.redirect(url, 302);
+    
+    // Set cookies with country data
+    response.cookies.set('countryData', JSON.stringify(countryData), {
+      path: '/',
+      maxAge: 60 * 60 * 24, // 1 day
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+    
+    // Set cookies with filtered location data
+    if (countryInfo) {
+      const locationData = {
         country_code: countryCode,
-        // Add additional country info if available from locations data
+        filtered_locations: [countryInfo],
+        hreflang_tags: [countryInfo.hreflang]
       };
-
-      response.cookies.set('countryData', JSON.stringify(finalCountryData), {
+      
+      response.cookies.set('locationData', JSON.stringify(locationData), {
         path: '/',
         maxAge: 60 * 60 * 24, // 1 day
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax'
       });
-
-    } else if (existingCountryData && !countryCode) {
-      // Extract country code from existing cookie
-      const existingData = JSON.parse(existingCountryData.value);
-      finalCountryCode = existingData.country_code || existingData.countryCode;
-    }
-
-    // Handle location data cookie
-    if (!existingLocationData && finalCountryCode) {
-      let finalLocationsData = locationsData;
       
-      // Fetch locations data if not provided
-      if (!finalLocationsData) {
-        finalLocationsData = await getLocationsData();
-      }
-
-      if (finalLocationsData) {
-        // Filter locations based on country code
-        const filteredLocations = finalLocationsData.filter(
-          location => location.country_code?.toLowerCase() === finalCountryCode?.toLowerCase()
-        );
-
-        // Extract hreflang values from filtered locations
-        const hreflangTags = filteredLocations.map(location => location.hreflang);
-
-        const locationFilterData = {
-          country_code: finalCountryCode,
-          hreflang_tags: hreflangTags,
-          filtered_locations: filteredLocations,
-          total_matches: filteredLocations.length
-        };
-
-        response.cookies.set('locationData', JSON.stringify(locationFilterData), {
-          path: '/',
-          maxAge: 60 * 60 * 24, // 1 day
-          httpOnly: false,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax'
-        });
-
-        // Store all location data for reference
-        response.cookies.set('lanTagValues', JSON.stringify(finalLocationsData), {
-          path: '/',
-          maxAge: 60 * 60 * 24, // 1 day
-          httpOnly: false,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax'
-        });
-      }
+      // Store all location data for reference
+      response.cookies.set('lanTagValues', JSON.stringify(locationsData), {
+        path: '/',
+        maxAge: 60 * 60 * 24, // 1 day
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      });
     }
-
-  } catch (err) {
-    console.error('Error setting cookies:', err);
+    
+    return response;
+    
+  } catch (error) {
+    console.error('❌ Middleware error:', error);
+    
+    // Ultimate fallback to en-lk
+    const fallbackPathname = `/en-lk${pathname === '/' ? '/' : pathname}`;
+    url.pathname = fallbackPathname;
+    
+    console.log(`🔄 Ultimate error fallback redirect from ${pathname} to ${fallbackPathname}`);
+    console.log('📌 Using hardcoded Sri Lanka fallback due to error');
+    
+    return NextResponse.redirect(url, 302);
   }
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files with extensions
-     */
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)',
   ],
-}
+};

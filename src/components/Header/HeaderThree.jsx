@@ -82,8 +82,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         country,
         setCountry
     } = useGlobalData();
-console.log(countryCode,"counrty cod")
-    // console.log(blogCategories,"blog categories")
+
     // Initialize dark mode from localStorage
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -129,9 +128,6 @@ console.log(countryCode,"counrty cod")
         setLocationData(locationCookie);
         setCountryData(countryCookie);
 
-        // console.log('Location Data:', locationCookie);
-        // console.log('Country Data:', countryCookie);
-
         // Set initial values based on cookie data
         if (locationData?.filtered_locations?.length > 0) {
             const firstLocation = locationData.filtered_locations[0];
@@ -142,11 +138,6 @@ console.log(countryCode,"counrty cod")
 
     const hreflangTags = locationData?.hreflang_tags || [];
     const filteredLocations = locationData?.filtered_locations || [];
-
-    // console.log(hreflangTags, "hreflang tags");
-    // console.log(filteredLocations, "filtered locations");
-    // console.log('countryCodeCookie:', countryCodeCookie);
-    // console.log('hreflang:', hreflang);
     
     // Initialize GSAP animation
     useEffect(() => {
@@ -293,12 +284,22 @@ console.log(countryCode,"counrty cod")
 
     // Function to parse URL path for country code and language
     const parseUrlPath = (pathname) => {
-        const isUrlCountryPresent = pathname?.replace(/^,?\//, '').split('-');
-        // console.log(isUrlCountryPresent, "is url")
-        const parts = pathname.split('/').filter(part => part !== '');
-        const countryCode = isUrlCountryPresent[1];
-        const language = isUrlCountryPresent[0];
-        return { countryCode, language };
+        if (!pathname) return { countryCode: '', language: '' };
+        
+        // Extract the first segment of the path (e.g., "en-lk" from "/en-lk/some/path")
+        const firstSegment = pathname.replace(/^\//, '').split('/')[0];
+        
+        // Check if it matches the format: language-countrycode
+        const match = firstSegment.match(/^([a-z]{2})-([a-z]{2})$/i);
+        
+        if (match) {
+            return {
+                language: match[1].toLowerCase(),
+                countryCode: match[2].toLowerCase()
+            };
+        }
+        
+        return { countryCode: '', language: '' };
     };
 
     // Handle URL-based country code and language
@@ -318,7 +319,7 @@ console.log(countryCode,"counrty cod")
 
         // Set sport based on URL country code if available
         if (urlCountryCode) {
-            const matchedLocation = location.find(loc => loc.country_code === urlCountryCode);
+            const matchedLocation = location.find(loc => loc.country_code.toLowerCase() === urlCountryCode);
             if (matchedLocation?.sports) {
                 const apiSport = matchedLocation.sports.toLowerCase();
                 if (apiSport !== sport) {
@@ -457,28 +458,33 @@ console.log(countryCode,"counrty cod")
         updateTranslations();
     }, [language, translateText, blogCategories]);
 
+    // Updated handleLanguageChange function
     const handleLanguageChange = (selectedLanguage) => {
+        // Update language in state and localStorage
         setLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
+        
+        // Close dropdowns
         setExpandedLanguageSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);
         }
 
-        // Use the languageValidation hook's handleLanguageChange if available
-        if (languageValidation && languageValidation.handleLanguageChange) {
-            languageValidation.handleLanguageChange(selectedLanguage);
+        // Get current URL path parts
+        const { countryCode: currentCountryCode } = parseUrlPath(pathname);
+        
+        // If we have a valid country code in the URL
+        if (currentCountryCode) {
+            // Create the new URL with updated language parameter
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('setLanguage', selectedLanguage);
+            
+            console.log('🔄 Navigating to new language path with parameter:', currentUrl.toString());
+            
+            // Navigate to the new URL with the parameter
+            window.location.href = currentUrl.toString();
         } else {
-            // Fallback to the original logic
-            const { countryCode: currentCountryCode } = parseUrlPath(pathname);
-            if (currentCountryCode) {
-                const pathParts = pathname.split('/');
-                const pathAfterPrefix = pathParts.slice(2).join('/');
-                const newPath = `/${selectedLanguage}-${currentCountryCode.toLowerCase()}${pathAfterPrefix ? '/' + pathAfterPrefix : ''}`;
-                
-                console.log('🔄 Navigating to new language path:', newPath);
-                router.push(newPath);
-            }
+            console.error('No country code found in URL');
         }
     };
 
@@ -632,18 +638,6 @@ console.log(countryCode,"counrty cod")
                     >
                         {translatedText.contact}
                     </Link>
-
-                    {/* Dark Mode Toggle in Mobile Menu - Commented out as in HeaderTwo */}
-                    {/* <div
-                        className={styles.mobileNavItem}
-                        onClick={toggleDarkMode}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        <span>
-                            {darkMode ? <FaSun /> : <FaMoon />}
-                            {darkMode ? ' Light Mode' : ' Dark Mode'}
-                        </span>
-                    </div> */}
                 </div>
 
                 {/* Mobile Dropdown-style Selectors */}

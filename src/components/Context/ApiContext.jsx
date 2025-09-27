@@ -79,11 +79,19 @@ export const DataProvider = ({ children, countryDataHome }) => {
     const getCountryCode = async () => {
         try {
             if (validatedLocationData && validatedLocationData.country_code) {
-                // console.log("calls the validation country code", validatedLocationData);
+                // Use validated location data if available
                 setCountryCode(validatedLocationData);
                 setCurrentTimezone(getTimezoneByCountryCode(validatedLocationData.country_code));
-                // console.log('Using validated location data:', validatedLocationData);
             } else {
+                // Fetch locations data first
+                const locationsRes = await fetch('https://admin.sportsbuz.com/api/locations');
+                let locationsData = [];
+                
+                if (locationsRes.ok) {
+                    locationsData = await locationsRes.json();
+                }
+                
+                // Then fetch country code
                 const response = await fetch('https://admin.sportsbuz.com/api/get-country-code');
 
                 // Check if the response is successful
@@ -94,17 +102,45 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 // Parse the JSON response
                 const data = await response.json();
 
-                // Process the response with fallback logic
-                const countryData = processCountryCodeResponse(data);
+                // Process the response with fallback logic using locations data
+                const countryData = data && data.country_code ? 
+                    data : 
+                    processCountryCodeResponse(data, locationsData);
+                    
                 setCountryCode(countryData);
                 setCurrentTimezone(getTimezoneByCountryCode(countryData.country_code));
             }
         } catch (error) {
             console.error('Failed to fetch country code:', error);
 
-            // Use Sri Lankan data as fallback in case of any error
+            // Fetch locations data for fallback
+            try {
+                const locationsRes = await fetch('https://admin.sportsbuz.com/api/locations');
+                
+                if (locationsRes.ok) {
+                    const locationsData = await locationsRes.json();
+                    
+                    // Find Sri Lanka in locations data
+                    const sriLankaLocation = locationsData.find(location => 
+                        location.country_code === "LK"
+                    ) || locationsData[0];
+                    
+                    // Format Sri Lanka data to match get-country-code API response
+                    const fallbackData = {
+                        country_code: sriLankaLocation.country_code,
+                        location: { ...sriLankaLocation }
+                    };
+                    
+                    setCountryCode(fallbackData);
+                    setCurrentTimezone(getTimezoneByCountryCode(fallbackData.country_code));
+                    return;
+                }
+            } catch (fallbackError) {
+                console.error('Failed to fetch locations data for fallback:', fallbackError);
+            }
+            
+            // Ultimate fallback to static data if everything else fails
             console.log('Using Sri Lanka as fallback due to error:', error);
-            // Set both the country code and location data from the fallback
             setCountryCode(sriLankaFallbackData);
             setCurrentTimezone(getTimezoneByCountryCode(sriLankaFallbackData.country_code));
         }
