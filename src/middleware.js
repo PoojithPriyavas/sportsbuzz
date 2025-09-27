@@ -42,6 +42,14 @@ export async function middleware(request) {
       console.log('📌 Country API response:', JSON.stringify(countryData));
     } else {
       console.error('❌ Country API failed with status:', countryRes.status);
+      // Set fallback values when API fails
+      console.log('🔄 Using fallback values: en-lk');
+      countryData = {
+        country_code: 'LK',
+        location: {
+          hreflang: 'en'
+        }
+      };
     }
     
     // Step 2: Get locations data
@@ -60,7 +68,7 @@ export async function middleware(request) {
     
     // Check if we're at the root URL and need to redirect
     if (pathname === '/' && countryData && countryData.country_code && countryData.location && countryData.location.hreflang) {
-      // Get the hreflang and country code from the API response
+      // Get the hreflang and country code from the API response (or fallback)
       const hreflang = countryData.location.hreflang.toLowerCase();
       const countryCode = countryData.country_code.toLowerCase();
       
@@ -173,6 +181,31 @@ export async function middleware(request) {
   } catch (error) {
     console.error('❌ Middleware error:', error);
     console.error('❌ Error stack:', error.stack);
+    
+    // On catch error, try to handle root redirect with fallback
+    if (pathname === '/') {
+      console.log('🔄 Error occurred, using fallback values for root redirect: en-lk');
+      const fallbackUrl = '/en-lk/';
+      const response = NextResponse.redirect(new URL(fallbackUrl, request.url));
+      
+      // Set fallback country data cookie
+      const fallbackCountryData = {
+        country_code: 'LK',
+        location: {
+          hreflang: 'en'
+        }
+      };
+      
+      response.cookies.set('countryData', JSON.stringify(fallbackCountryData), {
+        path: '/',
+        maxAge: 60 * 60 * 24, // 1 day
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      });
+      
+      return response;
+    }
     
     // Even on error, continue with normal request processing
     return NextResponse.next();
