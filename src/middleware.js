@@ -22,19 +22,9 @@ export async function middleware(request) {
   }
 
   try {
-    // Add a small delay before starting API calls to ensure stability
-    await delay(500);
-    
     // Step 1: Get country code from API
     console.log('📡 Fetching country code...');
-    const countryRes = await fetch('https://admin.sportsbuz.com/api/get-country-code/', {
-      // headers: {
-      //   'User-Agent': request.headers.get('user-agent') || '',
-      //   'X-Forwarded-For': request.headers.get('x-forwarded-for') || '',
-      //   'X-Real-IP': request.headers.get('x-real-ip') || '',
-      // },
-      // cache: 'no-store'
-    });
+    const countryRes = await fetch('https://admin.sportsbuz.com/api/get-country-code/');
     
     let countryData;
     if (countryRes.ok) {
@@ -54,9 +44,7 @@ export async function middleware(request) {
     
     // Step 2: Get locations data
     console.log('📡 Fetching locations data...');
-    const locationsRes = await fetch('https://admin.sportsbuz.com/api/locations', {
-      // cache: 'no-store'
-    });
+    const locationsRes = await fetch('https://admin.sportsbuz.com/api/locations');
     
     let locationsData = [];
     if (locationsRes.ok) {
@@ -74,7 +62,7 @@ export async function middleware(request) {
       response.cookies.set('countryData', JSON.stringify(countryData), {
         path: '/',
         maxAge: 60 * 60 * 24, // 1 day
-        httpOnly: false,
+        httpOnly: false, // Important: Set to false so client-side JS can access it
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax'
       });
@@ -86,7 +74,7 @@ export async function middleware(request) {
       response.cookies.set('lanTagValues', JSON.stringify(locationsData), {
         path: '/',
         maxAge: 60 * 60 * 24, // 1 day
-        httpOnly: false,
+        httpOnly: false, // Important: Set to false so client-side JS can access it
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax'
       });
@@ -108,7 +96,7 @@ export async function middleware(request) {
           response.cookies.set('locationData', JSON.stringify(locationData), {
             path: '/',
             maxAge: 60 * 60 * 24, // 1 day
-            httpOnly: false,
+            httpOnly: false, // Important: Set to false so client-side JS can access it
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax'
           });
