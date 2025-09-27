@@ -32,11 +32,11 @@ import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 
 // Import hreflang helper utilities
-import {
-  hasHreflangTags,
-  hasLanguageCountryFormat,
-  logHreflangStatus
-} from "@/utils/hreflangHelper";
+// import {
+//   hasHreflangTags,
+//   hasLanguageCountryFormat,
+//   logHreflangStatus
+// } from "@/utils/hreflangHelper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -107,33 +107,33 @@ export default function Home({ locationDataHome, isLocalhost }) {
   const [hreflangDetected, setHreflangDetected] = useState(false);
 
   // Check for hreflang tags and URL format on component mount
-  useEffect(() => {
-    const checkHreflangStatus = () => {
-      const hasHreflang = hasHreflangTags();
-      const hasValidFormat = hasLanguageCountryFormat(window.location.pathname);
+  // useEffect(() => {
+  //   const checkHreflangStatus = () => {
+  //     const hasHreflang = hasHreflangTags();
+  //     const hasValidFormat = hasLanguageCountryFormat(window.location.pathname);
 
-      setHreflangDetected(hasHreflang);
+  //     setHreflangDetected(hasHreflang);
 
-      // Log the scenario being used
-      if (hasHreflang && hasValidFormat) {
-        logHreflangStatus('2', {
-          pathname: window.location.pathname,
-          hasHreflang,
-          hasValidFormat
-        });
-      } else {
-        logHreflangStatus('1', {
-          pathname: window.location.pathname,
-          hasHreflang,
-          hasValidFormat
-        });
-      }
-    };
+  //     // Log the scenario being used
+  //     if (hasHreflang && hasValidFormat) {
+  //       logHreflangStatus('2', {
+  //         pathname: window.location.pathname,
+  //         hasHreflang,
+  //         hasValidFormat
+  //       });
+  //     } else {
+  //       logHreflangStatus('1', {
+  //         pathname: window.location.pathname,
+  //         hasHreflang,
+  //         hasValidFormat
+  //       });
+  //     }
+  //   };
 
-    // Check after a small delay to ensure DOM is ready
-    const timer = setTimeout(checkHreflangStatus, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  //   // Check after a small delay to ensure DOM is ready
+  //   const timer = setTimeout(checkHreflangStatus, 500);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   useEffect(() => {
     // Check if animation has been played before
@@ -254,7 +254,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
 
       <>
         {/* Debug info in development */}
-        {process.env.NODE_ENV === 'development' && (
+        {/* {process.env.NODE_ENV === 'development' && (
           <div style={{
             position: 'fixed',
             top: 0,
@@ -269,7 +269,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
             <div>URL Format: {hasLanguageCountryFormat(typeof window !== 'undefined' ? window.location.pathname : '') ? '✅' : '❌'}</div>
             <div>Scenario: {hreflangDetected && hasLanguageCountryFormat(typeof window !== 'undefined' ? window.location.pathname : '') ? '2' : '1'}</div>
           </div>
-        )}
+        )} */}
 
         <HeaderTwo animationStage={animationStage} />
         {showOtherDivs && (
@@ -332,3 +332,27 @@ export default function Home({ locationDataHome, isLocalhost }) {
     </>
   );
 }
+
+// Add this import at the top of the file
+import DebugPanel from '../components/Common/DebugPanel';
+
+// In your component's return statement, add the DebugPanel
+// Find the closing tag of your main container and add it right before that
+
+// For example, if your component looks like:
+// return (
+//   <div className={styles.container}>
+//     {/* Your existing content */}
+//   </div>
+// );
+
+// Change it to:
+// return (
+//   <div className={styles.container}>
+//     {/* Your existing content */}
+//     <DebugPanel />
+//   </div>
+// );
+
+// If you're in development mode, you can conditionally render it:
+// {process.env.NODE_ENV === 'development' && <DebugPanel />}

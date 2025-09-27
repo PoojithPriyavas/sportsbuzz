@@ -32,7 +32,7 @@ const CarouselSkeleton = ({ isMobile }) => {
 
 export default function HeroCarousal() {
   const { countryCode } = useGlobalData()
-  console.log(countryCode, "carousal country")
+  // console.log(countryCode, "carousal country")
   const [banners, setBanners] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const swiperRef = useRef(null);

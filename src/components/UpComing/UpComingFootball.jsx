@@ -57,7 +57,7 @@ function getTime(esd) {
 export default function UpcomingFootballMatches() {
     const { upcoming, fetchFootBallLineUp, fetchFootballDetails } = useGlobalData();
 
-    console.log(upcoming, "upcoming values")
+    // console.log(upcoming, "upcoming values")
     const [selectedLeague, setSelectedLeague] = useState('All');
     const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
     // console.log(upcoming, "up ckaskjdjsd")

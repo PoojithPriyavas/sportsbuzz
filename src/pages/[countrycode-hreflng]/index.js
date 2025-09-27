@@ -33,6 +33,7 @@ import { useRouter } from "next/router";
 import { useParams } from "next/navigation";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
+import DebugPanel from "@/components/Common/DebugPanel"; // Import the DebugPanel component
 
 
 const geistSans = Geist({
@@ -176,10 +177,10 @@ export default function Home({ locationDataHome, isLocalhost }) {
                 <link rel="alternate" href="https://sportsbuz.com/" hreflang="x-default" />
                 {/* Canonical */}
                 {locationDataHome?.map(({ hreflang, country_code }) => {
-                    console.log(hreflang, "href lan sp-home");
+                    {/* console.log(hreflang, "href lan sp-home"); */}
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    console.log('sp-Generated link:', { href, fullHrefLang });
+                    {/* console.log('sp-Generated link:', { href, fullHrefLang }); */}
 
                     return (
                         <link
@@ -216,6 +217,8 @@ export default function Home({ locationDataHome, isLocalhost }) {
             </Head>
 
             <>
+                {/* Add the DebugPanel component here */}
+                <DebugPanel />
 
                 {/* {showOtherDivs && <RegionSelector countryCode={countryCode} locationDataHome={locationDataHome} />} */}
                 <HeaderThree animationStage={animationStage} languageValidation={languageValidation} />
@@ -245,13 +248,6 @@ export default function Home({ locationDataHome, isLocalhost }) {
                                 )}
                                 <div className={styles.twoSplitRow}>
                                     <div className={styles.leftSplit}>
-                                        {/* {sport === 'cricket' ? (
-                      <>
-                        <UpcomingMatches upcomingMatches={upcomingMatches} />
-                      </>
-                    ) : (
-                      <UpcomingFootballMatches />
-                    )} */}
                                         <SportsOdsList />
                                         {news && (
                                             <div className={styles.hideOnMobile}>
