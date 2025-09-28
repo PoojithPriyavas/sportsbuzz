@@ -28,29 +28,37 @@ const CarouselSkeleton = ({ isMobile }) => {
 
 export default function HeroCarousal() {
   const { countryCode } = useGlobalData();
-  // console.log(countryCode, "carousal country")
   const [banners, setBanners] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false); // New state to track if we've ever loaded
   const swiperRef = useRef(null);
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' });
 
   // Fetch banner data
   useEffect(() => {
+    // Skip fetching if we don't have a valid countryCode yet
+    if (!countryCode?.location?.id) return;
+    
     const fetchBanners = async () => {
       try {
-        setIsLoading(true);
-        const url = new URL('https://admin.sportsbuz.com/api/banners');
-        if (countryCode?.location?.id) {
-          url.searchParams.append('country_code', countryCode.location.id);
+        // Only show loading state on first load
+        if (!hasLoaded) {
+          setIsLoading(true);
         }
+        
+        const url = new URL('https://admin.sportsbuz.com/api/banners');
+        url.searchParams.append('country_code', countryCode.location.id);
 
         const res = await fetch(url.toString());
         const data = await res.json();
-        const countryWiseBanner = data.filter(b => b.location === countryCode?.location?.id)
-        // console.log(countryWiseBanner, "countrywise banner")
-        // console.log(data, "carousal responses")
+        const countryWiseBanner = data.filter(b => b.location === countryCode.location.id);
         const activeBanners = countryWiseBanner.filter(b => b.is_active === 'Active');
+        
+        // Update banners
         setBanners(activeBanners.sort((a, b) => a.order_by - b.order_by));
+        
+        // Mark that we've successfully loaded data at least once
+        setHasLoaded(true);
       } catch (error) {
         console.error('Failed to fetch banners:', error);
       } finally {
@@ -59,7 +67,7 @@ export default function HeroCarousal() {
     };
 
     fetchBanners();
-  }, [countryCode]);
+  }, [countryCode?.location?.id, hasLoaded]); // Only depend on the specific ID, not the entire object
 
   // Force restart autoplay after banners are loaded
   useEffect(() => {
@@ -76,8 +84,8 @@ export default function HeroCarousal() {
     }
   }, [banners, isLoading]);
 
-  // Show skeleton loading when loading
-  if (isLoading) {
+  // Show skeleton loading when loading and never loaded before
+  if (isLoading && !hasLoaded) {
     return <CarouselSkeleton isMobile={isMobile} />;
   }
 
