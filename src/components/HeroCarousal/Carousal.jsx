@@ -14,11 +14,7 @@ import { useGlobalData } from '../Context/ApiContext';
 const CarouselSkeleton = ({ isMobile }) => {
   return (
     <div className={styles.carouselWrapper} style={{ marginTop: '20px' }}>
-      <div className={styles.skeletonContainer}>
-        <div className={`${styles.skeletonSlide} ${styles.shimmer}`}>
-          <div className={styles.skeletonImage} />
-        </div>
-        
+      <div className={`${styles.skeletonSlide} ${styles.shimmer}`}>
         {/* Skeleton pagination dots */}
         <div className={styles.skeletonPagination}>
           <div className={styles.skeletonDot} />
@@ -31,7 +27,7 @@ const CarouselSkeleton = ({ isMobile }) => {
 };
 
 export default function HeroCarousal() {
-  const { countryCode } = useGlobalData()
+  const { countryCode } = useGlobalData();
   // console.log(countryCode, "carousal country")
   const [banners, setBanners] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,8 +47,8 @@ export default function HeroCarousal() {
         const res = await fetch(url.toString());
         const data = await res.json();
         const countryWiseBanner = data.filter(b => b.location === countryCode?.location?.id)
-        console.log(countryWiseBanner, "countrywise banner")
-        console.log(data, "carousal responses")
+        // console.log(countryWiseBanner, "countrywise banner")
+        // console.log(data, "carousal responses")
         const activeBanners = countryWiseBanner.filter(b => b.is_active === 'Active');
         setBanners(activeBanners.sort((a, b) => a.order_by - b.order_by));
       } catch (error) {
@@ -87,7 +83,7 @@ export default function HeroCarousal() {
 
   // Don't render if no banners after loading
   if (banners.length === 0) {
-    return <div className={styles.carouselWrapper} style={{ marginTop: '20px', height: '200px' }} />;
+    return <div className={styles.carouselWrapper} style={{ marginTop: '20px' }} />;
   }
 
   // Helper function to safely handle autoplay
@@ -128,7 +124,6 @@ export default function HeroCarousal() {
                 src={isMobile ? banner.mobile_image : banner.image}
                 className={styles.slideImage}
                 alt={`Banner ${index + 1}`}
-                style={{ aspectRatio: isMobile ? '3/1' : 'auto' }}
                 loading={index === 0 ? 'eager' : 'lazy'} 
               />
             </a>

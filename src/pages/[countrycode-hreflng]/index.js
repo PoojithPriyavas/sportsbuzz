@@ -95,7 +95,8 @@ export default function Home({ locationDataHome, isLocalhost }) {
         bannerLoading,
 
     } = useGlobalData();
-    console.log(blogs, "blogs in country home")
+    console.log(locationDataHome,"location data for best betting apps")
+    // console.log(blogs, "blogs in country home")
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     const router = useRouter();
     const { "countrycode-hreflng": countryLang } = useParams();
@@ -180,7 +181,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                     {/* console.log(hreflang, "href lan sp-home"); */}
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    {/* console.log('sp-Generated link:', { href, fullHrefLang }); */}
+                    console.log('sp-Generated link:', { href, fullHrefLang });
 
                     return (
                         <link

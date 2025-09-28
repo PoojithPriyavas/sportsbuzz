@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useGlobalData } from '../Context/ApiContext';
 
 // Mock components for demonstration
 const JoinTelegramButton = () => (
@@ -31,10 +32,6 @@ const CustomAxios = {
     }
 };
 
-// Mock global data
-const useGlobalData = () => ({
-    settings: [{ email: 'contact@company.com' }]
-});
 
 const ContactUsPage = () => {
     const [formData, setFormData] = useState({

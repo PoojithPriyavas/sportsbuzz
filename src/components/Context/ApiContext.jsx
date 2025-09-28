@@ -178,7 +178,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
     const [language, setLanguage] = useState('en');
 
-    const translateText = async (text, from = 'en', toLang = language) => {
+    const translateText = async (textInput, from = 'en', toLang = language) => {
         const langMap = {
             English: 'en',
             Malayalam: 'ml',
@@ -186,18 +186,39 @@ export const DataProvider = ({ children, countryDataHome }) => {
         const to = langMap[toLang] || toLang;
         const fromCode = langMap[from] || from;
 
-        if (fromCode === to) return text;
+        // If source and target languages are the same, return the input as is
+        if (fromCode === to) {
+            return Array.isArray(textInput) 
+                ? textInput.map(item => item.text) 
+                : textInput;
+        }
 
         try {
-            const response = await axios.post('/api/translate', {
-                text,
-                from: fromCode,
-                to,
-            });
-            return response.data;
+            // Handle both single text string and array of text objects
+            const isArray = Array.isArray(textInput);
+            
+            if (isArray) {
+                // Batch translation
+                const texts = textInput;
+                const response = await axios.post('/api/translate', {
+                    texts,
+                    from: fromCode,
+                    to,
+                });
+                return response.data;
+            } else {
+                // Single text translation (maintain backward compatibility)
+                const response = await axios.post('/api/translate', {
+                    text: textInput,
+                    from: fromCode,
+                    to,
+                });
+                return response.data;
+            }
         } catch (error) {
             console.error('Translation error:', error);
-            return text;
+            // Return original text(s) in case of error
+            return Array.isArray(textInput) ? textInput.map(item => item.text) : textInput;
         }
     };
 
@@ -214,7 +235,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 });
                 const data = response.data;
                 const countryWiseSideBanner = data.filter(data => data.location === countryCode?.location?.id)
-                console.log(countryWiseSideBanner, "country wise side banner")
+                // console.log(countryWiseSideBanner, "country wise side banner")
                 setBanners(countryWiseSideBanner);
             } catch (error) {
                 console.error('Error fetching side banners:', error);
@@ -1095,7 +1116,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
     useEffect(() => {
         if (countryCode?.country_code) {
-            console.log('Country code available, fetching initial blogs:', countryCode.country_code);
+            // console.log('Country code available, fetching initial blogs:', countryCode.country_code);
             fetchBlogs({ countryCodeParam: countryCode.country_code });
             fetchBettingApps(countryCode.country_code);
             fetchBestBettingAppsPrevious(countryCode.country_code);

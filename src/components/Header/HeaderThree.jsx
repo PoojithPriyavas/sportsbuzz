@@ -35,7 +35,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     const router = useRouter();
     // Add this line to use the usePathHelper hook
     const { pathPrefix } = usePathHelper();
-    console.log(pathPrefix,"path prefix")
+    // console.log(pathPrefix,"path prefix")
     
     // Mobile dropdown states
     const [expandedLanguageSelector, setExpandedLanguageSelector] = useState(false);
@@ -414,47 +414,71 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     useEffect(() => {
         const updateTranslations = async () => {
             try {
-                const [home, apps, news, schedule, cricket, football, contact, languageText, sportText] = await Promise.all([
-                    translateText('Home', 'en', language),
-                    translateText('Best Betting Apps', 'en', language),
-                    translateText('News', 'en', language),
-                    translateText('Match Schedules', 'en', language),
-                    translateText('Cricket', 'en', language),
-                    translateText('Football', 'en', language),
-                    translateText('Contact', 'en', language),
-                    translateText('Language', 'en', language),
-                    translateText('Sport', 'en', language),
-                ]);
-
+                // Create an array of text objects for batch translation
+                const textsToTranslate = [
+                    { text: 'Home' },
+                    { text: 'Best Betting Apps' },
+                    { text: 'News' },
+                    { text: 'Match Schedules' },
+                    { text: 'Cricket' },
+                    { text: 'Football' },
+                    { text: 'Contact' },
+                    { text: 'Language' },
+                    { text: 'Sport' }
+                ];
+                
+                // Get translations in a single API call
+                const translations = await translateText(textsToTranslate, 'en', language);
+                
+                // Update state with the translated texts
                 setTranslatedText(prev => ({
                     ...prev,
-                    home, apps, news, schedule, cricket, football, contact,
-                    language: languageText,
-                    sport: sportText
+                    home: translations[0],
+                    apps: translations[1],
+                    news: translations[2],
+                    schedule: translations[3],
+                    cricket: translations[4],
+                    football: translations[5],
+                    contact: translations[6],
+                    language: translations[7],
+                    sport: translations[8]
                 }));
-
-                const translatedCategories = await Promise.all(
-                    blogCategories.map(async (cat) => {
-                        const translatedCatName = await translateText(cat.name, 'en', language);
-                        const translatedSubs = await Promise.all(
-                            (cat.subcategories || []).map(async (sub) => ({
-                                ...sub,
-                                name: await translateText(sub.name, 'en', language),
-                            }))
-                        );
-                        return {
-                            ...cat,
-                            name: translatedCatName,
-                            subcategories: translatedSubs,
-                        };
-                    })
-                );
-                setTranslatedCategories(translatedCategories);
+            
+                // For blog categories, we'll still use individual calls for now
+                // as the structure is more complex
+                if (blogCategories.length > 0) {
+                    const translatedCategories = await Promise.all(
+                        blogCategories.map(async (cat) => {
+                            // Translate category name
+                            const translatedCatName = await translateText(cat.name, 'en', language);
+                            
+                            // Translate subcategories if they exist
+                            let translatedSubs = [];
+                            if (cat.subcategories?.length > 0) {
+                                // Create batch for subcategory names
+                                const subTexts = cat.subcategories.map(sub => ({ text: sub.name }));
+                                const subTranslations = await translateText(subTexts, 'en', language);
+                                
+                                translatedSubs = cat.subcategories.map((sub, index) => ({
+                                    ...sub,
+                                    name: subTranslations[index],
+                                }));
+                            }
+                            
+                            return {
+                                ...cat,
+                                name: translatedCatName,
+                                subcategories: translatedSubs,
+                            };
+                        })
+                    );
+                    setTranslatedCategories(translatedCategories);
+                }
             } catch (error) {
                 console.error('Translation error:', error);
             }
         };
-
+    
         updateTranslations();
     }, [language, translateText, blogCategories]);
 
@@ -469,20 +493,32 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         if (isMobile) {
             setMobileMenuOpen(false);
         }
-
+    
         // Get current URL path parts
         const { countryCode: currentCountryCode } = parseUrlPath(pathname);
         
         // If we have a valid country code in the URL
         if (currentCountryCode) {
-            // Create the new URL with updated language parameter
+            // Get the current URL
             const currentUrl = new URL(window.location.href);
-            currentUrl.searchParams.set('setLanguage', selectedLanguage);
             
-            console.log('🔄 Navigating to new language path with parameter:', currentUrl.toString());
+            // Get the path without the domain
+            let path = currentUrl.pathname;
             
-            // Navigate to the new URL with the parameter
-            window.location.href = currentUrl.toString();
+            // Replace the language code in the path
+            // First segment is language-country, so we replace it with newlanguage-country
+            const newPath = path.replace(/^\/([a-z]{2})-([a-z]{2})/, `/${selectedLanguage}-${currentCountryCode}`);
+            
+            // Create the new URL with the updated path
+            const newUrl = new URL(newPath, window.location.origin);
+            
+            // Keep any existing query parameters
+            newUrl.search = currentUrl.search;
+            
+            console.log('🔄 Navigating to new language path:', newUrl.toString());
+            
+            // Navigate to the new URL
+            window.location.href = newUrl.toString();
         } else {
             console.error('No country code found in URL');
         }

@@ -4,7 +4,7 @@
   margin: auto;
   overflow: hidden;
   border-radius: 12px;
-  background-color: #868282d6;
+  /* background-color: #868282d6; */
 }
 
 .swiperContainer {
@@ -19,17 +19,8 @@
 }
 
 /* Skeleton Loading Styles */
-.skeletonWrapper {
-  background-color: transparent !important;
-  /* Override the default background */
-  position: relative;
-}
-
 .skeletonSlide {
   width: 100%;
-  /* height: 100%;
-  min-height: 100px;  */
-  aspect-ratio: 10 / 2;
   background: linear-gradient(90deg,
       #f0f0f0 0%,
       #e8e8e8 20%,
@@ -38,21 +29,29 @@
   background-size: 200% 100%;
   animation: loading 2s infinite linear;
   border-radius: 12px;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Desktop specific skeleton styles */
 @media (min-width: 769px) {
-  .skeletonWrapper .skeletonSlide {
-    height: auto;
+  .carouselWrapper {
     aspect-ratio: 10/2;
+  }
+  
+  .skeletonSlide {
+    height: 100%;
   }
 }
 
 /* Mobile specific skeleton styles */
 @media (max-width: 768px) {
-  .skeletonWrapper .skeletonSlide {
-    height: auto;
+  .carouselWrapper {
     aspect-ratio: 3/1;
+  }
+  
+  .skeletonSlide {
+    height: 100%;
   }
 }
 
@@ -104,20 +103,6 @@
 
   to {
     opacity: 1;
-  }
-}
-
-/* Desktop specific styles */
-@media (min-width: 769px) {
-  .carouselWrapper {
-    aspect-ratio: 10/2;
-  }
-}
-
-/* Mobile specific styles */
-@media (max-width: 768px) {
-  .carouselWrapper {
-    aspect-ratio: 3/1;
   }
 }
 

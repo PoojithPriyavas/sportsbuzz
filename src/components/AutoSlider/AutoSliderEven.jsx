@@ -11,7 +11,7 @@ import axios from 'axios';
 import { useGlobalData } from '../Context/ApiContext';
 
 export default function AutoSliderEven({activeEvenBanners, bannerLoading}) {
-  console.log(bannerLoading,"banner loading state")
+  // console.log(bannerLoading,"banner loading state")
   // const [banners, setBanners] = useState([]);
   // const [loading, setLoading] = useState(true);
   const swiperRef = useRef(null);
