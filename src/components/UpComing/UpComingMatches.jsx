@@ -1,33 +1,73 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './UpComingMatches.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faClock, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { useGlobalData } from '../Context/ApiContext';
 
 export default function UpcomingMatches({ upcomingMatches = [] }) {
+    const { language, translateText } = useGlobalData();
     const [filter, setFilter] = useState('all');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    
+    const [translatedText, setTranslatedText] = useState({
+        cricketSchedules: 'Cricket Schedules',
+        filter: 'Filter',
+        all: 'all',
+        upcoming: 'Upcoming',
+        vs: 'vs',
+        noMatches: 'No matches found for the selected filter'
+    });
+
+    useEffect(() => {
+        const translateLabels = async () => {
+            // Create an array of text objects for batch translation
+            const textsToTranslate = [
+                { text: 'Cricket Schedules', to: language },
+                { text: 'Filter', to: language },
+                { text: 'all', to: language },
+                { text: 'Upcoming', to: language },
+                { text: 'vs', to: language },
+                { text: 'No matches found for the selected filter', to: language }
+            ];
+            
+            // Get translations in a single API call
+            const translations = await translateText(textsToTranslate, 'en', language);
+            
+            // Update state with the translated texts
+            setTranslatedText({
+                cricketSchedules: translations[0],
+                filter: translations[1],
+                all: translations[2],
+                upcoming: translations[3],
+                vs: translations[4],
+                noMatches: translations[5]
+            });
+        };
+
+        translateLabels();
+    }, [language, translateText]);
 
     // Get unique match types for filter options
-    const matchTypes = ['all', ...new Set(upcomingMatches.map(match => match.type))];
+    const matchTypes = [translatedText.all, ...new Set(upcomingMatches.map(match => match.type))];
 
     // Filter matches based on selected filter
-    const filteredMatches = filter === 'all'
+    const filteredMatches = filter === translatedText.all
         ? upcomingMatches
         : upcomingMatches.filter(match => match.type === filter);
 
     return (
         <div className={styles.section}>
             <div className={styles.header}>
-                <h4 className={styles.cricketMatchesTitle}>Cricket Schedules</h4>
+                <h4 className={styles.cricketMatchesTitle}>{translatedText.cricketSchedules}</h4>
                 <div className={styles.filterContainer}>
                     <button
                         className={styles.filterButton}
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     >
-                        <FontAwesomeIcon icon={faFilter} /> Filter
+                        <FontAwesomeIcon icon={faFilter} /> {translatedText.filter}
                     </button>
                     {isDropdownOpen && (
                         <div className={styles.dropdown}>
@@ -40,7 +80,7 @@ export default function UpcomingMatches({ upcomingMatches = [] }) {
                                         setIsDropdownOpen(false);
                                     }}
                                 >
-                                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                                    {type === translatedText.all ? type : type.charAt(0).toUpperCase() + type.slice(1)}
                                 </div>
                             ))}
                         </div>
@@ -54,10 +94,10 @@ export default function UpcomingMatches({ upcomingMatches = [] }) {
                         <div key={match.matchId} className={styles.card}>
                             <div className={styles.labels}>
                                 <span className={styles.intl}>{match.type}</span>
-                                <span className={styles.upcoming}>Upcoming</span>
+                                <span className={styles.upcoming}>{translatedText.upcoming}</span>
                             </div>
                             <div className={styles.teams}>
-                                {match.team1} <strong>vs</strong> {match.team2}
+                                {match.team1} <strong>{translatedText.vs}</strong> {match.team2}
                             </div>
                             <div className={styles.details}>
                                 <span>{match.seriesName}</span><br /><br />
@@ -67,7 +107,7 @@ export default function UpcomingMatches({ upcomingMatches = [] }) {
                         </div>
                     ))
                 ) : (
-                    <div className={styles.noMatches}>No matches found for the selected filter</div>
+                    <div className={styles.noMatches}>{translatedText.noMatches}</div>
                 )}
             </div>
         </div>

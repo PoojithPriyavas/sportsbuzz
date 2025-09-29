@@ -45,8 +45,6 @@ export default function MatchScheduler() {
         fetchFootBallLineUp
     } = useGlobalData();
 
-    // console.log(matchSchedule,"match schedule")
-
     const router = useRouter();
 
     // Theme detection hook
@@ -82,37 +80,44 @@ export default function MatchScheduler() {
         loadingTimezone: 'Loading timezone...',
         loadingMatches: 'Loading matches...',
         noMatches: 'No matches found for the selected date and league',
-        allLeagues: 'All Leagues'
+        allLeagues: 'All Leagues',
+        loadingDates: 'Loading dates...',
+        vs: 'VS',
+        upcoming: 'upcoming'
     });
 
     useEffect(() => {
         const translateLabels = async () => {
-            const [
-                matchSchedule,
-                selectDate,
-                loadingTimezone,
-                loadingMatches,
-                noMatches,
-                allLeagues
-            ] = await Promise.all([
-                translateText('Match Schedule', 'en', language),
-                translateText('Select a date to view matches', 'en', language),
-                translateText('Loading timezone...', 'en', language),
-                translateText('Loading matches...', 'en', language),
-                translateText('No matches found for the selected date and league', 'en', language),
-                translateText('All Leagues', 'en', language)
-            ]);
-
+            // Create an array of text objects for batch translation
+            const textsToTranslate = [
+                { text: 'Match Schedule', to: language },
+                { text: 'Select a date to view matches', to: language },
+                { text: 'Loading timezone...', to: language },
+                { text: 'Loading matches...', to: language },
+                { text: 'No matches found for the selected date and league', to: language },
+                { text: 'All Leagues', to: language },
+                { text: 'Loading dates...', to: language },
+                { text: 'VS', to: language },
+                { text: 'upcoming', to: language }
+            ];
+            
+            // Get translations in a single API call
+            const translations = await translateText(textsToTranslate, 'en', language);
+            
+            // Update state with the translated texts
             setTranslatedText({
-                matchSchedule,
-                selectDate,
-                loadingTimezone,
-                loadingMatches,
-                noMatches,
-                allLeagues
+                matchSchedule: translations[0],
+                selectDate: translations[1],
+                loadingTimezone: translations[2],
+                loadingMatches: translations[3],
+                noMatches: translations[4],
+                allLeagues: translations[5],
+                loadingDates: translations[6],
+                vs: translations[7],
+                upcoming: translations[8]
             });
         };
-
+    
         translateLabels();
     }, [language, translateText]);
 
@@ -229,18 +234,16 @@ export default function MatchScheduler() {
                     awayImg: event.T2[0].Abr || event.T2[0].Nm.substring(0, 3).toUpperCase(),
                     homeScore: event.Tr1 ?? null,
                     awayScore: event.Tr2 ?? null,
-                    status: event.Eps === 'NS' ? 'upcoming' : 'FT',
+                    status: event.Eps === 'NS' ? translatedText.upcoming : 'FT',
                     time: event.Esd.toString().substring(8, 10) + ':' + event.Esd.toString().substring(10, 12)
                 });
             });
         });
 
         return transformedData;
-    }, [matchSchedule, dates]);
+    }, [matchSchedule, dates, translatedText.upcoming]);
 
     const matchData = transformMatchData();
-
-    console.log(matchData,"match DAta")
 
     const displayMatches = useCallback((date) => {
         if (!date) return [];
@@ -308,7 +311,7 @@ export default function MatchScheduler() {
                             );
                         })
                     ) : (
-                        <div>Loading dates...</div>
+                        <div>{translatedText.loadingDates}</div>
                     )}
                 </div>
             </div>
@@ -355,7 +358,7 @@ export default function MatchScheduler() {
                                             <div className={styles.teamName}>{match.home}</div>
                                         </div>
                                         <div className={styles.matchScore}>
-                                            {match.status === 'upcoming' ? (
+                                            {match.status === translatedText.upcoming ? (
                                                 <span className={styles.upcomingTime}>{match.time}</span>
                                             ) : (
                                                 `${match.homeScore ?? '-'} - ${match.awayScore ?? '-'}`
@@ -366,7 +369,7 @@ export default function MatchScheduler() {
                                             <div className={styles.teamName}>{match.away}</div>
                                         </div>
                                     </div>
-                                                                    ))}
+                                ))}
                             </div>
                         </div>
                     ))

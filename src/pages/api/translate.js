@@ -3,33 +3,47 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Handle both old and new API formats
   const { text, texts, from = 'en', to } = req.body;
 
   try {
-    // Handle both single text string and array of texts
     const isArray = Array.isArray(texts);
-    
-    // If using old format with single text, use that
-    // If using new format with texts array, use that
-    const textArray = isArray ? texts : [{ Text: text || '' }];
-    
-    // Format the request body for Microsoft Translator API
-    const requestBody = isArray ? textArray.map(item => ({ Text: item.text })) : textArray;
 
-    const response = await fetch(`https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=${from}&to=${to}&textType=html`, {
-      method: 'POST',
-      headers: {
-        'Ocp-Apim-Subscription-Key': process.env.TRANSLATOR_KEY,
-        'Ocp-Apim-Subscription-Region': process.env.TRANSLATOR_REGION,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
+    // Format the request body correctly for Microsoft Translator API
+    let requestBody;
+    
+    if (isArray) {
+      // Handle array of texts
+      requestBody = texts.map(item => ({ text: item.text }));
+    } else {
+      // Handle single text
+      requestBody = [{ text: text || '' }];
+    }
+
+    console.log(requestBody, "request body");
+
+    const response = await fetch(
+      `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=${from}&to=${to}&textType=html`,
+      {
+        method: 'POST',
+        headers: {
+          'Ocp-Apim-Subscription-Key': process.env.TRANSLATOR_KEY,
+          'Ocp-Apim-Subscription-Region': process.env.TRANSLATOR_REGION,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('API Error:', errorData);
+      return res.status(response.status).json({ error: 'Translation API error', details: errorData });
+    }
 
     const data = await response.json();
+    console.log(data, "response data of translation");
     
-    // Return array of translations or single translation based on input
+    // Return formatted response
     if (isArray) {
       const translations = data.map(item => item?.translations[0]?.text || '');
       res.status(200).json(translations);
@@ -38,6 +52,6 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error('Translation error:', error);
-    res.status(500).json({ error: 'Translation failed' });
+    res.status(500).json({ error: 'Translation failed', message: error.message });
   }
 }

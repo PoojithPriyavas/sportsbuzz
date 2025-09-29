@@ -53,8 +53,135 @@ const ContactUsPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const { settings } = useGlobalData();
+    const { settings, language, translateText } = useGlobalData();
     const contact = settings?.[0] || {};
+    
+    // Add translation state
+    const [translatedText, setTranslatedText] = useState({
+        contactUs: 'Contact Us',
+        getInTouch: 'Get in touch',
+        firstName: 'First Name',
+        lastName: 'Last Name',
+        email: 'Email',
+        telegram: 'Telegram ID',
+        company: 'Company (Optional)',
+        jobTitle: 'Job Title (Optional)',
+        country: 'Country',
+        subject: 'Subject',
+        message: 'Message',
+        howDidYouHear: 'How did you hear about us? (Optional)',
+        newsletter: 'Subscribe to our newsletter',
+        submit: 'Submit',
+        submitting: 'Submitting...',
+        successMessage: 'Thank you! Your message has been sent successfully.',
+        firstNameRequired: 'First name is required',
+        lastNameRequired: 'Last name is required',
+        emailRequired: 'Email is required',
+        emailInvalid: 'Please enter a valid email address',
+        telegramRequired: 'Telegram ID is required',
+        subjectRequired: 'Please select a subject',
+        messageRequired: 'Message is required',
+        messageLength: 'Message must be at least 10 characters',
+        contactInfo: 'Contact Info',
+        emailLabel: 'Email',
+        responseTime: 'Response within 24 hours',
+        telegramLabel: 'Telegram',
+        telegramSupport: '24/7 Support',
+        officeHours: 'Office Hours',
+        workingHours: 'Monday - Friday, 9am - 6pm',
+        address: 'Address',
+        addressDetails: 'Colombo, Sri Lanka',
+        followUs: 'Follow Us',
+        contactDescription: 'Have questions or need assistance? Fill out the form below and our team will get back to you as soon as possible.'
+    });
+    
+    // Implement batch translation
+    useEffect(() => {
+        const translateLabels = async () => {
+            // Create an array of text objects for batch translation
+            const textsToTranslate = [
+                { text: 'Contact Us', to: language },
+                { text: 'Get in touch', to: language },
+                { text: 'First Name', to: language },
+                { text: 'Last Name', to: language },
+                { text: 'Email', to: language },
+                { text: 'Telegram ID', to: language },
+                { text: 'Company (Optional)', to: language },
+                { text: 'Job Title (Optional)', to: language },
+                { text: 'Country', to: language },
+                { text: 'Subject', to: language },
+                { text: 'Message', to: language },
+                { text: 'How did you hear about us? (Optional)', to: language },
+                { text: 'Subscribe to our newsletter', to: language },
+                { text: 'Submit', to: language },
+                { text: 'Submitting...', to: language },
+                { text: 'Thank you! Your message has been sent successfully.', to: language },
+                { text: 'First name is required', to: language },
+                { text: 'Last name is required', to: language },
+                { text: 'Email is required', to: language },
+                { text: 'Please enter a valid email address', to: language },
+                { text: 'Telegram ID is required', to: language },
+                { text: 'Please select a subject', to: language },
+                { text: 'Message is required', to: language },
+                { text: 'Message must be at least 10 characters', to: language },
+                { text: 'Contact Info', to: language },
+                { text: 'Email', to: language },
+                { text: 'Response within 24 hours', to: language },
+                { text: 'Telegram', to: language },
+                { text: '24/7 Support', to: language },
+                { text: 'Office Hours', to: language },
+                { text: 'Monday - Friday, 9am - 6pm', to: language },
+                { text: 'Address', to: language },
+                { text: 'Colombo, Sri Lanka', to: language },
+                { text: 'Follow Us', to: language },
+                { text: 'Have questions or need assistance? Fill out the form below and our team will get back to you as soon as possible.', to: language }
+            ];
+            
+            // Get translations in a single API call
+            const translations = await translateText(textsToTranslate, 'en', language);
+            
+            // Update state with the translated texts
+            setTranslatedText({
+                contactUs: translations[0],
+                getInTouch: translations[1],
+                firstName: translations[2],
+                lastName: translations[3],
+                email: translations[4],
+                telegram: translations[5],
+                company: translations[6],
+                jobTitle: translations[7],
+                country: translations[8],
+                subject: translations[9],
+                message: translations[10],
+                howDidYouHear: translations[11],
+                newsletter: translations[12],
+                submit: translations[13],
+                submitting: translations[14],
+                successMessage: translations[15],
+                firstNameRequired: translations[16],
+                lastNameRequired: translations[17],
+                emailRequired: translations[18],
+                emailInvalid: translations[19],
+                telegramRequired: translations[20],
+                subjectRequired: translations[21],
+                messageRequired: translations[22],
+                messageLength: translations[23],
+                contactInfo: translations[24],
+                emailLabel: translations[25],
+                responseTime: translations[26],
+                telegramLabel: translations[27],
+                telegramSupport: translations[28],
+                officeHours: translations[29],
+                workingHours: translations[30],
+                address: translations[31],
+                addressDetails: translations[32],
+                followUs: translations[33],
+                contactDescription: translations[34]
+            });
+        };
+
+        translateLabels();
+    }, [language, translateText]);
 
     // Check for dark mode on mount and listen for changes
     useEffect(() => {
@@ -119,24 +246,24 @@ const ContactUsPage = () => {
     const validate = () => {
         const newErrors = {};
 
-        if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-        if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+        if (!formData.firstName.trim()) newErrors.firstName = translatedText.firstNameRequired;
+        if (!formData.lastName.trim()) newErrors.lastName = translatedText.lastNameRequired;
 
         if (!formData.email.trim()) {
-            newErrors.email = 'Email is required';
+            newErrors.email = translatedText.emailRequired;
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = 'Please enter a valid email address';
+            newErrors.email = translatedText.emailInvalid;
         }
 
         if (!formData.telegram.trim()) {
-            newErrors.telegram = 'Telegram ID is required';
+            newErrors.telegram = translatedText.telegramRequired;
         }
 
-        if (!formData.subject) newErrors.subject = 'Please select a subject';
+        if (!formData.subject) newErrors.subject = translatedText.subjectRequired;
         if (!formData.message.trim()) {
-            newErrors.message = 'Message is required';
+            newErrors.message = translatedText.messageRequired;
         } else if (formData.message.trim().length < 10) {
-            newErrors.message = 'Message must be at least 10 characters';
+            newErrors.message = translatedText.messageLength;
         }
 
         setErrors(newErrors);
@@ -197,19 +324,8 @@ const ContactUsPage = () => {
             });
 
             setTimeout(() => setSuccess(false), 5000);
-
         } catch (error) {
-            console.error('Form submission failed:', error);
-
-            if (error.response && error.response.data) {
-                if (error.response.data.errors) {
-                    setErrors(error.response.data.errors);
-                } else {
-                    setErrors({ submit: 'Failed to send message. Please try again.' });
-                }
-            } else {
-                setErrors({ submit: 'Network error. Please check your connection and try again.' });
-            }
+            console.error('Error submitting form:', error);
         } finally {
             setIsSubmitting(false);
         }
@@ -223,35 +339,35 @@ const ContactUsPage = () => {
                 cardBackground: '#2d2d2d',
                 textPrimary: '#ffffff',
                 textSecondary: '#b0b0b0',
-                borderColor: '#404040',
-                inputBackground: '#383838',
-                inputBorder: '#505050',
-                inputBorderFocus: '#3498db',
-                inputBorderError: '#e74c3c',
-                errorBackground: '#4a2c2c',
-                successBackground: '#2c4a2c',
-                successBorder: '#4a6b4a',
-                successText: '#8fbc8f',
-                contactItemBackground: '#383838',
-                placeholderColor: '#888888'
+                borderColor: '#444444',
+                inputBackground: '#3a3a3a',
+                inputBorder: '#555555',
+                inputFocus: '#4a90e2',
+                buttonBackground: '#3182ce',
+                buttonHover: '#2b6cb0',
+                successBackground: '#2d3748',
+                successText: '#68d391',
+                successBorder: '#38a169',
+                errorColor: '#fc8181',
+                contactItemBackground: '#2d2d2d'
             };
         } else {
             return {
                 background: '#f8f9fa',
                 cardBackground: '#ffffff',
-                textPrimary: '#2c3e50',
-                textSecondary: '#6c757d',
-                borderColor: '#e9ecef',
-                inputBackground: '#fff',
-                inputBorder: '#e9ecef',
-                inputBorderFocus: '#3498db',
-                inputBorderError: '#e74c3c',
-                errorBackground: '#fdf2f2',
-                successBackground: '#d4edda',
-                successBorder: '#c3e6cb',
-                successText: '#155724',
-                contactItemBackground: '#f8f9fa',
-                placeholderColor: '#666666'
+                textPrimary: '#333333',
+                textSecondary: '#666666',
+                borderColor: '#e2e8f0',
+                inputBackground: '#ffffff',
+                inputBorder: '#cbd5e0',
+                inputFocus: '#3182ce',
+                buttonBackground: '#3182ce',
+                buttonHover: '#2b6cb0',
+                successBackground: '#f0fff4',
+                successText: '#38a169',
+                successBorder: '#c6f6d5',
+                errorColor: '#e53e3e',
+                contactItemBackground: '#f7fafc'
             };
         }
     };
@@ -278,33 +394,26 @@ const ContactUsPage = () => {
         },
         title: {
             fontSize: isMobile ? '2.5rem' : '3rem',
-            fontWeight: 'bold',
+            fontWeight: '700',
+            marginBottom: '20px',
             color: colors.textPrimary,
-            marginBottom: '16px',
-            position: 'relative'
+            transition: 'color 0.3s ease'
         },
-        titleUnderline: {
-            width: '100px',
-            height: '4px',
-            backgroundColor: '#3498db',
+        description: {
+            fontSize: '1.1rem',
+            maxWidth: '800px',
             margin: '0 auto',
-            borderRadius: '2px',
-            marginBottom: '20px'
-        },
-        subtitle: {
-            fontSize: '1.2rem',
             color: colors.textSecondary,
-            maxWidth: '600px',
-            margin: '0 auto',
-            lineHeight: '1.6'
-        },
-        mainContent: {
-            display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
-            gap: isMobile ? '30px' : '60px',
-            alignItems: 'start'
+            transition: 'color 0.3s ease'
         },
         formContainer: {
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: '30px',
+            marginBottom: '50px'
+        },
+        formColumn: {
+            flex: isMobile ? '1' : '2',
             backgroundColor: colors.cardBackground,
             padding: isMobile ? '30px 20px' : '40px',
             borderRadius: '12px',
@@ -312,126 +421,102 @@ const ContactUsPage = () => {
             border: `1px solid ${colors.borderColor}`,
             transition: 'background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease'
         },
-        formTitle: {
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            color: colors.textPrimary,
-            marginBottom: '30px'
-        },
-        formGrid: {
-            display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-            gap: isMobile ? '0' : '20px',
-            marginBottom: '20px'
+        contactColumn: {
+            flex: '1',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
         },
         formGroup: {
-            marginBottom: '24px'
-        },
-        formGroupFull: {
-            gridColumn: '1 / -1',
-            marginBottom: '24px'
+            marginBottom: '20px'
         },
         label: {
             display: 'block',
             marginBottom: '8px',
-            fontWeight: '600',
+            fontWeight: '500',
             color: colors.textPrimary,
-            fontSize: '0.95rem'
-        },
-        required: {
-            color: '#e74c3c'
+            transition: 'color 0.3s ease'
         },
         input: {
             width: '100%',
             padding: '12px 16px',
-            border: `2px solid ${colors.inputBorder}`,
-            borderRadius: '8px',
             fontSize: '1rem',
-            transition: 'all 0.3s ease',
+            borderRadius: '8px',
+            border: `1px solid ${colors.inputBorder}`,
             backgroundColor: colors.inputBackground,
-            fontFamily: 'inherit',
-            boxSizing: 'border-box',
-            color: colors.textPrimary
+            color: colors.textPrimary,
+            transition: 'border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease',
+            outline: 'none'
         },
         inputFocus: {
-            borderColor: colors.inputBorderFocus,
-            boxShadow: '0 0 0 3px rgba(52, 152, 219, 0.1)'
-        },
-        inputError: {
-            borderColor: colors.inputBorderError,
-            backgroundColor: colors.errorBackground
-        },
-        textarea: {
-            width: '100%',
-            padding: '12px 16px',
-            border: `2px solid ${colors.inputBorder}`,
-            borderRadius: '8px',
-            fontSize: '1rem',
-            transition: 'all 0.3s ease',
-            backgroundColor: colors.inputBackground,
-            fontFamily: 'inherit',
-            resize: 'vertical',
-            minHeight: '120px',
-            boxSizing: 'border-box',
-            color: colors.textPrimary
+            borderColor: colors.inputFocus,
+            boxShadow: `0 0 0 1px ${colors.inputFocus}`
         },
         select: {
             width: '100%',
             padding: '12px 16px',
-            border: `2px solid ${colors.inputBorder}`,
-            borderRadius: '8px',
             fontSize: '1rem',
-            transition: 'all 0.3s ease',
+            borderRadius: '8px',
+            border: `1px solid ${colors.inputBorder}`,
             backgroundColor: colors.inputBackground,
-            fontFamily: 'inherit',
+            color: colors.textPrimary,
+            transition: 'border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease',
+            outline: 'none',
             appearance: 'none',
-            backgroundImage: `url("data:image/svg+xml,%3csvg viewBox='0 0 24 24' fill='none' stroke='${isDarkMode ? '%23fff' : '%23666'}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e")`,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23${isDarkMode ? 'ffffff' : '333333'}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
             backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'right 12px center',
-            backgroundSize: '16px',
-            paddingRight: '40px',
-            boxSizing: 'border-box',
-            color: colors.textPrimary
+            backgroundPosition: 'right 16px center',
+            backgroundSize: '16px'
+        },
+        textarea: {
+            width: '100%',
+            padding: '12px 16px',
+            fontSize: '1rem',
+            borderRadius: '8px',
+            border: `1px solid ${colors.inputBorder}`,
+            backgroundColor: colors.inputBackground,
+            color: colors.textPrimary,
+            transition: 'border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease',
+            outline: 'none',
+            minHeight: '150px',
+            resize: 'vertical'
+        },
+        error: {
+            color: colors.errorColor,
+            fontSize: '0.875rem',
+            marginTop: '5px'
         },
         checkboxContainer: {
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            marginTop: '20px'
+            marginBottom: '20px'
         },
         checkbox: {
+            marginRight: '10px',
             width: '18px',
             height: '18px',
-            accentColor: '#3498db'
+            accentColor: colors.buttonBackground
         },
         checkboxLabel: {
             fontSize: '0.95rem',
-            color: colors.textPrimary,
-            cursor: 'pointer'
-        },
-        errorMessage: {
-            color: '#e74c3c',
-            fontSize: '0.875rem',
-            marginTop: '6px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px'
+            color: colors.textSecondary,
+            transition: 'color 0.3s ease'
         },
         submitButton: {
-            backgroundColor: '#3498db',
+            backgroundColor: colors.buttonBackground,
             color: 'white',
-            padding: '14px 32px',
             border: 'none',
-            borderRadius: '8px',
-            fontSize: '1.1rem',
+            padding: '14px 24px',
+            fontSize: '1rem',
             fontWeight: '600',
+            borderRadius: '8px',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
             width: '100%',
             marginTop: '10px'
         },
         submitButtonHover: {
-            backgroundColor: '#2980b9',
+            backgroundColor: colors.buttonHover,
             transform: 'translateY(-2px)',
             boxShadow: '0 6px 20px rgba(52, 152, 219, 0.3)'
         },
@@ -449,30 +534,27 @@ const ContactUsPage = () => {
             marginBottom: '24px',
             textAlign: 'center',
             fontWeight: '500',
-            transition: 'all 0.3s ease'
+            transition: 'background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease'
         },
         contactInfo: {
             backgroundColor: colors.cardBackground,
-            padding: isMobile ? '30px 20px' : '40px 30px',
+            padding: '30px',
             borderRadius: '12px',
             boxShadow: isDarkMode ? '0 4px 6px rgba(0, 0, 0, 0.3)' : '0 4px 6px rgba(0, 0, 0, 0.1)',
             border: `1px solid ${colors.borderColor}`,
-            height: 'fit-content',
-            position: isMobile ? 'relative' : 'sticky',
-            top: isMobile ? 'auto' : '20px',
             transition: 'background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease'
         },
         contactInfoTitle: {
-            fontSize: '1.4rem',
+            fontSize: '1.5rem',
             fontWeight: '600',
+            marginBottom: '20px',
             color: colors.textPrimary,
-            marginBottom: '30px'
+            transition: 'color 0.3s ease'
         },
         contactItem: {
             display: 'flex',
             alignItems: 'flex-start',
-            gap: '15px',
-            marginBottom: '25px',
+            marginBottom: '20px',
             padding: '20px',
             backgroundColor: colors.contactItemBackground,
             borderRadius: '8px',
@@ -493,306 +575,310 @@ const ContactUsPage = () => {
             marginBottom: '5px'
         },
         contactText: {
-            fontSize: '0.9rem',
             color: colors.textSecondary,
-            lineHeight: '1.4'
+            fontSize: '0.95rem',
+            lineHeight: '1.5'
+        },
+        socialLinks: {
+            display: 'flex',
+            gap: '15px',
+            marginTop: '10px'
+        },
+        socialIcon: {
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            backgroundColor: colors.buttonBackground,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontSize: '1.2rem',
+            transition: 'transform 0.3s ease, background-color 0.3s ease',
+            cursor: 'pointer'
+        },
+        socialIconHover: {
+            transform: 'translateY(-3px)',
+            backgroundColor: colors.buttonHover
+        },
+        row: {
+            display: 'flex',
+            gap: '20px',
+            marginBottom: '20px'
+        },
+        column: {
+            flex: 1
         }
-    };
-
-    const [focusedField, setFocusedField] = useState('');
-    const [hoveredButton, setHoveredButton] = useState(false);
-
-    const getInputStyle = (fieldName) => {
-        let style = { ...styles.input };
-        if (errors[fieldName]) style = { ...style, ...styles.inputError };
-        if (focusedField === fieldName) style = { ...style, ...styles.inputFocus };
-        return style;
-    };
-
-    const getSelectStyle = (fieldName) => {
-        let style = { ...styles.select };
-        if (errors[fieldName]) style = { ...style, ...styles.inputError };
-        if (focusedField === fieldName) style = { ...style, ...styles.inputFocus };
-        return style;
-    };
-
-    const getTextareaStyle = () => {
-        let style = { ...styles.textarea };
-        if (errors.message) style = { ...style, ...styles.inputError };
-        if (focusedField === 'message') style = { ...style, ...styles.inputFocus };
-        return style;
-    };
-
-    const getButtonStyle = () => {
-        let style = { ...styles.submitButton };
-        if (isSubmitting) style = { ...style, ...styles.submitButtonDisabled };
-        else if (hoveredButton) style = { ...style, ...styles.submitButtonHover };
-        return style;
     };
 
     const ContactInfoSection = () => (
         <div style={styles.contactInfo}>
-            <h3 style={styles.contactInfoTitle}>Get in touch</h3>
+            <h3 style={styles.contactInfoTitle}>{translatedText.getInTouch}</h3>
 
             <div style={styles.contactItem}>
                 <div style={styles.contactIcon}>📧</div>
                 <div style={styles.contactDetails}>
-                    <div style={styles.contactTitle}>Email</div>
+                    <div style={styles.contactTitle}>{translatedText.emailLabel}</div>
                     <div style={styles.contactText}>
                         {contact.email}<br />
-                        Response within 24 hours
+                        {translatedText.responseTime}
                     </div>
                 </div>
             </div>
 
             <div style={styles.contactItem}>
-                <div style={styles.contactIcon}>🕐</div>
+                <div style={styles.contactIcon}>💬</div>
                 <div style={styles.contactDetails}>
-                    <div style={styles.contactTitle}>Business Hours</div>
+                    <div style={styles.contactTitle}>{translatedText.telegramLabel}</div>
                     <div style={styles.contactText}>
-                        Monday - Friday: 9:00 AM - 6:00 PM<br />
-                        Saturday: 10:00 AM - 4:00 PM<br />
-                        Sunday: Closed
+                        {contact.telegram_link ? contact.telegram_link.replace('https://t.me/', '@') : '@sportsbuz'}<br />
+                        {translatedText.telegramSupport}
+                    </div>
+                    <JoinTelegramButton />
+                </div>
+            </div>
+
+            <div style={styles.contactItem}>
+                <div style={styles.contactIcon}>🕒</div>
+                <div style={styles.contactDetails}>
+                    <div style={styles.contactTitle}>{translatedText.officeHours}</div>
+                    <div style={styles.contactText}>
+                        {translatedText.workingHours}
                     </div>
                 </div>
             </div>
-            <JoinTelegramButton />
+
+            <div style={styles.contactItem}>
+                <div style={styles.contactIcon}>📍</div>
+                <div style={styles.contactDetails}>
+                    <div style={styles.contactTitle}>{translatedText.address}</div>
+                    <div style={styles.contactText}>
+                        {translatedText.addressDetails}
+                    </div>
+                </div>
+            </div>
+
+            <div style={styles.contactItem}>
+                <div style={styles.contactDetails}>
+                    <div style={styles.contactTitle}>{translatedText.followUs}</div>
+                    <div style={styles.socialLinks}>
+                        {contact.facebook_link && (
+                            <a href={contact.facebook_link} target="_blank" rel="noopener noreferrer" style={styles.socialIcon}>f</a>
+                        )}
+                        {contact.twitter_link && (
+                            <a href={contact.twitter_link} target="_blank" rel="noopener noreferrer" style={styles.socialIcon}>t</a>
+                        )}
+                        {contact.instagram_link && (
+                            <a href={contact.instagram_link} target="_blank" rel="noopener noreferrer" style={styles.socialIcon}>i</a>
+                        )}
+                        {contact.youtube_link && (
+                            <a href={contact.youtube_link} target="_blank" rel="noopener noreferrer" style={styles.socialIcon}>y</a>
+                        )}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 
     return (
         <div style={styles.pageContainer}>
             <div style={styles.container}>
-                <div style={styles.hero}> </div>
+                <div style={styles.header}>
+                    <h1 style={styles.title}>{translatedText.contactUs}</h1>
+                    <p style={styles.description}>{translatedText.contactDescription}</p>
+                </div>
 
-                <div style={styles.mainContent}>
-                    <div style={styles.formContainer}>
-                        <h2 style={styles.formTitle}>Send us a message</h2>
-
+                <div style={styles.formContainer}>
+                    <div style={styles.formColumn}>
                         {success && (
                             <div style={styles.successMessage}>
-                                ✓ Thank you for your message! We'll get back to you within 24 hours.
-                            </div>
-                        )}
-
-                        {errors.submit && (
-                            <div style={styles.errorMessage}>
-                                ⚠️ {errors.submit}
+                                {translatedText.successMessage}
                             </div>
                         )}
 
                         <form onSubmit={handleSubmit}>
-                            <div style={styles.formGrid}>
-                                <div style={styles.formGroup}>
-                                    <label style={styles.label}>
-                                        First Name <span style={styles.required}>*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="firstName"
-                                        value={formData.firstName}
-                                        onChange={handleChange}
-                                        onFocus={() => setFocusedField('firstName')}
-                                        onBlur={() => setFocusedField('')}
-                                        style={getInputStyle('firstName')}
-                                        placeholder="Enter your first name"
-                                    />
-                                    {errors.firstName && (
-                                        <div style={styles.errorMessage}>
-                                            ⚠️ {errors.firstName}
-                                        </div>
-                                    )}
+                            <div style={styles.row}>
+                                <div style={styles.column}>
+                                    <div style={styles.formGroup}>
+                                        <label style={styles.label} htmlFor="firstName">{translatedText.firstName}</label>
+                                        <input
+                                            type="text"
+                                            id="firstName"
+                                            name="firstName"
+                                            value={formData.firstName}
+                                            onChange={handleChange}
+                                            style={styles.input}
+                                            placeholder="John"
+                                        />
+                                        {errors.firstName && <div style={styles.error}>{errors.firstName}</div>}
+                                    </div>
                                 </div>
-
-                                <div style={styles.formGroup}>
-                                    <label style={styles.label}>
-                                        Last Name <span style={styles.required}>*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="lastName"
-                                        value={formData.lastName}
-                                        onChange={handleChange}
-                                        onFocus={() => setFocusedField('lastName')}
-                                        onBlur={() => setFocusedField('')}
-                                        style={getInputStyle('lastName')}
-                                        placeholder="Enter your last name"
-                                    />
-                                    {errors.lastName && (
-                                        <div style={styles.errorMessage}>
-                                            ⚠️ {errors.lastName}
-                                        </div>
-                                    )}
+                                <div style={styles.column}>
+                                    <div style={styles.formGroup}>
+                                        <label style={styles.label} htmlFor="lastName">{translatedText.lastName}</label>
+                                        <input
+                                            type="text"
+                                            id="lastName"
+                                            name="lastName"
+                                            value={formData.lastName}
+                                            onChange={handleChange}
+                                            style={styles.input}
+                                            placeholder="Doe"
+                                        />
+                                        {errors.lastName && <div style={styles.error}>{errors.lastName}</div>}
+                                    </div>
                                 </div>
                             </div>
 
-                            <div style={styles.formGrid}>
-                                <div style={styles.formGroup}>
-                                    <label style={styles.label}>
-                                        Email Address <span style={styles.required}>*</span>
-                                    </label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        onFocus={() => setFocusedField('email')}
-                                        onBlur={() => setFocusedField('')}
-                                        style={getInputStyle('email')}
-                                        placeholder="Enter your email address"
-                                    />
-                                    {errors.email && (
-                                        <div style={styles.errorMessage}>
-                                            ⚠️ {errors.email}
-                                        </div>
-                                    )}
-                                </div>
+                            <div style={styles.formGroup}>
+                                <label style={styles.label} htmlFor="email">{translatedText.email}</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    style={styles.input}
+                                    placeholder="john.doe@example.com"
+                                />
+                                {errors.email && <div style={styles.error}>{errors.email}</div>}
+                            </div>
 
-                                <div style={styles.formGroup}>
-                                    <label style={styles.label}>
-                                        Telegram ID <span style={styles.required}>*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="telegram"
-                                        value={formData.telegram}
-                                        onChange={handleChange}
-                                        onFocus={() => setFocusedField('telegram')}
-                                        onBlur={() => setFocusedField('')}
-                                        style={getInputStyle('telegram')}
-                                        placeholder="Enter your Telegram ID (e.g., @username)"
-                                    />
-                                    {errors.telegram && (
-                                        <div style={styles.errorMessage}>
-                                            ⚠️ {errors.telegram}
-                                        </div>
-                                    )}
+                            <div style={styles.formGroup}>
+                                <label style={styles.label} htmlFor="telegram">{translatedText.telegram}</label>
+                                <input
+                                    type="text"
+                                    id="telegram"
+                                    name="telegram"
+                                    value={formData.telegram}
+                                    onChange={handleChange}
+                                    style={styles.input}
+                                    placeholder="@username"
+                                />
+                                {errors.telegram && <div style={styles.error}>{errors.telegram}</div>}
+                            </div>
+
+                            <div style={styles.row}>
+                                <div style={styles.column}>
+                                    <div style={styles.formGroup}>
+                                        <label style={styles.label} htmlFor="company">{translatedText.company}</label>
+                                        <input
+                                            type="text"
+                                            id="company"
+                                            name="company"
+                                            value={formData.company}
+                                            onChange={handleChange}
+                                            style={styles.input}
+                                            placeholder="Company Name"
+                                        />
+                                    </div>
+                                </div>
+                                <div style={styles.column}>
+                                    <div style={styles.formGroup}>
+                                        <label style={styles.label} htmlFor="jobTitle">{translatedText.jobTitle}</label>
+                                        <input
+                                            type="text"
+                                            id="jobTitle"
+                                            name="jobTitle"
+                                            value={formData.jobTitle}
+                                            onChange={handleChange}
+                                            style={styles.input}
+                                            placeholder="Your Position"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div style={styles.formGrid}>
-                                <div style={styles.formGroup}>
-                                    <label style={styles.label}>Category</label>
-                                    <select
-                                        name="category"
-                                        value={formData.category}
-                                        onChange={handleChange}
-                                        onFocus={() => setFocusedField('category')}
-                                        onBlur={() => setFocusedField('')}
-                                        style={getSelectStyle('category')}
-                                    >
-                                        <option value="">Select your category</option>
-                                        {categories.map(category => (
-                                            <option key={category} value={category} style={{ color: colors.textSecondary }}>{category}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div style={styles.formGroup}>
-                                    <label style={styles.label}>
-                                        Subject <span style={styles.required}>*</span>
-                                    </label>
-                                    <select
-                                        name="subject"
-                                        value={formData.subject}
-                                        onChange={handleChange}
-                                        onFocus={() => setFocusedField('subject')}
-                                        onBlur={() => setFocusedField('')}
-                                        style={getSelectStyle('subject')}
-                                    >
-                                        <option value="">Select a subject</option>
-                                        {subjects.map(subject => (
-                                            <option key={subject} value={subject}>{subject}</option>
-                                        ))}
-                                    </select>
-                                    {errors.subject && (
-                                        <div style={styles.errorMessage}>
-                                            ⚠️ {errors.subject}
-                                        </div>
-                                    )}
-                                </div>
+                            <div style={styles.formGroup}>
+                                <label style={styles.label} htmlFor="category">{translatedText.country}</label>
+                                <select
+                                    id="category"
+                                    name="category"
+                                    value={formData.category}
+                                    onChange={handleChange}
+                                    style={styles.select}
+                                >
+                                    <option value="">-- Select Country --</option>
+                                    {categories.map((category, index) => (
+                                        <option key={index} value={category}>{category}</option>
+                                    ))}
+                                </select>
+                                {errors.category && <div style={styles.error}>{errors.category}</div>}
                             </div>
 
-                            <div style={styles.formGroupFull}>
-                                <label style={styles.label}>
-                                    Message <span style={styles.required}>*</span>
-                                </label>
+                            <div style={styles.formGroup}>
+                                <label style={styles.label} htmlFor="subject">{translatedText.subject}</label>
+                                <select
+                                    id="subject"
+                                    name="subject"
+                                    value={formData.subject}
+                                    onChange={handleChange}
+                                    style={styles.select}
+                                >
+                                    <option value="">-- Select Subject --</option>
+                                    {subjects.map((subject, index) => (
+                                        <option key={index} value={subject}>{subject}</option>
+                                    ))}
+                                </select>
+                                {errors.subject && <div style={styles.error}>{errors.subject}</div>}
+                            </div>
+
+                            <div style={styles.formGroup}>
+                                <label style={styles.label} htmlFor="message">{translatedText.message}</label>
                                 <textarea
+                                    id="message"
                                     name="message"
                                     value={formData.message}
                                     onChange={handleChange}
-                                    onFocus={() => setFocusedField('message')}
-                                    onBlur={() => setFocusedField('')}
-                                    style={getTextareaStyle()}
-                                    placeholder="Tell us more about your inquiry..."
-                                    rows={5}
+                                    style={styles.textarea}
+                                    placeholder="How can we help you?"
+                                ></textarea>
+                                {errors.message && <div style={styles.error}>{errors.message}</div>}
+                            </div>
+
+                            <div style={styles.formGroup}>
+                                <label style={styles.label} htmlFor="howDidYouHear">{translatedText.howDidYouHear}</label>
+                                <input
+                                    type="text"
+                                    id="howDidYouHear"
+                                    name="howDidYouHear"
+                                    value={formData.howDidYouHear}
+                                    onChange={handleChange}
+                                    style={styles.input}
+                                    placeholder="Google, Social Media, Friend, etc."
                                 />
-                                {errors.message && (
-                                    <div style={styles.errorMessage}>
-                                        ⚠️ {errors.message}
-                                    </div>
-                                )}
+                            </div>
+
+                            <div style={styles.checkboxContainer}>
+                                <input
+                                    type="checkbox"
+                                    id="newsletter"
+                                    name="newsletter"
+                                    checked={formData.newsletter}
+                                    onChange={handleChange}
+                                    style={styles.checkbox}
+                                />
+                                <label htmlFor="newsletter" style={styles.checkboxLabel}>{translatedText.newsletter}</label>
                             </div>
 
                             <button
                                 type="submit"
+                                style={{
+                                    ...styles.submitButton,
+                                    ...(isSubmitting ? styles.submitButtonDisabled : {})
+                                }}
                                 disabled={isSubmitting}
-                                style={getButtonStyle()}
-                                onMouseEnter={() => setHoveredButton(true)}
-                                onMouseLeave={() => setHoveredButton(false)}
                             >
-                                {isSubmitting ? 'Sending...' : 'Send Message'}
+                                {isSubmitting ? translatedText.submitting : translatedText.submit}
                             </button>
                         </form>
                     </div>
 
-                    <ContactInfoSection />
+                    <div style={styles.contactColumn}>
+                        <ContactInfoSection />
+                    </div>
                 </div>
             </div>
-
-            {/* Demo controls for testing */}
-            {/* <div style={{
-                position: 'fixed',
-                bottom: '20px',
-                right: '20px',
-                backgroundColor: colors.cardBackground,
-                padding: '15px',
-                borderRadius: '8px',
-                border: `1px solid ${colors.borderColor}`,
-                boxShadow: isDarkMode ? '0 4px 6px rgba(0, 0, 0, 0.3)' : '0 4px 6px rgba(0, 0, 0, 0.1)',
-                zIndex: 1000,
-                transition: 'all 0.3s ease'
-            }}>
-                <button
-                    onClick={() => {
-                        if (document.documentElement.classList.contains('dark-theme')) {
-                            document.documentElement.classList.remove('dark-theme');
-                        } else {
-                            document.documentElement.classList.add('dark-theme');
-                        }
-                    }}
-                    style={{
-                        backgroundColor: '#3498db',
-                        color: 'white',
-                        border: 'none',
-                        padding: '8px 16px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        fontWeight: '500'
-                    }}
-                >
-                    Toggle Dark Mode
-                </button>
-                <div style={{ 
-                    fontSize: '12px', 
-                    color: colors.textSecondary, 
-                    marginTop: '8px',
-                    textAlign: 'center' 
-                }}>
-                    Demo: {isDarkMode ? 'Dark' : 'Light'} Mode
-                </div>
-            </div> */}
         </div>
     );
 };

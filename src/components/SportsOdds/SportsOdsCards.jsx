@@ -90,7 +90,6 @@ export default function BettingCards() {
         placeBet: 'Place Bet',
         potentialWinnings: 'Potential Winnings',
         selectOdds: 'Select your odds and enter stake to place your bet',
-        // betSuccess: '✓ Bet Placed Successfully!',
         betSuccess: 'Play responsibly at your own risk',
         team1Win: 'Team 1 Win',
         draw: 'Draw',
@@ -102,35 +101,49 @@ export default function BettingCards() {
 
     useEffect(() => {
         const translateLabels = async () => {
-            const [
-                bettingOdds, allTournaments, loading, loadingSubtext, noEvents, matchWinner, live,
-                vs, enterStake, placeBet, potentialWinnings, selectOdds, betSuccess,
-                team1Win, draw, team2Win, potentialProfit
-            ] = await Promise.all([
-                translateText('Betting Odds', 'en', language),
-                translateText('All Tournaments', 'en', language),
-                translateText('Loading events...', 'en', language),
-                translateText('Please wait while we fetch the latest betting odds', 'en', language),
-                translateText('No events available', 'en', language),
-                translateText('Match Winner', 'en', language),
-                translateText('Live', 'en', language),
-                translateText('VS', 'en', language),
-                translateText('Enter stake amount', 'en', language),
-                translateText('Place Bet', 'en', language),
-                translateText('Potential Winnings', 'en', language),
-                translateText('Select your odds and enter stake to place your bet', 'en', language),
-                // translateText('✓ Bet Placed Successfully!', 'en', language),
-                translateText('Play responsibly at your own risk!', 'en', language),
-                translateText('Team 1 Win', 'en', language),
-                translateText('Draw', 'en', language),
-                translateText('Team 2 Win', 'en', language),
-                translateText('Potential Profit', 'en', language),
-            ]);
-
+            // Create an array of text objects for batch translation
+            const textsToTranslate = [
+                { text: 'Betting Odds', to: language },
+                { text: 'All Tournaments', to: language },
+                { text: 'Loading events...', to: language },
+                { text: 'Please wait while we fetch the latest betting odds', to: language },
+                { text: 'No events available', to: language },
+                { text: 'Match Winner', to: language },
+                { text: 'Live', to: language },
+                { text: 'VS', to: language },
+                { text: 'Enter stake amount', to: language },
+                { text: 'Place Bet', to: language },
+                { text: 'Potential Winnings', to: language },
+                { text: 'Select your odds and enter stake to place your bet', to: language },
+                { text: 'Play responsibly at your own risk!', to: language },
+                { text: 'Team 1 Win', to: language },
+                { text: 'Draw', to: language },
+                { text: 'Team 2 Win', to: language },
+                { text: 'Potential Profit', to: language }
+            ];
+            
+            // Get translations in a single API call
+            const translations = await translateText(textsToTranslate, 'en', language);
+            
+            // Update state with the translated texts
             setTranslatedText({
-                bettingOdds, allTournaments, loading, loadingSubtext, noEvents, matchWinner, live,
-                vs, enterStake, placeBet, potentialWinnings, selectOdds, betSuccess,
-                team1Win, draw, team2Win, potentialProfit
+                bettingOdds: translations[0],
+                allTournaments: translations[1],
+                loading: translations[2],
+                loadingSubtext: translations[3],
+                noEvents: translations[4],
+                matchWinner: translations[5],
+                live: translations[6],
+                vs: translations[7],
+                enterStake: translations[8],
+                placeBet: translations[9],
+                potentialWinnings: translations[10],
+                selectOdds: translations[11],
+                betSuccess: translations[12],
+                team1Win: translations[13],
+                draw: translations[14],
+                team2Win: translations[15],
+                potentialProfit: translations[16]
             });
         };
 
@@ -147,7 +160,7 @@ export default function BettingCards() {
     };
 
     const allTournaments = getAllTournaments();
-
+    
     const getSelectedTournamentName = () => {
         if (!selectedTournament || selectedTournament === 'all') {
             return translatedText.allTournaments;
@@ -298,7 +311,6 @@ export default function BettingCards() {
     );
 }
 
-// ... rest of your existing functions (transformEventToCard, fetchMarketData, SportsOddsCard)
 function transformEventToCard(event, marketData) {
     // console.log(event.imageOpponent2[0], "eve");
     // console.log(marketData, "market dtaaasd")

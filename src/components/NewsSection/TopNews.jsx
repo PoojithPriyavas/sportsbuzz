@@ -9,7 +9,6 @@ import { useDynamicRouter } from '@/hooks/useDynamicRouter';
 
 const NewsList = () => {
   const { news, fetchNewsDetails, language, translateText } = useGlobalData();
-  // console.log(news, "newssssss")
   const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
   const stories = useMemo(() => {
     return news?.storyList?.filter(item => item.story)?.map(item => item.story) || [];
@@ -24,39 +23,66 @@ const NewsList = () => {
 
   // Translate headlines and article titles on language or data change
   useEffect(() => {
-    // console.log("this useffect is the issue")
     const translateAll = async () => {
       if (!stories.length) return;
 
-      // Translate static header strings
-      const [title, subtitle] = await Promise.all([
-        translateText('Latest News', 'en', language),
-        translateText('Stay informed with the latest updates', 'en', language),
-      ]);
-      setTranslatedHeader({ title, subtitle });
-
-      // Translate story headlines and captions
-      const translated = await Promise.all(
-        stories.map(async (item) => {
-          const translatedTitle = await translateText(item.hline, 'en', language);
-          const translatedIntro = item.intro
-            ? await translateText(item.intro, 'en', language)
-            : '';
-          const originalCaption = item.coverImage?.caption || '';
-          const translatedCaption = originalCaption
-            ? await translateText(originalCaption, 'en', language)
-            : '';
-
-          return {
-            ...item,
-            translatedTitle,
-            translatedIntro,
-            translatedCaption,
-          };
-        })
-      );
-
-      setTranslatedNews(translated);
+      // Create a single array of all texts that need translation
+      const textsToTranslate = [
+        // Static header texts
+        { text: 'Latest News', to: language },
+        { text: 'Stay informed with the latest updates', to: language }
+      ];
+      
+      // Add all story headlines, intros, and captions to the batch
+      stories.forEach(item => {
+        textsToTranslate.push({ text: item.hline, to: language });
+        
+        if (item.intro) {
+          textsToTranslate.push({ text: item.intro, to: language });
+        }
+        
+        if (item.coverImage?.caption) {
+          textsToTranslate.push({ text: item.coverImage.caption, to: language });
+        }
+      });
+      
+      // Translate everything in one batch
+      const allTranslations = await translateText(textsToTranslate, 'en', language);
+      
+      // Extract header translations
+      setTranslatedHeader({
+        title: allTranslations[0],
+        subtitle: allTranslations[1]
+      });
+      
+      // Process story translations
+      const translatedStories = [];
+      let translationIndex = 2; // Start after the header translations
+      
+      for (const item of stories) {
+        const translatedItem = { ...item };
+        
+        // Add headline translation
+        translatedItem.translatedTitle = allTranslations[translationIndex++];
+        
+        // Add intro translation if it exists
+        if (item.intro) {
+          translatedItem.translatedIntro = allTranslations[translationIndex++];
+        } else {
+          translatedItem.translatedIntro = '';
+        }
+        
+        // Add caption translation if it exists
+        if (item.coverImage?.caption) {
+          translatedItem.translatedCaption = allTranslations[translationIndex++];
+        } else {
+          translatedItem.translatedCaption = '';
+        }
+        
+        translatedStories.push(translatedItem);
+      }
+      
+      setTranslatedNews(translatedStories);
     };
 
     translateAll();
@@ -100,16 +126,6 @@ const NewsList = () => {
               className={styles.newsItem}
               onClick={() => openNews(item)}
             >
-              {/* <div className={styles.thumbnail}>
-              {item.coverImage?.id && (
-                <img
-                  src={`https://your-image-base-url/${item.coverImage.id}`} // Update with your actual image base URL
-                  alt={item.translatedCaption || 'News Thumbnail'}
-                  className={styles.thumbnailImage}
-                />
-              )}
-            </div> */}
-
               <div className={styles.newsInfo}>
                 <h3 className={styles.newsTitle}>{item.translatedTitle}</h3>
                 {item.translatedIntro && (
@@ -137,7 +153,6 @@ const NewsList = () => {
         </div>
       </div>
     </div>
-
   );
 };
 

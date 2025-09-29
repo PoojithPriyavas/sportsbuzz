@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import { useDynamicRouter } from '@/hooks/useDynamicRouter';
 
 // Utility to format match date
-function formatDate(esd) {
+function formatDate(esd, labels = { today: 'Today', tomorrow: 'Tomorrow' }) {
     const raw = esd?.toString();
     if (!raw || raw.length !== 14) return '';
 
@@ -33,9 +33,9 @@ function formatDate(esd) {
     tomorrow.setHours(0, 0, 0, 0);
 
     if (matchDate.getTime() === today.getTime()) {
-        return `Today ${timeString}`;
+        return `${labels.today} ${timeString}`;
     } else if (matchDate.getTime() === tomorrow.getTime()) {
-        return `Tomorrow ${timeString}`;
+        return `${labels.tomorrow} ${timeString}`;
     } else {
         return `${day}/${month}/${year} ${timeString}`;
     }
@@ -54,21 +54,62 @@ function getTime(esd) {
 
     return `${hour12}:${minute} ${period}`;
 }
-export default function UpcomingFootballMatches() {
-    const { upcoming, fetchFootBallLineUp, fetchFootballDetails } = useGlobalData();
 
-    // console.log(upcoming, "upcoming values")
+export default function UpcomingFootballMatches() {
+    const { upcoming, fetchFootBallLineUp, fetchFootballDetails, language, translateText } = useGlobalData();
     const [selectedLeague, setSelectedLeague] = useState('All');
     const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
-    // console.log(upcoming, "up ckaskjdjsd")
+    const router = useRouter();
+    
+    const [translatedText, setTranslatedText] = useState({
+        footballSchedules: 'Football Schedules',
+        viewAll: 'view all',
+        today: 'Today',
+        tomorrow: 'Tomorrow',
+        all: 'All',
+        live: 'LIVE',
+        finished: 'FT'
+    });
+
+    useEffect(() => {
+        const translateLabels = async () => {
+            // Create an array of text objects for batch translation
+            const textsToTranslate = [
+                { text: 'Football Schedules', to: language },
+                { text: 'view all', to: language },
+                { text: 'Today', to: language },
+                { text: 'Tomorrow', to: language },
+                { text: 'All', to: language },
+                { text: 'LIVE', to: language },
+                { text: 'FT', to: language }
+            ];
+            
+            // Get translations in a single API call
+            const translations = await translateText(textsToTranslate, 'en', language);
+            
+            // Update state with the translated texts
+            setTranslatedText({
+                footballSchedules: translations[0],
+                viewAll: translations[1],
+                today: translations[2],
+                tomorrow: translations[3],
+                all: translations[4],
+                live: translations[5],
+                finished: translations[6]
+            });
+        };
+
+        translateLabels();
+    }, [language, translateText]);
+
     // Prepare league names
     const allLeagues = upcoming?.Stages?.map(stage => stage?.Cnm).filter(Boolean) || [];
     const uniqueLeagues = Array.from(new Set(allLeagues));
-    const router = useRouter();
+    
     // Group matches by league
     const groupedMatches = {};
     upcoming?.Stages
-        ?.filter(stage => selectedLeague === 'All' || stage?.Cnm === selectedLeague)
+        ?.filter(stage => selectedLeague === translatedText.all || stage?.Cnm === selectedLeague)
         ?.forEach(stage => {
             const leagueKey = stage?.Cnm;
             if (!groupedMatches[leagueKey]) {
@@ -94,8 +135,8 @@ export default function UpcomingFootballMatches() {
         <div className={styles["football-matches-container"]}>
             {/* Header */}
             <div className={styles["football-matches-header"]}>
-                <h4 className={styles["football-matches-title"]}>Football Schedules</h4>
-                <a href="#" className={styles["football-matches-view-all"]}>view all</a>
+                <h4 className={styles["football-matches-title"]}>{translatedText.footballSchedules}</h4>
+                <a href="#" className={styles["football-matches-view-all"]}>{translatedText.viewAll}</a>
             </div>
 
             {/* Match List */}
@@ -132,7 +173,7 @@ export default function UpcomingFootballMatches() {
                                                 {isFinished ? '00:' + getTime(event.Esd).split(':')[1] : getTime(event.Esd)}
                                             </div>
                                             <div className={`${styles["football-status"]} ${isLive ? styles["live"] : ""} ${isFinished ? styles["finished"] : ""}`}>
-                                                {isFinished ? 'FT' : (isLive ? 'LIVE' : '-')}
+                                                {isFinished ? translatedText.finished : (isLive ? translatedText.live : '-')}
                                             </div>
                                         </div>
 
@@ -172,6 +213,5 @@ export default function UpcomingFootballMatches() {
                 ))}
             </div>
         </div>
-
     );
 }

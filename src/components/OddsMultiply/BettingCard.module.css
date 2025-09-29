@@ -18,6 +18,7 @@
     margin: 0;
     background-clip: text;
     position: relative;
+    font-size: 18px;
 }
 
 .filterContainer {
