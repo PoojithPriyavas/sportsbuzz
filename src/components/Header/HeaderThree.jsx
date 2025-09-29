@@ -371,12 +371,29 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     });
     const [filteredList, setFilteredList] = useState([]);
 
-    // Load saved language on component mount
+    // Load saved language and cached translations on component mount
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const savedLanguage = localStorage.getItem('language');
+            const cachedTranslations = localStorage.getItem('cachedTranslations');
+            
             if (savedLanguage && savedLanguage !== language) {
                 setLanguage(savedLanguage);
+            }
+            
+            // If we have cached translations for the current language, use them immediately
+            if (cachedTranslations) {
+                try {
+                    const parsed = JSON.parse(cachedTranslations);
+                    if (parsed.language === language) {
+                        setTranslatedText(prev => ({
+                            ...prev,
+                            ...parsed.translations
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Error parsing cached translations:', error);
+                }
             }
         }
     }, []);
@@ -482,8 +499,14 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         updateTranslations();
     }, [language, translateText, blogCategories]);
 
+    // Add a new state for tracking translation loading
+    const [isTranslating, setIsTranslating] = useState(false);
+
     // Updated handleLanguageChange function
-    const handleLanguageChange = (selectedLanguage) => {
+    const handleLanguageChange = async (selectedLanguage) => {
+        // Set loading state
+        setIsTranslating(true);
+        
         // Update language in state and localStorage
         setLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
@@ -493,34 +516,86 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         if (isMobile) {
             setMobileMenuOpen(false);
         }
-    
-        // Get current URL path parts
-        const { countryCode: currentCountryCode } = parseUrlPath(pathname);
         
-        // If we have a valid country code in the URL
-        if (currentCountryCode) {
-            // Get the current URL
-            const currentUrl = new URL(window.location.href);
+        try {
+            // Pre-fetch translations before navigation
+            const textsToTranslate = [
+                { text: 'Home' },
+                { text: 'Best Betting Apps' },
+                { text: 'News' },
+                { text: 'Match Schedules' },
+                { text: 'Cricket' },
+                { text: 'Football' },
+                { text: 'Contact' },
+                { text: 'Language' },
+                { text: 'Sport' }
+            ];
             
-            // Get the path without the domain
-            let path = currentUrl.pathname;
+            // Get translations in a single API call
+            const translations = await translateText(textsToTranslate, 'en', selectedLanguage);
             
-            // Replace the language code in the path
-            // First segment is language-country, so we replace it with newlanguage-country
-            const newPath = path.replace(/^\/([a-z]{2})-([a-z]{2})/, `/${selectedLanguage}-${currentCountryCode}`);
+            // Update state with the translated texts
+            setTranslatedText(prev => ({
+                ...prev,
+                home: translations[0],
+                apps: translations[1],
+                news: translations[2],
+                schedule: translations[3],
+                cricket: translations[4],
+                football: translations[5],
+                contact: translations[6],
+                language: translations[7],
+                sport: translations[8]
+            }));
             
-            // Create the new URL with the updated path
-            const newUrl = new URL(newPath, window.location.origin);
+            // Cache translations in localStorage to prevent flashing
+            localStorage.setItem('cachedTranslations', JSON.stringify({
+                language: selectedLanguage,
+                translations: {
+                    home: translations[0],
+                    apps: translations[1],
+                    news: translations[2],
+                    schedule: translations[3],
+                    cricket: translations[4],
+                    football: translations[5],
+                    contact: translations[6],
+                    language: translations[7],
+                    sport: translations[8]
+                }
+            }));
             
-            // Keep any existing query parameters
-            newUrl.search = currentUrl.search;
+            // Get current URL path parts
+            const { countryCode: currentCountryCode } = parseUrlPath(pathname);
             
-            console.log('🔄 Navigating to new language path:', newUrl.toString());
-            
-            // Navigate to the new URL
-            window.location.href = newUrl.toString();
-        } else {
-            console.error('No country code found in URL');
+            // If we have a valid country code in the URL
+            if (currentCountryCode) {
+                // Get the current URL
+                const currentUrl = new URL(window.location.href);
+                
+                // Get the path without the domain
+                let path = currentUrl.pathname;
+                
+                // Replace the language code in the path
+                // First segment is language-country, so we replace it with newlanguage-country
+                const newPath = path.replace(/^\/([a-z]{2})-([a-z]{2})/, `/${selectedLanguage}-${currentCountryCode}`);
+                
+                // Create the new URL with the updated path
+                const newUrl = new URL(newPath, window.location.origin);
+                
+                // Keep any existing query parameters
+                newUrl.search = currentUrl.search;
+                
+                console.log('🔄 Navigating to new language path:', newUrl.toString());
+                
+                // Now that translations are complete, navigate to the new URL
+                window.location.href = newUrl.toString();
+            } else {
+                console.error('No country code found in URL');
+                setIsTranslating(false);
+            }
+        } catch (error) {
+            console.error('Translation error before navigation:', error);
+            setIsTranslating(false);
         }
     };
 
@@ -696,10 +771,10 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                             {filteredList.map((lang) => (
                                 <div
                                     key={lang.hreflang}
-                                    className={`${styles.mobileSubmenuItem} ${language === lang.hreflang ? styles.active : ''}`}
-                                    onClick={() => handleLanguageChange(lang.hreflang)}
+                                    className={`${styles.mobileSubmenuItem} ${language === lang.hreflang ? styles.active : ''} ${isTranslating ? styles.disabled : ''}`}
+                                    onClick={() => !isTranslating && handleLanguageChange(lang.hreflang)}
                                 >
-                                    {lang.language}
+                                    {lang.language} {isTranslating && lang.hreflang === language ? '(loading...)' : ''}
                                 </div>
                             ))}
                         </div>
@@ -858,14 +933,16 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
 
                 {/* Desktop Right Section */}
                 <div className={styles.rightSection}>
+                   
                     <select
                         className={styles.languageSelector}
                         value={language}
                         onChange={(e) => handleLanguageChange(e.target.value)}
+                        disabled={isTranslating}
                     >
                         {filteredList.map((lang) => (
                             <option key={lang.hreflang} value={lang.hreflang}>
-                                {lang.language}
+                                {lang.language} {isTranslating && lang.hreflang === language ? '(loading...)' : ''}
                             </option>
                         ))}
                     </select>
