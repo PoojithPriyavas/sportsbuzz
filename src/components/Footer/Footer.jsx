@@ -16,12 +16,30 @@ import {
     FaWhatsapp
 } from 'react-icons/fa';
 import { useGlobalData } from '../Context/ApiContext';
+import { usePathHelper } from '@/hooks/usePathHelper';
+import { useRouter } from 'next/router';
 
 const FooterTwo = () => {
     const { translateText, language, settings, sport, setSport, blogCategories } = useGlobalData();
-
+    const { pathPrefix, buildPath } = usePathHelper();
+    const router = useRouter();
     const contact = settings?.[0] || {};
     const [translatedBlogCategories, setTranslatedBlogCategories] = useState([]);
+    const [isMobile, setIsMobile] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    
+    useEffect(() => {
+        const checkIfMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        
+        checkIfMobile();
+        window.addEventListener('resize', checkIfMobile);
+        
+        return () => {
+            window.removeEventListener('resize', checkIfMobile);
+        };
+    }, []);
     
     const handleSportChange = (newSport) => {
         setSport(newSport);
@@ -30,8 +48,8 @@ const FooterTwo = () => {
             setMobileMenuOpen(false);
         }
 
-        // Navigate to the new sport page
-        router.push(`/${newSport}`);
+        // Navigate to the new sport page with pathPrefix
+        router.push(buildPath(`/${newSport}`));
     };
 
     const [translatedText, setTranslatedText] = useState({
@@ -174,11 +192,11 @@ const FooterTwo = () => {
                     <div className={styles.col}>
                         <h3 className={styles.title}>{translatedText.quickLinks}</h3>
                         <ul className={styles.linkList}>
-                            <li><a href="/">{translatedText.home}</a></li>
-                            {/* <li><a href="/live-scores">{translatedText.liveScores}</a></li> */}
-                            <li><a href="/best-betting-apps/current">{translatedText.bestApps}</a></li>
-                            <li><a href="/blogs/pages/all-blogs">{translatedText.blogs}</a></li>
-                            <li><a href="/contact">{translatedText.contactUs}</a></li>
+                            <li><a href={buildPath("/")}>{translatedText.home}</a></li>
+                            {/* <li><a href={buildPath("/live-scores")}>{translatedText.liveScores}</a></li> */}
+                            <li><a href={buildPath("/best-betting-apps/current")}>{translatedText.bestApps}</a></li>
+                            <li><a href={buildPath("/blogs/pages/all-blogs")}>{translatedText.blogs}</a></li>
+                            <li><a href={buildPath("/contact")}>{translatedText.contactUs}</a></li>
                         </ul>
                     </div>
 
@@ -206,7 +224,7 @@ const FooterTwo = () => {
                             {translatedBlogCategories && translatedBlogCategories.length > 0 ? (
                                 translatedBlogCategories.map((category) => (
                                     <li key={category.id}>
-                                        <a href={`/blogs/pages/all-blogs?category=${category.id}`}>
+                                        <a href={buildPath(`/blogs/pages/all-blogs?category=${category.id}`)}>
                                             {category.name}
                                         </a>
                                         {/* If you want to show subcategories as well, uncomment below */}
@@ -214,7 +232,7 @@ const FooterTwo = () => {
                                             <ul className={styles.subCategoryList}>
                                                 {category.subcategories.map((sub) => (
                                                     <li key={sub.id}>
-                                                        <a href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}>
+                                                        <a href={buildPath(`/blogs/pages/all-blogs?subcategory=${sub.id}`)}>
                                                             {sub.name}
                                                         </a>
                                                     </li>
@@ -226,8 +244,8 @@ const FooterTwo = () => {
                             ) : (
                                 // Fallback to static categories if dynamic ones are not available
                                 <>
-                                    <li><a href="/blogs/pages/all-blogs?category=1">{translatedText.cricket}</a></li>
-                                    <li><a href="/blogs/pages/all-blogs?category=2">{translatedText.football}</a></li>
+                                    <li><a href={buildPath("/blogs/pages/all-blogs?category=1")}>{translatedText.cricket}</a></li>
+                                    <li><a href={buildPath("/blogs/pages/all-blogs?category=2")}>{translatedText.football}</a></li>
                                 </>
                             )}
                         </ul>
@@ -263,8 +281,8 @@ const FooterTwo = () => {
                         </span>
                     </div>
                     <div className={styles.bottomRight}>
-                        <a href="/terms">{translatedText.terms}</a>
-                        <a href="/privacy">{translatedText.privacy}</a>
+                        <a href={buildPath("/terms")}>{translatedText.terms}</a>
+                        <a href={buildPath("/privacy")}>{translatedText.privacy}</a>
                     </div>
                 </div>
             </div>

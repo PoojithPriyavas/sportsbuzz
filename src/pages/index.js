@@ -95,6 +95,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
     activeEvenBanners,
     bannerLoading
   } = useGlobalData();
+  console.log(apiResponse,"api response")
   console.log(blogs, "blogs in index")
 
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
