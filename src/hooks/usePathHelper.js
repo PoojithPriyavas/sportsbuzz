@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { usePathname } from 'next/navigation';
+import { useMemo } from 'react';
 
 export const usePathHelper = () => {
   const pathname = usePathname();
@@ -21,30 +22,32 @@ export const usePathHelper = () => {
     return '';
   };
   
-  // Get the pathPrefix from the current URL
-  const pathPrefix = parseUrlPath(pathname);
+  // Get the pathPrefix from the current URL - memoized to prevent unnecessary recalculations
+  const pathPrefix = useMemo(() => parseUrlPath(pathname), [pathname]);
   
-  // Build a path with the pathPrefix
-  const buildPath = (path) => {
-    // If the path already starts with the pathPrefix or has its own hreflang-countrycode, return it as is
-    if (pathPrefix && path.startsWith(pathPrefix)) {
-      return path;
-    }
-    
-    // If the path already has a hreflang-countrycode format
-    if (path.match(/^\/[a-z]{2}-[a-z]{2}\//i)) {
-      return path;
-    }
-    
-    // If the path is just "/", add the prefix
-    if (path === '/') {
-      return `${pathPrefix}/`;
-    }
-    
-    // For other paths, ensure we don't add double slashes
-    const cleanPath = path.startsWith('/') ? path : `/${path}`;
-    return `${pathPrefix}${cleanPath}`;
-  };
+  // Build a path with the pathPrefix - memoized function to improve performance
+  const buildPath = useMemo(() => {
+    return (path) => {
+      // If the path already starts with the pathPrefix or has its own hreflang-countrycode, return it as is
+      if (pathPrefix && path.startsWith(pathPrefix)) {
+        return path;
+      }
+      
+      // If the path already has a hreflang-countrycode format
+      if (path.match(/^\/[a-z]{2}-[a-z]{2}\//i)) {
+        return path;
+      }
+      
+      // If the path is just "/", add the prefix
+      if (path === '/') {
+        return `${pathPrefix}/`;
+      }
+      
+      // For other paths, ensure we don't add double slashes
+      const cleanPath = path.startsWith('/') ? path : `/${path}`;
+      return `${pathPrefix}${cleanPath}`;
+    };
+  }, [pathPrefix]);
   
   return {
     pathPrefix,
