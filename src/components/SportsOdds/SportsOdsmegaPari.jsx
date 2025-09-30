@@ -99,56 +99,7 @@ export default function SportsOdsMegaPari() {
 
     const { oneXTournament, oneXAccessToken, fetchOneXEventsIdData, oneXEventDetails, translateText, language } = useGlobalData();
 
-    useEffect(() => {
-        const translateLabels = async () => {
-            // Create an array of text objects for batch translation
-            const textsToTranslate = [
-                { text: 'Betting Odds', to: language },
-                { text: 'All Tournaments', to: language },
-                { text: 'Loading events...', to: language },
-                { text: 'Please wait while we fetch the latest betting odds', to: language },
-                { text: 'No events available', to: language },
-                { text: 'Match Winner', to: language },
-                { text: 'Live', to: language },
-                { text: 'VS', to: language },
-                { text: 'Enter stake amount', to: language },
-                { text: 'Place Bet', to: language },
-                { text: 'Potential Winnings', to: language },
-                { text: 'Select your odds and enter stake to place your bet', to: language },
-                { text: 'Play responsibly at your own risk!', to: language },
-                { text: 'Team 1 Win', to: language },
-                { text: 'Draw', to: language },
-                { text: 'Team 2 Win', to: language },
-                { text: 'Potential Profit', to: language }
-            ];
-            
-            // Get translations in a single API call
-            const translations = await translateText(textsToTranslate, 'en', language);
-            
-            // Update state with the translated texts
-            setTranslatedText({
-                bettingOdds: translations[0],
-                allTournaments: translations[1],
-                loading: translations[2],
-                loadingSubtext: translations[3],
-                noEvents: translations[4],
-                matchWinner: translations[5],
-                live: translations[6],
-                vs: translations[7],
-                enterStake: translations[8],
-                placeBet: translations[9],
-                potentialWinnings: translations[10],
-                selectOdds: translations[11],
-                betSuccess: translations[12],
-                team1Win: translations[13],
-                draw: translations[14],
-                team2Win: translations[15],
-                potentialProfit: translations[16]
-            });
-        };
-
-        translateLabels();
-    }, [language, translateText]);
+    // Remove the initial translation useEffect
 
     const getAllTournaments = () => {
         if (!oneXTournament?.items) return [];
@@ -190,18 +141,70 @@ export default function SportsOdsMegaPari() {
         return cards;
     };
 
+    // Translate only the visible cards
+    const translateVisibleCards = async (cards) => {
+        if (cards.length === 0) return;
+        
+        // Only translate UI elements once
+        const textsToTranslate = [
+            { text: 'Betting Odds', to: language },
+            { text: 'All Tournaments', to: language },
+            { text: 'Loading events...', to: language },
+            { text: 'Please wait while we fetch the latest betting odds', to: language },
+            { text: 'No events available', to: language },
+            { text: 'Match Winner', to: language },
+            { text: 'Live', to: language },
+            { text: 'VS', to: language },
+            { text: 'Enter stake amount', to: language },
+            { text: 'Place Bet', to: language },
+            { text: 'Potential Winnings', to: language },
+            { text: 'Select your odds and enter stake to place your bet', to: language },
+            { text: 'Play responsibly at your own risk!', to: language },
+            { text: 'Team 1 Win', to: language },
+            { text: 'Draw', to: language },
+            { text: 'Team 2 Win', to: language },
+            { text: 'Potential Profit', to: language }
+        ];
+        
+        // Get translations in a single API call
+        const translations = await translateText(textsToTranslate, 'en', language);
+        
+        // Update state with the translated texts
+        setTranslatedText({
+            bettingOdds: translations[0],
+            allTournaments: translations[1],
+            loading: translations[2],
+            loadingSubtext: translations[3],
+            noEvents: translations[4],
+            matchWinner: translations[5],
+            live: translations[6],
+            vs: translations[7],
+            enterStake: translations[8],
+            placeBet: translations[9],
+            potentialWinnings: translations[10],
+            selectOdds: translations[11],
+            betSuccess: translations[12],
+            team1Win: translations[13],
+            draw: translations[14],
+            team2Win: translations[15],
+            potentialProfit: translations[16]
+        });
+    };
+
     useEffect(() => {
         if (oneXEventDetails?.length > 0) {
             setIsLoading(true);
             getTransformedCards(oneXEventDetails).then((cards) => {
                 setTransformedCards(cards);
                 setIsLoading(false);
+                // Only translate the visible cards (up to 4)
+                translateVisibleCards(cards.slice(0, 4));
             });
         } else {
             setTransformedCards([]);
             setIsLoading(false);
         }
-    }, [oneXEventDetails, oneXAccessToken]);
+    }, [oneXEventDetails, oneXAccessToken, language]);
 
     const handleTournamentChange = (tournamentId) => {
         setIsLoading(true);

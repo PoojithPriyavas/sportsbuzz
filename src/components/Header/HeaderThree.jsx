@@ -438,65 +438,102 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     useEffect(() => {
         const updateTranslations = async () => {
             try {
-                // Create an array of text objects for batch translation
-                const textsToTranslate = [
-                    { text: 'Home' },
-                    { text: 'Best Betting Apps' },
-                    { text: 'News' },
-                    { text: 'Match Schedules' },
-                    { text: 'Cricket' },
-                    { text: 'Football' },
-                    { text: 'Contact' },
-                    { text: 'Language' },
-                    { text: 'Sport' }
-                ];
+                // Create a grouped object for all texts that need translation
+                const allTextsToTranslate = {
+                    // Navigation items
+                    navItems: [
+                        'Home',
+                        'Best Betting Apps',
+                        'News',
+                        'Match Schedules',
+                        'Cricket',
+                        'Football',
+                        'Contact',
+                        'Language',
+                        'Sport'
+                    ]
+                };
                 
-                // Get translations in a single API call
-                const translations = await translateText(textsToTranslate, 'en', language);
+                // Add blog categories and subcategories
+                if (blogCategories.length > 0) {
+                    // Add category names
+                    allTextsToTranslate.categories = blogCategories.map(cat => cat.name);
+                    
+                    // Add subcategory names
+                    const allSubcategories = [];
+                    blogCategories.forEach(cat => {
+                        if (cat.subcategories?.length > 0) {
+                            cat.subcategories.forEach(sub => {
+                                allSubcategories.push(sub.name);
+                            });
+                        }
+                    });
+                    
+                    if (allSubcategories.length > 0) {
+                        allTextsToTranslate.subcategories = allSubcategories;
+                    }
+                }
                 
-                // Update state with the translated texts
+                // Get translations in a single API call for all text groups
+                const translatedGroups = await translateText(allTextsToTranslate, 'en', language);
+                
+                // Update navigation item translations
                 setTranslatedText(prev => ({
                     ...prev,
-                    home: translations[0],
-                    apps: translations[1],
-                    news: translations[2],
-                    schedule: translations[3],
-                    cricket: translations[4],
-                    football: translations[5],
-                    contact: translations[6],
-                    language: translations[7],
-                    sport: translations[8]
+                    home: translatedGroups.navItems[0],
+                    apps: translatedGroups.navItems[1],
+                    news: translatedGroups.navItems[2],
+                    schedule: translatedGroups.navItems[3],
+                    cricket: translatedGroups.navItems[4],
+                    football: translatedGroups.navItems[5],
+                    contact: translatedGroups.navItems[6],
+                    language: translatedGroups.navItems[7],
+                    sport: translatedGroups.navItems[8]
                 }));
-            
-                // For blog categories, we'll still use individual calls for now
-                // as the structure is more complex
+                
+                // Update blog categories with their translations
                 if (blogCategories.length > 0) {
-                    const translatedCategories = await Promise.all(
-                        blogCategories.map(async (cat) => {
-                            // Translate category name
-                            const translatedCatName = await translateText(cat.name, 'en', language);
-                            
-                            // Translate subcategories if they exist
-                            let translatedSubs = [];
-                            if (cat.subcategories?.length > 0) {
-                                // Create batch for subcategory names
-                                const subTexts = cat.subcategories.map(sub => ({ text: sub.name }));
-                                const subTranslations = await translateText(subTexts, 'en', language);
-                                
-                                translatedSubs = cat.subcategories.map((sub, index) => ({
+                    let subcategoryIndex = 0;
+                    const translatedCategories = blogCategories.map((cat, catIndex) => {
+                        // Get translated category name
+                        const translatedCatName = translatedGroups.categories[catIndex];
+                        
+                        // Get translated subcategories if they exist
+                        let translatedSubs = [];
+                        if (cat.subcategories?.length > 0) {
+                            translatedSubs = cat.subcategories.map(sub => {
+                                const translatedSubName = translatedGroups.subcategories[subcategoryIndex++];
+                                return {
                                     ...sub,
-                                    name: subTranslations[index],
-                                }));
-                            }
-                            
-                            return {
-                                ...cat,
-                                name: translatedCatName,
-                                subcategories: translatedSubs,
-                            };
-                        })
-                    );
+                                    name: translatedSubName,
+                                };
+                            });
+                        }
+                        
+                        return {
+                            ...cat,
+                            name: translatedCatName,
+                            subcategories: translatedSubs,
+                        };
+                    });
+                    
                     setTranslatedCategories(translatedCategories);
+                    
+                    // Cache translations in localStorage to prevent flashing
+                    localStorage.setItem('cachedTranslations', JSON.stringify({
+                        language: language,
+                        translations: {
+                            home: translatedGroups.navItems[0],
+                            apps: translatedGroups.navItems[1],
+                            news: translatedGroups.navItems[2],
+                            schedule: translatedGroups.navItems[3],
+                            cricket: translatedGroups.navItems[4],
+                            football: translatedGroups.navItems[5],
+                            contact: translatedGroups.navItems[6],
+                            language: translatedGroups.navItems[7],
+                            sport: translatedGroups.navItems[8]
+                        }
+                    }));
                 }
             } catch (error) {
                 console.error('Translation error:', error);
