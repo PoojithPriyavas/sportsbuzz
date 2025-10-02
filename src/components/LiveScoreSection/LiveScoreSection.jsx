@@ -8,40 +8,7 @@ import DynamicLink from '../Common/DynamicLink';
 import { convertToVenueTime, formatMatchTime, getMatchStateDisplay } from '../../utils/TimeZoneUtils';
 
 export default function LiveScores({ apiResponse = [], matchTypes = [], teamImages = [] }) {
-  const { language, translateText } = useGlobalData();
   const [activeType, setActiveType] = useState('');
-  const [translatedText, setTranslatedText] = useState({
-    noLiveMatches: 'No live matches for',
-    loading: 'Loading...',
-    noMatchesAvailable: 'No live matches available',
-    venueTimezone: 'Venue timezone:'
-  });
-
-  // Translate texts using batch translation
-  useEffect(() => {
-    const translateLabels = async () => {
-      // Create an array of text objects for batch translation
-      const textsToTranslate = [
-        { text: 'No live matches for', to: language },
-        { text: 'Loading...', to: language },
-        { text: 'No live matches available', to: language },
-        { text: 'Venue timezone:', to: language }
-      ];
-      
-      // Get translations in a single API call
-      const translations = await translateText(textsToTranslate, 'en', language);
-      
-      // Update state with the translated texts
-      setTranslatedText({
-        noLiveMatches: translations[0],
-        loading: translations[1],
-        noMatchesAvailable: translations[2],
-        venueTimezone: translations[3]
-      });
-    };
-
-    translateLabels();
-  }, [language, translateText]);
 
   // Function to check if a match type has data
   const hasMatchData = (matchType) => {
@@ -84,7 +51,7 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
     );
 
     if (!typeMatch) {
-      return <div className={styles.card}>{translatedText.noLiveMatches} {activeType}</div>;
+      return <div className={styles.card}>No live matches for {activeType}</div>;
     }
 
     const cards = [];
@@ -122,12 +89,13 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
           <DynamicLink href={`/cricket-match-details/${info.matchId}`} key={`match-${info.matchId}`}>
             <div className={styles.card}>
               <div className={styles.status}>
+
                 <span style={matchState.style}> <span className={styles.liveDot}></span><strong style={{paddingLeft:'5px'}}>{matchState.text} </strong></span>
                 <strong>{activeType}</strong>
                 {formattedMatchTime && (
                   <span className={styles.matchTime}>
                     {venueInfo?.timezone && (
-                      <span className={styles.timezone} title={`${translatedText.venueTimezone} ${venueInfo.timezone}`}>🕒</span>
+                      <span className={styles.timezone} title={`Venue timezone: ${venueInfo.timezone}`}>🕒</span>
                     )}
                     {formattedMatchTime}
                   </span>
@@ -176,7 +144,7 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
     });
 
     return cards.length > 0 ? cards : (
-      <div className={styles.card}>{translatedText.noMatchesAvailable}</div>
+      <div className={styles.card}>No live matches available</div>
     );
   };
 
@@ -191,6 +159,15 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
             title={hasMatchData(type) ? `${type} - Has live matches` : `${type} - No live matches`}
           >
             {type}
+            {/* {hasMatchData(type) && (
+              <span style={{
+                marginLeft: '0.5rem',
+                color: '#10b981',
+                fontSize: '0.7rem'
+              }}>
+                ●
+              </span>
+            )} */}
           </span>
         ))}
       </div>

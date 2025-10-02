@@ -116,45 +116,51 @@ function SkeletonCard() {
                         }}></div>
                     </div>
                 </div>
+            </div>
 
-                {/* Match time skeleton */}
-                <div className={styles.matchTime}>
-                    <div className={styles.skeleton} style={{
-                        width: '100px',
-                        height: '12px',
-                        backgroundColor: '#e0e0e0',
-                        margin: '0 auto'
-                    }}></div>
-                </div>
+            {/* Match info skeleton */}
+            <div className={styles.matchInfo}>
+                <div className={styles.skeleton} style={{
+                    width: '80px',
+                    height: '12px',
+                    backgroundColor: '#e0e0e0'
+                }}></div>
+                <div className={styles.skeleton} style={{
+                    width: '60px',
+                    height: '20px',
+                    backgroundColor: '#e0e0e0',
+                    borderRadius: '20px'
+                }}></div>
             </div>
         </div>
     );
 }
 
+// Skeleton Filter Bar Component
 function SkeletonFilterBar() {
     return (
         <div className={styles.leagueSelector}>
-            <span className={styles.selectedLeague}>
-                <div className={styles.skeleton} style={{
-                    width: '40px',
-                    height: '16px',
-                    backgroundColor: '#e0e0e0'
-                }}></div>
-            </span>
+            <div className={styles.skeleton} style={{
+                width: '30px',
+                height: '16px',
+                backgroundColor: '#e0e0e0'
+            }}></div>
             {Array.from({ length: 4 }).map((_, index) => (
-                <span key={index} className={styles.leagueItem}>
-                    <div className={styles.skeleton} style={{
-                        width: index % 2 === 0 ? '60px' : '80px',
+                <div
+                    key={index}
+                    className={styles.skeleton}
+                    style={{
+                        width: `${60 + (index * 10)}px`,
                         height: '16px',
                         backgroundColor: '#e0e0e0'
-                    }}></div>
-                </span>
+                    }}
+                ></div>
             ))}
             <div className={styles.skeleton} style={{
-                width: '120px',
+                width: '100px',
                 height: '30px',
                 backgroundColor: '#e0e0e0',
-                borderRadius: '4px'
+                borderRadius: '6px'
             }}></div>
         </div>
     );
@@ -162,6 +168,7 @@ function SkeletonFilterBar() {
 
 export default function TestLive() {
     const { stages, language, translateText, fetchFootballDetails, fetchFootBallLineUp, setMatchTeams } = useGlobalData();
+    console.log(stages, "stages")
     const [selectedLeague, setSelectedLeague] = useState('All');
     const [translatedStages, setTranslatedStages] = useState([]);
     const [dateLabels, setDateLabels] = useState({ today: 'Today', tomorrow: 'Tomorrow' });
@@ -203,157 +210,82 @@ export default function TestLive() {
             setIsLoading(false);
             setIsTranslating(true);
 
-            // First translate just the date labels for immediate display using batch translation
-            const dateTextsToTranslate = [
-                { text: 'Today', to: language },
-                { text: 'Tomorrow', to: language },
-                { text: 'All', to: language },
-                { text: 'Other Leagues', to: language }
-            ];
-            
-            const dateTranslations = await translateText(dateTextsToTranslate, 'en', language);
-            
-            setDateLabels({ 
-                today: dateTranslations[0], 
-                tomorrow: dateTranslations[1],
-                all: dateTranslations[2],
-                otherLeagues: dateTranslations[3]
-            });
+            // First translate just the date labels for immediate display
+            const [today, tomorrow] = await Promise.all([
+                translateText('Today', 'en', language),
+                translateText('Tomorrow', 'en', language),
+            ]);
+            setDateLabels({ today, tomorrow });
 
-            // Collect all texts that need translation
-            const allTextsToTranslate = [];
-            const textMappings = new Map(); // To track which index corresponds to which stage/event
-
-            // Add league and subleague names
-            stages.Stages.forEach((stage, stageIndex) => {
+            // Then process stages incrementally
+            for (const stage of stages.Stages) {
                 const stageKey = `${stage.Sid}_${stage.Cid}`;
-                
+
                 // Skip if already translated
-                if (translationProgress[stageKey]) return;
-                
-                // Add league name
-                if (stage.Cnm) {
-                    const leagueIndex = allTextsToTranslate.length;
-                    allTextsToTranslate.push({ text: stage.Cnm, to: language });
-                    textMappings.set(`league_${stageKey}`, leagueIndex);
-                }
-                
-                // Add subleague name
-                if (stage.Snm) {
-                    const subleagueIndex = allTextsToTranslate.length;
-                    allTextsToTranslate.push({ text: stage.Snm, to: language });
-                    textMappings.set(`subleague_${stageKey}`, subleagueIndex);
-                }
-                
-                // Add team names and statuses for each event
-                (stage.Events || []).forEach((event, eventIndex) => {
-                    const eventKey = `${stageKey}_${event.Eid}`;
-                    const team1 = event.T1?.[0];
-                    const team2 = event.T2?.[0];
-                    
-                    if (team1?.Nm) {
-                        const team1Index = allTextsToTranslate.length;
-                        allTextsToTranslate.push({ text: team1.Nm, to: language });
-                        textMappings.set(`team1_${eventKey}`, team1Index);
+                if (translationProgress[stageKey]) continue;
+
+                const translatedLeague = await translateText(stage.Cnm || '', 'en', language);
+                const translatedSubLeague = stage.Snm
+                    ? await translateText(stage.Snm, 'en', language)
+                    : '';
+
+                // Update with just this stage's league info first
+                setTranslatedStages(prev => {
+                    const existingIndex = prev.findIndex(s => s.Sid === stage.Sid);
+                    if (existingIndex >= 0) {
+                        const updated = [...prev];
+                        updated[existingIndex] = {
+                            ...updated[existingIndex],
+                            translatedLeague,
+                            translatedSubLeague
+                        };
+                        return updated;
                     }
-                    
-                    if (team2?.Nm) {
-                        const team2Index = allTextsToTranslate.length;
-                        allTextsToTranslate.push({ text: team2.Nm, to: language });
-                        textMappings.set(`team2_${eventKey}`, team2Index);
-                    }
-                    
-                    if (event.Eps) {
-                        const statusIndex = allTextsToTranslate.length;
-                        allTextsToTranslate.push({ text: event.Eps, to: language });
-                        textMappings.set(`status_${eventKey}`, statusIndex);
-                    }
+                    return [
+                        ...prev,
+                        {
+                            ...stage,
+                            translatedLeague,
+                            translatedSubLeague,
+                            translatedEvents: [] // Events will be added later
+                        }
+                    ];
                 });
-            });
-            
-            // If there's nothing to translate, we're done
-            if (allTextsToTranslate.length === 0) {
-                setIsTranslating(false);
-                return;
-            }
-            
-            // Translate everything in one batch
-            const allTranslations = await translateText(allTextsToTranslate, 'en', language);
-            
-            // Process the translations and update the state
-            const newTranslatedStages = [];
-            
-            stages.Stages.forEach((stage) => {
-                const stageKey = `${stage.Sid}_${stage.Cid}`;
-                
-                // Skip if already translated
-                if (translationProgress[stageKey]) {
-                    const existingStage = translatedStages.find(s => s.Sid === stage.Sid);
-                    if (existingStage) {
-                        newTranslatedStages.push(existingStage);
-                    }
-                    return;
-                }
-                
-                // Get translated league and subleague names
-                const translatedLeague = textMappings.has(`league_${stageKey}`) 
-                    ? allTranslations[textMappings.get(`league_${stageKey}`)] 
-                    : stage.Cnm || '';
-                    
-                const translatedSubLeague = textMappings.has(`subleague_${stageKey}`) 
-                    ? allTranslations[textMappings.get(`subleague_${stageKey}`)] 
-                    : stage.Snm || '';
-                
-                // Process events
-                const translatedEvents = (stage.Events || []).map(event => {
-                    const eventKey = `${stageKey}_${event.Eid}`;
+
+                // Then translate events one by one
+                const translatedEvents = [];
+                for (const event of stage.Events || []) {
                     const team1 = event.T1?.[0];
                     const team2 = event.T2?.[0];
-                    
-                    const translatedTeam1 = textMappings.has(`team1_${eventKey}`) 
-                        ? allTranslations[textMappings.get(`team1_${eventKey}`)] 
-                        : team1?.Nm || '';
-                        
-                    const translatedTeam2 = textMappings.has(`team2_${eventKey}`) 
-                        ? allTranslations[textMappings.get(`team2_${eventKey}`)] 
-                        : team2?.Nm || '';
-                        
-                    const translatedStatus = textMappings.has(`status_${eventKey}`) 
-                        ? allTranslations[textMappings.get(`status_${eventKey}`)] 
-                        : event.Eps || '';
-                    
-                    return {
+
+                    const [translatedTeam1, translatedTeam2, translatedStatus] = await Promise.all([
+                        team1?.Nm ? translateText(team1.Nm, 'en', language) : '',
+                        team2?.Nm ? translateText(team2.Nm, 'en', language) : '',
+                        event.Eps ? translateText(event.Eps, 'en', language) : ''
+                    ]);
+
+                    translatedEvents.push({
                         ...event,
                         translatedTeam1,
                         translatedTeam2,
                         translatedStatus,
-                    };
-                });
-                
-                // Add the translated stage
-                newTranslatedStages.push({
-                    ...stage,
-                    translatedLeague,
-                    translatedSubLeague,
-                    translatedEvents
-                });
-                
+                    });
+
+                    // Update with newly translated event
+                    setTranslatedStages(prev => prev.map(s =>
+                        s.Sid === stage.Sid
+                            ? { ...s, translatedEvents: [...translatedEvents] }
+                            : s
+                    ));
+                }
+
                 // Mark this stage as fully translated
                 setTranslationProgress(prev => ({
                     ...prev,
                     [stageKey]: true
                 }));
-            });
-            
-            // Update the state with all translated stages
-            setTranslatedStages(prev => {
-                // Keep any stages that were already translated but not in the new batch
-                const existingStages = prev.filter(prevStage => 
-                    !newTranslatedStages.some(newStage => newStage.Sid === prevStage.Sid)
-                );
-                return [...existingStages, ...newTranslatedStages];
-            });
-            
+            }
+
             setIsTranslating(false);
         };
 
@@ -388,7 +320,7 @@ export default function TestLive() {
                     onClick={() => setSelectedLeague('All')}
                     className={selectedLeague === 'All' ? styles.selectedLeague : styles.leagueItem}
                 >
-                    {dateLabels.all || 'All'}
+                    All
                 </span>
 
                 {topLeagues.map((league) => (
@@ -407,7 +339,7 @@ export default function TestLive() {
                         value={selectedLeague}
                         className={styles.leagueDropdown}
                     >
-                        <option value="All">{dateLabels.otherLeagues || 'Other Leagues'}</option>
+                        <option value="All">Other Leagues</option>
                         {otherLeagues.map((league) => (
                             <option key={league} value={league}>
                                 {league}
@@ -441,48 +373,53 @@ export default function TestLive() {
                                     key={`${stageIdx}-${eventIdx}`}
                                     className={styles.matchCard}
                                     onClick={() => handleMatchClick(event.Eid, event.translatedTeam1, event.translatedTeam2)}
+                                    style={{ cursor: 'pointer' }}
                                 >
+                                    {/* League info */}
                                     <div className={styles.leagueHeader}>
                                         <div className={styles.leagueName}>{stage.translatedLeague}</div>
-                                        {stage.translatedSubLeague && (
-                                            <div className={styles.subLeague}>{stage.translatedSubLeague}</div>
-                                        )}
+                                        <div className={styles.subLeague}>Group • {stage.translatedSubLeague}</div>
                                     </div>
 
+                                    {/* Teams and scores */}
                                     <div className={styles.matchContent}>
                                         <div className={styles.teamsContainer}>
                                             <div className={styles.team}>
                                                 <div className={styles.teamLogo}>
-                                                    {team1?.Abr || team1?.Nm?.substring(0, 3).toUpperCase()}
+                                                    <img
+                                                        src={`https://lsm-static-prod.livescore.com/medium/${team1?.Img}`}
+                                                        alt={event.translatedTeam1}
+                                                        className={styles.logoImage}
+                                                    />
                                                 </div>
                                                 <div className={styles.teamName}>{event.translatedTeam1}</div>
                                             </div>
 
                                             <div className={styles.scoreSection}>
-                                                <div className={styles.score}>
-                                                    {event.Tr1 !== undefined ? event.Tr1 : '-'}
-                                                </div>
+                                                <div className={styles.score}>{event.Tr1 ?? '-'}</div>
                                                 <div className={styles.vs}>VS</div>
-                                                <div className={styles.score}>
-                                                    {event.Tr2 !== undefined ? event.Tr2 : '-'}
-                                                </div>
+                                                <div className={styles.score}>{event.Tr2 ?? '-'}</div>
                                             </div>
 
                                             <div className={styles.team}>
                                                 <div className={styles.teamLogo}>
-                                                    {team2?.Abr || team2?.Nm?.substring(0, 3).toUpperCase()}
+                                                    <img
+                                                        src={`https://lsm-static-prod.livescore.com/medium/${team2?.Img}`}
+                                                        alt={event.translatedTeam2}
+                                                        className={styles.logoImage}
+                                                    />
                                                 </div>
                                                 <div className={styles.teamName}>{event.translatedTeam2}</div>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div className={styles.matchTime}>
-                                            <span className={styles.matchStatus} style={matchStatusStyle}>
-                                                {status}
-                                            </span>
-                                            <span className={styles.dateTime}>
-                                                {formatDate(event.Esd, dateLabels)}
-                                            </span>
+                                    {/* Match time & status */}
+                                    <div className={styles.matchInfo}>
+                                        <div className={styles.matchTime}>{formatDate(event.Esd, dateLabels)}</div>
+                                        <div className={styles.matchStatus} style={matchStatusStyle}>
+                                            {isLive && <span className={styles.liveIndicator}></span>}
+                                            {status}
                                         </div>
                                     </div>
                                 </div>

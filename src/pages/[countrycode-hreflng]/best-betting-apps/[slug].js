@@ -61,7 +61,7 @@ export async function getServerSideProps({ req, resolvedUrl }) {
                 })
         ]);
 
-        countryDataHome = countryRes;
+        countryDataHome = countryRes?.country_code || 'LK';
         locationDataHome = locationRes;
 
     } catch (error) {
@@ -72,7 +72,7 @@ export async function getServerSideProps({ req, resolvedUrl }) {
     // Fetch betting apps data based on country code
     let sections = null;
     try {
-        sections = await fetchBettingAppsSSR(countryCode);
+        sections = await fetchBettingAppsSSR(countryDataHome);
     } catch (error) {
         console.error('Error fetching betting apps:', error);
         sections = null; // or provide a default value
