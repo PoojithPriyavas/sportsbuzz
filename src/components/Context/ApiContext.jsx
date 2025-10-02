@@ -86,11 +86,11 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 // Fetch locations data first
                 const locationsRes = await fetch('https://admin.sportsbuz.com/api/locations');
                 let locationsData = [];
-                
+
                 if (locationsRes.ok) {
                     locationsData = await locationsRes.json();
                 }
-                
+
                 // Then fetch country code
                 const response = await fetch('https://admin.sportsbuz.com/api/get-country-code');
 
@@ -103,10 +103,10 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 const data = await response.json();
 
                 // Process the response with fallback logic using locations data
-                const countryData = data && data.country_code ? 
-                    data : 
+                const countryData = data && data.country_code ?
+                    data :
                     processCountryCodeResponse(data, locationsData);
-                    
+
                 setCountryCode(countryData);
                 setCurrentTimezone(getTimezoneByCountryCode(countryData.country_code));
             }
@@ -116,21 +116,21 @@ export const DataProvider = ({ children, countryDataHome }) => {
             // Fetch locations data for fallback
             try {
                 const locationsRes = await fetch('https://admin.sportsbuz.com/api/locations');
-                
+
                 if (locationsRes.ok) {
                     const locationsData = await locationsRes.json();
-                    
+
                     // Find Sri Lanka in locations data
-                    const sriLankaLocation = locationsData.find(location => 
+                    const sriLankaLocation = locationsData.find(location =>
                         location.country_code === "LK"
                     ) || locationsData[0];
-                    
+
                     // Format Sri Lanka data to match get-country-code API response
                     const fallbackData = {
                         country_code: sriLankaLocation.country_code,
                         location: { ...sriLankaLocation }
                     };
-                    
+
                     setCountryCode(fallbackData);
                     setCurrentTimezone(getTimezoneByCountryCode(fallbackData.country_code));
                     return;
@@ -138,7 +138,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
             } catch (fallbackError) {
                 console.error('Failed to fetch locations data for fallback:', fallbackError);
             }
-            
+
             // Ultimate fallback to static data if everything else fails
             console.log('Using Sri Lanka as fallback due to error:', error);
             setCountryCode(sriLankaFallbackData);
@@ -178,6 +178,8 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
     const [language, setLanguage] = useState('en');
 
+    // Replace the translateText function in ApiContext with this updated version
+
     const translateText = async (textInput, from = 'en', toLang = language) => {
         const langMap = {
             English: 'en',
@@ -215,8 +217,10 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 });
                 return response.data;
             } else if (Array.isArray(textInput)) {
-                // Batch translation (existing format)
-                const texts = textInput;
+                // Batch translation
+                const texts = textInput.map(item => ({
+                    text: typeof item === 'string' ? item : item.text
+                }));
                 const response = await axios.post('/api/translate', {
                     texts,
                     from: fromCode,
@@ -224,7 +228,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 });
                 return response.data;
             } else {
-                // Single text translation (maintain backward compatibility)
+                // Single text translation
                 const response = await axios.post('/api/translate', {
                     text: textInput,
                     from: fromCode,
@@ -795,16 +799,19 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
     // CRICKET LIVE SCORE SECTION
 
-    const rapidApiKey = 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1';
+    const rapidApiKey = '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf';
 
     const [apiResponse, setApiResponse] = useState(null);
     const [matchTypes, setMatchTypes] = useState([]);
+    console.log(matchTypes, "match types")
     const [teamImages, setTeamImages] = useState({});
 
     const fetchMatches = async () => {
+        console.log("enters the matches api")
         try {
             // Check if we already have cached data
             if (dataCache.cricket.matches) {
+                console.log('enters the if condition')
                 // console.log('Using cached cricket matches data');
                 setApiResponse(dataCache.cricket.matches.apiResponse);
                 setMatchTypes(dataCache.cricket.matches.matchTypes);
@@ -815,6 +822,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
             const res = await axios.get('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live', {
                 headers: { 'X-RapidAPI-Key': rapidApiKey },
             });
+            console.log(res.data, "api respone data")
 
             setApiResponse(res.data);
 
@@ -873,7 +881,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
             console.error('Failed to fetch live matches:', error);
         }
     };
-
+    console.log(apiResponse, "api response tt")
     // CRICKET MATCH DETAILS SECTION
 
     const [cricketDetails, setCricketDetails] = useState([]);
@@ -956,6 +964,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
     // FOOTBALL LIVE SCORE SECTION
     const [stages, setStages] = useState([]);
+    console.log(stages, "stages in apicontext")
     const liveFootBall = async () => {
         // console.log('Fetching live football matches...');
         const today = new Date();
@@ -1085,7 +1094,6 @@ export const DataProvider = ({ children, countryDataHome }) => {
             const response = await axios.get(
                 `https://cricbuzz-cricket.p.rapidapi.com/news/v1/detail/${id}`,
                 {
-
                     headers: {
                         'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
                     },

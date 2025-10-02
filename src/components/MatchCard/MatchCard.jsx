@@ -15,90 +15,86 @@ const MatchCard = () => {
     date: 'Date',
     time: 'Time',
     country: 'Country',
-    league: 'Championship League',
+    league: 'League',
     vs: 'VS',
     coach: 'Coach',
-    lineup: 'Team Lineups',
-    substitutions: 'Match Substitutions',
+    lineup: 'Lineup',
+    substitutions: 'Substitutions',
     noSubs: 'No substitutions',
     formation: 'Formation',
     totalPlayers: 'Total Players',
-    subs: 'Substitutions',
+    subs: 'Substitutes',
     matchStatus: 'Match Status',
     completed: 'Completed',
     loading: 'Loading...',
     noTeamData: 'No team data available',
-    noMatchData: 'No match data available'
+    noMatchData: 'Match data not available'
   });
 
   useEffect(() => {
     const translateLabels = async () => {
-      const [
-        stadium,
-        city,
-        date,
-        time,
-        country,
-        league,
-        vs,
-        coach,
-        lineup,
-        substitutions,
-        noSubs,
-        formation,
-        totalPlayers,
-        subs,
-        matchStatus,
-        completed,
-        loading,
-        noTeamData,
-        noMatchData
-      ] = await Promise.all([
-        translateText('Stadium', 'en', language),
-        translateText('City', 'en', language),
-        translateText('Date', 'en', language),
-        translateText('Time', 'en', language),
-        translateText('Country', 'en', language),
-        translateText('Championship League', 'en', language),
-        translateText('VS', 'en', language),
-        translateText('Coach', 'en', language),
-        translateText('Team Lineups', 'en', language),
-        translateText('Match Substitutions', 'en', language),
-        translateText('No substitutions', 'en', language),
-        translateText('Formation', 'en', language),
-        translateText('Total Players', 'en', language),
-        translateText('Substitutions', 'en', language),
-        translateText('Match Status', 'en', language),
-        translateText('Completed', 'en', language),
-        translateText('Loading...', 'en', language),
-        translateText('No team data available', 'en', language),
-        translateText('No match data available', 'en', language)
-      ]);
+      try {
+        // Translate each text individually
+        const translations = {
+          stadium: await translateText('Stadium', 'en', language),
+          city: await translateText('City', 'en', language),
+          date: await translateText('Date', 'en', language),
+          time: await translateText('Time', 'en', language),
+          country: await translateText('Country', 'en', language),
+          league: await translateText('League', 'en', language),
+          vs: await translateText('VS', 'en', language),
+          coach: await translateText('Coach', 'en', language),
+          lineup: await translateText('Lineup', 'en', language),
+          substitutions: await translateText('Substitutions', 'en', language),
+          noSubs: await translateText('No substitutions', 'en', language),
+          formation: await translateText('Formation', 'en', language),
+          totalPlayers: await translateText('Total Players', 'en', language),
+          subs: await translateText('Substitutes', 'en', language),
+          matchStatus: await translateText('Match Status', 'en', language),
+          completed: await translateText('Completed', 'en', language),
+          loading: await translateText('Loading...', 'en', language),
+          noTeamData: await translateText('No team data available', 'en', language),
+          noMatchData: await translateText('Match data not available', 'en', language)
+        };
 
-      setTranslatedText({
-        stadium,
-        city,
-        date,
-        time,
-        country,
-        league,
-        vs,
-        coach,
-        lineup,
-        substitutions,
-        noSubs,
-        formation,
-        totalPlayers,
-        subs,
-        matchStatus,
-        completed,
-        loading,
-        noTeamData,
-        noMatchData
-      });
+        // Update translations in state
+        setTranslatedText(prev => ({
+          ...prev,
+          ...translations
+        }));
+
+        // Cache translations
+        localStorage.setItem('matchCardTranslations', JSON.stringify({
+          language,
+          translations
+        }));
+
+      } catch (error) {
+        console.error('Error translating match card labels:', error);
+      }
     };
 
-    translateLabels();
+    // Check for cached translations first
+    const cachedTranslations = localStorage.getItem('matchCardTranslations');
+    if (cachedTranslations) {
+      try {
+        const parsed = JSON.parse(cachedTranslations);
+        if (parsed.language === language) {
+          setTranslatedText(prev => ({
+            ...prev,
+            ...parsed.translations
+          }));
+        } else {
+          // Language changed, update translations
+          translateLabels();
+        }
+      } catch (error) {
+        console.error('Error parsing cached translations:', error);
+        translateLabels();
+      }
+    } else {
+      translateLabels();
+    }
   }, [language, translateText]);
 
   // Show loading state initially

@@ -27,30 +27,6 @@ const FooterTwo = () => {
     const [translatedBlogCategories, setTranslatedBlogCategories] = useState([]);
     const [isMobile, setIsMobile] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    
-    useEffect(() => {
-        const checkIfMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-        
-        checkIfMobile();
-        window.addEventListener('resize', checkIfMobile);
-        
-        return () => {
-            window.removeEventListener('resize', checkIfMobile);
-        };
-    }, []);
-    
-    const handleSportChange = (newSport) => {
-        setSport(newSport);
-        localStorage.setItem('selectedSport', newSport);
-        if (isMobile) {
-            setMobileMenuOpen(false);
-        }
-
-        // Navigate to the new sport page with pathPrefix
-        router.push(buildPath(`/${newSport}`));
-    };
 
     const [translatedText, setTranslatedText] = useState({
         quickLinks: 'Quick Links',
@@ -78,111 +54,102 @@ const FooterTwo = () => {
         description: 'Your ultimate destination for live cricket & football scores, match predictions, betting tips, and comprehensive sports analysis. Stay updated with the latest sports news and insights.'
     });
 
-    // Combined translation function for both blog categories and footer text
+    // Translate blog categories individually
     useEffect(() => {
-        const translateFooterContent = async () => {
-            if (!blogCategories) return;
+        const translateBlogCategories = async () => {
+            if (!blogCategories || blogCategories.length === 0) return;
             
             try {
-                // Prepare all texts for translation in a single batch
-                const textsToTranslate = [
-                    // Static footer texts
-                    { text: 'Quick Links', to: language },
-                    { text: 'Sports', to: language },
-                    { text: 'Blog Categories', to: language },
-                    { text: 'Contact Info', to: language },
-                    { text: 'Home', to: language },
-                    { text: 'Blogs', to: language },
-                    { text: 'Best Betting Apps', to: language },
-                    { text: 'Contact Us', to: language },
-                    { text: 'Cricket', to: language },
-                    { text: 'Football', to: language },
-                    { text: 'Featured', to: language },
-                    { text: 'Match Analysis', to: language },
-                    { text: 'Betting Tips', to: language },
-                    { text: 'Player Stats', to: language },
-                    { text: 'Sports News', to: language },
-                    { text: '24/7 Sports Updates', to: language },
-                    { text: '© 2025 SportsBuz. All rights reserved.', to: language },
-                    { text: 'Play responsibly. 18+ only. Gambling can be addictive.', to: language },
-                    { text: 'Terms of Use', to: language },
-                    { text: 'Privacy Policy', to: language },
-                    { text: 'Your ultimate destination for live cricket & football scores, match predictions, betting tips, and comprehensive sports analysis. Stay updated with the latest sports news and insights.', to: language }
-                ];
-                
-                // Add blog category names and subcategory names to the translation batch
-                const categoryTextIndices = {};
-                const subcategoryTextIndices = {};
-                
-                blogCategories.forEach((category, catIndex) => {
-                    const catTextIndex = textsToTranslate.length;
-                    textsToTranslate.push({ text: category.name, to: language });
-                    categoryTextIndices[category.id] = catTextIndex;
-                    
-                    if (category.subcategories && category.subcategories.length > 0) {
-                        subcategoryTextIndices[category.id] = {};
-                        category.subcategories.forEach((sub) => {
-                            const subTextIndex = textsToTranslate.length;
-                            textsToTranslate.push({ text: sub.name, to: language });
-                            subcategoryTextIndices[category.id][sub.id] = subTextIndex;
-                        });
-                    }
-                });
-                
-                // Make a single API call for all translations
-                const allTranslations = await translateText(textsToTranslate, 'en', language);
-                
-                // Update footer text translations
-                setTranslatedText({
-                    quickLinks: allTranslations[0],
-                    sports: allTranslations[1],
-                    blogCategories: allTranslations[2],
-                    contactInfo: allTranslations[3],
-                    home: allTranslations[4],
-                    blogs: allTranslations[5],
-                    bestApps: allTranslations[6],
-                    contactUs: allTranslations[7],
-                    cricket: allTranslations[8],
-                    football: allTranslations[9],
-                    featured: allTranslations[10],
-                    matchAnalysis: allTranslations[11],
-                    bettingTips: allTranslations[12],
-                    playerStats: allTranslations[13],
-                    news: allTranslations[14],
-                    email: contact.email || 'info@sportsbuz.com',
-                    availability: allTranslations[15],
-                    copyright: allTranslations[16],
-                    disclaimer: allTranslations[17],
-                    terms: allTranslations[18],
-                    privacy: allTranslations[19],
-                    description: allTranslations[20]
-                });
-                
-                // Process blog category translations
-                const translatedCategories = blogCategories.map((cat) => {
-                    const translatedCatName = allTranslations[categoryTextIndices[cat.id]];
-                    
-                    const translatedSubs = (cat.subcategories || []).map((sub) => ({
-                        ...sub,
-                        name: allTranslations[subcategoryTextIndices[cat.id][sub.id]],
-                    }));
-                    
-                    return {
-                        ...cat,
-                        name: translatedCatName,
-                        subcategories: translatedSubs,
-                    };
-                });
-                
+                const translatedCategories = await Promise.all(
+                    blogCategories.map(async (cat) => {
+                        const translatedCatName = await translateText(cat.name, 'en', language);
+                        const translatedSubs = await Promise.all(
+                            (cat.subcategories || []).map(async (sub) => ({
+                                ...sub,
+                                name: await translateText(sub.name, 'en', language),
+                            }))
+                        );
+                        return {
+                            ...cat,
+                            name: translatedCatName,
+                            subcategories: translatedSubs,
+                        };
+                    })
+                );
                 setTranslatedBlogCategories(translatedCategories);
             } catch (error) {
-                console.error('Error translating footer content:', error);
+                console.error('Error translating blog categories:', error);
                 setTranslatedBlogCategories(blogCategories || []);
             }
         };
 
-        translateFooterContent();
-    }, [blogCategories, language, translateText, contact.email]);
+        translateBlogCategories();
+    }, [blogCategories, language, translateText]);
+
+    // Translate footer text individually
+    useEffect(() => {
+        const translateFooterTexts = async () => {
+            try {
+                const translations = {
+                    quickLinks: await translateText('Quick Links', 'en', language),
+                    sports: await translateText('Sports', 'en', language),
+                    blogCategories: await translateText('Blog Categories', 'en', language),
+                    contactInfo: await translateText('Contact Info', 'en', language),
+                    home: await translateText('Home', 'en', language),
+                    blogs: await translateText('Blogs', 'en', language),
+                    bestApps: await translateText('Best Betting Apps', 'en', language),
+                    contactUs: await translateText('Contact Us', 'en', language),
+                    cricket: await translateText('Cricket', 'en', language),
+                    football: await translateText('Football', 'en', language),
+                    featured: await translateText('Featured', 'en', language),
+                    matchAnalysis: await translateText('Match Analysis', 'en', language),
+                    bettingTips: await translateText('Betting Tips', 'en', language),
+                    playerStats: await translateText('Player Stats', 'en', language),
+                    news: await translateText('Sports News', 'en', language),
+                    availability: await translateText('24/7 Sports Updates', 'en', language),
+                    copyright: await translateText('© 2025 SportsBuz. All rights reserved.', 'en', language),
+                    disclaimer: await translateText('Play responsibly. 18+ only. Gambling can be addictive.', 'en', language),
+                    terms: await translateText('Terms of Use', 'en', language),
+                    privacy: await translateText('Privacy Policy', 'en', language),
+                    description: await translateText('Your ultimate destination for live cricket & football scores, match predictions, betting tips, and comprehensive sports analysis. Stay updated with the latest sports news and insights.', 'en', language)
+                };
+
+                setTranslatedText(prev => ({
+                    ...prev,
+                    ...translations,
+                    email: contact.email || prev.email
+                }));
+            } catch (error) {
+                console.error('Error translating footer texts:', error);
+            }
+        };
+
+        translateFooterTexts();
+    }, [language, translateText, contact.email]);
+
+    useEffect(() => {
+        const checkIfMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        
+        checkIfMobile();
+        window.addEventListener('resize', checkIfMobile);
+        
+        return () => {
+            window.removeEventListener('resize', checkIfMobile);
+        };
+    }, []);
+    
+    const handleSportChange = (newSport) => {
+        setSport(newSport);
+        localStorage.setItem('selectedSport', newSport);
+        if (isMobile) {
+            setMobileMenuOpen(false);
+        }
+
+        // Navigate to the new sport page with pathPrefix
+        router.push(buildPath(`/${newSport}`));
+    };
 
     return (
         <footer className={styles.footer}>

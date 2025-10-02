@@ -35,15 +35,15 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     const [isMobile, setIsMobile] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState(null);
     const router = useRouter();
-    
+
     // Use the usePathHelper hook
     const { pathPrefix, buildPath } = usePathHelper();
-    
+
     // Add a function to generate URLs efficiently
     const getUrl = (path) => {
         return buildPath(path);
     };
-    
+
     // Mobile dropdown states
     const [expandedLanguageSelector, setExpandedLanguageSelector] = useState(false);
     const [expandedSportsSelector, setExpandedSportsSelector] = useState(false);
@@ -108,19 +108,19 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     const toggleDarkMode = () => {
         const newDarkMode = !darkMode;
         setDarkMode(newDarkMode);
-        
+
         // Save to localStorage
         if (typeof window !== 'undefined') {
             localStorage.setItem('darkMode', newDarkMode.toString());
         }
-        
+
         // Apply theme to document
         if (newDarkMode) {
             document.documentElement.classList.add('dark-theme');
         } else {
             document.documentElement.classList.remove('dark-theme');
         }
-        
+
         // Close mobile menu if open
         if (isMobile) {
             setMobileMenuOpen(false);
@@ -145,7 +145,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
 
     const hreflangTags = locationData?.hreflang_tags || [];
     const filteredLocations = locationData?.filtered_locations || [];
-    
+
     // Initialize GSAP animation
     useEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
@@ -292,20 +292,20 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     // Function to parse URL path for country code and language
     const parseUrlPath = (pathname) => {
         if (!pathname) return { countryCode: '', language: '' };
-        
+
         // Extract the first segment of the path (e.g., "en-lk" from "/en-lk/some/path")
         const firstSegment = pathname.replace(/^\//, '').split('/')[0];
-        
+
         // Check if it matches the format: language-countrycode
         const match = firstSegment.match(/^([a-z]{2})-([a-z]{2})$/i);
-        
+
         if (match) {
             return {
                 language: match[1].toLowerCase(),
                 countryCode: match[2].toLowerCase()
             };
         }
-        
+
         return { countryCode: '', language: '' };
     };
 
@@ -324,8 +324,11 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
             }
         }
 
-        // Set sport based on URL country code if available
-        if (urlCountryCode) {
+        // Respect user-selected sport: only set from URL if no user choice
+        const userSelectedSport = typeof window !== 'undefined' ? localStorage.getItem('selectedSport') : null;
+
+        // Set sport based on URL country code only if user hasn't manually selected one
+        if (urlCountryCode && !userSelectedSport) {
             const matchedLocation = location.find(loc => loc.country_code.toLowerCase() === urlCountryCode);
             if (matchedLocation?.sports) {
                 const apiSport = matchedLocation.sports.toLowerCase();
@@ -335,7 +338,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                 }
             }
         }
-    }, [pathname, location, language, sport]);
+    }, [pathname, location, language]);
 
     // Close mobile menu when clicking outside
     useEffect(() => {
@@ -383,11 +386,11 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         if (typeof window !== 'undefined') {
             const savedLanguage = localStorage.getItem('language');
             const cachedTranslations = localStorage.getItem('cachedTranslations');
-            
+
             if (savedLanguage && savedLanguage !== language) {
                 setLanguage(savedLanguage);
             }
-            
+
             // If we have cached translations for the current language, use them immediately
             if (cachedTranslations) {
                 try {
@@ -435,113 +438,101 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         }
     }, [location, countryCode]);
 
+    // Replace the useEffect that handles translations (around line 283) with this updated version
+
     useEffect(() => {
         const updateTranslations = async () => {
             try {
-                // Create a grouped object for all texts that need translation
-                const allTextsToTranslate = {
-                    // Navigation items
-                    navItems: [
-                        'Home',
-                        'Best Betting Apps',
-                        'News',
-                        'Match Schedules',
-                        'Cricket',
-                        'Football',
-                        'Contact',
-                        'Language',
-                        'Sport'
-                    ]
+                // Translate each text individually
+                const translations = {
+                    home: await translateText('Home', 'en', language),
+                    apps: await translateText('Best Betting Apps', 'en', language),
+                    news: await translateText('News', 'en', language),
+                    schedule: await translateText('Match Schedules', 'en', language),
+                    cricket: await translateText('Cricket', 'en', language),
+                    football: await translateText('Football', 'en', language),
+                    contact: await translateText('Contact', 'en', language),
+                    language: await translateText('Language', 'en', language),
+                    sport: await translateText('Sport', 'en', language)
                 };
-                
-                // Add blog categories and subcategories
-                if (blogCategories.length > 0) {
-                    // Add category names
-                    allTextsToTranslate.categories = blogCategories.map(cat => cat.name);
-                    
-                    // Add subcategory names
-                    const allSubcategories = [];
-                    blogCategories.forEach(cat => {
-                        if (cat.subcategories?.length > 0) {
-                            cat.subcategories.forEach(sub => {
-                                allSubcategories.push(sub.name);
-                            });
-                        }
-                    });
-                    
-                    if (allSubcategories.length > 0) {
-                        allTextsToTranslate.subcategories = allSubcategories;
-                    }
-                }
-                
-                // Get translations in a single API call for all text groups
-                const translatedGroups = await translateText(allTextsToTranslate, 'en', language);
-                
-                // Update navigation item translations
+
+                // Update translations in state
                 setTranslatedText(prev => ({
                     ...prev,
-                    home: translatedGroups.navItems[0],
-                    apps: translatedGroups.navItems[1],
-                    news: translatedGroups.navItems[2],
-                    schedule: translatedGroups.navItems[3],
-                    cricket: translatedGroups.navItems[4],
-                    football: translatedGroups.navItems[5],
-                    contact: translatedGroups.navItems[6],
-                    language: translatedGroups.navItems[7],
-                    sport: translatedGroups.navItems[8]
+                    ...translations
                 }));
-                
-                // Update blog categories with their translations
-                if (blogCategories.length > 0) {
-                    let subcategoryIndex = 0;
-                    const translatedCategories = blogCategories.map((cat, catIndex) => {
-                        // Get translated category name
-                        const translatedCatName = translatedGroups.categories[catIndex];
-                        
-                        // Get translated subcategories if they exist
-                        let translatedSubs = [];
-                        if (cat.subcategories?.length > 0) {
-                            translatedSubs = cat.subcategories.map(sub => {
-                                const translatedSubName = translatedGroups.subcategories[subcategoryIndex++];
-                                return {
-                                    ...sub,
-                                    name: translatedSubName,
-                                };
-                            });
-                        }
-                        
-                        return {
-                            ...cat,
-                            name: translatedCatName,
-                            subcategories: translatedSubs,
-                        };
-                    });
-                    
-                    setTranslatedCategories(translatedCategories);
-                    
-                    // Cache translations in localStorage to prevent flashing
-                    localStorage.setItem('cachedTranslations', JSON.stringify({
-                        language: language,
-                        translations: {
-                            home: translatedGroups.navItems[0],
-                            apps: translatedGroups.navItems[1],
-                            news: translatedGroups.navItems[2],
-                            schedule: translatedGroups.navItems[3],
-                            cricket: translatedGroups.navItems[4],
-                            football: translatedGroups.navItems[5],
-                            contact: translatedGroups.navItems[6],
-                            language: translatedGroups.navItems[7],
-                            sport: translatedGroups.navItems[8]
-                        }
-                    }));
-                }
+
+                // Cache translations
+                localStorage.setItem('cachedTranslations', JSON.stringify({
+                    language: language,
+                    translations: translations
+                }));
+
             } catch (error) {
                 console.error('Translation error:', error);
             }
         };
-    
-        updateTranslations();
-    }, [language, translateText, blogCategories]);
+
+        // Check for cached translations first
+        const cachedTranslations = localStorage.getItem('cachedTranslations');
+        if (cachedTranslations) {
+            try {
+                const parsed = JSON.parse(cachedTranslations);
+                if (parsed.language === language) {
+                    setTranslatedText(prev => ({
+                        ...prev,
+                        ...parsed.translations
+                    }));
+                } else {
+                    // Language changed, update translations
+                    updateTranslations();
+                }
+            } catch (error) {
+                console.error('Error parsing cached translations:', error);
+                updateTranslations();
+            }
+        } else {
+            updateTranslations();
+        }
+    }, [language, translateText]);
+
+    // Blog categories translation (if needed)
+    useEffect(() => {
+        const translateBlogCategories = async () => {
+            if (!blogCategories || blogCategories.length === 0) return;
+            
+            try {
+                const translatedCategories = await Promise.all(
+                    blogCategories.map(async (cat) => {
+                        // Translate category name
+                        const translatedCatName = await translateText(cat.name, 'en', language);
+                        
+                        // Translate subcategories if they exist
+                        const translatedSubs = await Promise.all(
+                            (cat.subcategories || []).map(async (sub) => ({
+                                ...sub,
+                                name: await translateText(sub.name, 'en', language)
+                            }))
+                        );
+
+                        return {
+                            ...cat,
+                            name: translatedCatName,
+                            subcategories: translatedSubs
+                        };
+                    })
+                );
+
+                // Update translated categories in state
+                setTranslatedCategories(translatedCategories);
+            } catch (error) {
+                console.error('Error translating blog categories:', error);
+                setTranslatedCategories(blogCategories);
+            }
+        };
+
+        translateBlogCategories();
+    }, [blogCategories, language, translateText]);
 
     // Add a new state for tracking translation loading
     const [isTranslating, setIsTranslating] = useState(false);
@@ -550,17 +541,17 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     const handleLanguageChange = async (selectedLanguage) => {
         // Set loading state
         setIsTranslating(true);
-        
+
         // Update language in state and localStorage
         setLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
-        
+
         // Close dropdowns
         setExpandedLanguageSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);
         }
-        
+
         try {
             // Pre-fetch translations before navigation
             const textsToTranslate = [
@@ -574,10 +565,10 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                 { text: 'Language' },
                 { text: 'Sport' }
             ];
-            
+
             // Get translations in a single API call
             const translations = await translateText(textsToTranslate, 'en', selectedLanguage);
-            
+
             // Update state with the translated texts
             setTranslatedText(prev => ({
                 ...prev,
@@ -591,7 +582,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                 language: translations[7],
                 sport: translations[8]
             }));
-            
+
             // Cache translations in localStorage to prevent flashing
             localStorage.setItem('cachedTranslations', JSON.stringify({
                 language: selectedLanguage,
@@ -607,30 +598,30 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                     sport: translations[8]
                 }
             }));
-            
+
             // Get current URL path parts
             const { countryCode: currentCountryCode } = parseUrlPath(pathname);
-            
+
             // If we have a valid country code in the URL
             if (currentCountryCode) {
                 // Get the current URL
                 const currentUrl = new URL(window.location.href);
-                
+
                 // Get the path without the domain
                 let path = currentUrl.pathname;
-                
+
                 // Replace the language code in the path
                 // First segment is language-country, so we replace it with newlanguage-country
                 const newPath = path.replace(/^\/([a-z]{2})-([a-z]{2})/, `/${selectedLanguage}-${currentCountryCode}`);
-                
+
                 // Create the new URL with the updated path
                 const newUrl = new URL(newPath, window.location.origin);
-                
+
                 // Keep any existing query parameters
                 newUrl.search = currentUrl.search;
-                
+
                 console.log('🔄 Navigating to new language path:', newUrl.toString());
-                
+
                 // Now that translations are complete, navigate to the new URL
                 window.location.href = newUrl.toString();
             } else {
@@ -977,7 +968,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
 
                 {/* Desktop Right Section */}
                 <div className={styles.rightSection}>
-                   
+
                     <select
                         className={styles.languageSelector}
                         value={language}
@@ -986,7 +977,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                     >
                         {filteredList.map((lang) => (
                             <option key={lang.hreflang} value={lang.hreflang}>
-                                {lang.language} 
+                                {lang.language}
                                 {/* {isTranslating && lang.hreflang === language ? '(loading...)' : ''} */}
                             </option>
                         ))}

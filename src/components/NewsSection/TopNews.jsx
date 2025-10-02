@@ -1,109 +1,108 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import React, { useState, useEffect, useMemo } from 'react';
 import styles from './TopNews.module.css';
 import { useGlobalData } from '../Context/ApiContext';
-import { useMemo } from 'react';
 import { useDynamicRouter } from '@/hooks/useDynamicRouter';
+import { useRouter } from 'next/router';
 
 const NewsList = () => {
   const { news, fetchNewsDetails, language, translateText } = useGlobalData();
-  const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
+  const { pushDynamic } = useDynamicRouter();
   const stories = useMemo(() => {
     return news?.storyList?.filter(item => item.story)?.map(item => item.story) || [];
   }, [news]);
-  const router = useRouter();
 
   const [translatedNews, setTranslatedNews] = useState([]);
   const [translatedHeader, setTranslatedHeader] = useState({
     title: 'Latest News',
-    subtitle: 'Stay informed with the latest updates',
+    subtitle: 'Stay informed with the latest updates'
   });
 
-  // Translate headlines and article titles on language or data change
   useEffect(() => {
-    const translateAll = async () => {
-      if (!stories.length) return;
+    const translateContent = async () => {
+      try {
+        // Translate header content individually
+        const headerTranslations = {
+          title: await translateText('Latest News', 'en', language),
+          subtitle: await translateText('Stay informed with the latest updates', 'en', language)
+        };
 
-      // Create a single array of all texts that need translation
-      const textsToTranslate = [
-        // Static header texts
-        { text: 'Latest News', to: language },
-        { text: 'Stay informed with the latest updates', to: language }
-      ];
-      
-      // Add all story headlines, intros, and captions to the batch
-      stories.forEach(item => {
-        textsToTranslate.push({ text: item.hline, to: language });
-        
-        if (item.intro) {
-          textsToTranslate.push({ text: item.intro, to: language });
-        }
-        
-        if (item.coverImage?.caption) {
-          textsToTranslate.push({ text: item.coverImage.caption, to: language });
-        }
-      });
-      
-      // Translate everything in one batch
-      const allTranslations = await translateText(textsToTranslate, 'en', language);
-      
-      // Extract header translations
-      setTranslatedHeader({
-        title: allTranslations[0],
-        subtitle: allTranslations[1]
-      });
-      
-      // Process story translations
-      const translatedStories = [];
-      let translationIndex = 2; // Start after the header translations
-      
-      for (const item of stories) {
-        const translatedItem = { ...item };
-        
-        // Add headline translation
-        translatedItem.translatedTitle = allTranslations[translationIndex++];
-        
-        // Add intro translation if it exists
-        if (item.intro) {
-          translatedItem.translatedIntro = allTranslations[translationIndex++];
-        } else {
-          translatedItem.translatedIntro = '';
-        }
-        
-        // Add caption translation if it exists
-        if (item.coverImage?.caption) {
-          translatedItem.translatedCaption = allTranslations[translationIndex++];
-        } else {
-          translatedItem.translatedCaption = '';
-        }
-        
-        translatedStories.push(translatedItem);
+        setTranslatedHeader(headerTranslations);
+
+        // Cache header translations
+        localStorage.setItem('newsHeaderTranslations', JSON.stringify({
+          language,
+          translations: headerTranslations
+        }));
+
+        // Translate each story individually
+        const translatedStories = await Promise.all(stories.map(async (item) => {
+          const translatedItem = {
+            ...item,
+            translatedHeadline: await translateText(item.hline, 'en', language),
+            translatedIntro: item.intro ? await translateText(item.intro, 'en', language) : '',
+            translatedCaption: item.coverImage?.caption ? 
+              await translateText(item.coverImage.caption, 'en', language) : ''
+          };
+          return translatedItem;
+        }));
+
+        setTranslatedNews(translatedStories);
+
+        // Cache story translations
+        localStorage.setItem('newsStoriesTranslations', JSON.stringify({
+          language,
+          stories: translatedStories.map(story => ({
+            id: story.id,
+            translatedHeadline: story.translatedHeadline,
+            translatedIntro: story.translatedIntro,
+            translatedCaption: story.translatedCaption
+          }))
+        }));
+
+      } catch (error) {
+        console.error('Error translating news content:', error);
       }
-      
-      setTranslatedNews(translatedStories);
     };
 
-    translateAll();
-  }, [stories, language]);
+    // Check for cached header translations
+    const cachedHeaderTranslations = localStorage.getItem('newsHeaderTranslations');
+    const cachedStoriesTranslations = localStorage.getItem('newsStoriesTranslations');
 
-  // Helper function to convert timestamp to readable format
-  const formatTime = (timestamp) => {
-    const now = Date.now();
-    const pubTime = parseInt(timestamp);
-    const diffInMinutes = Math.floor((now - pubTime) / (1000 * 60));
+    if (cachedHeaderTranslations && cachedStoriesTranslations) {
+      try {
+        const parsedHeader = JSON.parse(cachedHeaderTranslations);
+        const parsedStories = JSON.parse(cachedStoriesTranslations);
 
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes} mins ago`;
-    } else if (diffInMinutes < 1440) {
-      const hours = Math.floor(diffInMinutes / 60);
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+        if (parsedHeader.language === language) {
+          setTranslatedHeader(parsedHeader.translations);
+        }
+
+        if (parsedStories.language === language) {
+          // Match cached translations with current stories
+          const updatedStories = stories.map(story => {
+            const cachedStory = parsedStories.stories.find(s => s.id === story.id);
+            if (cachedStory) {
+              return {
+                ...story,
+                translatedHeadline: cachedStory.translatedHeadline,
+                translatedIntro: cachedStory.translatedIntro,
+                translatedCaption: cachedStory.translatedCaption
+              };
+            }
+            return story;
+          });
+          setTranslatedNews(updatedStories);
+        } else {
+          translateContent();
+        }
+      } catch (error) {
+        console.error('Error parsing cached translations:', error);
+        translateContent();
+      }
     } else {
-      const days = Math.floor(diffInMinutes / 1440);
-      return `${days} day${days > 1 ? 's' : ''} ago`;
+      translateContent();
     }
-  };
+  }, [language, stories, translateText]);
 
   const openNews = async (item) => {
     await fetchNewsDetails(item.id);
@@ -125,28 +124,24 @@ const NewsList = () => {
               key={item.id}
               className={styles.newsItem}
               onClick={() => openNews(item)}
+              role="button"
+              tabIndex={0}
+              onKeyPress={(e) => e.key === 'Enter' && openNews(item)}
             >
+              <div className={styles.thumbnail}>
+                {item.coverImage?.url && (
+                  <img
+                    src={item.coverImage.url}
+                    alt={item.translatedCaption || item.translatedHeadline}
+                    loading="lazy"
+                  />
+                )}
+              </div>
               <div className={styles.newsInfo}>
-                <h3 className={styles.newsTitle}>{item.translatedTitle}</h3>
+                <h3 className={styles.newsTitle}>{item.translatedHeadline}</h3>
                 {item.translatedIntro && (
                   <p className={styles.newsIntro}>{item.translatedIntro}</p>
                 )}
-                <div className={styles.newsMeta}>
-                  <span className={styles.newsDate}>
-                    📅 {formatTime(item.pubTime)}
-                  </span>
-                  <span className={styles.newsSource}>
-                    📰 {item.source}
-                  </span>
-                  <span className={styles.newsType}>
-                    🏷️ {item.storyType}
-                  </span>
-                  {item.context && (
-                    <span className={styles.newsContext}>
-                      🏏 {item.context}
-                    </span>
-                  )}
-                </div>
               </div>
             </div>
           ))}

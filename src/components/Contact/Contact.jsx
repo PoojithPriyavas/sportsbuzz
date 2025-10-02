@@ -95,92 +95,86 @@ const ContactUsPage = () => {
         contactDescription: 'Have questions or need assistance? Fill out the form below and our team will get back to you as soon as possible.'
     });
     
-    // Implement batch translation
     useEffect(() => {
         const translateLabels = async () => {
-            // Create an array of text objects for batch translation
-            const textsToTranslate = [
-                { text: 'Contact Us', to: language },
-                { text: 'Get in touch', to: language },
-                { text: 'First Name', to: language },
-                { text: 'Last Name', to: language },
-                { text: 'Email', to: language },
-                { text: 'Telegram ID', to: language },
-                { text: 'Company (Optional)', to: language },
-                { text: 'Job Title (Optional)', to: language },
-                { text: 'Country', to: language },
-                { text: 'Subject', to: language },
-                { text: 'Message', to: language },
-                { text: 'How did you hear about us? (Optional)', to: language },
-                { text: 'Subscribe to our newsletter', to: language },
-                { text: 'Submit', to: language },
-                { text: 'Submitting...', to: language },
-                { text: 'Thank you! Your message has been sent successfully.', to: language },
-                { text: 'First name is required', to: language },
-                { text: 'Last name is required', to: language },
-                { text: 'Email is required', to: language },
-                { text: 'Please enter a valid email address', to: language },
-                { text: 'Telegram ID is required', to: language },
-                { text: 'Please select a subject', to: language },
-                { text: 'Message is required', to: language },
-                { text: 'Message must be at least 10 characters', to: language },
-                { text: 'Contact Info', to: language },
-                { text: 'Email', to: language },
-                { text: 'Response within 24 hours', to: language },
-                { text: 'Telegram', to: language },
-                { text: '24/7 Support', to: language },
-                { text: 'Office Hours', to: language },
-                { text: 'Monday - Friday, 9am - 6pm', to: language },
-                { text: 'Address', to: language },
-                { text: 'Colombo, Sri Lanka', to: language },
-                { text: 'Follow Us', to: language },
-                { text: 'Have questions or need assistance? Fill out the form below and our team will get back to you as soon as possible.', to: language }
-            ];
-            
-            // Get translations in a single API call
-            const translations = await translateText(textsToTranslate, 'en', language);
-            
-            // Update state with the translated texts
-            setTranslatedText({
-                contactUs: translations[0],
-                getInTouch: translations[1],
-                firstName: translations[2],
-                lastName: translations[3],
-                email: translations[4],
-                telegram: translations[5],
-                company: translations[6],
-                jobTitle: translations[7],
-                country: translations[8],
-                subject: translations[9],
-                message: translations[10],
-                howDidYouHear: translations[11],
-                newsletter: translations[12],
-                submit: translations[13],
-                submitting: translations[14],
-                successMessage: translations[15],
-                firstNameRequired: translations[16],
-                lastNameRequired: translations[17],
-                emailRequired: translations[18],
-                emailInvalid: translations[19],
-                telegramRequired: translations[20],
-                subjectRequired: translations[21],
-                messageRequired: translations[22],
-                messageLength: translations[23],
-                contactInfo: translations[24],
-                emailLabel: translations[25],
-                responseTime: translations[26],
-                telegramLabel: translations[27],
-                telegramSupport: translations[28],
-                officeHours: translations[29],
-                workingHours: translations[30],
-                address: translations[31],
-                addressDetails: translations[32],
-                followUs: translations[33],
-                contactDescription: translations[34]
-            });
+            try {
+                // Translate each text individually
+                const translations = {
+                    contactUs: await translateText('Contact Us', 'en', language),
+                    getInTouch: await translateText('Get in touch', 'en', language),
+                    firstName: await translateText('First Name', 'en', language),
+                    lastName: await translateText('Last Name', 'en', language),
+                    email: await translateText('Email', 'en', language),
+                    telegram: await translateText('Telegram ID', 'en', language),
+                    company: await translateText('Company (Optional)', 'en', language),
+                    jobTitle: await translateText('Job Title (Optional)', 'en', language),
+                    country: await translateText('Country', 'en', language),
+                    subject: await translateText('Subject', 'en', language),
+                    message: await translateText('Message', 'en', language),
+                    howDidYouHear: await translateText('How did you hear about us? (Optional)', 'en', language),
+                    newsletter: await translateText('Subscribe to our newsletter', 'en', language),
+                    submit: await translateText('Submit', 'en', language),
+                    submitting: await translateText('Submitting...', 'en', language),
+                    successMessage: await translateText('Thank you! Your message has been sent successfully.', 'en', language),
+                    firstNameRequired: await translateText('First name is required', 'en', language),
+                    lastNameRequired: await translateText('Last name is required', 'en', language),
+                    emailRequired: await translateText('Email is required', 'en', language),
+                    emailInvalid: await translateText('Please enter a valid email address', 'en', language),
+                    telegramRequired: await translateText('Telegram ID is required', 'en', language),
+                    subjectRequired: await translateText('Please select a subject', 'en', language),
+                    messageRequired: await translateText('Message is required', 'en', language),
+                    messageLength: await translateText('Message must be at least 10 characters', 'en', language),
+                    contactInfo: await translateText('Contact Info', 'en', language),
+                    emailLabel: await translateText('Email', 'en', language),
+                    responseTime: await translateText('Response within 24 hours', 'en', language),
+                    telegramLabel: await translateText('Telegram', 'en', language),
+                    telegramSupport: await translateText('24/7 Support', 'en', language),
+                    officeHours: await translateText('Office Hours', 'en', language),
+                    workingHours: await translateText('Monday - Friday, 9am - 6pm', 'en', language),
+                    address: await translateText('Address', 'en', language),
+                    addressDetails: await translateText('Colombo, Sri Lanka', 'en', language),
+                    followUs: await translateText('Follow Us', 'en', language),
+                    contactDescription: await translateText('Have questions or need assistance? Fill out the form below and our team will get back to you as soon as possible.', 'en', language)
+                };
+
+                // Update translations in state
+                setTranslatedText(prev => ({
+                    ...prev,
+                    ...translations
+                }));
+
+                // Cache translations
+                localStorage.setItem('contactPageTranslations', JSON.stringify({
+                    language,
+                    translations
+                }));
+
+            } catch (error) {
+                console.error('Error translating contact page labels:', error);
+            }
         };
 
-        translateLabels();
+        // Check for cached translations first
+        const cachedTranslations = localStorage.getItem('contactPageTranslations');
+        if (cachedTranslations) {
+            try {
+                const parsed = JSON.parse(cachedTranslations);
+                if (parsed.language === language) {
+                    setTranslatedText(prev => ({
+                        ...prev,
+                        ...parsed.translations
+                    }));
+                } else {
+                    // Language changed, update translations
+                    translateLabels();
+                }
+            } catch (error) {
+                console.error('Error parsing cached translations:', error);
+                translateLabels();
+            }
+        } else {
+            translateLabels();
+        }
     }, [language, translateText]);
 
     // Check for dark mode on mount and listen for changes

@@ -50,108 +50,90 @@ const CricketDashboard = ({ cricketDetails }) => {
     seriesDuration: 'Series Duration'
   });
 
-  // Implement batch translation
   useEffect(() => {
     const translateLabels = async () => {
-      // Create an array of text objects for batch translation
-      const textsToTranslate = [
-        { text: 'No data found', to: language },
-        { text: 'Cricket match information is not available', to: language },
-        { text: 'Series Name Not Available', to: language },
-        { text: 'Match', to: language },
-        { text: 'Format', to: language },
-        { text: 'Date not available', to: language },
-        { text: 'Venue timezone', to: language },
-        { text: 'Match Complete', to: language },
-        { text: 'Match in progress', to: language },
-        { text: 'Match Yet to Begin', to: language },
-        { text: 'Date', to: language },
-        { text: 'Toss', to: language },
-        { text: 'Toss information not available', to: language },
-        { text: 'won, chose to', to: language },
-        { text: 'Venue', to: language },
-        { text: 'Venue not specified', to: language },
-        { text: 'Batting', to: language },
-        { text: 'Bowling', to: language },
-        { text: 'Yet to Play', to: language },
-        { text: 'VS', to: language },
-        { text: 'Winner', to: language },
-        { text: 'Won', to: language },
-        { text: 'Team Squads', to: language },
-        { text: 'Squad information not available', to: language },
-        { text: 'Venue Information', to: language },
-        { text: 'Stadium', to: language },
-        { text: 'Not specified', to: language },
-        { text: 'Location', to: language },
-        { text: 'Capacity', to: language },
-        { text: 'Established', to: language },
-        { text: 'Ends', to: language },
-        { text: 'Match Officials', to: language },
-        { text: 'Umpire 1', to: language },
-        { text: 'Umpire 2', to: language },
-        { text: '3rd Umpire', to: language },
-        { text: 'Match Referee', to: language },
-        { text: 'Additional Information', to: language },
-        { text: 'Match Type', to: language },
-        { text: 'Day/Night', to: language },
-        { text: 'Yes', to: language },
-        { text: 'No', to: language },
-        { text: 'Series Duration', to: language }
-      ];
-      
-      // Get translations in a single API call
-      const translations = await translateText(textsToTranslate, 'en', language);
-      
-      // Update state with the translated texts
-      setTranslatedText({
-        noDataFound: translations[0],
-        infoNotAvailable: translations[1],
-        seriesNameNotAvailable: translations[2],
-        match: translations[3],
-        format: translations[4],
-        dateNotAvailable: translations[5],
-        venueTimezone: translations[6],
-        matchComplete: translations[7],
-        matchInProgress: translations[8],
-        matchYetToBegin: translations[9],
-        date: translations[10],
-        toss: translations[11],
-        tossInfoNotAvailable: translations[12],
-        wonChoseTo: translations[13],
-        venue: translations[14],
-        venueNotSpecified: translations[15],
-        batting: translations[16],
-        bowling: translations[17],
-        yetToPlay: translations[18],
-        vs: translations[19],
-        winner: translations[20],
-        won: translations[21],
-        teamSquads: translations[22],
-        squadInfoNotAvailable: translations[23],
-        venueInformation: translations[24],
-        stadium: translations[25],
-        notSpecified: translations[26],
-        location: translations[27],
-        capacity: translations[28],
-        established: translations[29],
-        ends: translations[30],
-        matchOfficials: translations[31],
-        umpire1: translations[32],
-        umpire2: translations[33],
-        thirdUmpire: translations[34],
-        matchReferee: translations[35],
-        additionalInformation: translations[36],
-        matchType: translations[37],
-        dayNight: translations[38],
-        yes: translations[39],
-        no: translations[40],
-        seriesDuration: translations[41]
-      });
+      try {
+        // Translate each text individually
+        const translations = {
+          noDataFound: await translateText('No data found', 'en', language),
+          infoNotAvailable: await translateText('Cricket match information is not available', 'en', language),
+          seriesNameNotAvailable: await translateText('Series Name Not Available', 'en', language),
+          match: await translateText('Match', 'en', language),
+          format: await translateText('Format', 'en', language),
+          dateNotAvailable: await translateText('Date not available', 'en', language),
+          venueTimezone: await translateText('Venue timezone', 'en', language),
+          matchComplete: await translateText('Match Complete', 'en', language),
+          matchInProgress: await translateText('Match in progress', 'en', language),
+          matchYetToBegin: await translateText('Match Yet to Begin', 'en', language),
+          date: await translateText('Date', 'en', language),
+          toss: await translateText('Toss', 'en', language),
+          tossInfoNotAvailable: await translateText('Toss information not available', 'en', language),
+          wonChoseTo: await translateText('won, chose to', 'en', language),
+          venue: await translateText('Venue', 'en', language),
+          venueNotSpecified: await translateText('Venue not specified', 'en', language),
+          batting: await translateText('Batting', 'en', language),
+          bowling: await translateText('Bowling', 'en', language),
+          yetToPlay: await translateText('Yet to Play', 'en', language),
+          vs: await translateText('VS', 'en', language),
+          winner: await translateText('Winner', 'en', language),
+          notSpecified: await translateText('Not specified', 'en', language),
+          location: await translateText('Location', 'en', language),
+          capacity: await translateText('Capacity', 'en', language),
+          established: await translateText('Established', 'en', language),
+          ends: await translateText('Ends', 'en', language),
+          matchOfficials: await translateText('Match Officials', 'en', language),
+          umpire1: await translateText('Umpire 1', 'en', language),
+          umpire2: await translateText('Umpire 2', 'en', language),
+          thirdUmpire: await translateText('3rd Umpire', 'en', language),
+          matchReferee: await translateText('Match Referee', 'en', language),
+          additionalInformation: await translateText('Additional Information', 'en', language),
+          matchType: await translateText('Match Type', 'en', language),
+          dayNight: await translateText('Day/Night', 'en', language),
+          yes: await translateText('Yes', 'en', language),
+          no: await translateText('No', 'en', language),
+          seriesDuration: await translateText('Series Duration', 'en', language)
+        };
+
+        // Update translations in state
+        setTranslatedText(prev => ({
+          ...prev,
+          ...translations
+        }));
+
+        // Cache translations
+        localStorage.setItem('cricketDashboardTranslations', JSON.stringify({
+          language,
+          translations
+        }));
+
+      } catch (error) {
+        console.error('Error translating cricket dashboard labels:', error);
+      }
     };
 
-    translateLabels();
+    // Check for cached translations first
+    const cachedTranslations = localStorage.getItem('cricketDashboardTranslations');
+    if (cachedTranslations) {
+      try {
+        const parsed = JSON.parse(cachedTranslations);
+        if (parsed.language === language) {
+          setTranslatedText(prev => ({
+            ...prev,
+            ...parsed.translations
+          }));
+        } else {
+          // Language changed, update translations
+          translateLabels();
+        }
+      } catch (error) {
+        console.error('Error parsing cached translations:', error);
+        translateLabels();
+      }
+    } else {
+      translateLabels();
+    }
   }, [language, translateText]);
-  
+
   // Check if there's no data at all
   if (!cricketDetails) {
     return (

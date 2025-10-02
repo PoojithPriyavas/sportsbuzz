@@ -16,37 +16,61 @@ const TeamLineup = ({ team }) => {
 
   useEffect(() => {
     const translateLabels = async () => {
-      // Create an array of text objects for batch translation
-      const textsToTranslate = [
-        { text: 'Starting XI', to: language },
-        { text: 'Goalkeeper', to: language },
-        { text: 'Defenders', to: language },
-        { text: 'Midfielders', to: language },
-        { text: 'Forwards', to: language },
-        { text: 'Substitutes', to: language },
-        { text: 'Used', to: language }
-      ];
-      
-      // Get translations in a single API call
-      const translations = await translateText(textsToTranslate, 'en', language);
-      
-      // Update state with the translated texts
-      setTranslatedText({
-        startingXI: translations[0],
-        goalkeeper: translations[1],
-        defenders: translations[2],
-        midfielders: translations[3],
-        forwards: translations[4],
-        substitutes: translations[5],
-        used: translations[6]
-      });
+      try {
+        // Translate each text individually
+        const translations = {
+          startingXI: await translateText('Starting XI', 'en', language),
+          goalkeeper: await translateText('Goalkeeper', 'en', language),
+          defenders: await translateText('Defenders', 'en', language),
+          midfielders: await translateText('Midfielders', 'en', language),
+          forwards: await translateText('Forwards', 'en', language),
+          substitutes: await translateText('Substitutes', 'en', language),
+          used: await translateText('Used', 'en', language)
+        };
+
+        // Update translations in state
+        setTranslatedText(prev => ({
+          ...prev,
+          ...translations
+        }));
+
+        // Cache translations
+        localStorage.setItem('teamLineupTranslations', JSON.stringify({
+          language: language,
+          translations: translations
+        }));
+
+      } catch (error) {
+        console.error('Error translating team lineup labels:', error);
+      }
     };
 
-    translateLabels();
+    // Check for cached translations first
+    const cachedTranslations = localStorage.getItem('teamLineupTranslations');
+    if (cachedTranslations) {
+      try {
+        const parsed = JSON.parse(cachedTranslations);
+        if (parsed.language === language) {
+          setTranslatedText(prev => ({
+            ...prev,
+            ...parsed.translations
+          }));
+        } else {
+          // Language changed, update translations
+          translateLabels();
+        }
+      } catch (error) {
+        console.error('Error parsing cached translations:', error);
+        translateLabels();
+      }
+    } else {
+      translateLabels();
+    }
   }, [language, translateText]);
 
+  // Position emojis mapping
   const emojiMap = {
-    goalkeeper: "🥅",
+    goalkeeper: "🧤",
     defenders: "🛡️",
     midfielders: "⚽",
     forwards: "🎯"

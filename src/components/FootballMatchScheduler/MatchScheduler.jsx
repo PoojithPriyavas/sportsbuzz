@@ -86,39 +86,61 @@ export default function MatchScheduler() {
         upcoming: 'upcoming'
     });
 
+    // Update the translation useEffect
     useEffect(() => {
         const translateLabels = async () => {
-            // Create an array of text objects for batch translation
-            const textsToTranslate = [
-                { text: 'Match Schedule', to: language },
-                { text: 'Select a date to view matches', to: language },
-                { text: 'Loading timezone...', to: language },
-                { text: 'Loading matches...', to: language },
-                { text: 'No matches found for the selected date and league', to: language },
-                { text: 'All Leagues', to: language },
-                { text: 'Loading dates...', to: language },
-                { text: 'VS', to: language },
-                { text: 'upcoming', to: language }
-            ];
-            
-            // Get translations in a single API call
-            const translations = await translateText(textsToTranslate, 'en', language);
-            
-            // Update state with the translated texts
-            setTranslatedText({
-                matchSchedule: translations[0],
-                selectDate: translations[1],
-                loadingTimezone: translations[2],
-                loadingMatches: translations[3],
-                noMatches: translations[4],
-                allLeagues: translations[5],
-                loadingDates: translations[6],
-                vs: translations[7],
-                upcoming: translations[8]
-            });
+            try {
+                // Translate each text individually
+                const translations = {
+                    matchSchedule: await translateText('Match Schedule', 'en', language),
+                    selectDate: await translateText('Select a date to view matches', 'en', language),
+                    loadingTimezone: await translateText('Loading timezone...', 'en', language),
+                    loadingMatches: await translateText('Loading matches...', 'en', language),
+                    noMatches: await translateText('No matches found for the selected date and league', 'en', language),
+                    allLeagues: await translateText('All Leagues', 'en', language),
+                    loadingDates: await translateText('Loading dates...', 'en', language),
+                    vs: await translateText('VS', 'en', language),
+                    upcoming: await translateText('upcoming', 'en', language)
+                };
+
+                // Update translations in state
+                setTranslatedText(prev => ({
+                    ...prev,
+                    ...translations
+                }));
+
+                // Cache translations
+                localStorage.setItem('matchSchedulerTranslations', JSON.stringify({
+                    language: language,
+                    translations: translations
+                }));
+
+            } catch (error) {
+                console.error('Error translating match scheduler labels:', error);
+            }
         };
-    
-        translateLabels();
+
+        // Check for cached translations first
+        const cachedTranslations = localStorage.getItem('matchSchedulerTranslations');
+        if (cachedTranslations) {
+            try {
+                const parsed = JSON.parse(cachedTranslations);
+                if (parsed.language === language) {
+                    setTranslatedText(prev => ({
+                        ...prev,
+                        ...parsed.translations
+                    }));
+                } else {
+                    // Language changed, update translations
+                    translateLabels();
+                }
+            } catch (error) {
+                console.error('Error parsing cached translations:', error);
+                translateLabels();
+            }
+        } else {
+            translateLabels();
+        }
     }, [language, translateText]);
 
     const getInitialDate = useCallback(() => {
