@@ -24,72 +24,79 @@ import axios from "axios";
 import HeaderThree from "@/components/Header/HeaderThree";
 
 export async function getServerSideProps({ req, resolvedUrl }) {
-    let countryDataHome = 'LK'; // Default fallback
+    // Parse the cookie to get country code
+    const countryCookie = req.cookies.countryData;
+    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
+    const countryCode = countryData?.country_code || 'LK';
+    const hrefLanCookie = req.cookies.lanTagValues;
+    const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
+
+    let countryDataHome = null;
     let locationDataHome = null;
 
     try {
-        // Get country code from API
-        const countryResponse = await fetch('https://admin.sportsbuz.com/api/get-country-code/');
-        
-        if (!countryResponse.ok) {
-            throw new Error(`Country API failed with status: ${countryResponse.status}`);
-        }
-        
-        const countryRes = await countryResponse.json();
-        console.log('Country API Response:', countryRes);
-        
-        if (countryRes?.country_code) {
-            countryDataHome = countryRes.country_code;
-        }
+        const [countryRes, locationRes] = await Promise.all([
+            fetch('https://admin.sportsbuz.com/api/get-country-code/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('Error fetching country data:', error);
+                    return null; // Return null on error
+                }),
 
-        // Location API call
-        const locationResponse = await fetch('https://admin.sportsbuz.com/api/locations/');
-        
-        if (!locationResponse.ok) {
-            throw new Error(`Location API failed with status: ${locationResponse.status}`);
-        }
-        
-        locationDataHome = await locationResponse.json();
+            fetch('https://admin.sportsbuz.com/api/locations/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('Error fetching location data:', error);
+                    return null; // Return null on error
+                })
+        ]);
+
+        countryDataHome = countryRes?.country_code || 'LK';
+        locationDataHome = locationRes;
 
     } catch (error) {
-        console.error('API Error:', error.message);
+        console.error('Error in Promise.all:', error);
+        // Continue with null values if both APIs fail
     }
 
-    // Fetch betting apps data
+    // Fetch betting apps data based on country code
     let sectionsRes = null;
     try {
         sectionsRes = await fetchBettingAppsSSR(countryDataHome);
     } catch (error) {
         console.error('Error fetching betting apps:', error);
+        sectionsRes = null; // or provide a default value
     }
-
-    console.log('Final countryDataHome:', countryDataHome);
 
     return {
         props: {
             sectionsRes,
-            countryCode: countryDataHome, // Using API response instead of cookie
-            locationDataHome,
+            countryCode,
+            hrefLanData,
             resolvedUrl,
             isLocalhost: process.env.NODE_ENV === 'development',
             countryDataHome,
+            locationDataHome
         },
     };
 }
 
 
-export default function BestBettingApps({ 
-    sectionsRes, 
-    countryCode, 
-    resolvedUrl, 
-    isLocalhost, 
-    countryDataHome, 
-    locationDataHome 
-}) {
+export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome }) {
     console.log(locationDataHome, "href lan data in bset bettingapps")
     console.log(countryDataHome, "country code from ssr")
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
- 
+    console.log(sectionsRes, "sections in country page")
     // const countryCode = countryData?.country_code || 'IN';
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
     const [loading, setLoading] = useState(true);
@@ -245,8 +252,8 @@ export default function BestBettingApps({
                     <div className={styles.fourthColumn} >
                         <div className={styles.fourthColumnTwoColumns}>
                             <div className={styles.fourthColumnLeft}>
-                                <BettingCard  />
-                                <JoinTelegramButton  />
+                                <BettingCard />
+                                <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
                                 {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
@@ -257,7 +264,7 @@ export default function BestBettingApps({
                                 <UpcomingMatches upcomingMatches={upcomingMatches} />
                             </>
                         ) : (
-                            <UpcomingFootballMatches  />
+                            <UpcomingFootballMatches />
                         )}
                         {/* <TopNewsSection /> */}
                     </div>
