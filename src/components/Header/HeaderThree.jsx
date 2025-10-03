@@ -388,6 +388,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     }, [mobileMenuOpen]);
 
     const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
+    console.log(translatedCategories,"translated categories in header")
     const [translatedText, setTranslatedText] = useState({
         home: 'Home',
         apps: 'Best Betting Apps',
