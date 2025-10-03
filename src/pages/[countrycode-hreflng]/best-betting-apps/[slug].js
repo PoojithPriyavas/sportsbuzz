@@ -24,7 +24,6 @@ import axios from "axios";
 import HeaderThree from "@/components/Header/HeaderThree";
 
 export async function getServerSideProps({ req, resolvedUrl }) {
-    // Parse the cookie to get country code
     const countryCookie = req.cookies.countryData;
     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
     const countryCode = countryData?.country_code || 'LK';
@@ -35,48 +34,50 @@ export async function getServerSideProps({ req, resolvedUrl }) {
     let locationDataHome = null;
 
     try {
-        const [countryRes, locationRes] = await Promise.all([
-            fetch('https://admin.sportsbuz.com/api/get-country-code/')
-                .then(async (response) => {
-                    if (!response.ok) {
-                        throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .catch((error) => {
-                    console.error('Error fetching country data:', error);
-                    return null; // Return null on error
-                }),
+        // Separate the API calls for better error tracking
+        const countryResponse = await fetch('https://admin.sportsbuz.com/api/get-country-code/');
+        
+        if (!countryResponse.ok) {
+            throw new Error(`Country API failed with status: ${countryResponse.status}`);
+        }
+        
+        const countryRes = await countryResponse.json();
+        console.log('Country API Response:', countryRes); // Debug log
+        
+        countryDataHome = countryRes?.country_code;
+        
+        if (!countryDataHome) {
+            console.error('Country code is missing in API response:', countryRes);
+            countryDataHome = 'LK'; // Fallback
+        }
 
-            fetch('https://admin.sportsbuz.com/api/locations/')
-                .then(async (response) => {
-                    if (!response.ok) {
-                        throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .catch((error) => {
-                    console.error('Error fetching location data:', error);
-                    return null; // Return null on error
-                })
-        ]);
-
-        countryDataHome = countryRes?.country_code || 'LK';
-        locationDataHome = locationRes;
+        // Location API call
+        const locationResponse = await fetch('https://admin.sportsbuz.com/api/locations/');
+        
+        if (!locationResponse.ok) {
+            throw new Error(`Location API failed with status: ${locationResponse.status}`);
+        }
+        
+        locationDataHome = await locationResponse.json();
 
     } catch (error) {
-        console.error('Error in Promise.all:', error);
-        // Continue with null values if both APIs fail
+        console.error('API Error:', error.message);
+        // Set fallback values
+        countryDataHome = 'LK';
+        locationDataHome = null;
     }
 
-    // Fetch betting apps data based on country code
+    // Fetch betting apps data
     let sections = null;
     try {
         sections = await fetchBettingAppsSSR(countryDataHome);
     } catch (error) {
         console.error('Error fetching betting apps:', error);
-        sections = null; // or provide a default value
+        sections = null;
     }
+
+    // Log the final values being returned
+    console.log('Final countryDataHome:', countryDataHome);
 
     return {
         props: {
