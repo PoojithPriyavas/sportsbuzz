@@ -108,6 +108,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         country,
         setCountry
     } = useGlobalData();
+    console.log(blogCategories,"blog categories in header")
 
     // Initialize dark mode from localStorage
     useEffect(() => {
