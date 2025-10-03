@@ -33,9 +33,9 @@ const Logo = React.memo(({ logoRef }) => {
         <div ref={logoRef} className={styles.logo}>
             <DynamicLink href="/" className={styles.logoContent}>
                 <div className={styles.logoIcon}>
-                    <img 
-                        src="/sportsbuz.png" 
-                        alt="Sportsbuz Logo" 
+                    <img
+                        src="/sportsbuz.png"
+                        alt="Sportsbuz Logo"
                         className={styles.logoIconInner}
                         style={{ opacity: 1 }} // Force the logo to always be visible
                     />
@@ -53,6 +53,8 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     const [expandedCategory, setExpandedCategory] = useState(null);
     // Add isTranslating state
     const [isTranslating, setIsTranslating] = useState(false);
+    // New: track when the user is actively changing language to prevent URL effect from overriding
+    const [isUserChangingLanguage, setIsUserChangingLanguage] = useState(false);
     const router = useRouter();
 
     // Use the usePathHelper hook
@@ -108,7 +110,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         country,
         setCountry
     } = useGlobalData();
-    console.log(blogCategories,"blog categories in header")
+    console.log(blogCategories, "blog categories in header")
 
     // Initialize dark mode from localStorage
     useEffect(() => {
@@ -338,7 +340,8 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         // Set language from URL if available and valid
         if (urlLanguage) {
             const isValidLanguage = location.some(loc => loc.hreflang === urlLanguage);
-            if (isValidLanguage && language !== urlLanguage) {
+            // Only set language from URL if it's valid, differs from current, and user isn't in the middle of changing it
+            if (isValidLanguage && language !== urlLanguage && !isUserChangingLanguage) {
                 setLanguage(urlLanguage);
                 localStorage.setItem('language', urlLanguage);
             }
@@ -358,7 +361,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                 }
             }
         }
-    }, [pathname, location, language]);
+    }, [pathname, location, language, isUserChangingLanguage]);
 
     // Close mobile menu when clicking outside
     useEffect(() => {
@@ -467,36 +470,31 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     const updateUrlWithLanguage = (selectedLanguage) => {
         const currentPath = pathname;
         const segments = currentPath.split('/').filter(Boolean);
-        
+
         // Get the current country code from the URL
         const currentLangCountry = segments[0]?.split('-')[1] || 'in'; // default to 'in' if not found
-        
+
         // Create the new language-country code
         const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
-        
+
         // Reconstruct the URL
-        const newPath = segments.length > 1 
-            ? `/${newLangCountry}/${segments.slice(1).join('/')}` 
+        const newPath = segments.length > 1
+            ? `/${newLangCountry}/${segments.slice(1).join('/')}`
             : `/${newLangCountry}`;
-            
+
         // Use router to update the URL immediately
         router.push(newPath);
     };
 
+
     // Updated handleLanguageChange function
     const handleLanguageChange = async (selectedLanguage) => {
-        if (selectedLanguage === language) return; // Prevent unnecessary changes
+        if (selectedLanguage === language) return;
 
-        // Update URL immediately
-        const currentPath = pathname;
-        const segments = currentPath.split('/').filter(Boolean);
-        const currentLangCountry = segments[0]?.split('-')[1] || 'in';
-        const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
-        const newPath = segments.length > 1 
-            ? `/${newLangCountry}/${segments.slice(1).join('/')}` 
-            : `/${newLangCountry}`;
-            
-        // Update language in state and localStorage
+        // Mark that the user is changing the language to prevent URL effect from overriding
+        setIsUserChangingLanguage(true);
+
+        // Immediately update UI state (dropdown selection)
         setLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
 
@@ -506,68 +504,37 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
             setMobileMenuOpen(false);
         }
 
-        // Set loading state for translation
-        setIsTranslating(true);
+        // Prepare URL update
+        const currentPath = pathname;
+        const segments = currentPath.split('/').filter(Boolean);
+        const currentLangCountry = segments[0]?.split('-')[1] || 'in';
+        const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
+        const newPath = segments.length > 1
+            ? `/${newLangCountry}/${segments.slice(1).join('/')}`
+            : `/${newLangCountry}`;
 
-        try {
-            // Navigate to new URL immediately
-            router.push(newPath);
-
-            // Handle translations in background
-            const textsToTranslate = [
-                { text: 'Home' },
-                { text: 'Best Betting Apps' },
-                { text: 'News' },
-                { text: 'Match Schedules' },
-                { text: 'Cricket' },
-                { text: 'Football' },
-                { text: 'Contact' },
-                { text: 'Language' },
-                { text: 'Sport' }
-            ];
-
-            // Get translations in a single API call
-            const translations = await translateText(textsToTranslate, 'en', selectedLanguage);
-
-            // Update state with the translated texts
-            setTranslatedText(prev => ({
-                ...prev,
-                home: translations[0],
-                apps: translations[1],
-                news: translations[2],
-                schedule: translations[3],
-                cricket: translations[4],
-                football: translations[5],
-                contact: translations[6],
-                language: translations[7],
-                sport: translations[8]
-            }));
-
-            // Cache translations in localStorage
-            localStorage.setItem('cachedTranslations', JSON.stringify({
-                language: selectedLanguage,
-                translations: {
-                    home: translations[0],
-                    apps: translations[1],
-                    news: translations[2],
-                    schedule: translations[3],
-                    cricket: translations[4],
-                    football: translations[5],
-                    contact: translations[6],
-                    language: translations[7],
-                    sport: translations[8]
-                }
-            }));
-        } catch (error) {
-            console.error('Translation error:', error);
-        } finally {
-            setIsTranslating(false);
-        }
+        // Update URL and handle translation after URL update
+        router.push(newPath).then(() => {
+            translateContent(selectedLanguage)
+                .catch(error => {
+                    console.error('Translation error:', error);
+                })
+                .finally(() => {
+                    // Allow URL effect to take over again after the user-initiated change has settled
+                    setIsUserChangingLanguage(false);
+                });
+        }).catch(() => {
+            // In case navigation fails, still clear the flag to avoid locking
+            setIsUserChangingLanguage(false);
+        });
     };
 
     // Separate translation logic into its own function
     const translateContent = async (selectedLanguage) => {
         try {
+            // Optional: mark translating if you want to show any UI feedback
+            setIsTranslating(true);
+
             const textsToTranslate = [
                 { text: 'Home' },
                 { text: 'Best Betting Apps' },
@@ -790,11 +757,10 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                         <div className={`${styles.mobileSubmenu} ${expandedLanguageSelector ? styles.open : ''}`}>
                             {filteredList.map((lang) => (
                                 <div
-                                    key={lang.hreflang}
-                                    className={`${styles.mobileSubmenuItem} ${language === lang.hreflang ? styles.active : ''} ${isTranslating ? styles.disabled : ''}`}
-                                    onClick={() => !isTranslating && handleLanguageChange(lang.hreflang)}
+                                    className={`${styles.mobileSubmenuItem} ${language === lang.hreflang ? styles.active : ''}`}
+                                    onClick={() => handleLanguageChange(lang.hreflang)}
                                 >
-                                    {lang.language} {isTranslating && lang.hreflang === language ? '(loading...)' : ''}
+                                    {lang.language}
                                 </div>
                             ))}
                         </div>
@@ -952,12 +918,10 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                         className={styles.languageSelector}
                         value={language}
                         onChange={(e) => handleLanguageChange(e.target.value)}
-                        disabled={isTranslating}
                     >
                         {filteredList.map((lang) => (
                             <option key={lang.hreflang} value={lang.hreflang}>
                                 {lang.language}
-                                {/* {isTranslating && lang.hreflang === language ? '(loading...)' : ''} */}
                             </option>
                         ))}
                     </select>

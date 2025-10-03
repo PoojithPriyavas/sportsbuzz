@@ -95,8 +95,8 @@ export default function Home({ locationDataHome, isLocalhost }) {
         bannerLoading,
 
     } = useGlobalData();
-    console.log(apiResponse,"api response")
-    console.log(locationDataHome,"location data for best betting apps")
+    console.log(apiResponse, "api response")
+    console.log(locationDataHome, "location data for best betting apps")
     // console.log(blogs, "blogs in country home")
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     const router = useRouter();
@@ -179,7 +179,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                 <link rel="alternate" href="https://sportsbuz.com/" hreflang="x-default" />
                 {/* Canonical */}
                 {locationDataHome?.map(({ hreflang, country_code }) => {
-                    {/* console.log(hreflang, "href lan sp-home"); */}
+                    {/* console.log(hreflang, "href lan sp-home"); */ }
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
                     console.log('sp-Generated link:', { href, fullHrefLang });
@@ -256,6 +256,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                                                 <NewsList />
                                             </div>
                                         )}
+                                        {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
                                     </div>
                                     <div className={styles.centerSplit}>
                                         <BlogSection blogs={blogs} />
@@ -280,7 +281,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                                 ) : (
                                     <UpcomingFootballMatches />
                                 )}
-                               {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
+
                                 <SportsOdsMegaPari />
                             </div>
                         </div>
