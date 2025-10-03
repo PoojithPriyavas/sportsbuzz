@@ -28,12 +28,31 @@ function getCookie(name) {
     return null;
 }
 
+const Logo = React.memo(({ logoRef }) => {
+    return (
+        <div ref={logoRef} className={styles.logo}>
+            <DynamicLink href="/" className={styles.logoContent}>
+                <div className={styles.logoIcon}>
+                    <img 
+                        src="/sportsbuz.png" 
+                        alt="Sportsbuz Logo" 
+                        className={styles.logoIconInner}
+                        style={{ opacity: 1 }} // Force the logo to always be visible
+                    />
+                </div>
+            </DynamicLink>
+        </div>
+    );
+});
+
 const HeaderThree = ({ animationStage, languageValidation }) => {
     const [darkMode, setDarkMode] = useState(false);
     const [headerFixed, setHeaderFixed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState(null);
+    // Add isTranslating state
+    const [isTranslating, setIsTranslating] = useState(false);
     const router = useRouter();
 
     // Use the usePathHelper hook
@@ -438,110 +457,39 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         }
     }, [location, countryCode]);
 
-    // Replace the useEffect that handles translations (around line 283) with this updated version
-
-    useEffect(() => {
-        const updateTranslations = async () => {
-            try {
-                // Translate each text individually
-                const translations = {
-                    home: await translateText('Home', 'en', language),
-                    apps: await translateText('Best Betting Apps', 'en', language),
-                    news: await translateText('News', 'en', language),
-                    schedule: await translateText('Match Schedules', 'en', language),
-                    cricket: await translateText('Cricket', 'en', language),
-                    football: await translateText('Football', 'en', language),
-                    contact: await translateText('Contact', 'en', language),
-                    language: await translateText('Language', 'en', language),
-                    sport: await translateText('Sport', 'en', language)
-                };
-
-                // Update translations in state
-                setTranslatedText(prev => ({
-                    ...prev,
-                    ...translations
-                }));
-
-                // Cache translations
-                localStorage.setItem('cachedTranslations', JSON.stringify({
-                    language: language,
-                    translations: translations
-                }));
-
-            } catch (error) {
-                console.error('Translation error:', error);
-            }
-        };
-
-        // Check for cached translations first
-        const cachedTranslations = localStorage.getItem('cachedTranslations');
-        if (cachedTranslations) {
-            try {
-                const parsed = JSON.parse(cachedTranslations);
-                if (parsed.language === language) {
-                    setTranslatedText(prev => ({
-                        ...prev,
-                        ...parsed.translations
-                    }));
-                } else {
-                    // Language changed, update translations
-                    updateTranslations();
-                }
-            } catch (error) {
-                console.error('Error parsing cached translations:', error);
-                updateTranslations();
-            }
-        } else {
-            updateTranslations();
-        }
-    }, [language, translateText]);
-
-    // Blog categories translation (if needed)
-    useEffect(() => {
-        const translateBlogCategories = async () => {
-            if (!blogCategories || blogCategories.length === 0) return;
+    // Add this function to handle URL updates
+    const updateUrlWithLanguage = (selectedLanguage) => {
+        const currentPath = pathname;
+        const segments = currentPath.split('/').filter(Boolean);
+        
+        // Get the current country code from the URL
+        const currentLangCountry = segments[0]?.split('-')[1] || 'in'; // default to 'in' if not found
+        
+        // Create the new language-country code
+        const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
+        
+        // Reconstruct the URL
+        const newPath = segments.length > 1 
+            ? `/${newLangCountry}/${segments.slice(1).join('/')}` 
+            : `/${newLangCountry}`;
             
-            try {
-                const translatedCategories = await Promise.all(
-                    blogCategories.map(async (cat) => {
-                        // Translate category name
-                        const translatedCatName = await translateText(cat.name, 'en', language);
-                        
-                        // Translate subcategories if they exist
-                        const translatedSubs = await Promise.all(
-                            (cat.subcategories || []).map(async (sub) => ({
-                                ...sub,
-                                name: await translateText(sub.name, 'en', language)
-                            }))
-                        );
-
-                        return {
-                            ...cat,
-                            name: translatedCatName,
-                            subcategories: translatedSubs
-                        };
-                    })
-                );
-
-                // Update translated categories in state
-                setTranslatedCategories(translatedCategories);
-            } catch (error) {
-                console.error('Error translating blog categories:', error);
-                setTranslatedCategories(blogCategories);
-            }
-        };
-
-        translateBlogCategories();
-    }, [blogCategories, language, translateText]);
-
-    // Add a new state for tracking translation loading
-    const [isTranslating, setIsTranslating] = useState(false);
+        // Use router to update the URL immediately
+        router.push(newPath);
+    };
 
     // Updated handleLanguageChange function
     const handleLanguageChange = async (selectedLanguage) => {
-        // Set loading state
-        setIsTranslating(true);
+        if (selectedLanguage === language) return; // Prevent unnecessary changes
 
+        // Update URL immediately
+        const currentPath = pathname;
+        const segments = currentPath.split('/').filter(Boolean);
+        const currentLangCountry = segments[0]?.split('-')[1] || 'in';
+        const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
+        const newPath = segments.length > 1 
+            ? `/${newLangCountry}/${segments.slice(1).join('/')}` 
+            : `/${newLangCountry}`;
+            
         // Update language in state and localStorage
         setLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
@@ -552,8 +500,14 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
             setMobileMenuOpen(false);
         }
 
+        // Set loading state for translation
+        setIsTranslating(true);
+
         try {
-            // Pre-fetch translations before navigation
+            // Navigate to new URL immediately
+            router.push(newPath);
+
+            // Handle translations in background
             const textsToTranslate = [
                 { text: 'Home' },
                 { text: 'Best Betting Apps' },
@@ -583,7 +537,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                 sport: translations[8]
             }));
 
-            // Cache translations in localStorage to prevent flashing
+            // Cache translations in localStorage
             localStorage.setItem('cachedTranslations', JSON.stringify({
                 language: selectedLanguage,
                 translations: {
@@ -598,38 +552,63 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                     sport: translations[8]
                 }
             }));
-
-            // Get current URL path parts
-            const { countryCode: currentCountryCode } = parseUrlPath(pathname);
-
-            // If we have a valid country code in the URL
-            if (currentCountryCode) {
-                // Get the current URL
-                const currentUrl = new URL(window.location.href);
-
-                // Get the path without the domain
-                let path = currentUrl.pathname;
-
-                // Replace the language code in the path
-                // First segment is language-country, so we replace it with newlanguage-country
-                const newPath = path.replace(/^\/([a-z]{2})-([a-z]{2})/, `/${selectedLanguage}-${currentCountryCode}`);
-
-                // Create the new URL with the updated path
-                const newUrl = new URL(newPath, window.location.origin);
-
-                // Keep any existing query parameters
-                newUrl.search = currentUrl.search;
-
-                console.log('🔄 Navigating to new language path:', newUrl.toString());
-
-                // Now that translations are complete, navigate to the new URL
-                window.location.href = newUrl.toString();
-            } else {
-                console.error('No country code found in URL');
-                setIsTranslating(false);
-            }
         } catch (error) {
-            console.error('Translation error before navigation:', error);
+            console.error('Translation error:', error);
+        } finally {
+            setIsTranslating(false);
+        }
+    };
+
+    // Separate translation logic into its own function
+    const translateContent = async (selectedLanguage) => {
+        try {
+            const textsToTranslate = [
+                { text: 'Home' },
+                { text: 'Best Betting Apps' },
+                { text: 'News' },
+                { text: 'Match Schedules' },
+                { text: 'Cricket' },
+                { text: 'Football' },
+                { text: 'Contact' },
+                { text: 'Language' },
+                { text: 'Sport' }
+            ];
+
+            // Get translations in a single API call
+            const translations = await translateText(textsToTranslate, 'en', selectedLanguage);
+
+            // Update state with the translated texts
+            setTranslatedText(prev => ({
+                ...prev,
+                home: translations[0],
+                apps: translations[1],
+                news: translations[2],
+                schedule: translations[3],
+                cricket: translations[4],
+                football: translations[5],
+                contact: translations[6],
+                language: translations[7],
+                sport: translations[8]
+            }));
+
+            // Cache translations in localStorage
+            localStorage.setItem('cachedTranslations', JSON.stringify({
+                language: selectedLanguage,
+                translations: {
+                    home: translations[0],
+                    apps: translations[1],
+                    news: translations[2],
+                    schedule: translations[3],
+                    cricket: translations[4],
+                    football: translations[5],
+                    contact: translations[6],
+                    language: translations[7],
+                    sport: translations[8]
+                }
+            }));
+        } catch (error) {
+            console.error('Translation error:', error);
+        } finally {
             setIsTranslating(false);
         }
     };
@@ -876,7 +855,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
             {/* Loading Animation - Only show during initial animation */}
             <div
                 ref={loadingAnimationRef}
-                className={styles.loadingAnimation}
+                className={`${styles.loadingAnimation} ${shouldShowAnimation ? '' : styles.hidden}`}
             >
                 <div className={styles.loadingIcon}>
                     <div className={styles.mainIcon}>
@@ -886,13 +865,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
             </div>
 
             {/* SportsBuzz Logo */}
-            <div ref={logoRef} className={styles.logo}>
-                <DynamicLink href="/" className={styles.logoContent}>
-                    <div className={styles.logoIcon}>
-                        <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
-                    </div>
-                </DynamicLink>
-            </div>
+            <Logo logoRef={logoRef} />
 
             {/* Header Navigation */}
             <div ref={navigationRef} className={styles.navigation}>

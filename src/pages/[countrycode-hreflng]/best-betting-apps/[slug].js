@@ -94,7 +94,7 @@ export async function getServerSideProps({ req, resolvedUrl }) {
 
 export default function BestBettingApps({ sections, countryCode, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome }) {
     console.log(locationDataHome, "href lan data in bset bettingapps")
-    console.log(countryCode, "country code from cookie")
+    console.log(countryDataHome, "country code from ssr")
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     console.log(sections, "sections in country page")
     // const countryCode = countryData?.country_code || 'IN';
@@ -243,7 +243,7 @@ export default function BestBettingApps({ sections, countryCode, hrefLanData, re
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
-                        <BettingAppsTable sections={sections} countryCode={countryCode} />
+                        <BettingAppsTable sections={sections} />
                         <div
                             className={styles.description}
                             dangerouslySetInnerHTML={{ __html: sections?.[0]?.description }}
@@ -252,8 +252,8 @@ export default function BestBettingApps({ sections, countryCode, hrefLanData, re
                     <div className={styles.fourthColumn} >
                         <div className={styles.fourthColumnTwoColumns}>
                             <div className={styles.fourthColumnLeft}>
-                                <BettingCard countryCode={countryCode} />
-                                <JoinTelegramButton countryCode={countryCode} />
+                                <BettingCard  />
+                                <JoinTelegramButton  />
                             </div>
                             <div className={styles.fourthColumnRight}>
                                 {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
@@ -261,10 +261,10 @@ export default function BestBettingApps({ sections, countryCode, hrefLanData, re
                         </div>
                         {sport === 'cricket' ? (
                             <>
-                                <UpcomingMatches upcomingMatches={upcomingMatches} countryCode={countryCode} />
+                                <UpcomingMatches upcomingMatches={upcomingMatches} />
                             </>
                         ) : (
-                            <UpcomingFootballMatches countryCode={countryCode} />
+                            <UpcomingFootballMatches  />
                         )}
                         {/* <TopNewsSection /> */}
                     </div>
