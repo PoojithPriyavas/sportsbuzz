@@ -128,7 +128,7 @@ const NewsList = () => {
               tabIndex={0}
               onKeyPress={(e) => e.key === 'Enter' && openNews(item)}
             >
-              <div className={styles.thumbnail}>
+              {/* <div className={styles.thumbnail}>
                 {item.coverImage?.url && (
                   <img
                     src={item.coverImage.url}
@@ -136,7 +136,7 @@ const NewsList = () => {
                     loading="lazy"
                   />
                 )}
-              </div>
+              </div> */}
               <div className={styles.newsInfo}>
                 <h3 className={styles.newsTitle}>{item.translatedHeadline}</h3>
                 {item.translatedIntro && (

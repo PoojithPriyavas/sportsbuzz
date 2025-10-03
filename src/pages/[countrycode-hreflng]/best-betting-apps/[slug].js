@@ -24,17 +24,11 @@ import axios from "axios";
 import HeaderThree from "@/components/Header/HeaderThree";
 
 export async function getServerSideProps({ req, resolvedUrl }) {
-    const countryCookie = req.cookies.countryData;
-    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    const countryCode = countryData?.country_code || 'LK';
-    const hrefLanCookie = req.cookies.lanTagValues;
-    const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
-
-    let countryDataHome = null;
+    let countryDataHome = 'LK'; // Default fallback
     let locationDataHome = null;
 
     try {
-        // Separate the API calls for better error tracking
+        // Get country code from API
         const countryResponse = await fetch('https://admin.sportsbuz.com/api/get-country-code/');
         
         if (!countryResponse.ok) {
@@ -42,13 +36,10 @@ export async function getServerSideProps({ req, resolvedUrl }) {
         }
         
         const countryRes = await countryResponse.json();
-        console.log('Country API Response:', countryRes); // Debug log
+        console.log('Country API Response:', countryRes);
         
-        countryDataHome = countryRes?.country_code;
-        
-        if (!countryDataHome) {
-            console.error('Country code is missing in API response:', countryRes);
-            countryDataHome = 'LK'; // Fallback
+        if (countryRes?.country_code) {
+            countryDataHome = countryRes.country_code;
         }
 
         // Location API call
@@ -62,49 +53,50 @@ export async function getServerSideProps({ req, resolvedUrl }) {
 
     } catch (error) {
         console.error('API Error:', error.message);
-        // Set fallback values
-        countryDataHome = 'LK';
-        locationDataHome = null;
     }
 
     // Fetch betting apps data
-    let sections = null;
+    let sectionsRes = null;
     try {
-        sections = await fetchBettingAppsSSR(countryDataHome);
+        sectionsRes = await fetchBettingAppsSSR(countryDataHome);
     } catch (error) {
         console.error('Error fetching betting apps:', error);
-        sections = null;
     }
 
-    // Log the final values being returned
     console.log('Final countryDataHome:', countryDataHome);
 
     return {
         props: {
-            sections,
-            countryCode,
-            hrefLanData,
+            sectionsRes,
+            countryCode: countryDataHome, // Using API response instead of cookie
+            locationDataHome,
             resolvedUrl,
             isLocalhost: process.env.NODE_ENV === 'development',
             countryDataHome,
-            locationDataHome
         },
     };
 }
 
 
-export default function BestBettingApps({ sections, countryCode, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome }) {
+export default function BestBettingApps({ 
+    sectionsRes, 
+    countryCode, 
+    resolvedUrl, 
+    isLocalhost, 
+    countryDataHome, 
+    locationDataHome 
+}) {
     console.log(locationDataHome, "href lan data in bset bettingapps")
     console.log(countryDataHome, "country code from ssr")
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
-    console.log(sections, "sections in country page")
+ 
     // const countryCode = countryData?.country_code || 'IN';
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
     const [loading, setLoading] = useState(true);
     const {
         blogCategories,
         blogs,
-        // sections,
+        sections,
         apiResponse,
         matchTypes,
         teamImages,
@@ -196,12 +188,12 @@ export default function BestBettingApps({ sections, countryCode, hrefLanData, re
     return (
         <>
             <Head>
-                <title>{sections?.[0]?.metatitle || 'Best Betting Apps'}</title>
+                <title>{sectionsRes?.[0]?.metatitle || 'Best Betting Apps'}</title>
                 <meta
                     name="description"
                     content={
-                        sections?.[0]?.meta_description
-                            ? sections[0].meta_description.replace(/<[^>]+>/g, '').slice(0, 160)
+                        sectionsRes?.[0]?.meta_description
+                            ? sectionsRes[0].meta_description.replace(/<[^>]+>/g, '').slice(0, 160)
                             : 'Explore the best betting apps in India for July 2025.'
                     }
                 />
@@ -219,10 +211,10 @@ export default function BestBettingApps({ sections, countryCode, hrefLanData, re
                         />
                     );
                 })}
-                <meta property="og:title" content={sections?.[0]?.metatitle || 'Best Betting Apps'} />
-                <meta property="og:description" content={sections?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
-                <meta name="twitter:title" content={sections?.[0]?.metatitle || 'Best Betting Apps'} />
-                <meta name="twitter:description" content={sections?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
+                <meta property="og:title" content={sectionsRes?.[0]?.metatitle || 'Best Betting Apps'} />
+                <meta property="og:description" content={sectionsRes?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
+                <meta name="twitter:title" content={sectionsRes?.[0]?.metatitle || 'Best Betting Apps'} />
+                <meta name="twitter:description" content={sectionsRes?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
                 <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
             </Head>
 
