@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, use } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import styles from './HeaderTwo.module.css';
 import { usePathname, useRouter } from 'next/navigation';
@@ -171,8 +171,8 @@ function HeaderThree({ animationStage, languageValidation }) {
     const filteredLocations = locationData?.filtered_locations || [];
 
     // Initialize GSAP animation
-    useEffect(() => {
-        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
+    useIsomorphicLayoutEffect(() => {
+        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
 
         // Set initial states IMMEDIATELY to prevent flash
         gsap.set(containerRef.current, {
@@ -540,52 +540,56 @@ function HeaderThree({ animationStage, languageValidation }) {
     // Separate translation logic into its own function
     const translateContent = async (selectedLanguage) => {
         try {
-            // Optional: mark translating if you want to show any UI feedback
             setIsTranslating(true);
 
-            const textsToTranslate = [
-                { text: 'Home' },
-                { text: 'Best Betting Apps' },
-                { text: 'News' },
-                { text: 'Match Schedules' },
-                { text: 'Cricket' },
-                { text: 'Football' },
-                { text: 'Contact' },
-                { text: 'Language' },
-                { text: 'Sport' }
-            ];
+            const translations = {};
 
-            // Get translations in a single API call
-            const translations = await translateText(textsToTranslate, 'en', selectedLanguage);
+            // Translate Home
+            const homeTranslation = await translateText([{ text: 'Home' }], 'en', selectedLanguage);
+            translations.home = homeTranslation[0];
 
-            // Update state with the translated texts
+            // Translate Best Betting Apps
+            const appsTranslation = await translateText([{ text: 'Best Betting Apps' }], 'en', selectedLanguage);
+            translations.apps = appsTranslation[0];
+
+            // Translate News
+            const newsTranslation = await translateText([{ text: 'News' }], 'en', selectedLanguage);
+            translations.news = newsTranslation[0];
+
+            // Translate Match Schedules
+            const scheduleTranslation = await translateText([{ text: 'Match Schedules' }], 'en', selectedLanguage);
+            translations.schedule = scheduleTranslation[0];
+
+            // Translate Cricket
+            const cricketTranslation = await translateText([{ text: 'Cricket' }], 'en', selectedLanguage);
+            translations.cricket = cricketTranslation[0];
+
+            // Translate Football
+            const footballTranslation = await translateText([{ text: 'Football' }], 'en', selectedLanguage);
+            translations.football = footballTranslation[0];
+
+            // Translate Contact
+            const contactTranslation = await translateText([{ text: 'Contact' }], 'en', selectedLanguage);
+            translations.contact = contactTranslation[0];
+
+            // Translate Language
+            const languageTranslation = await translateText([{ text: 'Language' }], 'en', selectedLanguage);
+            translations.language = languageTranslation[0];
+
+            // Translate Sport
+            const sportTranslation = await translateText([{ text: 'Sport' }], 'en', selectedLanguage);
+            translations.sport = sportTranslation[0];
+
+            // Update state with all translations
             setTranslatedText(prev => ({
                 ...prev,
-                home: translations[0],
-                apps: translations[1],
-                news: translations[2],
-                schedule: translations[3],
-                cricket: translations[4],
-                football: translations[5],
-                contact: translations[6],
-                language: translations[7],
-                sport: translations[8]
+                ...translations
             }));
 
             // Cache translations in localStorage
             localStorage.setItem('cachedTranslations', JSON.stringify({
                 language: selectedLanguage,
-                translations: {
-                    home: translations[0],
-                    apps: translations[1],
-                    news: translations[2],
-                    schedule: translations[3],
-                    cricket: translations[4],
-                    football: translations[5],
-                    contact: translations[6],
-                    language: translations[7],
-                    sport: translations[8]
-                }
+                translations: translations
             }));
         } catch (error) {
             console.error('Translation error:', error);
@@ -965,3 +969,6 @@ function HeaderThree({ animationStage, languageValidation }) {
 };
 
 export default HeaderThree;
+
+// Use layout effect on the client to avoid visible flicker / hidden state issues
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;

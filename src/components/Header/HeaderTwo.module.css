@@ -47,6 +47,7 @@
     align-items: center;
     justify-content: center;
     /* Initial state will be set by GSAP */
+    pointer-events: none; /* Prevent overlay from blocking clicks */
 }
 
 .loadingIcon {
@@ -984,4 +985,12 @@
         font-size: 0.9rem;
         padding: 0.625rem 0;
     }
+}
+
+/* Utility: hidden state used by HeaderThree.jsx */
+.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
