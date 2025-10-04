@@ -45,7 +45,7 @@ const Logo = React.memo(({ logoRef }) => {
     );
 });
 
-const HeaderThree = ({ animationStage, languageValidation }) => {
+function HeaderThree({ animationStage, languageValidation }) {
     const [darkMode, setDarkMode] = useState(false);
     const [headerFixed, setHeaderFixed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -55,6 +55,8 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     const [isTranslating, setIsTranslating] = useState(false);
     // New: track when the user is actively changing language to prevent URL effect from overriding
     const [isUserChangingLanguage, setIsUserChangingLanguage] = useState(false);
+    // New: hold the selected language until the URL updates
+    const [pendingLanguage, setPendingLanguage] = useState(null);
     const router = useRouter();
 
     // Use the usePathHelper hook
@@ -363,6 +365,23 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         }
     }, [pathname, location, language, isUserChangingLanguage]);
 
+    // New: Start translation only after the URL reflects the pending language
+    useEffect(() => {
+        if (!isUserChangingLanguage || !pendingLanguage) return;
+
+        const { language: urlLanguage } = parseUrlPath(pathname);
+        if (urlLanguage === pendingLanguage) {
+            translateContent(pendingLanguage)
+                .catch(error => {
+                    console.error('Translation error:', error);
+                })
+                .finally(() => {
+                    setIsUserChangingLanguage(false);
+                });
+            setPendingLanguage(null);
+        }
+    }, [pathname, isUserChangingLanguage, pendingLanguage]);
+
     // Close mobile menu when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -493,6 +512,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
 
         // Mark that the user is changing the language to prevent URL effect from overriding
         setIsUserChangingLanguage(true);
+        setPendingLanguage(selectedLanguage);
 
         // Immediately update UI state (dropdown selection)
         setLanguage(selectedLanguage);
@@ -513,20 +533,8 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
             ? `/${newLangCountry}/${segments.slice(1).join('/')}`
             : `/${newLangCountry}`;
 
-        // Update URL and handle translation after URL update
-        router.push(newPath).then(() => {
-            translateContent(selectedLanguage)
-                .catch(error => {
-                    console.error('Translation error:', error);
-                })
-                .finally(() => {
-                    // Allow URL effect to take over again after the user-initiated change has settled
-                    setIsUserChangingLanguage(false);
-                });
-        }).catch(() => {
-            // In case navigation fails, still clear the flag to avoid locking
-            setIsUserChangingLanguage(false);
-        });
+        // Update URL (push returns void in next/navigation, do not chain .then)
+        router.push(newPath);
     };
 
     // Separate translation logic into its own function

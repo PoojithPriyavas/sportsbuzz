@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import styles from './TestLive.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 import { useDynamicRouter } from '@/hooks/useDynamicRouter';
@@ -42,7 +42,6 @@ function formatDate(esd, labels = { today: 'Today', tomorrow: 'Tomorrow' }) {
 function SkeletonCard() {
     return (
         <div className={styles.matchCard} style={{ pointerEvents: 'none' }}>
-            {/* League header skeleton */}
             <div className={styles.leagueHeader}>
                 <div className={styles.leagueName}>
                     <div className={styles.skeleton} style={{
@@ -60,10 +59,8 @@ function SkeletonCard() {
                 </div>
             </div>
 
-            {/* Teams and scores skeleton */}
             <div className={styles.matchContent}>
                 <div className={styles.teamsContainer}>
-                    {/* Home team skeleton */}
                     <div className={styles.team}>
                         <div className={styles.teamLogo}>
                             <div className={styles.skeleton} style={{
@@ -81,7 +78,6 @@ function SkeletonCard() {
                         }}></div>
                     </div>
 
-                    {/* Score section skeleton */}
                     <div className={styles.scoreSection}>
                         <div className={styles.skeleton} style={{
                             width: '30px',
@@ -98,7 +94,6 @@ function SkeletonCard() {
                         }}></div>
                     </div>
 
-                    {/* Away team skeleton */}
                     <div className={styles.team}>
                         <div className={styles.teamLogo}>
                             <div className={styles.skeleton} style={{
@@ -118,7 +113,6 @@ function SkeletonCard() {
                 </div>
             </div>
 
-            {/* Match info skeleton */}
             <div className={styles.matchInfo}>
                 <div className={styles.skeleton} style={{
                     width: '80px',
@@ -168,22 +162,19 @@ function SkeletonFilterBar() {
 
 export default function TestLive() {
     const { stages, language, translateText, fetchFootballDetails, fetchFootBallLineUp, setMatchTeams } = useGlobalData();
-    console.log(stages, "stages")
-    const [selectedLeague, setSelectedLeague] = useState('All');
+    
+    const [selectedLeague, setSelectedLeague] = useState('');
     const [translatedStages, setTranslatedStages] = useState([]);
     const [dateLabels, setDateLabels] = useState({ today: 'Today', tomorrow: 'Tomorrow' });
     const [isTranslating, setIsTranslating] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    
+    // Track previous language to detect changes
+    const previousLanguage = useRef(language);
 
-    // Use the dynamic router instead of regular router
-    const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
+    const { pushDynamic } = useDynamicRouter();
 
-    // Keep track of what's been translated
-    const [translationProgress, setTranslationProgress] = useState({});
-
-    // ✅ Updated handleMatchClick to pass team names to the global context
     const handleMatchClick = async (eid, team1Name, team2Name) => {
-        // Set the team names in the global context before navigation
         if (setMatchTeams) {
             setMatchTeams({
                 team1: team1Name,
@@ -196,65 +187,84 @@ export default function TestLive() {
             fetchFootBallLineUp(eid)
         ]);
 
-        // Use pushDynamic instead of router.push
         await pushDynamic(`/football-match-details/${eid}`);
     };
 
+    // Initialize translatedStages with original data on first load
+    useEffect(() => {
+        if (!stages?.Stages) {
+            setIsLoading(true);
+            return;
+        }
+
+        // Only initialize if translatedStages is empty
+        if (translatedStages.length === 0) {
+            const initialStages = stages.Stages.map(stage => ({
+                ...stage,
+                translatedLeague: stage.Cnm || '',
+                translatedSubLeague: stage.Snm || '',
+                translatedEvents: (stage.Events || []).map(event => {
+                    const team1 = event.T1?.[0];
+                    const team2 = event.T2?.[0];
+                    return {
+                        ...event,
+                        translatedTeam1: team1?.Nm || '',
+                        translatedTeam2: team2?.Nm || '',
+                        translatedStatus: event.Eps || ''
+                    };
+                })
+            }));
+            setTranslatedStages(initialStages);
+            setIsLoading(false);
+        }
+    }, [stages]);
+
+    // Handle translations when language changes
     useEffect(() => {
         const translateStageData = async () => {
-            if (!stages?.Stages) {
-                setIsLoading(true);
-                return;
-            }
+            if (!stages?.Stages || translatedStages.length === 0) return;
 
-            setIsLoading(false);
+            // Check if language actually changed
+            const languageChanged = previousLanguage.current !== language;
+            if (!languageChanged) return;
+
+            previousLanguage.current = language;
             setIsTranslating(true);
 
-            // First translate just the date labels for immediate display
+            // Translate date labels first
             const [today, tomorrow] = await Promise.all([
                 translateText('Today', 'en', language),
                 translateText('Tomorrow', 'en', language),
             ]);
             setDateLabels({ today, tomorrow });
 
-            // Then process stages incrementally
-            for (const stage of stages.Stages) {
-                const stageKey = `${stage.Sid}_${stage.Cid}`;
+            // Translate each stage incrementally without clearing existing data
+            for (let stageIdx = 0; stageIdx < stages.Stages.length; stageIdx++) {
+                const stage = stages.Stages[stageIdx];
 
-                // Skip if already translated
-                if (translationProgress[stageKey]) continue;
-
+                // Translate league names
                 const translatedLeague = await translateText(stage.Cnm || '', 'en', language);
                 const translatedSubLeague = stage.Snm
                     ? await translateText(stage.Snm, 'en', language)
                     : '';
 
-                // Update with just this stage's league info first
+                // Update stage with translated league info
                 setTranslatedStages(prev => {
-                    const existingIndex = prev.findIndex(s => s.Sid === stage.Sid);
-                    if (existingIndex >= 0) {
-                        const updated = [...prev];
-                        updated[existingIndex] = {
-                            ...updated[existingIndex],
+                    const updated = [...prev];
+                    if (updated[stageIdx]) {
+                        updated[stageIdx] = {
+                            ...updated[stageIdx],
                             translatedLeague,
                             translatedSubLeague
                         };
-                        return updated;
                     }
-                    return [
-                        ...prev,
-                        {
-                            ...stage,
-                            translatedLeague,
-                            translatedSubLeague,
-                            translatedEvents: [] // Events will be added later
-                        }
-                    ];
+                    return updated;
                 });
 
-                // Then translate events one by one
-                const translatedEvents = [];
-                for (const event of stage.Events || []) {
+                // Translate events for this stage
+                const events = stage.Events || [];
+                for (let eventIdx = 0; eventIdx < events.length; eventIdx++) {
+                    const event = events[eventIdx];
                     const team1 = event.T1?.[0];
                     const team2 = event.T2?.[0];
 
@@ -264,42 +274,93 @@ export default function TestLive() {
                         event.Eps ? translateText(event.Eps, 'en', language) : ''
                     ]);
 
-                    translatedEvents.push({
-                        ...event,
-                        translatedTeam1,
-                        translatedTeam2,
-                        translatedStatus,
+                    // Update this specific event
+                    setTranslatedStages(prev => {
+                        const updated = [...prev];
+                        if (updated[stageIdx]?.translatedEvents?.[eventIdx]) {
+                            updated[stageIdx].translatedEvents[eventIdx] = {
+                                ...updated[stageIdx].translatedEvents[eventIdx],
+                                translatedTeam1,
+                                translatedTeam2,
+                                translatedStatus
+                            };
+                        }
+                        return updated;
                     });
-
-                    // Update with newly translated event
-                    setTranslatedStages(prev => prev.map(s =>
-                        s.Sid === stage.Sid
-                            ? { ...s, translatedEvents: [...translatedEvents] }
-                            : s
-                    ));
                 }
-
-                // Mark this stage as fully translated
-                setTranslationProgress(prev => ({
-                    ...prev,
-                    [stageKey]: true
-                }));
             }
 
             setIsTranslating(false);
         };
 
         translateStageData();
-    }, [stages, language]);
+    }, [stages, language, translateText]);
 
-    // Recreate filtered league lists
-    const allLeagues = translatedStages.map(stage => stage.translatedLeague).filter(Boolean);
-    const uniqueLeagues = Array.from(new Set(allLeagues));
-    const topLeagues = uniqueLeagues.slice(0, 5);
-    const otherLeagues = uniqueLeagues.slice(5);
+    // Auto-select the first league that has events
+    useEffect(() => {
+        if (selectedLeague) return;
+        const stageWithEvents = translatedStages.find(
+            s => Array.isArray(s.translatedEvents) && s.translatedEvents.length > 0
+        );
+        if (stageWithEvents?.translatedLeague) {
+            setSelectedLeague(stageWithEvents.translatedLeague);
+        }
+    }, [translatedStages, selectedLeague]);
 
-    // Show skeleton loader when loading or no data
-    if (isLoading || !stages?.Stages) {
+    // Ensure selectedLeague stays valid
+    useEffect(() => {
+        if (!Array.isArray(translatedStages) || translatedStages.length === 0) return;
+
+        const leagues = Array.from(
+            new Set(
+                translatedStages
+                    .map(stage => stage.translatedLeague)
+                    .filter(Boolean)
+            )
+        );
+        const hasEvents = (league) =>
+            translatedStages.some(
+                s =>
+                    s.translatedLeague === league &&
+                    Array.isArray(s.translatedEvents) &&
+                    s.translatedEvents.length > 0
+            );
+
+        const saved =
+            typeof window !== 'undefined'
+                ? localStorage.getItem('footballSelectedLeague')
+                : null;
+
+        if (saved && leagues.includes(saved) && (saved === 'All' || hasEvents(saved))) {
+            setSelectedLeague(saved);
+            return;
+        }
+
+        if (selectedLeague && selectedLeague !== 'All' && !leagues.includes(selectedLeague)) {
+            const firstWithEvents = translatedStages.find(
+                s => Array.isArray(s.translatedEvents) && s.translatedEvents.length > 0
+            );
+            setSelectedLeague(firstWithEvents?.translatedLeague || 'All');
+            return;
+        }
+
+        if (!selectedLeague) {
+            const firstWithEvents = translatedStages.find(
+                s => Array.isArray(s.translatedEvents) && s.translatedEvents.length > 0
+            );
+            setSelectedLeague(firstWithEvents?.translatedLeague || 'All');
+        }
+    }, [translatedStages, language]);
+
+    // Persist selected league
+    useEffect(() => {
+        if (selectedLeague && typeof window !== 'undefined') {
+            localStorage.setItem('footballSelectedLeague', selectedLeague);
+        }
+    }, [selectedLeague]);
+
+    // Show skeleton loader only on initial load
+    if (isLoading || translatedStages.length === 0) {
         return (
             <>
                 <SkeletonFilterBar />
@@ -312,9 +373,13 @@ export default function TestLive() {
         );
     }
 
+    const allLeagues = translatedStages.map(stage => stage.translatedLeague).filter(Boolean);
+    const uniqueLeagues = Array.from(new Set(allLeagues));
+    const topLeagues = uniqueLeagues.slice(0, 5);
+    const otherLeagues = uniqueLeagues.slice(5);
+
     return (
         <>
-            {/* Filter Bar */}
             <div className={styles.leagueSelector}>
                 <span
                     onClick={() => setSelectedLeague('All')}
@@ -349,12 +414,11 @@ export default function TestLive() {
                 )}
             </div>
 
-            {/* Match Cards */}
             <div className={styles.cardsContainer}>
                 {translatedStages
                     .filter(stage => selectedLeague === 'All' || stage.translatedLeague === selectedLeague)
-                    .map((stage, stageIdx) =>
-                        stage.translatedEvents.map((event, eventIdx) => {
+                    .map((stage) =>
+                        stage.translatedEvents?.map((event) => {
                             const team1 = event.T1?.[0];
                             const team2 = event.T2?.[0];
 
@@ -370,18 +434,16 @@ export default function TestLive() {
 
                             return (
                                 <div
-                                    key={`${stageIdx}-${eventIdx}`}
+                                    key={event.Eid}
                                     className={styles.matchCard}
                                     onClick={() => handleMatchClick(event.Eid, event.translatedTeam1, event.translatedTeam2)}
                                     style={{ cursor: 'pointer' }}
                                 >
-                                    {/* League info */}
                                     <div className={styles.leagueHeader}>
                                         <div className={styles.leagueName}>{stage.translatedLeague}</div>
                                         <div className={styles.subLeague}>Group • {stage.translatedSubLeague}</div>
                                     </div>
 
-                                    {/* Teams and scores */}
                                     <div className={styles.matchContent}>
                                         <div className={styles.teamsContainer}>
                                             <div className={styles.team}>
@@ -390,6 +452,8 @@ export default function TestLive() {
                                                         src={`https://lsm-static-prod.livescore.com/medium/${team1?.Img}`}
                                                         alt={event.translatedTeam1}
                                                         className={styles.logoImage}
+                                                        loading="lazy"
+                                                        decoding="async"
                                                     />
                                                 </div>
                                                 <div className={styles.teamName}>{event.translatedTeam1}</div>
@@ -407,6 +471,8 @@ export default function TestLive() {
                                                         src={`https://lsm-static-prod.livescore.com/medium/${team2?.Img}`}
                                                         alt={event.translatedTeam2}
                                                         className={styles.logoImage}
+                                                        loading="lazy"
+                                                        decoding="async"
                                                     />
                                                 </div>
                                                 <div className={styles.teamName}>{event.translatedTeam2}</div>
@@ -414,7 +480,6 @@ export default function TestLive() {
                                         </div>
                                     </div>
 
-                                    {/* Match time & status */}
                                     <div className={styles.matchInfo}>
                                         <div className={styles.matchTime}>{formatDate(event.Esd, dateLabels)}</div>
                                         <div className={styles.matchStatus} style={matchStatusStyle}>

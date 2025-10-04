@@ -6,7 +6,9 @@ import { useRouter } from 'next/router';
 export default function BettingCards() {
     const scrollRef = useRef(null);
     const dropdownRef = useRef(null);
-    const inactivityTimerRef = useRef(null); // New: Timer for inactivity
+    const inactivityTimerRef = useRef(null);
+    const previousLanguage = useRef(null);
+    
     const [paused, setPaused] = useState(false);
     const [selectedTournament, setSelectedTournament] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -34,30 +36,25 @@ export default function BettingCards() {
 
     const { tournament, accessToken, fetchEventsIdData, eventDetails, translateText, language } = useGlobalData();
 
-    // New: Function to start inactivity timer
     const startInactivityTimer = () => {
         if (inactivityTimerRef.current) {
             clearTimeout(inactivityTimerRef.current);
         }
-
         inactivityTimerRef.current = setTimeout(() => {
             setPaused(false);
-        }, 10000); // 10 seconds
+        }, 10000);
     };
 
-    // New: Function to handle user activity (stops auto-scroll and starts timer)
     const handleUserActivity = () => {
         setPaused(true);
         startInactivityTimer();
     };
 
-    // New: Function to handle bet completion
     const handleBetCompletion = () => {
         setPaused(true);
         startInactivityTimer();
     };
 
-    // Clean up timer on unmount
     useEffect(() => {
         return () => {
             if (inactivityTimerRef.current) {
@@ -66,8 +63,13 @@ export default function BettingCards() {
         };
     }, []);
 
+    // Translate UI labels
     useEffect(() => {
         const translateLabels = async () => {
+            // Check if language actually changed
+            if (previousLanguage.current === language) return;
+            previousLanguage.current = language;
+
             const [
                 bettingOdds, allTournaments, loading, noEvents, matchWinner, live,
                 vs, enterStake, placeBet, potentialWinnings, selectOdds, betSuccess,
@@ -134,12 +136,22 @@ export default function BettingCards() {
 
         for (const event of events) {
             const marketData = await fetchMarketData(accessToken, event.sportEventId);
-            cards.push(transformEventToCard(event, marketData));
+            const baseCard = transformEventToCard(event, marketData);
+            
+            // Add translated fields initialized with original values
+            cards.push({
+                ...baseCard,
+                translatedMatchType: baseCard.matchType,
+                translatedTeam1Name: baseCard.team1.name,
+                translatedTeam2Name: baseCard.team2.name,
+                translatedOddsTitle: baseCard.oddsTitle
+            });
         }
 
         return cards;
     };
 
+    // Initialize cards with original data
     useEffect(() => {
         if (eventDetails) {
             setIsLoading(true);
@@ -152,6 +164,44 @@ export default function BettingCards() {
         }
     }, [eventDetails, accessToken]);
 
+    // Translate card content when language changes
+    useEffect(() => {
+        const translateCardContent = async () => {
+            if (!transformedCards || transformedCards.length === 0) return;
+            if (previousLanguage.current === language) return;
+
+            // Translate each card incrementally
+            for (let cardIdx = 0; cardIdx < transformedCards.length; cardIdx++) {
+                const card = transformedCards[cardIdx];
+
+                const [translatedMatchType, translatedTeam1Name, translatedTeam2Name, translatedOddsTitle] = 
+                    await Promise.all([
+                        card.matchType ? translateText(card.matchType, 'en', language) : card.matchType,
+                        card.team1.name ? translateText(card.team1.name, 'en', language) : card.team1.name,
+                        card.team2.name ? translateText(card.team2.name, 'en', language) : card.team2.name,
+                        card.oddsTitle ? translateText(card.oddsTitle, 'en', language) : card.oddsTitle
+                    ]);
+
+                // Update this specific card
+                setTransformedCards(prev => {
+                    const updated = [...prev];
+                    if (updated[cardIdx]) {
+                        updated[cardIdx] = {
+                            ...updated[cardIdx],
+                            translatedMatchType,
+                            translatedTeam1Name,
+                            translatedTeam2Name,
+                            translatedOddsTitle
+                        };
+                    }
+                    return updated;
+                });
+            }
+        };
+
+        translateCardContent();
+    }, [transformedCards.length, language, translateText]);
+
     const handleTournamentChange = (tournamentId) => {
         setIsLoading(true);
         fetchEventsIdData(accessToken, tournamentId).then(() => {
@@ -159,11 +209,10 @@ export default function BettingCards() {
         });
         setSelectedTournament(tournamentId);
         setIsDropdownOpen(false);
-        // Modified: Use the new activity handler
         handleUserActivity();
     };
 
-    // Auto-scroll effect (unchanged timing)
+    // Auto-scroll effect
     useEffect(() => {
         const container = scrollRef.current;
         if (!container || paused || transformedCards.length === 0) return;
@@ -293,8 +342,8 @@ export default function BettingCards() {
                             card={card}
                             styles={styles}
                             translatedText={translatedText}
-                            onSelectOdd={handleUserActivity} // Modified: Use activity handler
-                            onBetPlaced={handleBetCompletion} // Modified: Use bet completion handler
+                            onSelectOdd={handleUserActivity}
+                            onBetPlaced={handleBetCompletion}
                         />
                     ))
                 ) : (
@@ -363,18 +412,16 @@ async function fetchMarketData(token, sportEventId) {
 }
 
 function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced }) {
-    // console.log("card name", card);
     const [selectedOdd, setSelectedOdd] = useState(null);
     const [betAmount, setBetAmount] = useState('');
     const [win, setWin] = useState('0.00');
     const [success, setSuccess] = useState(false);
     const [showBettingSection, setShowBettingSection] = useState(false);
-    const navigate = useRouter();
 
     const handleSelect = (odd) => {
         setSelectedOdd(odd);
         setShowBettingSection(true);
-        onSelectOdd(); // This will now pause auto-scroll for 10 seconds
+        onSelectOdd();
         if (betAmount) calculateWin(betAmount, odd.value);
     };
 
@@ -383,8 +430,6 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
         if (amount < 0) return;
         setBetAmount(amount);
         if (selectedOdd) calculateWin(amount, selectedOdd.value);
-        // Optional: You can also pause auto-scroll when user types
-        // onSelectOdd();
     };
 
     const calculateWin = (amount, oddValue) => {
@@ -397,7 +442,6 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
             setSuccess(true);
             onBetPlaced();
 
-
             setTimeout(() => {
                 setSelectedOdd(null);
                 setBetAmount('');
@@ -405,10 +449,10 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                 setSuccess(false);
                 setShowBettingSection(false);
                 window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=17&bid=1484', '_blank');
-
             }, 500);
         }
     };
+
     const potentialClick = () => {
         window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=17&bid=1484', '_blank');
 
@@ -418,9 +462,8 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
             setWin('0.00');
             setSuccess(false);
             setShowBettingSection(false);
-        }, 500)
-
-    }
+        }, 500);
+    };
 
     const getOddLabel = (type) => {
         switch (type) {
@@ -444,7 +487,7 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                         <span className={styles.liveIndicator}></span>{translatedText.live}
                     </div>
                 )}
-                <div className={styles.matchType}>{card.matchType}</div>
+                <div className={styles.matchType}>{card.translatedMatchType}</div>
                 <div className={styles.matchInfo}>{card.matchInfo}</div>
             </div>
 
@@ -454,19 +497,19 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                         <div className={styles.teamLogo}>
                             <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team1.logo}`} alt={card.team1.name} className={styles.teamLogoImg} />
                         </div>
-                        <div className={styles.teamName}>{card.team1.name}</div>
+                        <div className={styles.teamName}>{card.translatedTeam1Name}</div>
                     </div>
                     <div className={styles.vs}>{translatedText.vs}</div>
                     <div className={styles.team}>
                         <div className={`${styles.teamLogo} ${styles.away}`}>
                             <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogoImg} />
                         </div>
-                        <div className={styles.teamName}>{card.team2.name}</div>
+                        <div className={styles.teamName}>{card.translatedTeam2Name}</div>
                     </div>
                 </div>
 
                 <div className={styles.oddsSection}>
-                    <div className={styles.oddsTitle}>{translatedText.matchWinner}</div>
+                    <div className={styles.oddsTitle}>{card.translatedOddsTitle}</div>
                     <div className={styles.oddsContainer}>
                         {card.odds.map((odd, idx) => (
                             <div
@@ -502,15 +545,12 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                             </button>
                         </div>
 
-
                         {betAmount && parseFloat(betAmount) > 0 && (
-                            <div className={styles.potentialWin}
-                                style={{ cursor: 'pointer' }}>
-
-                                <div className={styles.potentialWinLabel} onClick={() => potentialClick()}>{translatedText.potentialWinnings}</div>
-                                <div className={styles.potentialWinAmount}>
-                                    ₹{win}
+                            <div className={styles.potentialWin} style={{ cursor: 'pointer' }}>
+                                <div className={styles.potentialWinLabel} onClick={() => potentialClick()}>
+                                    {translatedText.potentialWinnings}
                                 </div>
+                                <div className={styles.potentialWinAmount}>₹{win}</div>
                             </div>
                         )}
                     </div>
