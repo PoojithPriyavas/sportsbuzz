@@ -10,7 +10,8 @@ import { usePathHelper } from '@/hooks/usePathHelper';
 
 import FeaturedButton from '../FeaturedButton/FeaturedButton';
 
-import DynamicLink from '../Common/DynamicLink';
+
+// import DynamicLink from '../Common/DynamicLink';
 
 function getCookie(name) {
     if (typeof document === 'undefined') return null;
@@ -28,10 +29,11 @@ function getCookie(name) {
     return null;
 }
 
-const Logo = React.memo(({ logoRef }) => {
+// Top-level component: Logo
+const Logo = React.memo(({ logoRef, buildPath }) => {
     return (
         <div ref={logoRef} className={styles.logo}>
-            <DynamicLink href="/" className={styles.logoContent}>
+            <a href={buildPath("/")} className={styles.logoContent}>
                 <div className={styles.logoIcon}>
                     <img
                         src="/sportsbuz.png"
@@ -40,7 +42,7 @@ const Logo = React.memo(({ logoRef }) => {
                         style={{ opacity: 1 }} // Force the logo to always be visible
                     />
                 </div>
-            </DynamicLink>
+            </a>
         </div>
     );
 });
@@ -660,11 +662,11 @@ function HeaderThree({ animationStage, languageValidation }) {
             >
                 {/* Mobile Header */}
                 <div className={styles.mobileHeader}>
-                    <DynamicLink href="/" className={styles.logoContent}>
+                    <a href={buildPath("/")} className={styles.logoContent}>
                         <div className={styles.logoIcon}>
                             <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                         </div>
-                    </DynamicLink>
+                    </a>
                     <button
                         className={styles.mobileCloseButton}
                         onClick={() => setMobileMenuOpen(false)}
@@ -675,31 +677,31 @@ function HeaderThree({ animationStage, languageValidation }) {
 
                 {/* Mobile Navigation Links */}
                 <div className={styles.mobileNavLinks}>
-                    <DynamicLink
-                        href="/"
+                    <a
+                        href={buildPath("/")}
                         className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.home}
-                    </DynamicLink>
+                    </a>
 
                     {countryCode?.location?.betting_apps == 'Active' && (
-                        <DynamicLink
-                            href="/best-betting-apps/current"
+                        <a
+                            href={buildPath("/best-betting-apps/current")}
                             className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/best-betting-apps/current` ? styles.active : ''}`}
                             onClick={handleNavItemClick}
                         >
                             {translatedText.apps}
-                        </DynamicLink>
+                        </a>
                     )}
 
-                    <DynamicLink
-                        href="/match-schedules"
+                    <a
+                        href={buildPath("/match-schedules")}
                         className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/match-schedules` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.schedule}
-                    </DynamicLink>
+                    </a>
 
                     {/* Mobile Dropdown Categories */}
                     {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
@@ -708,12 +710,12 @@ function HeaderThree({ animationStage, languageValidation }) {
                                 className={styles.mobileDropdownHeader}
                                 onClick={() => toggleCategory(cat.id)}
                             >
-                                <DynamicLink
-                                    href={`/blogs/pages/all-blogs?category=${cat.id}`}
+                                <a
+                                    href={buildPath(`/blogs/pages/all-blogs?category=${cat.id}`)}
                                     onClick={handleNavItemClick}
                                 >
                                     {capitalizeFirstLetter(cat.name)}
-                                </DynamicLink>
+                                </a>
                                 {cat.subcategories?.length > 0 && (
                                     <FaChevronDown
                                         style={{
@@ -727,27 +729,27 @@ function HeaderThree({ animationStage, languageValidation }) {
                             {cat.subcategories?.length > 0 && (
                                 <div className={`${styles.mobileSubmenu} ${expandedCategory === cat.id ? styles.open : ''}`}>
                                     {cat.subcategories.map((sub) => (
-                                        <DynamicLink
+                                        <a
                                             key={sub.id}
-                                            href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}
+                                            href={buildPath(`/blogs/pages/all-blogs?subcategory=${sub.id}`)}
                                             className={styles.mobileSubmenuItem}
                                             onClick={handleNavItemClick}
                                         >
                                             {sub.name}
-                                        </DynamicLink>
+                                        </a>
                                     ))}
                                 </div>
                             )}
                         </div>
                     ))}
 
-                    <DynamicLink
-                        href="/contact"
+                    <a
+                        href={buildPath("/contact")}
                         className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/contact` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.contact}
-                    </DynamicLink>
+                    </a>
                 </div>
 
                 {/* Mobile Dropdown-style Selectors */}
@@ -849,7 +851,7 @@ function HeaderThree({ animationStage, languageValidation }) {
             </div>
 
             {/* SportsBuzz Logo */}
-            <Logo logoRef={logoRef} />
+            <Logo logoRef={logoRef} buildPath={buildPath} />
 
             {/* Header Navigation */}
             <div ref={navigationRef} className={styles.navigation}>
@@ -879,39 +881,39 @@ function HeaderThree({ animationStage, languageValidation }) {
                     <div className={styles.divider}></div>
                     {/* Navigation Links */}
                     <div className={styles.navLinks}>
-                        <DynamicLink href="/" className={`${styles.navItem} ${pathname === `${pathPrefix}/` ? styles.active : ''}`}>
+                        <a href={buildPath("/")} className={`${styles.navItem} ${pathname === `${pathPrefix}/` ? styles.active : ''}`}>
                             {translatedText.home}
-                        </DynamicLink>
+                        </a>
 
                         {countryCode?.location?.betting_apps == 'Active' && (
-                            <DynamicLink href="/best-betting-apps/current" className={`${styles.navItem} ${pathname === `${pathPrefix}/best-betting-apps/current` ? styles.active : ''}`}>
+                            <a href={buildPath("/best-betting-apps/current")} className={`${styles.navItem} ${pathname === `${pathPrefix}/best-betting-apps/current` ? styles.active : ''}`}>
                                 {translatedText.apps}
-                            </DynamicLink>
+                            </a>
                         )}
 
-                        <DynamicLink href="/match-schedules" className={`${styles.navItem} ${pathname === `${pathPrefix}/match-schedules` ? styles.active : ''}`}>
+                        <a href={buildPath("/match-schedules" )}className={`${styles.navItem} ${pathname === `${pathPrefix}/match-schedules` ? styles.active : ''}`}>
                             {translatedText.schedule}
-                        </DynamicLink>
+                        </a>
 
                         {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
                             <div key={cat.id} className={styles.dropdown}>
-                                <DynamicLink
-                                    href={`/blogs/pages/all-blogs?category=${cat.id}`}
+                                <a
+                                    href={buildPath(`/blogs/pages/all-blogs?category=${cat.id}`)}
                                     className={styles.navItem}
                                 >
                                     {capitalizeFirstLetter(cat.name)} <FaChevronDown />
-                                </DynamicLink>
+                                </a>
 
                                 {cat.subcategories?.length > 0 && (
                                     <ul className={styles.submenu}>
                                         {cat.subcategories.map((sub) => (
                                             <li key={sub.id}>
-                                                <DynamicLink
-                                                    href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}
+                                                <a
+                                                    href={buildPath(`/blogs/pages/all-blogs?subcategory=${sub.id}`)}
                                                     className={styles.submenuItem}
                                                 >
                                                     {sub.name}
-                                                </DynamicLink>
+                                                </a>
                                             </li>
                                         ))}
                                     </ul>
@@ -956,9 +958,9 @@ function HeaderThree({ animationStage, languageValidation }) {
                         {darkMode ? <FaSun /> : <FaMoon />}
                     </button>
 
-                    <DynamicLink href="/contact" className={`${styles.navItem} ${pathname === `${pathPrefix}/contact` ? styles.active : ''}`}>
+                    <a href={buildPath("/contact")} className={`${styles.navItem} ${pathname === `${pathPrefix}/contact` ? styles.active : ''}`}>
                         {translatedText.contact}
-                    </DynamicLink>
+                    </a>
                 </div>
             </div>
 
