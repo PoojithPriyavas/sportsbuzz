@@ -144,6 +144,9 @@ export default function Home({ locationDataHome, isLocalhost }) {
             setAnimationStage('header');
             setShowOtherDivs(true);
             setLoading(false);
+            console.log('enters the header else condition');
+            console.log(animationStage, "animationStage value");
+
         }
     }, []);
 

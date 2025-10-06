@@ -33,7 +33,7 @@ function getCookie(name) {
 const Logo = React.memo(({ logoRef, buildPath }) => {
     return (
         <div ref={logoRef} className={styles.logo}>
-            <a href="/" className={styles.logoContent}>
+            <a href={buildPath("/")} className={styles.logoContent}>
                 <div className={styles.logoIcon}>
                     <img
                         src="/sportsbuz.png"
@@ -48,6 +48,7 @@ const Logo = React.memo(({ logoRef, buildPath }) => {
 });
 
 function HeaderThree({ animationStage, languageValidation }) {
+    console.log(animationStage, "animationStage value");
     const [darkMode, setDarkMode] = useState(false);
     const [headerFixed, setHeaderFixed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
