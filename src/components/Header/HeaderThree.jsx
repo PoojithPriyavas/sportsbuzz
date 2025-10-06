@@ -33,7 +33,7 @@ function getCookie(name) {
 const Logo = React.memo(({ logoRef, buildPath }) => {
     return (
         <div ref={logoRef} className={styles.logo}>
-            <Link as={buildPath("/")} className={styles.logoContent}>
+            <Link as={buildPath("/")} href={buildPath("/")} className={styles.logoContent}>
                 <div className={styles.logoIcon}>
                     <img
                         src="/sportsbuz.png"
