@@ -33,6 +33,13 @@
     box-sizing: border-box;
     transition: background-color 0.3s ease;
     /* Initial state will be set by GSAP */
+    /* Ensure final header state by default so the logo is visible immediately */
+    height: 5rem;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
 }
 
 /* Dark theme styles for header */
@@ -43,7 +50,7 @@
 .loadingAnimation {
     position: absolute;
     inset: 0;
-    display: flex;
+    display: none; /* Hide overlay by default; it will be enabled only for intro */
     align-items: center;
     justify-content: center;
     /* Initial state will be set by GSAP */

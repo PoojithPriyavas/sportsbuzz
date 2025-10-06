@@ -186,7 +186,6 @@ function HeaderThree({ animationStage, languageValidation }) {
     // Initialize GSAP animation
     useIsomorphicLayoutEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
-        console.log(hasPlayedAnimation, "hasPlayedAnimation value");
         // Set initial states IMMEDIATELY to prevent flash
         gsap.set(containerRef.current, {
             height: hasPlayedAnimation ? '5rem' : '100vh',
@@ -203,14 +202,15 @@ function HeaderThree({ animationStage, languageValidation }) {
             display: hasPlayedAnimation ? 'none' : 'flex'
         });
 
+        // Keep the logo visible immediately; allow position animation only for first run
         gsap.set(logoRef.current, {
             position: hasPlayedAnimation ? 'relative' : 'absolute',
             bottom: hasPlayedAnimation ? 'auto' : '2rem',
             left: hasPlayedAnimation ? 'auto' : '2rem',
-            opacity: hasPlayedAnimation ? 1 : 0,
+            opacity: 1, // ensure visible
             x: 0,
-            y: hasPlayedAnimation ? 0 : 80,
-            visibility: hasPlayedAnimation ? 'visible' : 'hidden'
+            y: hasPlayedAnimation ? 0 : 80
+            // removed visibility toggle to prevent hidden logo on route changes
         });
 
         gsap.set(navigationRef.current, {
@@ -860,7 +860,8 @@ function HeaderThree({ animationStage, languageValidation }) {
     return (
         <div
             ref={containerRef}
-            className={`${styles.loadingContainer} ${styles[animationStage]} ${headerFixed ? styles.fixedHeader : ''}`}
+            // Remove external animationStage coupling to avoid unintended states during navigation
+            className={`${styles.loadingContainer} ${headerFixed ? styles.fixedHeader : ''}`}
         >
             {/* Loading Animation - Only show during initial animation */}
             <div
