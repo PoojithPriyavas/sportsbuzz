@@ -149,6 +149,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
 
         }
     }, []);
+    console.log(animationStage, "animationStage value outer else");
 
     // Original loading timer (keeping for compatibility)
     useEffect(() => {

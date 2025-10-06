@@ -48,7 +48,7 @@ const Logo = React.memo(({ logoRef, buildPath }) => {
 });
 
 function HeaderThree({ animationStage, languageValidation }) {
-    console.log(animationStage, "animationStage value");
+    // console.log(animationStage, "animationStage value");
     const [darkMode, setDarkMode] = useState(false);
     const [headerFixed, setHeaderFixed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
