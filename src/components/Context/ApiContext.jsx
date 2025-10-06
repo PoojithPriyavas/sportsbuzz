@@ -799,7 +799,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
     // CRICKET LIVE SCORE SECTION
 
-    const rapidApiKey = '1f0cf9d711mshd3f8df3a0bdaf4ap1b7af3jsnd41d9bd9bbdf';
+    const rapidApiKey = process.env.NEXT_PUBLIC_FOOTBALL_RAPID_API_KEY;
 
     const [apiResponse, setApiResponse] = useState(null);
     const [matchTypes, setMatchTypes] = useState([]);
@@ -987,7 +987,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                     Timezone: currentTimezone
                 },
                 headers: {
-                    'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
+                    'X-RapidAPI-Key': process.env.NEXT_PUBLIC_FOOTBALL_RAPID_API_KEY,
                 }
             };
 
@@ -1037,7 +1037,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                     Timezone: currentTimezone
                 },
                 headers: {
-                    'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
+                    'X-RapidAPI-Key': process.env.NEXT_PUBLIC_FOOTBALL_RAPID_API_KEY,
                 }
             };
 
@@ -1095,7 +1095,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 `https://cricbuzz-cricket.p.rapidapi.com/news/v1/detail/${id}`,
                 {
                     headers: {
-                        'X-RapidAPI-Key': 'c3c1b4d9edmshb8fad382c23df43p14e64fjsn1f9d11ef49e1',
+                        'X-RapidAPI-Key': process.env.NEXT_PUBLIC_FOOTBALL_RAPID_API_KEY,
                     },
                 }
             );
