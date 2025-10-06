@@ -211,11 +211,17 @@ function HeaderThree({ animationStage, languageValidation }) {
         if (!hasPlayedAnimation) {
             setShouldShowAnimation(true);
 
+            // NEW: mark animation as played immediately to avoid logo delay on subsequent route changes
+            try {
+                localStorage.setItem('headerAnimationPlayed', 'true');
+            } catch (e) {}
+
             // Create the main timeline
             const tl = gsap.timeline({
                 onComplete: () => {
                     setAnimationComplete(true);
-                    localStorage.setItem('headerAnimationPlayed', 'true');
+                    // NOTE: we already set headerAnimationPlayed earlier to prevent re-runs across navigation
+                    // localStorage.setItem('headerAnimationPlayed', 'true');
                 }
             });
 
@@ -521,6 +527,11 @@ function HeaderThree({ animationStage, languageValidation }) {
         setLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
 
+        // NEW: ensure next route doesn't rerun intro animation which hides the logo
+        try {
+            localStorage.setItem('headerAnimationPlayed', 'true');
+        } catch (e) {}
+
         // Close dropdowns
         setExpandedLanguageSelector(false);
         if (isMobile) {
@@ -536,7 +547,7 @@ function HeaderThree({ animationStage, languageValidation }) {
             ? `/${newLangCountry}/${segments.slice(1).join('/')}`
             : `/${newLangCountry}`;
 
-        // Update URL (push returns void in next/navigation, do not chain .then)
+        // Update URL
         router.push(newPath);
     };
 
