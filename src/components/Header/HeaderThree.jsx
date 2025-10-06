@@ -33,16 +33,16 @@ function getCookie(name) {
 const Logo = React.memo(({ logoRef, buildPath }) => {
     return (
         <div ref={logoRef} className={styles.logo}>
-            <div onClick={() => router.push(buildPath("/"))} className={styles.logoContent}>
+            <a href="/" className={styles.logoContent}>
                 <div className={styles.logoIcon}>
                     <img
                         src="/sportsbuz.png"
                         alt="Sportsbuz Logo"
                         className={styles.logoIconInner}
-                        style={{ opacity: 1 }} // Force the logo to always be visible
+                        style={{ opacity: 1 }}
                     />
                 </div>
-            </div>
+            </a>
         </div>
     );
 });
@@ -175,7 +175,7 @@ function HeaderThree({ animationStage, languageValidation }) {
     // Initialize GSAP animation
     useIsomorphicLayoutEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
-
+        console.log(hasPlayedAnimation, "hasPlayedAnimation value");
         // Set initial states IMMEDIATELY to prevent flash
         gsap.set(containerRef.current, {
             height: hasPlayedAnimation ? '5rem' : '100vh',
@@ -891,7 +891,7 @@ function HeaderThree({ animationStage, languageValidation }) {
                             </a>
                         )}
 
-                        <a href={buildPath("/match-schedules" )}className={`${styles.navItem} ${pathname === `${pathPrefix}/match-schedules` ? styles.active : ''}`}>
+                        <a href={buildPath("/match-schedules")} className={`${styles.navItem} ${pathname === `${pathPrefix}/match-schedules` ? styles.active : ''}`}>
                             {translatedText.schedule}
                         </a>
 
