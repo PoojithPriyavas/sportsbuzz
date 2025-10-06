@@ -33,7 +33,7 @@ function getCookie(name) {
 const Logo = React.memo(({ logoRef, buildPath }) => {
     return (
         <div ref={logoRef} className={styles.logo}>
-            <Link as={buildPath("/")} href={buildPath("/")} className={styles.logoContent}>
+            <div onClick={() => router.push(buildPath("/"))} className={styles.logoContent}>
                 <div className={styles.logoIcon}>
                     <img
                         src="/sportsbuz.png"
@@ -42,7 +42,7 @@ const Logo = React.memo(({ logoRef, buildPath }) => {
                         style={{ opacity: 1 }} // Force the logo to always be visible
                     />
                 </div>
-            </Link>
+            </div>
         </div>
     );
 });
