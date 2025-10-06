@@ -199,7 +199,7 @@ function HeaderThree({ animationStage, languageValidation }) {
             opacity: hasPlayedAnimation ? 1 : 0,
             x: 0,
             y: hasPlayedAnimation ? 0 : 80,
-            visibility: hasPlayedAnimation ? 'visible' : 'visible'
+            visibility: hasPlayedAnimation ? 'visible' : 'hidden'
         });
 
         gsap.set(navigationRef.current, {

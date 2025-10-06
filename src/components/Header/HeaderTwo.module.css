@@ -106,8 +106,10 @@
     position: relative;
     flex-shrink: 0;
     padding: 10px;
-    opacity: 0;
-    visibility: hidden;
+    /* Removed to prevent logo being stuck hidden on hot reloads:
+       opacity: 0;
+       visibility: hidden;
+    */
     /* GSAP will handle visibility and positioning */
 }
 
@@ -993,4 +995,7 @@
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
+}
+.visible{
+    visibility: visible !important;
 }
