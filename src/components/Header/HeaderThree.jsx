@@ -173,6 +173,16 @@ function HeaderThree({ animationStage, languageValidation }) {
     const hreflangTags = locationData?.hreflang_tags || [];
     const filteredLocations = locationData?.filtered_locations || [];
 
+    // Ensure header final state CSS applies on initial paint if animation has already played
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const played = localStorage.getItem('headerAnimationPlayed') === 'true';
+            if (played) {
+                document.documentElement.classList.add('header-played');
+            }
+        }
+    }, []);
+
     // Initialize GSAP animation
     useIsomorphicLayoutEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
@@ -211,9 +221,10 @@ function HeaderThree({ animationStage, languageValidation }) {
         if (!hasPlayedAnimation) {
             setShouldShowAnimation(true);
 
-            // NEW: mark animation as played immediately to avoid logo delay on subsequent route changes
+            // Mark animation as played immediately to avoid overlay/logo hidden on next routes
             try {
                 localStorage.setItem('headerAnimationPlayed', 'true');
+                document.documentElement.classList.add('header-played');
             } catch (e) {}
 
             // Create the main timeline
@@ -530,6 +541,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         // NEW: ensure next route doesn't rerun intro animation which hides the logo
         try {
             localStorage.setItem('headerAnimationPlayed', 'true');
+            document.documentElement.classList.add('header-played');
         } catch (e) {}
 
         // Close dropdowns

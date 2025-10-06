@@ -996,3 +996,970 @@
     opacity: 0 !important;
     pointer-events: none !important;
 }
+
+/* Final state styling when header has already played - applies on initial paint */
+:global(.header-played) .loadingContainer {
+    height: 5rem;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+}
+
+.loadingAnimation {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Initial state will be set by GSAP */
+    pointer-events: none; /* Prevent overlay from blocking clicks */
+}
+
+.loadingIcon {
+    position: relative;
+}
+
+.mainIcon {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.iconInner {
+    width: 4rem;
+    height: 4rem;
+    color: white;
+}
+
+.rotatingRing {
+    position: absolute;
+    inset: 0;
+    border: 4px solid transparent;
+    border-top-color: #67e8f9;
+    border-right-color: #67e8f9;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.pulseRing {
+    position: absolute;
+    inset: -1rem;
+    border: 2px solid #22d3ee;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.backgroundGlow {
+    position: absolute;
+    inset: 0;
+    width: 8rem;
+    height: 8rem;
+    background-color: #22d3ee;
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: pulse 2s ease-in-out infinite;
+    filter: blur(3rem);
+}
+
+.logo {
+    /* Initial state: completely hidden to prevent flash */
+    position: relative;
+    flex-shrink: 0;
+    padding: 10px;
+    /* Removed to prevent logo being stuck hidden on hot reloads:
+       opacity: 0;
+       visibility: hidden;
+    */
+    /* GSAP will handle visibility and positioning */
+}
+
+.logoContent {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logoIcon {
+    width: 120px;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.logoIconInner {
+    height: 1.75rem;
+    color: white;
+}
+
+.logoText {
+    color: white;
+}
+
+.logoTitle {
+    font-size: 1.875rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.logoAccent {
+    color: #67e8f9;
+}
+
+.divider {
+    padding: 8px;
+    border-right: 3px solid #fff;
+    flex-shrink: 0;
+}
+
+:global(.dark-theme) .divider {
+    border-right-color: #e2e8f0;
+}
+
+.navigation {
+    /* Initial state: hidden by default to prevent flash */
+    position: relative;
+    display: none;
+    opacity: 0;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    padding-left: 15px;
+    /* GSAP will handle visibility */
+}
+
+.leftSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 0;
+    overflow: visible;
+    position: relative;
+}
+
+.rightSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.navLinks {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-left: 8px;
+    flex-wrap: nowrap;
+    overflow: visible;
+    flex: 1;
+    min-width: 0;
+    position: relative;
+}
+
+.navLink {
+    color: white;
+    font-weight: 500;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.navLink:hover {
+    color: #67e8f9;
+    transform: scale(1.05);
+}
+
+:global(.dark-theme) .navLink:hover {
+    color: #22d3ee;
+}
+
+.navItem {
+    color: white;
+    font-weight: 500;
+    font-size: 0.89rem;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.navItem:hover,
+.navLink:hover {
+    color: #67e8f9;
+    transform: scale(1.02);
+}
+
+:global(.dark-theme) .navItem:hover,
+:global(.dark-theme) .navLink:hover {
+    color: #22d3ee;
+}
+
+.navItem.active {
+    color: #67e8f9;
+    font-weight: 600;
+}
+
+:global(.dark-theme) .navItem.active {
+    color: #22d3ee;
+}
+
+.dropdown {
+    position: relative;
+    z-index: 10000;
+    flex-shrink: 0;
+}
+
+.submenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #0046aa;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    padding: 8px 0;
+    min-width: 160px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10001;
+    list-style: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px) translateZ(0);
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    pointer-events: none;
+}
+
+:global(.dark-theme) .submenu {
+    background: #1e293b;
+    border-color: rgba(226, 232, 240, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Make submenu interactive when visible */
+.dropdown:hover .submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) translateZ(0);
+    pointer-events: auto;
+}
+
+.submenuItem {
+    padding: 8px 16px;
+    display: block;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    position: relative;
+    z-index: 1;
+}
+
+.submenuItem:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+:global(.dark-theme) .submenuItem:hover {
+    background-color: rgba(226, 232, 240, 0.1);
+}
+
+/* Dark Mode Toggle Button Styles */
+.darkModeButton {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1000;
+    min-width: 40px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.darkModeButton:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.02);
+}
+
+:global(.dark-theme) .darkModeButton {
+    border-color: rgba(226, 232, 240, 0.3);
+    color: #e2e8f0;
+}
+
+:global(.dark-theme) .darkModeButton:hover {
+    border-color: rgba(226, 232, 240, 0.5);
+    background-color: rgba(226, 232, 240, 0.1);
+}
+
+.sportsSelectorWrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.sportsSelectorWrapper .loadingIndicator {
+    position: absolute;
+    right: 2.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+
+.languageSelector,
+.sportsSelector {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1000;
+    min-width: 80px;
+    max-width: 120px;
+}
+
+:global(.dark-theme) .languageSelector,
+:global(.dark-theme) .sportsSelector {
+    border-color: rgba(226, 232, 240, 0.3);
+    color: #e2e8f0;
+}
+
+.sportsSelector.disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.languageSelector:hover,
+.sportsSelector:hover:not(.disabled) {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+:global(.dark-theme) .languageSelector:hover,
+:global(.dark-theme) .sportsSelector:hover:not(.disabled) {
+    border-color: rgba(226, 232, 240, 0.5);
+}
+
+.languageSelector option,
+.sportsSelector option {
+    background: #0046aa;
+    color: white;
+}
+
+:global(.dark-theme) .languageSelector option,
+:global(.dark-theme) .sportsSelector option {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+
+.signInButton {
+    background-color: #06b6d4;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+.signInButton:hover {
+    background-color: #22d3ee;
+    transform: scale(1.02);
+}
+
+:global(.dark-theme) .signInButton {
+    background-color: #0891b2;
+}
+
+:global(.dark-theme) .signInButton:hover {
+    background-color: #06b6d4;
+}
+
+/* Keyframe Animations */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-0.625rem);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes ping {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    75%,
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* Mobile Menu Button - Hidden by default */
+.mobileMenuButton {
+    display: none;
+    opacity: 0;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.mobileMenuButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+:global(.dark-theme) .mobileMenuButton:hover {
+    background-color: rgba(226, 232, 240, 0.1);
+}
+
+.mobileOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+:global(.dark-theme) .mobileOverlay {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.mobileOverlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobileSidebar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: linear-gradient(135deg, #16213e 0%, #045fc6 50%, #16213e 100%);
+    z-index: 10000;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+    padding: 2rem 0;
+}
+
+:global(.dark-theme) .mobileSidebar {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+}
+
+.mobileSidebar.open {
+    right: 0;
+}
+
+.mobileHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 1rem;
+}
+
+:global(.dark-theme) .mobileHeader {
+    border-bottom-color: rgba(226, 232, 240, 0.2);
+}
+
+.mobileCloseButton {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.mobileCloseButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+:global(.dark-theme) .mobileCloseButton:hover {
+    background-color: rgba(226, 232, 240, 0.1);
+}
+
+.mobileNavLinks {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0 1.5rem;
+}
+
+.mobileNavItem {
+    color: white;
+    font-weight: 500;
+    font-size: 1.1rem;
+    text-decoration: none;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+:global(.dark-theme) .mobileNavItem {
+    color: #e2e8f0;
+    border-bottom-color: rgba(226, 232, 240, 0.1);
+}
+
+.mobileNavItem:hover {
+    color: #67e8f9;
+    padding-left: 0.5rem;
+}
+
+:global(.dark-theme) .mobileNavItem:hover {
+    color: #22d3ee;
+}
+
+.mobileNavItem.active {
+    color: #67e8f9;
+    font-weight: 600;
+}
+
+:global(.dark-theme) .mobileNavItem.active {
+    color: #22d3ee;
+}
+
+.mobileDropdown {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+:global(.dark-theme) .mobileDropdown {
+    border-bottom-color: rgba(226, 232, 240, 0.1);
+}
+
+.mobileDropdownHeader {
+    color: white;
+    font-weight: 500;
+    font-size: 1.1rem;
+    padding: 1rem 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+:global(.dark-theme) .mobileDropdownHeader {
+    color: #e2e8f0;
+}
+
+.mobileDropdownHeader:hover {
+    color: #67e8f9;
+    padding-left: 0.5rem;
+}
+
+:global(.dark-theme) .mobileDropdownHeader:hover {
+    color: #22d3ee;
+}
+
+.mobileSubmenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.2);
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem;
+}
+
+:global(.dark-theme) .mobileSubmenu {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.mobileSubmenu.open {
+    max-height: 500px;
+    padding: 0.5rem 1.5rem;
+}
+
+.mobileSubmenuItem {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    text-decoration: none;
+    padding: 0.75rem 0;
+    padding-left: 1rem;
+    display: block;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+:global(.dark-theme) .mobileSubmenuItem {
+    color: rgba(226, 232, 240, 0.8);
+    border-bottom-color: rgba(226, 232, 240, 0.05);
+}
+
+.mobileSubmenuItem:hover {
+    color: #67e8f9;
+    padding-left: 1.5rem;
+}
+
+:global(.dark-theme) .mobileSubmenuItem:hover {
+    color: #22d3ee;
+}
+
+.mobileSelectors {
+    padding: 0 1.5rem;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 2rem;
+}
+
+:global(.dark-theme) .mobileSelectors {
+    border-top-color: rgba(226, 232, 240, 0.2);
+}
+
+.mobileSelectorGroup {
+    margin-bottom: 1.5rem;
+}
+
+.mobileSelectorLabel {
+    color: white;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-weight: 500;
+}
+
+:global(.dark-theme) .mobileSelectorLabel {
+    color: #e2e8f0;
+}
+
+.mobileSelector {
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+:global(.dark-theme) .mobileSelector {
+    border-color: rgba(226, 232, 240, 0.3);
+    color: #e2e8f0;
+}
+
+.mobileSelector:hover,
+.mobileSelector:focus {
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+:global(.dark-theme) .mobileSelector:hover,
+:global(.dark-theme) .mobileSelector:focus {
+    border-color: rgba(226, 232, 240, 0.6);
+}
+
+.mobileSelector option {
+    background: #0046aa;
+    color: white;
+}
+
+:global(.dark-theme) .mobileSelector option {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+
+/* Mobile Selector Dropdown Styles */
+.mobileSelectors .mobileDropdown {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0;
+}
+
+:global(.dark-theme) .mobileSelectors .mobileDropdown {
+    border-bottom-color: rgba(226, 232, 240, 0.1);
+}
+
+.mobileSelectors .mobileDropdown:last-child {
+    border-bottom: none;
+}
+
+.mobileSelectors .mobileDropdownHeader {
+    padding: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.mobileSelectors .mobileDropdownHeader:hover {
+    color: #67e8f9;
+    padding-left: 0.5rem;
+}
+
+:global(.dark-theme) .mobileSelectors .mobileDropdownHeader:hover {
+    color: #22d3ee;
+}
+
+.mobileSelectors .mobileSubmenu {
+    margin: 0 -1.5rem;
+    padding: 0 1.5rem;
+}
+
+.mobileSelectors .mobileSubmenu.open {
+    padding: 0.5rem 1.5rem;
+}
+
+.mobileSelectors .mobileSubmenuItem {
+    cursor: pointer;
+    padding: 0.75rem 0;
+    padding-left: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+
+:global(.dark-theme) .mobileSelectors .mobileSubmenuItem {
+    border-bottom-color: rgba(226, 232, 240, 0.05);
+}
+
+.mobileSelectors .mobileSubmenuItem:hover {
+    color: #67e8f9;
+    padding-left: 1.5rem;
+}
+
+:global(.dark-theme) .mobileSelectors .mobileSubmenuItem:hover {
+    color: #22d3ee;
+}
+
+.mobileSelectors .mobileSubmenuItem.active {
+    color: #67e8f9;
+    font-weight: 600;
+}
+
+:global(.dark-theme) .mobileSelectors .mobileSubmenuItem.active {
+    color: #22d3ee;
+}
+
+.mobileTopRow {
+    display: none;
+}
+
+/* Enhanced Responsive Design */
+@media (max-width: 1200px) {
+    .navLinks {
+        gap: 0.8rem;
+    }
+
+    .navItem {
+        font-size: 0.9rem;
+    }
+
+    .languageSelector,
+    .sportsSelector {
+        min-width: 70px;
+        max-width: 100px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 992px) {
+    .leftSection {
+        gap: 0.8rem;
+    }
+
+    .navLinks {
+        gap: 0.6rem;
+    }
+
+    .navItem {
+        font-size: 0.85rem;
+    }
+
+    .logoIcon {
+        width: 100px;
+    }
+}
+
+/* Tablet and Mobile Responsive Design */
+/* Tablet and Mobile Responsive Design */
+@media (max-width: 1400px) {
+    .loadingContainer {
+        padding: 0 1rem;
+        justify-content: space-between;
+    }
+
+    .navigation {
+        width: 100%;
+        justify-content: space-between;
+        padding-left: 0;
+    }
+
+    /* Hide desktop navigation */
+    .leftSection .navLinks,
+    .rightSection .languageSelector,
+    .rightSection .sportsSelector,
+    .rightSection .navItem:not(.featuredButton),
+    .rightSection .darkModeButton {
+        display: none;
+    }
+
+    .divider {
+        display: none;
+    }
+
+    /* Show mobile top row */
+    .mobileTopRow {
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        width: 100%;
+    }
+
+    .mobileMenuButton {
+        display: block;
+        opacity: 1;
+    }
+
+    .logoIcon {
+        width: 175px;
+    }
+
+    /* Ensure featured button stays visible */
+    .rightSection {
+        gap: 1rem;
+        align-items: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .loadingContainer {
+        padding: 0 0.75rem;
+    }
+
+    .logoIcon {
+        width: 135px;
+    }
+
+    .logoIconInner {
+        height: 1.5rem;
+    }
+
+    .mobileSidebar {
+        width: 100%;
+        right: -100%;
+    }
+
+    .mobileMenuButton {
+        font-size: 1.25rem;
+        padding: 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .loadingContainer {
+        padding: 0 0.5rem;
+    }
+
+    .logoIcon {
+        width: 100px;
+    }
+
+    .logoIconInner {
+        height: 1.25rem;
+    }
+
+    .mobileNavItem,
+    .mobileDropdownHeader {
+        font-size: 1rem;
+        padding: 0.875rem 0;
+    }
+
+    .mobileSubmenuItem {
+        font-size: 0.9rem;
+        padding: 0.625rem 0;
+    }
+}
+
+/* Utility: hidden state used by HeaderThree.jsx */
+.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
