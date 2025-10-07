@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, use } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import styles from './HeaderTwo.module.css';
 import { usePathname, useRouter } from 'next/navigation';
@@ -10,7 +10,8 @@ import { usePathHelper } from '@/hooks/usePathHelper';
 
 import FeaturedButton from '../FeaturedButton/FeaturedButton';
 
-import DynamicLink from '../Common/DynamicLink';
+
+// import DynamicLink from '../Common/DynamicLink';
 
 function getCookie(name) {
     if (typeof document === 'undefined') return null;
@@ -28,22 +29,47 @@ function getCookie(name) {
     return null;
 }
 
-const HeaderThree = ({ animationStage, languageValidation }) => {
+// Top-level component: Logo
+const Logo = React.memo(({ logoRef, buildPath }) => {
+    return (
+        <div ref={logoRef} className={styles.logo}>
+            <a href={buildPath("/")} className={styles.logoContent}>
+                <div className={styles.logoIcon}>
+                    <img
+                        src="/sportsbuz.png"
+                        alt="Sportsbuz Logo"
+                        className={styles.logoIconInner}
+                        style={{ opacity: 1 }}
+                    />
+                </div>
+            </a>
+        </div>
+    );
+});
+
+function HeaderThree({ animationStage, languageValidation }) {
+    // console.log(animationStage, "animationStage value");
     const [darkMode, setDarkMode] = useState(false);
     const [headerFixed, setHeaderFixed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState(null);
+    // Add isTranslating state
+    const [isTranslating, setIsTranslating] = useState(false);
+    // New: track when the user is actively changing language to prevent URL effect from overriding
+    const [isUserChangingLanguage, setIsUserChangingLanguage] = useState(false);
+    // New: hold the selected language until the URL updates
+    const [pendingLanguage, setPendingLanguage] = useState(null);
     const router = useRouter();
-    
+
     // Use the usePathHelper hook
     const { pathPrefix, buildPath } = usePathHelper();
-    
+
     // Add a function to generate URLs efficiently
     const getUrl = (path) => {
         return buildPath(path);
     };
-    
+
     // Mobile dropdown states
     const [expandedLanguageSelector, setExpandedLanguageSelector] = useState(false);
     const [expandedSportsSelector, setExpandedSportsSelector] = useState(false);
@@ -89,6 +115,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         country,
         setCountry
     } = useGlobalData();
+    console.log(blogCategories, "blog categories in header")
 
     // Initialize dark mode from localStorage
     useEffect(() => {
@@ -108,19 +135,19 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     const toggleDarkMode = () => {
         const newDarkMode = !darkMode;
         setDarkMode(newDarkMode);
-        
+
         // Save to localStorage
         if (typeof window !== 'undefined') {
             localStorage.setItem('darkMode', newDarkMode.toString());
         }
-        
+
         // Apply theme to document
         if (newDarkMode) {
             document.documentElement.classList.add('dark-theme');
         } else {
             document.documentElement.classList.remove('dark-theme');
         }
-        
+
         // Close mobile menu if open
         if (isMobile) {
             setMobileMenuOpen(false);
@@ -145,11 +172,20 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
 
     const hreflangTags = locationData?.hreflang_tags || [];
     const filteredLocations = locationData?.filtered_locations || [];
-    
-    // Initialize GSAP animation
-    useEffect(() => {
-        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
 
+    // Ensure header final state CSS applies on initial paint if animation has already played
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const played = localStorage.getItem('headerAnimationPlayed') === 'true';
+            if (played) {
+                document.documentElement.classList.add('header-played');
+            }
+        }
+    }, []);
+
+    // Initialize GSAP animation
+    useIsomorphicLayoutEffect(() => {
+        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
         // Set initial states IMMEDIATELY to prevent flash
         gsap.set(containerRef.current, {
             height: hasPlayedAnimation ? '5rem' : '100vh',
@@ -166,14 +202,15 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
             display: hasPlayedAnimation ? 'none' : 'flex'
         });
 
+        // Keep the logo visible immediately; allow position animation only for first run
         gsap.set(logoRef.current, {
             position: hasPlayedAnimation ? 'relative' : 'absolute',
             bottom: hasPlayedAnimation ? 'auto' : '2rem',
             left: hasPlayedAnimation ? 'auto' : '2rem',
-            opacity: hasPlayedAnimation ? 1 : 0,
+            opacity: 1, // ensure visible
             x: 0,
-            y: hasPlayedAnimation ? 0 : 80,
-            visibility: hasPlayedAnimation ? 'visible' : 'hidden'
+            y: hasPlayedAnimation ? 0 : 80
+            // removed visibility toggle to prevent hidden logo on route changes
         });
 
         gsap.set(navigationRef.current, {
@@ -184,11 +221,18 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         if (!hasPlayedAnimation) {
             setShouldShowAnimation(true);
 
+            // Mark animation as played immediately to avoid overlay/logo hidden on next routes
+            try {
+                localStorage.setItem('headerAnimationPlayed', 'true');
+                document.documentElement.classList.add('header-played');
+            } catch (e) {}
+
             // Create the main timeline
             const tl = gsap.timeline({
                 onComplete: () => {
                     setAnimationComplete(true);
-                    localStorage.setItem('headerAnimationPlayed', 'true');
+                    // NOTE: we already set headerAnimationPlayed earlier to prevent re-runs across navigation
+                    // localStorage.setItem('headerAnimationPlayed', 'true');
                 }
             });
 
@@ -292,20 +336,20 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     // Function to parse URL path for country code and language
     const parseUrlPath = (pathname) => {
         if (!pathname) return { countryCode: '', language: '' };
-        
+
         // Extract the first segment of the path (e.g., "en-lk" from "/en-lk/some/path")
         const firstSegment = pathname.replace(/^\//, '').split('/')[0];
-        
+
         // Check if it matches the format: language-countrycode
         const match = firstSegment.match(/^([a-z]{2})-([a-z]{2})$/i);
-        
+
         if (match) {
             return {
                 language: match[1].toLowerCase(),
                 countryCode: match[2].toLowerCase()
             };
         }
-        
+
         return { countryCode: '', language: '' };
     };
 
@@ -318,7 +362,8 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         // Set language from URL if available and valid
         if (urlLanguage) {
             const isValidLanguage = location.some(loc => loc.hreflang === urlLanguage);
-            if (isValidLanguage && language !== urlLanguage) {
+            // Only set language from URL if it's valid, differs from current, and user isn't in the middle of changing it
+            if (isValidLanguage && language !== urlLanguage && !isUserChangingLanguage) {
                 setLanguage(urlLanguage);
                 localStorage.setItem('language', urlLanguage);
             }
@@ -338,7 +383,24 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                 }
             }
         }
-    }, [pathname, location, language]);
+    }, [pathname, location, language, isUserChangingLanguage]);
+
+    // New: Start translation only after the URL reflects the pending language
+    useEffect(() => {
+        if (!isUserChangingLanguage || !pendingLanguage) return;
+
+        const { language: urlLanguage } = parseUrlPath(pathname);
+        if (urlLanguage === pendingLanguage) {
+            translateContent(pendingLanguage)
+                .catch(error => {
+                    console.error('Translation error:', error);
+                })
+                .finally(() => {
+                    setIsUserChangingLanguage(false);
+                });
+            setPendingLanguage(null);
+        }
+    }, [pathname, isUserChangingLanguage, pendingLanguage]);
 
     // Close mobile menu when clicking outside
     useEffect(() => {
@@ -368,6 +430,11 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     }, [mobileMenuOpen]);
 
     const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
+
+    // Add this useEffect
+    useEffect(() => {
+        setTranslatedCategories(blogCategories);
+    }, [blogCategories]);
     const [translatedText, setTranslatedText] = useState({
         home: 'Home',
         apps: 'Best Betting Apps',
@@ -386,11 +453,11 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         if (typeof window !== 'undefined') {
             const savedLanguage = localStorage.getItem('language');
             const cachedTranslations = localStorage.getItem('cachedTranslations');
-            
+
             if (savedLanguage && savedLanguage !== language) {
                 setLanguage(savedLanguage);
             }
-            
+
             // If we have cached translations for the current language, use them immediately
             if (cachedTranslations) {
                 try {
@@ -438,210 +505,121 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
         }
     }, [location, countryCode]);
 
-    useEffect(() => {
-        const updateTranslations = async () => {
-            try {
-                // Create a grouped object for all texts that need translation
-                const allTextsToTranslate = {
-                    // Navigation items
-                    navItems: [
-                        'Home',
-                        'Best Betting Apps',
-                        'News',
-                        'Match Schedules',
-                        'Cricket',
-                        'Football',
-                        'Contact',
-                        'Language',
-                        'Sport'
-                    ]
-                };
-                
-                // Add blog categories and subcategories
-                if (blogCategories.length > 0) {
-                    // Add category names
-                    allTextsToTranslate.categories = blogCategories.map(cat => cat.name);
-                    
-                    // Add subcategory names
-                    const allSubcategories = [];
-                    blogCategories.forEach(cat => {
-                        if (cat.subcategories?.length > 0) {
-                            cat.subcategories.forEach(sub => {
-                                allSubcategories.push(sub.name);
-                            });
-                        }
-                    });
-                    
-                    if (allSubcategories.length > 0) {
-                        allTextsToTranslate.subcategories = allSubcategories;
-                    }
-                }
-                
-                // Get translations in a single API call for all text groups
-                const translatedGroups = await translateText(allTextsToTranslate, 'en', language);
-                
-                // Update navigation item translations
-                setTranslatedText(prev => ({
-                    ...prev,
-                    home: translatedGroups.navItems[0],
-                    apps: translatedGroups.navItems[1],
-                    news: translatedGroups.navItems[2],
-                    schedule: translatedGroups.navItems[3],
-                    cricket: translatedGroups.navItems[4],
-                    football: translatedGroups.navItems[5],
-                    contact: translatedGroups.navItems[6],
-                    language: translatedGroups.navItems[7],
-                    sport: translatedGroups.navItems[8]
-                }));
-                
-                // Update blog categories with their translations
-                if (blogCategories.length > 0) {
-                    let subcategoryIndex = 0;
-                    const translatedCategories = blogCategories.map((cat, catIndex) => {
-                        // Get translated category name
-                        const translatedCatName = translatedGroups.categories[catIndex];
-                        
-                        // Get translated subcategories if they exist
-                        let translatedSubs = [];
-                        if (cat.subcategories?.length > 0) {
-                            translatedSubs = cat.subcategories.map(sub => {
-                                const translatedSubName = translatedGroups.subcategories[subcategoryIndex++];
-                                return {
-                                    ...sub,
-                                    name: translatedSubName,
-                                };
-                            });
-                        }
-                        
-                        return {
-                            ...cat,
-                            name: translatedCatName,
-                            subcategories: translatedSubs,
-                        };
-                    });
-                    
-                    setTranslatedCategories(translatedCategories);
-                    
-                    // Cache translations in localStorage to prevent flashing
-                    localStorage.setItem('cachedTranslations', JSON.stringify({
-                        language: language,
-                        translations: {
-                            home: translatedGroups.navItems[0],
-                            apps: translatedGroups.navItems[1],
-                            news: translatedGroups.navItems[2],
-                            schedule: translatedGroups.navItems[3],
-                            cricket: translatedGroups.navItems[4],
-                            football: translatedGroups.navItems[5],
-                            contact: translatedGroups.navItems[6],
-                            language: translatedGroups.navItems[7],
-                            sport: translatedGroups.navItems[8]
-                        }
-                    }));
-                }
-            } catch (error) {
-                console.error('Translation error:', error);
-            }
-        };
-    
-        updateTranslations();
-    }, [language, translateText, blogCategories]);
+    // Add this function to handle URL updates
+    const updateUrlWithLanguage = (selectedLanguage) => {
+        const currentPath = pathname;
+        const segments = currentPath.split('/').filter(Boolean);
 
-    // Add a new state for tracking translation loading
-    const [isTranslating, setIsTranslating] = useState(false);
+        // Get the current country code from the URL
+        const currentLangCountry = segments[0]?.split('-')[1] || 'in'; // default to 'in' if not found
+
+        // Create the new language-country code
+        const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
+
+        // Reconstruct the URL
+        const newPath = segments.length > 1
+            ? `/${newLangCountry}/${segments.slice(1).join('/')}`
+            : `/${newLangCountry}`;
+
+        // Use router to update the URL immediately
+        router.push(newPath);
+    };
+
 
     // Updated handleLanguageChange function
     const handleLanguageChange = async (selectedLanguage) => {
-        // Set loading state
-        setIsTranslating(true);
-        
-        // Update language in state and localStorage
+        if (selectedLanguage === language) return;
+
+        // Mark that the user is changing the language to prevent URL effect from overriding
+        setIsUserChangingLanguage(true);
+        setPendingLanguage(selectedLanguage);
+
+        // Immediately update UI state (dropdown selection)
         setLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
-        
+
+        // NEW: ensure next route doesn't rerun intro animation which hides the logo
+        try {
+            localStorage.setItem('headerAnimationPlayed', 'true');
+            document.documentElement.classList.add('header-played');
+        } catch (e) {}
+
         // Close dropdowns
         setExpandedLanguageSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);
         }
-        
+
+        // Prepare URL update
+        const currentPath = pathname;
+        const segments = currentPath.split('/').filter(Boolean);
+        const currentLangCountry = segments[0]?.split('-')[1] || 'in';
+        const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
+        const newPath = segments.length > 1
+            ? `/${newLangCountry}/${segments.slice(1).join('/')}`
+            : `/${newLangCountry}`;
+
+        // Update URL
+        router.push(newPath);
+    };
+
+    // Separate translation logic into its own function
+    const translateContent = async (selectedLanguage) => {
         try {
-            // Pre-fetch translations before navigation
-            const textsToTranslate = [
-                { text: 'Home' },
-                { text: 'Best Betting Apps' },
-                { text: 'News' },
-                { text: 'Match Schedules' },
-                { text: 'Cricket' },
-                { text: 'Football' },
-                { text: 'Contact' },
-                { text: 'Language' },
-                { text: 'Sport' }
-            ];
-            
-            // Get translations in a single API call
-            const translations = await translateText(textsToTranslate, 'en', selectedLanguage);
-            
-            // Update state with the translated texts
+            setIsTranslating(true);
+
+            const translations = {};
+
+            // Translate Home
+            const homeTranslation = await translateText([{ text: 'Home' }], 'en', selectedLanguage);
+            translations.home = homeTranslation[0];
+
+            // Translate Best Betting Apps
+            const appsTranslation = await translateText([{ text: 'Best Betting Apps' }], 'en', selectedLanguage);
+            translations.apps = appsTranslation[0];
+
+            // Translate News
+            const newsTranslation = await translateText([{ text: 'News' }], 'en', selectedLanguage);
+            translations.news = newsTranslation[0];
+
+            // Translate Match Schedules
+            const scheduleTranslation = await translateText([{ text: 'Match Schedules' }], 'en', selectedLanguage);
+            translations.schedule = scheduleTranslation[0];
+
+            // Translate Cricket
+            const cricketTranslation = await translateText([{ text: 'Cricket' }], 'en', selectedLanguage);
+            translations.cricket = cricketTranslation[0];
+
+            // Translate Football
+            const footballTranslation = await translateText([{ text: 'Football' }], 'en', selectedLanguage);
+            translations.football = footballTranslation[0];
+
+            // Translate Contact
+            const contactTranslation = await translateText([{ text: 'Contact' }], 'en', selectedLanguage);
+            translations.contact = contactTranslation[0];
+
+            // Translate Language
+            const languageTranslation = await translateText([{ text: 'Language' }], 'en', selectedLanguage);
+            translations.language = languageTranslation[0];
+
+            // Translate Sport
+            const sportTranslation = await translateText([{ text: 'Sport' }], 'en', selectedLanguage);
+            translations.sport = sportTranslation[0];
+
+            // Update state with all translations
             setTranslatedText(prev => ({
                 ...prev,
-                home: translations[0],
-                apps: translations[1],
-                news: translations[2],
-                schedule: translations[3],
-                cricket: translations[4],
-                football: translations[5],
-                contact: translations[6],
-                language: translations[7],
-                sport: translations[8]
+                ...translations
             }));
-            
-            // Cache translations in localStorage to prevent flashing
+
+            // Cache translations in localStorage
             localStorage.setItem('cachedTranslations', JSON.stringify({
                 language: selectedLanguage,
-                translations: {
-                    home: translations[0],
-                    apps: translations[1],
-                    news: translations[2],
-                    schedule: translations[3],
-                    cricket: translations[4],
-                    football: translations[5],
-                    contact: translations[6],
-                    language: translations[7],
-                    sport: translations[8]
-                }
+                translations: translations
             }));
-            
-            // Get current URL path parts
-            const { countryCode: currentCountryCode } = parseUrlPath(pathname);
-            
-            // If we have a valid country code in the URL
-            if (currentCountryCode) {
-                // Get the current URL
-                const currentUrl = new URL(window.location.href);
-                
-                // Get the path without the domain
-                let path = currentUrl.pathname;
-                
-                // Replace the language code in the path
-                // First segment is language-country, so we replace it with newlanguage-country
-                const newPath = path.replace(/^\/([a-z]{2})-([a-z]{2})/, `/${selectedLanguage}-${currentCountryCode}`);
-                
-                // Create the new URL with the updated path
-                const newUrl = new URL(newPath, window.location.origin);
-                
-                // Keep any existing query parameters
-                newUrl.search = currentUrl.search;
-                
-                console.log('🔄 Navigating to new language path:', newUrl.toString());
-                
-                // Now that translations are complete, navigate to the new URL
-                window.location.href = newUrl.toString();
-            } else {
-                console.error('No country code found in URL');
-                setIsTranslating(false);
-            }
         } catch (error) {
-            console.error('Translation error before navigation:', error);
+            console.error('Translation error:', error);
+        } finally {
             setIsTranslating(false);
         }
     };
@@ -708,11 +686,11 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
             >
                 {/* Mobile Header */}
                 <div className={styles.mobileHeader}>
-                    <DynamicLink href="/" className={styles.logoContent}>
+                    <a href={buildPath("/")} className={styles.logoContent}>
                         <div className={styles.logoIcon}>
                             <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                         </div>
-                    </DynamicLink>
+                    </a>
                     <button
                         className={styles.mobileCloseButton}
                         onClick={() => setMobileMenuOpen(false)}
@@ -723,31 +701,31 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
 
                 {/* Mobile Navigation Links */}
                 <div className={styles.mobileNavLinks}>
-                    <DynamicLink
-                        href="/"
+                    <a
+                        href={buildPath("/")}
                         className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.home}
-                    </DynamicLink>
+                    </a>
 
                     {countryCode?.location?.betting_apps == 'Active' && (
-                        <DynamicLink
-                            href="/best-betting-apps/current"
+                        <a
+                            href={buildPath("/best-betting-apps/current")}
                             className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/best-betting-apps/current` ? styles.active : ''}`}
                             onClick={handleNavItemClick}
                         >
                             {translatedText.apps}
-                        </DynamicLink>
+                        </a>
                     )}
 
-                    <DynamicLink
-                        href="/match-schedules"
+                    <a
+                        href={buildPath("/match-schedules")}
                         className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/match-schedules` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.schedule}
-                    </DynamicLink>
+                    </a>
 
                     {/* Mobile Dropdown Categories */}
                     {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
@@ -756,12 +734,12 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                                 className={styles.mobileDropdownHeader}
                                 onClick={() => toggleCategory(cat.id)}
                             >
-                                <DynamicLink
-                                    href={`/blogs/pages/all-blogs?category=${cat.id}`}
+                                <a
+                                    href={buildPath(`/blogs/pages/all-blogs?category=${cat.id}`)}
                                     onClick={handleNavItemClick}
                                 >
                                     {capitalizeFirstLetter(cat.name)}
-                                </DynamicLink>
+                                </a>
                                 {cat.subcategories?.length > 0 && (
                                     <FaChevronDown
                                         style={{
@@ -775,27 +753,27 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                             {cat.subcategories?.length > 0 && (
                                 <div className={`${styles.mobileSubmenu} ${expandedCategory === cat.id ? styles.open : ''}`}>
                                     {cat.subcategories.map((sub) => (
-                                        <DynamicLink
+                                        <a
                                             key={sub.id}
-                                            href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}
+                                            href={buildPath(`/blogs/pages/all-blogs?subcategory=${sub.id}`)}
                                             className={styles.mobileSubmenuItem}
                                             onClick={handleNavItemClick}
                                         >
                                             {sub.name}
-                                        </DynamicLink>
+                                        </a>
                                     ))}
                                 </div>
                             )}
                         </div>
                     ))}
 
-                    <DynamicLink
-                        href="/contact"
+                    <a
+                        href={buildPath("/contact")}
                         className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/contact` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.contact}
-                    </DynamicLink>
+                    </a>
                 </div>
 
                 {/* Mobile Dropdown-style Selectors */}
@@ -817,11 +795,10 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                         <div className={`${styles.mobileSubmenu} ${expandedLanguageSelector ? styles.open : ''}`}>
                             {filteredList.map((lang) => (
                                 <div
-                                    key={lang.hreflang}
-                                    className={`${styles.mobileSubmenuItem} ${language === lang.hreflang ? styles.active : ''} ${isTranslating ? styles.disabled : ''}`}
-                                    onClick={() => !isTranslating && handleLanguageChange(lang.hreflang)}
+                                    className={`${styles.mobileSubmenuItem} ${language === lang.hreflang ? styles.active : ''}`}
+                                    onClick={() => handleLanguageChange(lang.hreflang)}
                                 >
-                                    {lang.language} {isTranslating && lang.hreflang === language ? '(loading...)' : ''}
+                                    {lang.language}
                                 </div>
                             ))}
                         </div>
@@ -883,12 +860,13 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
     return (
         <div
             ref={containerRef}
-            className={`${styles.loadingContainer} ${styles[animationStage]} ${headerFixed ? styles.fixedHeader : ''}`}
+            // Remove external animationStage coupling to avoid unintended states during navigation
+            className={`${styles.loadingContainer} ${headerFixed ? styles.fixedHeader : ''}`}
         >
             {/* Loading Animation - Only show during initial animation */}
             <div
                 ref={loadingAnimationRef}
-                className={styles.loadingAnimation}
+                className={`${styles.loadingAnimation} ${shouldShowAnimation ? '' : styles.hidden}`}
             >
                 <div className={styles.loadingIcon}>
                     <div className={styles.mainIcon}>
@@ -898,13 +876,7 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
             </div>
 
             {/* SportsBuzz Logo */}
-            <div ref={logoRef} className={styles.logo}>
-                <DynamicLink href="/" className={styles.logoContent}>
-                    <div className={styles.logoIcon}>
-                        <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
-                    </div>
-                </DynamicLink>
-            </div>
+            <Logo logoRef={logoRef} buildPath={buildPath} />
 
             {/* Header Navigation */}
             <div ref={navigationRef} className={styles.navigation}>
@@ -934,39 +906,39 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                     <div className={styles.divider}></div>
                     {/* Navigation Links */}
                     <div className={styles.navLinks}>
-                        <DynamicLink href="/" className={`${styles.navItem} ${pathname === `${pathPrefix}/` ? styles.active : ''}`}>
+                        <a href={buildPath("/")} className={`${styles.navItem} ${pathname === `${pathPrefix}/` ? styles.active : ''}`}>
                             {translatedText.home}
-                        </DynamicLink>
+                        </a>
 
                         {countryCode?.location?.betting_apps == 'Active' && (
-                            <DynamicLink href="/best-betting-apps/current" className={`${styles.navItem} ${pathname === `${pathPrefix}/best-betting-apps/current` ? styles.active : ''}`}>
+                            <a href={buildPath("/best-betting-apps/current")} className={`${styles.navItem} ${pathname === `${pathPrefix}/best-betting-apps/current` ? styles.active : ''}`}>
                                 {translatedText.apps}
-                            </DynamicLink>
+                            </a>
                         )}
 
-                        <DynamicLink href="/match-schedules" className={`${styles.navItem} ${pathname === `${pathPrefix}/match-schedules` ? styles.active : ''}`}>
+                        <a href={buildPath("/match-schedules")} className={`${styles.navItem} ${pathname === `${pathPrefix}/match-schedules` ? styles.active : ''}`}>
                             {translatedText.schedule}
-                        </DynamicLink>
+                        </a>
 
                         {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
                             <div key={cat.id} className={styles.dropdown}>
-                                <DynamicLink
-                                    href={`/blogs/pages/all-blogs?category=${cat.id}`}
+                                <a
+                                    href={buildPath(`/blogs/pages/all-blogs?category=${cat.id}`)}
                                     className={styles.navItem}
                                 >
                                     {capitalizeFirstLetter(cat.name)} <FaChevronDown />
-                                </DynamicLink>
+                                </a>
 
                                 {cat.subcategories?.length > 0 && (
                                     <ul className={styles.submenu}>
                                         {cat.subcategories.map((sub) => (
                                             <li key={sub.id}>
-                                                <DynamicLink
-                                                    href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}
+                                                <a
+                                                    href={buildPath(`/blogs/pages/all-blogs?subcategory=${sub.id}`)}
                                                     className={styles.submenuItem}
                                                 >
                                                     {sub.name}
-                                                </DynamicLink>
+                                                </a>
                                             </li>
                                         ))}
                                     </ul>
@@ -980,17 +952,15 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
 
                 {/* Desktop Right Section */}
                 <div className={styles.rightSection}>
-                   
+
                     <select
                         className={styles.languageSelector}
                         value={language}
                         onChange={(e) => handleLanguageChange(e.target.value)}
-                        disabled={isTranslating}
                     >
                         {filteredList.map((lang) => (
                             <option key={lang.hreflang} value={lang.hreflang}>
-                                {lang.language} 
-                                {/* {isTranslating && lang.hreflang === language ? '(loading...)' : ''} */}
+                                {lang.language}
                             </option>
                         ))}
                     </select>
@@ -1013,9 +983,9 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
                         {darkMode ? <FaSun /> : <FaMoon />}
                     </button>
 
-                    <DynamicLink href="/contact" className={`${styles.navItem} ${pathname === `${pathPrefix}/contact` ? styles.active : ''}`}>
+                    <a href={buildPath("/contact")} className={`${styles.navItem} ${pathname === `${pathPrefix}/contact` ? styles.active : ''}`}>
                         {translatedText.contact}
-                    </DynamicLink>
+                    </a>
                 </div>
             </div>
 
@@ -1026,3 +996,6 @@ const HeaderThree = ({ animationStage, languageValidation }) => {
 };
 
 export default HeaderThree;
+
+// Use layout effect on the client to avoid visible flicker / hidden state issues
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
