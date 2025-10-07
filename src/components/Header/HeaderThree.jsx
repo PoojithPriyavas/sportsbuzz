@@ -10,6 +10,9 @@ import { usePathHelper } from '@/hooks/usePathHelper';
 
 import FeaturedButton from '../FeaturedButton/FeaturedButton';
 
+
+// import DynamicLink from '../Common/DynamicLink';
+
 function getCookie(name) {
     if (typeof document === 'undefined') return null;
 
@@ -26,34 +29,17 @@ function getCookie(name) {
     return null;
 }
 
-// Top-level component: Logo - Always visible, memoized to prevent unnecessary re-renders
-const Logo = React.memo(({ logoRef, buildPath, isTranslating, pathname }) => {
+// Top-level component: Logo
+const Logo = React.memo(({ logoRef, buildPath }) => {
     return (
-        <div ref={logoRef} className={styles.logo} style={{ opacity: 1, visibility: 'visible' }}>
-            <a href={buildPath("/")} className={styles.logoContent} onClick={() => {
-                console.log('[Logo] Clicked', { pathname, time: new Date().toISOString() });
-            }}>
+        <div ref={logoRef} className={styles.logo}>
+            <a href={buildPath("/")} className={styles.logoContent}>
                 <div className={styles.logoIcon}>
                     <img
                         src="/sportsbuz.png"
                         alt="Sportsbuz Logo"
                         className={styles.logoIconInner}
                         style={{ opacity: 1 }}
-                        onLoad={() => {
-                            console.log('[Logo] <img> onLoad', {
-                                pathname,
-                                isTranslating,
-                                time: new Date().toISOString(),
-                            });
-                        }}
-                        onError={(e) => {
-                            console.error('[Logo] <img> onError', {
-                                pathname,
-                                isTranslating,
-                                error: e?.nativeEvent?.message ?? 'Unknown error',
-                                time: new Date().toISOString(),
-                            });
-                        }}
                     />
                 </div>
             </a>
@@ -61,16 +47,18 @@ const Logo = React.memo(({ logoRef, buildPath, isTranslating, pathname }) => {
     );
 });
 
-Logo.displayName = 'Logo';
-
 function HeaderThree({ animationStage, languageValidation }) {
+    // console.log(animationStage, "animationStage value");
     const [darkMode, setDarkMode] = useState(false);
     const [headerFixed, setHeaderFixed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState(null);
+    // Add isTranslating state
     const [isTranslating, setIsTranslating] = useState(false);
+    // New: track when the user is actively changing language to prevent URL effect from overriding
     const [isUserChangingLanguage, setIsUserChangingLanguage] = useState(false);
+    // New: hold the selected language until the URL updates
     const [pendingLanguage, setPendingLanguage] = useState(null);
     const router = useRouter();
 
@@ -127,6 +115,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         country,
         setCountry
     } = useGlobalData();
+    console.log(blogCategories, "blog categories in header")
 
     // Initialize dark mode from localStorage
     useEffect(() => {
@@ -194,20 +183,10 @@ function HeaderThree({ animationStage, languageValidation }) {
         }
     }, []);
 
-    // Use layout effect for GSAP to avoid flicker
-    const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
-
     // Initialize GSAP animation
     useIsomorphicLayoutEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
-        console.log('[HeaderThree] Init animation', {
-            hasPlayedAnimation,
-            pathname,
-            isTranslating,
-            time: new Date().toISOString(),
-        });
-
-        // CRITICAL FIX: Set initial states with logo ALWAYS visible
+        // Set initial states IMMEDIATELY to prevent flash
         gsap.set(containerRef.current, {
             height: hasPlayedAnimation ? '5rem' : '100vh',
             overflow: hasPlayedAnimation ? 'visible' : 'hidden',
@@ -220,21 +199,18 @@ function HeaderThree({ animationStage, languageValidation }) {
         gsap.set(loadingAnimationRef.current, {
             opacity: hasPlayedAnimation ? 0 : 1,
             scale: hasPlayedAnimation ? 0.5 : 1,
-            display: hasPlayedAnimation ? 'none' : 'flex',
-            pointerEvents: 'none' // Prevent interference with logo
+            display: hasPlayedAnimation ? 'none' : 'flex'
         });
 
-        // CRITICAL FIX: Logo must ALWAYS be visible and interactive
+        // Keep the logo visible immediately; allow position animation only for first run
         gsap.set(logoRef.current, {
             position: hasPlayedAnimation ? 'relative' : 'absolute',
             bottom: hasPlayedAnimation ? 'auto' : '2rem',
             left: hasPlayedAnimation ? 'auto' : '2rem',
-            opacity: 1, // Always visible
-            visibility: 'visible', // Always visible
+            opacity: 1, // ensure visible
             x: 0,
-            y: hasPlayedAnimation ? 0 : 80,
-            pointerEvents: 'auto', // Always interactive
-            zIndex: 100 // Ensure it's above other elements
+            y: hasPlayedAnimation ? 0 : 80
+            // removed visibility toggle to prevent hidden logo on route changes
         });
 
         gsap.set(navigationRef.current, {
@@ -245,34 +221,25 @@ function HeaderThree({ animationStage, languageValidation }) {
         if (!hasPlayedAnimation) {
             setShouldShowAnimation(true);
 
+            // Mark animation as played immediately to avoid overlay/logo hidden on next routes
             try {
                 localStorage.setItem('headerAnimationPlayed', 'true');
                 document.documentElement.classList.add('header-played');
-                console.log('[HeaderThree] Marked headerAnimationPlayed=true');
-            } catch (e) {
-                console.error('[HeaderThree] Failed to set animation flag', e);
-            }
+            } catch (e) {}
 
             // Create the main timeline
             const tl = gsap.timeline({
                 onComplete: () => {
                     setAnimationComplete(true);
-                    console.log('[Logo Timeline] onComplete', {
-                        pathname,
-                        time: new Date().toISOString(),
-                    });
+                    // NOTE: we already set headerAnimationPlayed earlier to prevent re-runs across navigation
+                    // localStorage.setItem('headerAnimationPlayed', 'true');
                 }
             });
 
-            console.log('[Logo Timeline] Step 1: show loading start');
+            // Step 1: Show loading animation (1 second)
             tl.to({}, { duration: 2 })
-                .call(() => {
-                    console.log('[Logo Timeline] Step 1: show loading complete', {
-                        time: new Date().toISOString(),
-                    });
-                })
 
-                // Step 2: Hide loading animation and ensure logo is visible
+                // Step 2: Hide loading animation and show logo (0.5 seconds)
                 .to(loadingAnimationRef.current, {
                     opacity: 0,
                     scale: 0.75,
@@ -286,22 +253,11 @@ function HeaderThree({ animationStage, languageValidation }) {
                     duration: 0.75,
                     ease: "power2.out"
                 }, "-=0.3")
-                .call(() => {
-                    console.log('[Logo Timeline] Step 2: hide loading & show logo complete', {
-                        logoRect: logoRef.current?.getBoundingClientRect(),
-                        time: new Date().toISOString(),
-                    });
-                })
 
-                // Step 3: Wait a moment (1 second)
+                // Step 3: Wait a moment then start transition (1 second wait)
                 .to({}, { duration: 1 })
-                .call(() => {
-                    console.log('[Logo Timeline] Step 3: wait complete', {
-                        time: new Date().toISOString(),
-                    });
-                })
 
-                // Step 4: Shrink container and move logo to header position
+                // Step 4: Shrink container and move logo to header position (1.5 seconds)
                 .to(containerRef.current, {
                     height: '5rem',
                     duration: 1.5,
@@ -314,28 +270,14 @@ function HeaderThree({ animationStage, languageValidation }) {
                     duration: 1.5,
                     ease: "power2.inOut"
                 }, "-=1.5")
-                .call(() => {
-                    console.log('[Logo Timeline] Step 4: shrink & move logo complete', {
-                        logoRect: logoRef.current?.getBoundingClientRect(),
-                        time: new Date().toISOString(),
-                    });
-                })
 
-                // Step 5: Convert logo to relative positioning
+                // Step 5: Convert logo to relative positioning after animation
                 .set(logoRef.current, {
                     position: 'relative',
                     bottom: 'auto',
                     left: 'auto',
                     x: 0,
-                    y: 0,
-                    opacity: 1,
-                    visibility: 'visible'
-                })
-                .call(() => {
-                    console.log('[Logo Timeline] Step 5: position set (relative)', {
-                        logoRect: logoRef.current?.getBoundingClientRect(),
-                        time: new Date().toISOString(),
-                    });
+                    y: 0
                 })
 
                 // Step 6: Show navigation and set final states
@@ -356,24 +298,19 @@ function HeaderThree({ animationStage, languageValidation }) {
                 })
                 .set(loadingAnimationRef.current, {
                     display: 'none'
-                })
-                .call(() => {
-                    console.log('[Logo Timeline] Step 6: navigation shown, loading hidden', {
-                        time: new Date().toISOString(),
-                    });
                 });
 
             timelineRef.current = tl;
         } else {
+            // Animation already played - already set to final state above
             setShouldShowAnimation(false);
             setAnimationComplete(true);
-            console.log('[HeaderThree] Animation already played; final state applied');
         }
 
+        // Cleanup function
         return () => {
             if (timelineRef.current) {
                 timelineRef.current.kill();
-                console.log('[HeaderThree] Timeline killed on cleanup');
             }
         };
     }, []);
@@ -381,7 +318,6 @@ function HeaderThree({ animationStage, languageValidation }) {
     // Function to reset animation (for development)
     const resetAnimation = () => {
         localStorage.removeItem('headerAnimationPlayed');
-        document.documentElement.classList.remove('header-played');
         window.location.reload();
     };
 
@@ -401,7 +337,10 @@ function HeaderThree({ animationStage, languageValidation }) {
     const parseUrlPath = (pathname) => {
         if (!pathname) return { countryCode: '', language: '' };
 
+        // Extract the first segment of the path (e.g., "en-lk" from "/en-lk/some/path")
         const firstSegment = pathname.replace(/^\//, '').split('/')[0];
+
+        // Check if it matches the format: language-countrycode
         const match = firstSegment.match(/^([a-z]{2})-([a-z]{2})$/i);
 
         if (match) {
@@ -423,15 +362,17 @@ function HeaderThree({ animationStage, languageValidation }) {
         // Set language from URL if available and valid
         if (urlLanguage) {
             const isValidLanguage = location.some(loc => loc.hreflang === urlLanguage);
+            // Only set language from URL if it's valid, differs from current, and user isn't in the middle of changing it
             if (isValidLanguage && language !== urlLanguage && !isUserChangingLanguage) {
                 setLanguage(urlLanguage);
                 localStorage.setItem('language', urlLanguage);
             }
         }
 
-        // Respect user-selected sport
+        // Respect user-selected sport: only set from URL if no user choice
         const userSelectedSport = typeof window !== 'undefined' ? localStorage.getItem('selectedSport') : null;
 
+        // Set sport based on URL country code only if user hasn't manually selected one
         if (urlCountryCode && !userSelectedSport) {
             const matchedLocation = location.find(loc => loc.country_code.toLowerCase() === urlCountryCode);
             if (matchedLocation?.sports) {
@@ -444,7 +385,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         }
     }, [pathname, location, language, isUserChangingLanguage]);
 
-    // Start translation after URL reflects pending language
+    // New: Start translation only after the URL reflects the pending language
     useEffect(() => {
         if (!isUserChangingLanguage || !pendingLanguage) return;
 
@@ -490,10 +431,10 @@ function HeaderThree({ animationStage, languageValidation }) {
 
     const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
 
+    // Add this useEffect
     useEffect(() => {
         setTranslatedCategories(blogCategories);
     }, [blogCategories]);
-
     const [translatedText, setTranslatedText] = useState({
         home: 'Home',
         apps: 'Best Betting Apps',
@@ -507,7 +448,7 @@ function HeaderThree({ animationStage, languageValidation }) {
     });
     const [filteredList, setFilteredList] = useState([]);
 
-    // Load saved language and cached translations
+    // Load saved language and cached translations on component mount
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const savedLanguage = localStorage.getItem('language');
@@ -517,6 +458,7 @@ function HeaderThree({ animationStage, languageValidation }) {
                 setLanguage(savedLanguage);
             }
 
+            // If we have cached translations for the current language, use them immediately
             if (cachedTranslations) {
                 try {
                     const parsed = JSON.parse(cachedTranslations);
@@ -549,39 +491,66 @@ function HeaderThree({ animationStage, languageValidation }) {
             ? [...matched, ...otherLanguages]
             : [...location.filter(item => item.country_code === 'IN'), ...otherLanguages];
 
+        // Remove duplicates based on hreflang
         const uniqueList = combinedList.filter((item, index, self) =>
             index === self.findIndex(t => t.hreflang === item.hreflang)
         );
 
         setFilteredList(uniqueList);
 
+        // Set language if not already set
         const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
         if (!savedLanguage && matched.length > 0 && language !== matched[0].hreflang) {
             setLanguage(matched[0].hreflang);
         }
     }, [location, countryCode]);
 
-    // Handle language change
+    // Add this function to handle URL updates
+    const updateUrlWithLanguage = (selectedLanguage) => {
+        const currentPath = pathname;
+        const segments = currentPath.split('/').filter(Boolean);
+
+        // Get the current country code from the URL
+        const currentLangCountry = segments[0]?.split('-')[1] || 'in'; // default to 'in' if not found
+
+        // Create the new language-country code
+        const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
+
+        // Reconstruct the URL
+        const newPath = segments.length > 1
+            ? `/${newLangCountry}/${segments.slice(1).join('/')}`
+            : `/${newLangCountry}`;
+
+        // Use router to update the URL immediately
+        router.push(newPath);
+    };
+
+
+    // Updated handleLanguageChange function
     const handleLanguageChange = async (selectedLanguage) => {
         if (selectedLanguage === language) return;
 
+        // Mark that the user is changing the language to prevent URL effect from overriding
         setIsUserChangingLanguage(true);
         setPendingLanguage(selectedLanguage);
 
+        // Immediately update UI state (dropdown selection)
         setLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
 
-        // Ensure animation flag is set
+        // NEW: ensure next route doesn't rerun intro animation which hides the logo
         try {
             localStorage.setItem('headerAnimationPlayed', 'true');
             document.documentElement.classList.add('header-played');
         } catch (e) {}
 
+        // Close dropdowns
         setExpandedLanguageSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);
         }
 
+        // Prepare URL update
         const currentPath = pathname;
         const segments = currentPath.split('/').filter(Boolean);
         const currentLangCountry = segments[0]?.split('-')[1] || 'in';
@@ -590,59 +559,70 @@ function HeaderThree({ animationStage, languageValidation }) {
             ? `/${newLangCountry}/${segments.slice(1).join('/')}`
             : `/${newLangCountry}`;
 
-        console.group('[LanguageChange]');
-        console.log('From language:', language);
-        console.log('To language:', selectedLanguage);
-        console.log('Current pathname:', pathname);
-
-        console.log('Navigating to newPath:', newPath);
-        console.groupEnd();
-
+        // Update URL
         router.push(newPath);
     };
 
-    // Translate content function
+    // Separate translation logic into its own function
     const translateContent = async (selectedLanguage) => {
-        console.time('[translateContent]');
-        console.log('[translateContent] Start', { selectedLanguage, pathname, time: new Date().toISOString() });
         try {
             setIsTranslating(true);
+
             const translations = {};
-            const textsToTranslate = [
-                'Home', 'Best Betting Apps', 'News', 'Match Schedules',
-                'Cricket', 'Football', 'Contact', 'Language', 'Sport'
-            ];
 
-            for (let i = 0; i < textsToTranslate.length; i++) {
-                console.log('[translateContent] Translating', { index: i, text: textsToTranslate[i] });
-                const translated = await translateText([{ text: textsToTranslate[i] }], 'en', selectedLanguage);
-                const keys = ['home', 'apps', 'news', 'schedule', 'cricket', 'football', 'contact', 'language', 'sport'];
-                translations[keys[i]] = translated[0];
-            }
+            // Translate Home
+            const homeTranslation = await translateText([{ text: 'Home' }], 'en', selectedLanguage);
+            translations.home = homeTranslation[0];
 
+            // Translate Best Betting Apps
+            const appsTranslation = await translateText([{ text: 'Best Betting Apps' }], 'en', selectedLanguage);
+            translations.apps = appsTranslation[0];
+
+            // Translate News
+            const newsTranslation = await translateText([{ text: 'News' }], 'en', selectedLanguage);
+            translations.news = newsTranslation[0];
+
+            // Translate Match Schedules
+            const scheduleTranslation = await translateText([{ text: 'Match Schedules' }], 'en', selectedLanguage);
+            translations.schedule = scheduleTranslation[0];
+
+            // Translate Cricket
+            const cricketTranslation = await translateText([{ text: 'Cricket' }], 'en', selectedLanguage);
+            translations.cricket = cricketTranslation[0];
+
+            // Translate Football
+            const footballTranslation = await translateText([{ text: 'Football' }], 'en', selectedLanguage);
+            translations.football = footballTranslation[0];
+
+            // Translate Contact
+            const contactTranslation = await translateText([{ text: 'Contact' }], 'en', selectedLanguage);
+            translations.contact = contactTranslation[0];
+
+            // Translate Language
+            const languageTranslation = await translateText([{ text: 'Language' }], 'en', selectedLanguage);
+            translations.language = languageTranslation[0];
+
+            // Translate Sport
+            const sportTranslation = await translateText([{ text: 'Sport' }], 'en', selectedLanguage);
+            translations.sport = sportTranslation[0];
+
+            // Update state with all translations
             setTranslatedText(prev => ({
                 ...prev,
                 ...translations
             }));
 
+            // Cache translations in localStorage
             localStorage.setItem('cachedTranslations', JSON.stringify({
                 language: selectedLanguage,
                 translations: translations
             }));
-            console.log('[translateContent] Cached translations updated');
         } catch (error) {
             console.error('Translation error:', error);
         } finally {
             setIsTranslating(false);
-            console.timeEnd('[translateContent]');
-            console.log('[translateContent] End', { selectedLanguage, time: new Date().toISOString() });
         }
     };
-
-    // Log translation state changes
-    useEffect(() => {
-        console.log('[HeaderThree] isTranslating changed', { isTranslating, pathname, time: new Date().toISOString() });
-    }, [isTranslating, pathname]);
 
     const handleSportChange = (selectedSport) => {
         setSport(selectedSport);
@@ -680,26 +660,31 @@ function HeaderThree({ animationStage, languageValidation }) {
         setExpandedLanguageSelector(false);
     };
 
+    // Function to get current language display name
     const getCurrentLanguageDisplay = () => {
         const currentLang = filteredList.find(lang => lang.hreflang === language);
         return currentLang ? currentLang.language : 'Language';
     };
 
+    // Function to get current sport display name
     const getCurrentSportDisplay = () => {
         return sport === 'cricket' ? translatedText.cricket : translatedText.football;
     };
 
     const renderMobileMenu = () => (
         <>
+            {/* Mobile Overlay */}
             <div
                 className={`${styles.mobileOverlay} ${mobileMenuOpen ? styles.open : ''}`}
                 onClick={() => setMobileMenuOpen(false)}
             />
 
+            {/* Mobile Sidebar */}
             <div
                 ref={sidebarRef}
                 className={`${styles.mobileSidebar} ${mobileMenuOpen ? styles.open : ''}`}
             >
+                {/* Mobile Header */}
                 <div className={styles.mobileHeader}>
                     <a href={buildPath("/")} className={styles.logoContent}>
                         <div className={styles.logoIcon}>
@@ -714,6 +699,7 @@ function HeaderThree({ animationStage, languageValidation }) {
                     </button>
                 </div>
 
+                {/* Mobile Navigation Links */}
                 <div className={styles.mobileNavLinks}>
                     <a
                         href={buildPath("/")}
@@ -741,6 +727,7 @@ function HeaderThree({ animationStage, languageValidation }) {
                         {translatedText.schedule}
                     </a>
 
+                    {/* Mobile Dropdown Categories */}
                     {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
                         <div key={cat.id} className={styles.mobileDropdown}>
                             <div
@@ -789,7 +776,9 @@ function HeaderThree({ animationStage, languageValidation }) {
                     </a>
                 </div>
 
+                {/* Mobile Dropdown-style Selectors */}
                 <div className={styles.mobileSelectors}>
+                    {/* Language Dropdown */}
                     <div className={styles.mobileDropdown}>
                         <div
                             className={styles.mobileDropdownHeader}
@@ -806,7 +795,6 @@ function HeaderThree({ animationStage, languageValidation }) {
                         <div className={`${styles.mobileSubmenu} ${expandedLanguageSelector ? styles.open : ''}`}>
                             {filteredList.map((lang) => (
                                 <div
-                                    key={lang.hreflang}
                                     className={`${styles.mobileSubmenuItem} ${language === lang.hreflang ? styles.active : ''}`}
                                     onClick={() => handleLanguageChange(lang.hreflang)}
                                 >
@@ -816,6 +804,7 @@ function HeaderThree({ animationStage, languageValidation }) {
                         </div>
                     </div>
 
+                    {/* Sports Dropdown */}
                     <div className={styles.mobileDropdown}>
                         <div
                             className={styles.mobileDropdownHeader}
@@ -846,6 +835,7 @@ function HeaderThree({ animationStage, languageValidation }) {
                     </div>
                 </div>
 
+                {/* Debug button to reset animation (remove in production) */}
                 {process.env.NODE_ENV === 'development' && (
                     <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.2)', marginTop: '1rem' }}>
                         <button
@@ -870,37 +860,31 @@ function HeaderThree({ animationStage, languageValidation }) {
     return (
         <div
             ref={containerRef}
+            // Remove external animationStage coupling to avoid unintended states during navigation
             className={`${styles.loadingContainer} ${headerFixed ? styles.fixedHeader : ''}`}
         >
+            {/* Loading Animation - Only show during initial animation */}
             <div
                 ref={loadingAnimationRef}
                 className={`${styles.loadingAnimation} ${shouldShowAnimation ? '' : styles.hidden}`}
-                style={{ pointerEvents: 'none' }}
             >
                 <div className={styles.loadingIcon}>
                     <div className={styles.mainIcon}>
-                        <img
-                            src="/sportsbuz.gif"
-                            alt="Loading"
-                            className={styles.iconInner}
-                            onLoad={() => console.log('[LoadingGif] onLoad', { time: new Date().toISOString() })}
-                            onError={(e) => console.error('[LoadingGif] onError', { error: e?.nativeEvent?.message ?? 'Unknown', time: new Date().toISOString() })}
-                        />
+                        <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInner} />
                     </div>
                 </div>
             </div>
 
-            <Logo
-                logoRef={logoRef}
-                buildPath={buildPath}
-                isTranslating={isTranslating}
-                pathname={pathname}
-            />
+            {/* SportsBuzz Logo */}
+            <Logo logoRef={logoRef} buildPath={buildPath} />
 
+            {/* Header Navigation */}
             <div ref={navigationRef} className={styles.navigation}>
+                {/* Mobile Top Row - Only visible on mobile/tablet */}
                 <div className={styles.mobileTopRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <FeaturedButton />
+                        {/* Dark Mode Toggle Button for Mobile Top Row */}
                         <button
                             className={styles.darkModeButton}
                             onClick={toggleDarkMode}
@@ -917,8 +901,10 @@ function HeaderThree({ animationStage, languageValidation }) {
                     </div>
                 </div>
 
+                {/* Desktop Navigation */}
                 <div className={styles.leftSection}>
                     <div className={styles.divider}></div>
+                    {/* Navigation Links */}
                     <div className={styles.navLinks}>
                         <a href={buildPath("/")} className={`${styles.navItem} ${pathname === `${pathPrefix}/` ? styles.active : ''}`}>
                             {translatedText.home}
@@ -964,7 +950,9 @@ function HeaderThree({ animationStage, languageValidation }) {
                     </div>
                 </div>
 
+                {/* Desktop Right Section */}
                 <div className={styles.rightSection}>
+
                     <select
                         className={styles.languageSelector}
                         value={language}
@@ -986,6 +974,7 @@ function HeaderThree({ animationStage, languageValidation }) {
                         <option value="football">{translatedText.football}</option>
                     </select>
 
+                    {/* Dark Mode Toggle Button for Desktop */}
                     <button
                         className={styles.darkModeButton}
                         onClick={toggleDarkMode}
@@ -1000,9 +989,13 @@ function HeaderThree({ animationStage, languageValidation }) {
                 </div>
             </div>
 
+            {/* Mobile Menu */}
             {renderMobileMenu()}
         </div>
     );
-}
+};
 
 export default HeaderThree;
+
+// Use layout effect on the client to avoid visible flicker / hidden state issues
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
