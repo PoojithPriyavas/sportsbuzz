@@ -11,7 +11,7 @@ import { usePathHelper } from '@/hooks/usePathHelper';
 import FeaturedButton from '../FeaturedButton/FeaturedButton';
 
 
-// import DynamicLink from '../Common/DynamicLink';
+import DynamicLink from '../Common/DynamicLink';
 
 function getCookie(name) {
     if (typeof document === 'undefined') return null;
@@ -74,8 +74,8 @@ const Logo = React.memo(({ logoRef, buildPath, isTranslating, isNavigating, isLo
                 position: 'relative'
             }}
         >
-            <a
-                href={buildPath("/")}
+            <DynamicLink
+                href="/"
                 className={styles.logoContent}
                 onClick={() => console.log('[Logo] click -> navigating to home')}
             >
@@ -97,7 +97,7 @@ const Logo = React.memo(({ logoRef, buildPath, isTranslating, isNavigating, isLo
                         onError={handleImgError}
                     />
                 </div>
-            </a>
+            </DynamicLink>
         </div>
     );
 });
@@ -262,7 +262,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         // Navigation completed when pathname updates
         setIsNavigating(false);
     }, [pathname]);
-    
+
     // Handle navigation start
     const handleNavigationStart = (url) => {
         setIsNavigating(true);
@@ -312,7 +312,7 @@ function HeaderThree({ animationStage, languageValidation }) {
             try {
                 localStorage.setItem('headerAnimationPlayed', 'true');
                 document.documentElement.classList.add('header-played');
-            } catch (e) {}
+            } catch (e) { }
 
             // Create the main timeline
             const tl = gsap.timeline({
@@ -636,7 +636,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         try {
             localStorage.setItem('headerAnimationPlayed', 'true');
             document.documentElement.classList.add('header-played');
-        } catch (e) {}
+        } catch (e) { }
 
         // Close dropdowns
         setExpandedLanguageSelector(false);
