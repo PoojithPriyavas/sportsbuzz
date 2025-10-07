@@ -30,16 +30,71 @@ function getCookie(name) {
 }
 
 // Top-level component: Logo
-const Logo = React.memo(({ logoRef, buildPath }) => {
+const Logo = React.memo(({ logoRef, buildPath, isTranslating, isNavigating, isLogoLoaded }) => {
+    // Add render-time logging
+    console.log('[Logo] render', {
+        isTranslating,
+        isNavigating,
+        isLogoLoaded
+    });
+
+    // Mount/unmount logs
+    useEffect(() => {
+        console.log('[Logo] mounted', {
+            isTranslating,
+            isNavigating
+        });
+        return () => {
+            console.log('[Logo] unmounted');
+        };
+    }, [isTranslating, isNavigating]);
+
+    const handleImgLoad = () => {
+        console.log('[Logo] image loaded: /sportsbuz.png');
+    };
+
+    const handleImgError = (e) => {
+        console.error('[Logo] image load error', e?.target?.src);
+    };
+
+    // Force visible when translating or navigating
+    const forceVisible = isTranslating || isNavigating;
+
     return (
-        <div ref={logoRef} className={styles.logo}>
-            <a href={buildPath("/")} className={styles.logoContent}>
-                <div className={styles.logoIcon}>
+        <div
+            ref={logoRef}
+            className={styles.logo}
+            data-translating={String(isTranslating)}
+            data-navigating={String(isNavigating)}
+            style={{
+                // keep logo above overlays
+                zIndex: 1000,
+                opacity: 1,
+                visibility: 'visible',
+                position: 'relative'
+            }}
+        >
+            <a
+                href={buildPath("/")}
+                className={styles.logoContent}
+                onClick={() => console.log('[Logo] click -> navigating to home')}
+            >
+                <div className={styles.logoIcon} style={{ zIndex: 1000 }}>
                     <img
                         src="/sportsbuz.png"
                         alt="Sportsbuz Logo"
                         className={styles.logoIconInner}
-                        style={{ opacity: 1 }}
+                        style={{
+                            // always visible; do not allow any hidden/opacity effects to hide it
+                            opacity: 1,
+                            visibility: 'visible',
+                            display: 'block',
+                            zIndex: 1000,
+                            // small safeguard to keep dimensions stable
+                            transform: 'translateZ(0)'
+                        }}
+                        onLoad={handleImgLoad}
+                        onError={handleImgError}
                     />
                 </div>
             </a>
@@ -56,6 +111,10 @@ function HeaderThree({ animationStage, languageValidation }) {
     const [expandedCategory, setExpandedCategory] = useState(null);
     // Add isTranslating state
     const [isTranslating, setIsTranslating] = useState(false);
+    // New: track navigation state for logging and forcing logo visibility
+    const [isNavigating, setIsNavigating] = useState(false);
+    // New: track if logo image was successfully preloaded
+    const [isLogoLoaded, setIsLogoLoaded] = useState(false);
     // New: track when the user is actively changing language to prevent URL effect from overriding
     const [isUserChangingLanguage, setIsUserChangingLanguage] = useState(false);
     // New: hold the selected language until the URL updates
@@ -183,6 +242,33 @@ function HeaderThree({ animationStage, languageValidation }) {
         }
     }, []);
 
+    // Preload the logo image to avoid flicker on route changes and log status
+    useEffect(() => {
+        console.log('[Logo] preload start');
+        const img = new Image();
+        img.src = '/sportsbuz.png';
+        img.onload = () => {
+            setIsLogoLoaded(true);
+            console.log('[Logo] preload complete');
+        };
+        img.onerror = (err) => {
+            console.error('[Logo] preload error', err);
+        };
+    }, []);
+
+    // Track route changes and log navigation stages
+    useEffect(() => {
+        console.log('[Router] pathname changed', { pathname });
+        // Navigation completed when pathname updates
+        setIsNavigating(false);
+    }, [pathname]);
+    
+    // Handle navigation start
+    const handleNavigationStart = (url) => {
+        setIsNavigating(true);
+        console.log('[Router] navigation start', { url });
+    };
+
     // Initialize GSAP animation
     useIsomorphicLayoutEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
@@ -212,6 +298,7 @@ function HeaderThree({ animationStage, languageValidation }) {
             y: hasPlayedAnimation ? 0 : 80
             // removed visibility toggle to prevent hidden logo on route changes
         });
+        console.log('[GSAP] initial state applied to logo', { hasPlayedAnimation });
 
         gsap.set(navigationRef.current, {
             opacity: hasPlayedAnimation ? 1 : 0,
@@ -301,6 +388,13 @@ function HeaderThree({ animationStage, languageValidation }) {
                 });
 
             timelineRef.current = tl;
+            tl.eventCallback('onStart', () => {
+                console.log('[GSAP] timeline started for logo/header');
+            });
+            tl.eventCallback('onComplete', () => {
+                console.log('[GSAP] timeline completed for logo/header');
+                setAnimationComplete(true);
+            });
         } else {
             // Animation already played - already set to final state above
             setShouldShowAnimation(false);
@@ -538,7 +632,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         setLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
 
-        // NEW: ensure next route doesn't rerun intro animation which hides the logo
+        // Ensure next route doesn't rerun intro animation which hides the logo
         try {
             localStorage.setItem('headerAnimationPlayed', 'true');
             document.documentElement.classList.add('header-played');
@@ -559,13 +653,16 @@ function HeaderThree({ animationStage, languageValidation }) {
             ? `/${newLangCountry}/${segments.slice(1).join('/')}`
             : `/${newLangCountry}`;
 
-        // Update URL
+        // Set navigating state for visibility/logging and push route
+        setIsNavigating(true);
+        console.log('[Router] route push start', { newPath });
         router.push(newPath);
     };
 
     // Separate translation logic into its own function
     const translateContent = async (selectedLanguage) => {
         try {
+            console.log('[Translate] start', { selectedLanguage });
             setIsTranslating(true);
 
             const translations = {};
@@ -606,6 +703,8 @@ function HeaderThree({ animationStage, languageValidation }) {
             const sportTranslation = await translateText([{ text: 'Sport' }], 'en', selectedLanguage);
             translations.sport = sportTranslation[0];
 
+            console.log('[Translate] translations fetched', { selectedLanguage, translations });
+
             // Update state with all translations
             setTranslatedText(prev => ({
                 ...prev,
@@ -617,10 +716,12 @@ function HeaderThree({ animationStage, languageValidation }) {
                 language: selectedLanguage,
                 translations: translations
             }));
+            console.log('[Translate] state updated and cached', { selectedLanguage });
         } catch (error) {
             console.error('Translation error:', error);
         } finally {
             setIsTranslating(false);
+            console.log('[Translate] end', { selectedLanguage });
         }
     };
 
@@ -860,7 +961,6 @@ function HeaderThree({ animationStage, languageValidation }) {
     return (
         <div
             ref={containerRef}
-            // Remove external animationStage coupling to avoid unintended states during navigation
             className={`${styles.loadingContainer} ${headerFixed ? styles.fixedHeader : ''}`}
         >
             {/* Loading Animation - Only show during initial animation */}
@@ -876,7 +976,7 @@ function HeaderThree({ animationStage, languageValidation }) {
             </div>
 
             {/* SportsBuzz Logo */}
-            <Logo logoRef={logoRef} buildPath={buildPath} />
+            <Logo logoRef={logoRef} buildPath={buildPath} isTranslating={isTranslating} isNavigating={isNavigating} isLogoLoaded={isLogoLoaded} />
 
             {/* Header Navigation */}
             <div ref={navigationRef} className={styles.navigation}>
