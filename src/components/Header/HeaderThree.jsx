@@ -27,16 +27,33 @@ function getCookie(name) {
 }
 
 // Top-level component: Logo - Always visible, memoized to prevent unnecessary re-renders
-const Logo = React.memo(({ logoRef, buildPath }) => {
+const Logo = React.memo(({ logoRef, buildPath, isTranslating, pathname }) => {
     return (
         <div ref={logoRef} className={styles.logo} style={{ opacity: 1, visibility: 'visible' }}>
-            <a href={buildPath("/")} className={styles.logoContent}>
+            <a href={buildPath("/")} className={styles.logoContent} onClick={() => {
+                console.log('[Logo] Clicked', { pathname, time: new Date().toISOString() });
+            }}>
                 <div className={styles.logoIcon}>
                     <img
                         src="/sportsbuz.png"
                         alt="Sportsbuz Logo"
                         className={styles.logoIconInner}
                         style={{ opacity: 1 }}
+                        onLoad={() => {
+                            console.log('[Logo] <img> onLoad', {
+                                pathname,
+                                isTranslating,
+                                time: new Date().toISOString(),
+                            });
+                        }}
+                        onError={(e) => {
+                            console.error('[Logo] <img> onError', {
+                                pathname,
+                                isTranslating,
+                                error: e?.nativeEvent?.message ?? 'Unknown error',
+                                time: new Date().toISOString(),
+                            });
+                        }}
                     />
                 </div>
             </a>
@@ -183,7 +200,13 @@ function HeaderThree({ animationStage, languageValidation }) {
     // Initialize GSAP animation
     useIsomorphicLayoutEffect(() => {
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
-        
+        console.log('[HeaderThree] Init animation', {
+            hasPlayedAnimation,
+            pathname,
+            isTranslating,
+            time: new Date().toISOString(),
+        });
+
         // CRITICAL FIX: Set initial states with logo ALWAYS visible
         gsap.set(containerRef.current, {
             height: hasPlayedAnimation ? '5rem' : '100vh',
@@ -222,23 +245,32 @@ function HeaderThree({ animationStage, languageValidation }) {
         if (!hasPlayedAnimation) {
             setShouldShowAnimation(true);
 
-            // Mark animation as played immediately to prevent re-runs
             try {
                 localStorage.setItem('headerAnimationPlayed', 'true');
                 document.documentElement.classList.add('header-played');
+                console.log('[HeaderThree] Marked headerAnimationPlayed=true');
             } catch (e) {
-                console.error('Failed to set animation flag:', e);
+                console.error('[HeaderThree] Failed to set animation flag', e);
             }
 
             // Create the main timeline
             const tl = gsap.timeline({
                 onComplete: () => {
                     setAnimationComplete(true);
+                    console.log('[Logo Timeline] onComplete', {
+                        pathname,
+                        time: new Date().toISOString(),
+                    });
                 }
             });
 
-            // Step 1: Show loading animation (2 seconds)
+            console.log('[Logo Timeline] Step 1: show loading start');
             tl.to({}, { duration: 2 })
+                .call(() => {
+                    console.log('[Logo Timeline] Step 1: show loading complete', {
+                        time: new Date().toISOString(),
+                    });
+                })
 
                 // Step 2: Hide loading animation and ensure logo is visible
                 .to(loadingAnimationRef.current, {
@@ -254,9 +286,20 @@ function HeaderThree({ animationStage, languageValidation }) {
                     duration: 0.75,
                     ease: "power2.out"
                 }, "-=0.3")
+                .call(() => {
+                    console.log('[Logo Timeline] Step 2: hide loading & show logo complete', {
+                        logoRect: logoRef.current?.getBoundingClientRect(),
+                        time: new Date().toISOString(),
+                    });
+                })
 
                 // Step 3: Wait a moment (1 second)
                 .to({}, { duration: 1 })
+                .call(() => {
+                    console.log('[Logo Timeline] Step 3: wait complete', {
+                        time: new Date().toISOString(),
+                    });
+                })
 
                 // Step 4: Shrink container and move logo to header position
                 .to(containerRef.current, {
@@ -271,6 +314,12 @@ function HeaderThree({ animationStage, languageValidation }) {
                     duration: 1.5,
                     ease: "power2.inOut"
                 }, "-=1.5")
+                .call(() => {
+                    console.log('[Logo Timeline] Step 4: shrink & move logo complete', {
+                        logoRect: logoRef.current?.getBoundingClientRect(),
+                        time: new Date().toISOString(),
+                    });
+                })
 
                 // Step 5: Convert logo to relative positioning
                 .set(logoRef.current, {
@@ -281,6 +330,12 @@ function HeaderThree({ animationStage, languageValidation }) {
                     y: 0,
                     opacity: 1,
                     visibility: 'visible'
+                })
+                .call(() => {
+                    console.log('[Logo Timeline] Step 5: position set (relative)', {
+                        logoRect: logoRef.current?.getBoundingClientRect(),
+                        time: new Date().toISOString(),
+                    });
                 })
 
                 // Step 6: Show navigation and set final states
@@ -301,19 +356,24 @@ function HeaderThree({ animationStage, languageValidation }) {
                 })
                 .set(loadingAnimationRef.current, {
                     display: 'none'
+                })
+                .call(() => {
+                    console.log('[Logo Timeline] Step 6: navigation shown, loading hidden', {
+                        time: new Date().toISOString(),
+                    });
                 });
 
             timelineRef.current = tl;
         } else {
-            // Animation already played - set to final state
             setShouldShowAnimation(false);
             setAnimationComplete(true);
+            console.log('[HeaderThree] Animation already played; final state applied');
         }
 
-        // Cleanup function
         return () => {
             if (timelineRef.current) {
                 timelineRef.current.kill();
+                console.log('[HeaderThree] Timeline killed on cleanup');
             }
         };
     }, []);
@@ -530,14 +590,23 @@ function HeaderThree({ animationStage, languageValidation }) {
             ? `/${newLangCountry}/${segments.slice(1).join('/')}`
             : `/${newLangCountry}`;
 
+        console.group('[LanguageChange]');
+        console.log('From language:', language);
+        console.log('To language:', selectedLanguage);
+        console.log('Current pathname:', pathname);
+
+        console.log('Navigating to newPath:', newPath);
+        console.groupEnd();
+
         router.push(newPath);
     };
 
     // Translate content function
     const translateContent = async (selectedLanguage) => {
+        console.time('[translateContent]');
+        console.log('[translateContent] Start', { selectedLanguage, pathname, time: new Date().toISOString() });
         try {
             setIsTranslating(true);
-
             const translations = {};
             const textsToTranslate = [
                 'Home', 'Best Betting Apps', 'News', 'Match Schedules',
@@ -545,6 +614,7 @@ function HeaderThree({ animationStage, languageValidation }) {
             ];
 
             for (let i = 0; i < textsToTranslate.length; i++) {
+                console.log('[translateContent] Translating', { index: i, text: textsToTranslate[i] });
                 const translated = await translateText([{ text: textsToTranslate[i] }], 'en', selectedLanguage);
                 const keys = ['home', 'apps', 'news', 'schedule', 'cricket', 'football', 'contact', 'language', 'sport'];
                 translations[keys[i]] = translated[0];
@@ -559,12 +629,20 @@ function HeaderThree({ animationStage, languageValidation }) {
                 language: selectedLanguage,
                 translations: translations
             }));
+            console.log('[translateContent] Cached translations updated');
         } catch (error) {
             console.error('Translation error:', error);
         } finally {
             setIsTranslating(false);
+            console.timeEnd('[translateContent]');
+            console.log('[translateContent] End', { selectedLanguage, time: new Date().toISOString() });
         }
     };
+
+    // Log translation state changes
+    useEffect(() => {
+        console.log('[HeaderThree] isTranslating changed', { isTranslating, pathname, time: new Date().toISOString() });
+    }, [isTranslating, pathname]);
 
     const handleSportChange = (selectedSport) => {
         setSport(selectedSport);
@@ -801,12 +879,23 @@ function HeaderThree({ animationStage, languageValidation }) {
             >
                 <div className={styles.loadingIcon}>
                     <div className={styles.mainIcon}>
-                        <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInner} />
+                        <img
+                            src="/sportsbuz.gif"
+                            alt="Loading"
+                            className={styles.iconInner}
+                            onLoad={() => console.log('[LoadingGif] onLoad', { time: new Date().toISOString() })}
+                            onError={(e) => console.error('[LoadingGif] onError', { error: e?.nativeEvent?.message ?? 'Unknown', time: new Date().toISOString() })}
+                        />
                     </div>
                 </div>
             </div>
 
-            <Logo logoRef={logoRef} buildPath={buildPath} />
+            <Logo
+                logoRef={logoRef}
+                buildPath={buildPath}
+                isTranslating={isTranslating}
+                pathname={pathname}
+            />
 
             <div ref={navigationRef} className={styles.navigation}>
                 <div className={styles.mobileTopRow}>
