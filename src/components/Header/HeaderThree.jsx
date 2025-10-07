@@ -30,20 +30,17 @@ function getCookie(name) {
 }
 
 // Top-level component: Logo
-const Logo = React.memo(({ logoRef, buildPath }) => {
+const Logo = React.memo(({ logoRef, pathPrefix }) => {
+
     return (
         <div ref={logoRef} className={styles.logo}>
-            <a href={buildPath("/")} className={styles.logoContent}>
+            <Link href={`${pathPrefix}/`} className={styles.logoContent}>
                 <div className={styles.logoIcon}>
-                    <img
-                        src="/sportsbuz.png"
-                        alt="Sportsbuz Logo"
-                        className={styles.logoIconInner}
-                        style={{ opacity: 1 }}
-                    />
+                    <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                 </div>
-            </a>
+            </Link>
         </div>
+
     );
 });
 
@@ -225,7 +222,7 @@ function HeaderThree({ animationStage, languageValidation }) {
             try {
                 localStorage.setItem('headerAnimationPlayed', 'true');
                 document.documentElement.classList.add('header-played');
-            } catch (e) {}
+            } catch (e) { }
 
             // Create the main timeline
             const tl = gsap.timeline({
@@ -542,7 +539,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         try {
             localStorage.setItem('headerAnimationPlayed', 'true');
             document.documentElement.classList.add('header-played');
-        } catch (e) {}
+        } catch (e) { }
 
         // Close dropdowns
         setExpandedLanguageSelector(false);
@@ -876,7 +873,7 @@ function HeaderThree({ animationStage, languageValidation }) {
             </div>
 
             {/* SportsBuzz Logo */}
-            <Logo logoRef={logoRef} buildPath={buildPath} />
+            <Logo logoRef={logoRef} pathPrefix={pathPrefix} />
 
             {/* Header Navigation */}
             <div ref={navigationRef} className={styles.navigation}>

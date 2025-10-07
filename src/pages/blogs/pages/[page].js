@@ -195,7 +195,7 @@ export default function BlogPages({
             </Head>
 
             {/* <Header /> */}
-            <HeaderThree animationStage={animationStage} />
+            <HeaderTwo animationStage={animationStage} />
             <div className='container'>
                 {/* <LiveScores /> */}
                 <BlogsPage blogs={blogs} />

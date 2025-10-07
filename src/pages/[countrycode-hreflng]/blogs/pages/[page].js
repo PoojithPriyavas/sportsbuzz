@@ -367,7 +367,7 @@ export default function BlogPages({
                 <meta name="twitter:image" content="https://www.sportsbuz.com/images/social-preview.jpg" />
 
                 <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
-                 <link rel="alternate" href="https://sportsbuz.com/blogs/pages/1" hreflang="x-default" />
+                <link rel="alternate" href="https://sportsbuz.com/blogs/pages/1" hreflang="x-default" />
             </Head>
 
             <HeaderThree animationStage={animationStage} />
