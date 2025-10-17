@@ -50,11 +50,13 @@
 .loadingAnimation {
     position: absolute;
     inset: 0;
-    display: none; /* Hide overlay by default; it will be enabled only for intro */
+    display: none;
+    /* Hide overlay by default; it will be enabled only for intro */
     align-items: center;
     justify-content: center;
     /* Initial state will be set by GSAP */
-    pointer-events: none; /* Prevent overlay from blocking clicks */
+    pointer-events: none;
+    /* Prevent overlay from blocking clicks */
 }
 
 .loadingIcon {
@@ -1021,7 +1023,8 @@
     align-items: center;
     justify-content: center;
     /* Initial state will be set by GSAP */
-    pointer-events: none; /* Prevent overlay from blocking clicks */
+    pointer-events: none;
+    /* Prevent overlay from blocking clicks */
 }
 
 .loadingIcon {
@@ -1969,4 +1972,15 @@
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
+}
+
+/* Add to HeaderTwo.module.css */
+.loadingCategories {
+    padding: 1rem;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    margin: 0.5rem 0;
 }

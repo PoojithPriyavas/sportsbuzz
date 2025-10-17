@@ -4,8 +4,6 @@ import styles from './HeaderTwo.module.css';
 import { usePathname, useRouter } from 'next/navigation';
 import { useGlobalData } from '../Context/ApiContext';
 import { FaMoon, FaSun, FaChevronDown, FaBars, FaTimes } from 'react-icons/fa';
-import Link from 'next/link';
-import axios from 'axios';
 import { usePathHelper } from '@/hooks/usePathHelper';
 
 import FeaturedButton from '../FeaturedButton/FeaturedButton';
@@ -137,6 +135,12 @@ function HeaderThree({ animationStage, languageValidation }) {
     const [animationComplete, setAnimationComplete] = useState(false);
     const [shouldShowAnimation, setShouldShowAnimation] = useState(false);
 
+    // Categoires Section
+
+    const [translatedCategories, setTranslatedCategories] = useState([]);
+    const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+    const [categoriesCacheKey, setCategoriesCacheKey] = useState('')
+
     // GSAP refs
     const containerRef = useRef(null);
     const loadingAnimationRef = useRef(null);
@@ -150,7 +154,7 @@ function HeaderThree({ animationStage, languageValidation }) {
     const pathname = usePathname();
     const {
         blogCategories,
-        translateText,
+        translateHeaders,
         setLanguage,
         language,
         location,
@@ -229,8 +233,346 @@ function HeaderThree({ animationStage, languageValidation }) {
         }
     }, []);
 
-    const hreflangTags = locationData?.hreflang_tags || [];
-    const filteredLocations = locationData?.filtered_locations || [];
+
+    // OPTIMIZED: Initialize and cache categories
+    useEffect(() => {
+        if (!blogCategories || blogCategories.length === 0) return;
+
+        // Create a stable cache key based on categories content
+        const newCacheKey = JSON.stringify(blogCategories.map(cat => ({
+            id: cat.id,
+            name: cat.name,
+            featured: cat.featured,
+            subcategories: cat.subcategories?.map(sub => sub.id) || []
+        })));
+
+        // Only update if categories actually changed
+        if (newCacheKey !== categoriesCacheKey) {
+            console.log('[Categories] Updating categories cache');
+            setTranslatedCategories(blogCategories);
+            setCategoriesCacheKey(newCacheKey);
+            setCategoriesLoaded(true);
+
+            // Cache in localStorage for persistence
+            try {
+                localStorage.setItem('cachedCategories', JSON.stringify({
+                    categories: blogCategories,
+                    timestamp: Date.now(),
+                    cacheKey: newCacheKey
+                }));
+            } catch (error) {
+                console.warn('Failed to cache categories:', error);
+            }
+        }
+    }, [blogCategories, categoriesCacheKey]);
+
+    // Add this helper function for retrying failed translations
+    const retryTranslation = async (fn, retries = 3, delay = 1000) => {
+        try {
+            return await fn();
+        } catch (error) {
+            if (retries > 0) {
+                console.log(`Retrying translation... ${retries} attempts left`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return retryTranslation(fn, retries - 1, delay * 2);
+            }
+            throw error;
+        }
+    };
+
+
+    useEffect(() => {
+        if (categoriesLoaded || (blogCategories && blogCategories.length > 0)) return;
+
+        try {
+            const cached = localStorage.getItem('cachedCategories');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                // Use cache if it's less than 24 hours old
+                if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
+                    console.log('[Categories] Loading categories from cache');
+                    setTranslatedCategories(parsed.categories);
+                    setCategoriesCacheKey(parsed.cacheKey);
+                    setCategoriesLoaded(true);
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load cached categories:', error);
+        }
+    }, [categoriesLoaded, blogCategories]);
+
+    const filteredCategories = React.useMemo(() => {
+        if (!categoriesLoaded) return [];
+        return translatedCategories.filter((cat) => cat.featured === false);
+    }, [translatedCategories, categoriesLoaded]);
+
+    // OPTIMIZED: Batch categories translation - single API call with English handling
+    useEffect(() => {
+        const translateCategories = async () => {
+            if (!categoriesLoaded || !translatedCategories.length || !isUserChangingLanguage) return;
+
+            try {
+                console.log('[Categories] Batch translating categories for language:', language);
+
+                // Check if we already have translated categories cached
+                const cachedCategoriesKey = `translatedCategories_${language}`;
+                const cached = localStorage.getItem(cachedCategoriesKey);
+
+                if (cached) {
+                    try {
+                        const parsed = JSON.parse(cached);
+                        if (Date.now() - parsed.timestamp < 60 * 60 * 1000) { // 1 hour cache
+                            console.log('[Categories] Using cached translated categories');
+                            setTranslatedCategories(parsed.categories);
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('Failed to parse cached categories:', e);
+                    }
+                }
+
+                // 🆕 SPECIAL HANDLING FOR ENGLISH: No translation needed
+                if (language === 'en') {
+                    console.log('[Categories] English detected, loading original categories');
+
+                    // Load original categories from blogCategories or cache
+                    let originalCategories = blogCategories;
+                    if (!originalCategories || originalCategories.length === 0) {
+                        const cachedOriginal = localStorage.getItem('cachedCategories');
+                        if (cachedOriginal) {
+                            const parsed = JSON.parse(cachedOriginal);
+                            originalCategories = parsed.categories;
+                        }
+                    }
+
+                    if (originalCategories && originalCategories.length > 0) {
+                        setTranslatedCategories(originalCategories);
+
+                        // Cache the English version too for consistency
+                        try {
+                            localStorage.setItem(cachedCategoriesKey, JSON.stringify({
+                                categories: originalCategories,
+                                timestamp: Date.now(),
+                                language: language
+                            }));
+                        } catch (cacheError) {
+                            console.warn('Failed to cache English categories:', cacheError);
+                        }
+                    }
+                    return;
+                }
+
+                // For non-English languages: proceed with translation
+                console.log('[Categories] Translating to non-English language:', language);
+
+                // Collect ALL unique category and subcategory names for batch translation
+                const allTextsToTranslate = new Set();
+
+                translatedCategories.forEach(category => {
+                    // Add category name if it needs translation
+                    if (category.name && category.name.trim() !== '' && category.name !== 'Home') {
+                        allTextsToTranslate.add(category.name);
+                    }
+
+                    // Add all subcategory names
+                    if (category.subcategories?.length > 0) {
+                        category.subcategories.forEach(sub => {
+                            if (sub.name && sub.name.trim() !== '') {
+                                allTextsToTranslate.add(sub.name);
+                            }
+                        });
+                    }
+                });
+
+                // Convert Set to Array for API call
+                const uniqueTexts = Array.from(allTextsToTranslate);
+
+                if (uniqueTexts.length === 0) {
+                    console.log('[Categories] No texts to translate');
+                    return;
+                }
+
+                console.log(`[Categories] Batch translating ${uniqueTexts.length} unique texts`);
+
+                // SINGLE API CALL for all translations
+                const textsToTranslate = uniqueTexts.map(text => ({ text }));
+                const translatedResults = await retryTranslation(
+                    () => Promise.race([
+                        translateHeaders(textsToTranslate, 'en', language),
+                        new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('Translation timeout')), 15000)
+                        )
+                    ])
+                );
+
+                // Create a mapping of original text -> translated text
+                const translationMap = {};
+                uniqueTexts.forEach((originalText, index) => {
+                    translationMap[originalText] = translatedResults[index] || originalText;
+                });
+
+                console.log('[Categories] Translation map created:', translationMap);
+
+                // Apply translations to all categories and subcategories
+                const updatedCategories = translatedCategories.map(category => {
+                    // Translate category name
+                    const translatedCategoryName = translationMap[category.name] || category.name;
+
+                    // Translate subcategories
+                    const translatedSubcategories = category.subcategories?.map(sub => ({
+                        ...sub,
+                        name: translationMap[sub.name] || sub.name
+                    })) || [];
+
+                    return {
+                        ...category,
+                        name: translatedCategoryName,
+                        subcategories: translatedSubcategories
+                    };
+                });
+
+                setTranslatedCategories(updatedCategories);
+
+                // Cache the translated categories
+                try {
+                    localStorage.setItem(cachedCategoriesKey, JSON.stringify({
+                        categories: updatedCategories,
+                        timestamp: Date.now(),
+                        language: language
+                    }));
+                } catch (cacheError) {
+                    console.warn('Failed to cache translated categories:', cacheError);
+                }
+
+                console.log('[Categories] Batch category translation completed');
+
+            } catch (error) {
+                console.error('Batch category translation error:', error);
+
+                // Fallback: try individual translations if batch fails
+                console.log('[Categories] Falling back to individual translations');
+                await fallbackIndividualTranslation();
+            }
+        };
+
+        // Fallback function for individual translations if batch fails
+        const fallbackIndividualTranslation = async () => {
+            try {
+                // 🆕 SPECIAL HANDLING FOR ENGLISH IN FALLBACK TOO
+                if (language === 'en') {
+                    console.log('[Categories] English detected in fallback, loading original categories');
+                    let originalCategories = blogCategories;
+                    if (!originalCategories || originalCategories.length === 0) {
+                        const cachedOriginal = localStorage.getItem('cachedCategories');
+                        if (cachedOriginal) {
+                            const parsed = JSON.parse(cachedOriginal);
+                            originalCategories = parsed.categories;
+                        }
+                    }
+                    if (originalCategories && originalCategories.length > 0) {
+                        setTranslatedCategories(originalCategories);
+                    }
+                    return;
+                }
+
+                const translationPromises = translatedCategories.map(async (category) => {
+                    try {
+                        // Translate category name
+                        const [translatedName] = await retryTranslation(
+                            () => translateHeaders([{ text: category.name }], 'en', language)
+                        );
+
+                        // Translate subcategories if they exist
+                        let translatedSubcategories = category.subcategories;
+                        if (category.subcategories?.length > 0) {
+                            const subTranslationPromises = category.subcategories.map(async (sub) => {
+                                try {
+                                    const [translatedSubName] = await retryTranslation(
+                                        () => translateHeaders([{ text: sub.name }], 'en', language)
+                                    );
+                                    return { ...sub, name: translatedSubName || sub.name };
+                                } catch (error) {
+                                    console.warn(`Failed to translate subcategory "${sub.name}":`, error);
+                                    return sub;
+                                }
+                            });
+
+                            translatedSubcategories = await Promise.all(subTranslationPromises);
+                        }
+
+                        return {
+                            ...category,
+                            name: translatedName || category.name,
+                            subcategories: translatedSubcategories
+                        };
+                    } catch (error) {
+                        console.warn(`Failed to translate category "${category.name}":`, error);
+                        return category;
+                    }
+                });
+
+                const translated = await Promise.all(translationPromises);
+                setTranslatedCategories(translated);
+
+            } catch (fallbackError) {
+                console.error('Fallback translation also failed:', fallbackError);
+            }
+        };
+
+        if (isUserChangingLanguage && pendingLanguage) {
+            translateCategories();
+        }
+    }, [language, isUserChangingLanguage, pendingLanguage, categoriesLoaded, translatedCategories, translateHeaders, blogCategories]);
+
+
+    // NEW: Load translations on component mount
+    useEffect(() => {
+        const loadInitialTranslations = async () => {
+            if (!language) return;
+
+            try {
+                // Try to load cached translations first
+                const cachedTranslationsKey = `cachedTranslations_${language}`;
+                const cached = localStorage.getItem(cachedTranslationsKey);
+
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    setTranslatedText(prev => ({
+                        ...prev,
+                        ...parsed.translations
+                    }));
+                    console.log('[Translate] Loaded initial translations from cache');
+                } else {
+                    // If no cache exists, translate on mount
+                    await translateContent(language);
+                }
+
+                // Load translated categories if available
+                const cachedCategoriesKey = `translatedCategories_${language}`;
+                const cachedCats = localStorage.getItem(cachedCategoriesKey);
+
+                if (cachedCats && categoriesLoaded) {
+                    const parsed = JSON.parse(cachedCats);
+                    setTranslatedCategories(parsed.categories);
+                    console.log('[Categories] Loaded initial categories from cache');
+                } else if (language === 'en' && categoriesLoaded) {
+                    // 🆕 SPECIAL CASE: For English, ensure we use original categories
+                    console.log('[Categories] English language, ensuring original categories');
+                    if (blogCategories && blogCategories.length > 0) {
+                        setTranslatedCategories(blogCategories);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load initial translations:', error);
+            }
+        };
+
+        loadInitialTranslations();
+    }, [language, categoriesLoaded, blogCategories]);
+
+
+
+
 
     // Ensure header final state CSS applies on initial paint if animation has already played
     useEffect(() => {
@@ -523,12 +865,14 @@ function HeaderThree({ animationStage, languageValidation }) {
         };
     }, [mobileMenuOpen]);
 
-    const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
 
-    // Add this useEffect
-    useEffect(() => {
-        setTranslatedCategories(blogCategories);
-    }, [blogCategories]);
+    // // Add this useEffect
+    // useEffect(() => {
+    //     setTranslatedCategories(blogCategories);
+    // }, [blogCategories]);
+
+
+
     const [translatedText, setTranslatedText] = useState({
         home: 'Home',
         apps: 'Best Betting Apps',
@@ -621,18 +965,59 @@ function HeaderThree({ animationStage, languageValidation }) {
 
 
     // Updated handleLanguageChange function
+    // const handleLanguageChange = async (selectedLanguage) => {
+    //     if (selectedLanguage === language) return;
+
+    //     // Mark that the user is changing the language to prevent URL effect from overriding
+    //     setIsUserChangingLanguage(true);
+    //     setPendingLanguage(selectedLanguage);
+
+    //     // Immediately update UI state (dropdown selection)
+    //     setLanguage(selectedLanguage);
+    //     localStorage.setItem('language', selectedLanguage);
+
+    //     // Ensure next route doesn't rerun intro animation which hides the logo
+    //     try {
+    //         localStorage.setItem('headerAnimationPlayed', 'true');
+    //         document.documentElement.classList.add('header-played');
+    //     } catch (e) { }
+
+    //     // Close dropdowns
+    //     setExpandedLanguageSelector(false);
+    //     if (isMobile) {
+    //         setMobileMenuOpen(false);
+    //     }
+
+    //     // Prepare URL update
+    //     const currentPath = pathname;
+    //     const segments = currentPath.split('/').filter(Boolean);
+    //     const currentLangCountry = segments[0]?.split('-')[1] || 'in';
+    //     const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
+    //     const newPath = segments.length > 1
+    //         ? `/${newLangCountry}/${segments.slice(1).join('/')}`
+    //         : `/${newLangCountry}`;
+
+    //     // Set navigating state for visibility/logging and push route
+    //     setIsNavigating(true);
+    //     console.log('[Router] route push start', { newPath });
+    //     router.push(newPath);
+    // };
+
+    // IMPROVED: Handle language change with better error handling
     const handleLanguageChange = async (selectedLanguage) => {
         if (selectedLanguage === language) return;
 
-        // Mark that the user is changing the language to prevent URL effect from overriding
+        console.log('[Language] Changing to:', selectedLanguage);
+
+        // Mark that the user is changing the language
         setIsUserChangingLanguage(true);
         setPendingLanguage(selectedLanguage);
 
-        // Immediately update UI state (dropdown selection)
+        // Immediately update UI state
         setLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
 
-        // Ensure next route doesn't rerun intro animation which hides the logo
+        // Ensure next route doesn't rerun intro animation
         try {
             localStorage.setItem('headerAnimationPlayed', 'true');
             document.documentElement.classList.add('header-played');
@@ -644,6 +1029,14 @@ function HeaderThree({ animationStage, languageValidation }) {
             setMobileMenuOpen(false);
         }
 
+        try {
+            // Start translation in background
+            await translateContent(selectedLanguage);
+        } catch (error) {
+            console.error('Language change translation failed:', error);
+            // Continue with navigation even if translation fails
+        }
+
         // Prepare URL update
         const currentPath = pathname;
         const segments = currentPath.split('/').filter(Boolean);
@@ -653,72 +1046,174 @@ function HeaderThree({ animationStage, languageValidation }) {
             ? `/${newLangCountry}/${segments.slice(1).join('/')}`
             : `/${newLangCountry}`;
 
-        // Set navigating state for visibility/logging and push route
+        // Navigate
         setIsNavigating(true);
         console.log('[Router] route push start', { newPath });
         router.push(newPath);
     };
 
+
+
+
+
+
     // Separate translation logic into its own function
+    // OPTIMIZED: Improved translation function with better error handling
+    // OPTIMIZED: Improved translation function with retry mechanism
     const translateContent = async (selectedLanguage) => {
         try {
             console.log('[Translate] start', { selectedLanguage });
             setIsTranslating(true);
 
-            const translations = {};
 
-            // Translate Home
-            const homeTranslation = await translateText([{ text: 'Home' }], 'en', selectedLanguage);
-            translations.home = homeTranslation[0];
+            // 🆕 SPECIAL HANDLING FOR ENGLISH
+            if (selectedLanguage === 'en') {
+                console.log('[Translate] English selected, resetting to original texts');
 
-            // Translate Best Betting Apps
-            const appsTranslation = await translateText([{ text: 'Best Betting Apps' }], 'en', selectedLanguage);
-            translations.apps = appsTranslation[0];
+                // Reset to original English texts
+                const originalTranslations = {
+                    home: 'Home',
+                    apps: 'Best Betting Apps',
+                    news: 'News',
+                    schedule: 'Match Schedules',
+                    cricket: 'Cricket',
+                    football: 'Football',
+                    contact: 'Contact Us',
+                    language: 'Language',
+                    sport: 'Sport'
+                };
 
-            // Translate News
-            const newsTranslation = await translateText([{ text: 'News' }], 'en', selectedLanguage);
-            translations.news = newsTranslation[0];
+                setTranslatedText(originalTranslations);
 
-            // Translate Match Schedules
-            const scheduleTranslation = await translateText([{ text: 'Match Schedules' }], 'en', selectedLanguage);
-            translations.schedule = scheduleTranslation[0];
+                // Cache the English translations
+                try {
+                    const cacheData = {
+                        language: selectedLanguage,
+                        translations: originalTranslations,
+                        timestamp: Date.now()
+                    };
+                    localStorage.setItem(`cachedTranslations_${selectedLanguage}`, JSON.stringify(cacheData));
+                } catch (cacheError) {
+                    console.warn('Failed to cache English translations:', cacheError);
+                }
 
-            // Translate Cricket
-            const cricketTranslation = await translateText([{ text: 'Cricket' }], 'en', selectedLanguage);
-            translations.cricket = cricketTranslation[0];
+                return; // Exit early for English
+            }
 
-            // Translate Football
-            const footballTranslation = await translateText([{ text: 'Football' }], 'en', selectedLanguage);
-            translations.football = footballTranslation[0];
+            // Check if we already have cached translations for this language
+            const cachedTranslationsKey = `cachedTranslations_${selectedLanguage}`;
+            const cached = localStorage.getItem(cachedTranslationsKey);
 
-            // Translate Contact
-            const contactTranslation = await translateText([{ text: 'Contact' }], 'en', selectedLanguage);
-            translations.contact = contactTranslation[0];
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    // Use cache if it's less than 1 hour old
+                    if (Date.now() - parsed.timestamp < 60 * 60 * 1000) {
+                        console.log('[Translate] Using cached translations');
+                        setTranslatedText(prev => ({
+                            ...prev,
+                            ...parsed.translations
+                        }));
+                        return; // Exit early if we have valid cache
+                    }
+                } catch (e) {
+                    console.warn('Failed to parse cached translations:', e);
+                }
+            }
 
-            // Translate Language
-            const languageTranslation = await translateText([{ text: 'Language' }], 'en', selectedLanguage);
-            translations.language = languageTranslation[0];
+            // Batch all translation requests together for better performance
+            const translationTexts = [
+                'Home',
+                'Best Betting Apps',
+                'News',
+                'Match Schedules',
+                'Cricket',
+                'Football',
+                'Contact',
+                // 'Language',
+                // 'Sport'
+            ];
 
-            // Translate Sport
-            const sportTranslation = await translateText([{ text: 'Sport' }], 'en', selectedLanguage);
-            translations.sport = sportTranslation[0];
+            // Single API call for all translations with timeout and retry
+            const textsToTranslate = translationTexts.map(text => ({ text }));
 
-            console.log('[Translate] translations fetched', { selectedLanguage, translations });
+            try {
+                // Use retry mechanism for the main translation call
+                const translatedResults = await retryTranslation(
+                    () => Promise.race([
+                        translateHeaders(textsToTranslate, 'en', selectedLanguage),
+                        new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('Translation timeout')), 10000)
+                        )
+                    ])
+                );
 
-            // Update state with all translations
-            setTranslatedText(prev => ({
-                ...prev,
-                ...translations
-            }));
+                // Map results to translation keys
+                const translations = {
+                    home: translatedResults[0] || 'Home',
+                    apps: translatedResults[1] || 'Best Betting Apps',
+                    news: translatedResults[2] || 'News',
+                    schedule: translatedResults[3] || 'Match Schedules',
+                    cricket: translatedResults[4] || 'Cricket',
+                    football: translatedResults[5] || 'Football',
+                    contact: translatedResults[6] || 'Contact',
+                    // language: translatedResults[7] || 'Language',
+                    // sport: translatedResults[8] || 'Sport'
+                };
 
-            // Cache translations in localStorage
-            localStorage.setItem('cachedTranslations', JSON.stringify({
-                language: selectedLanguage,
-                translations: translations
-            }));
-            console.log('[Translate] state updated and cached', { selectedLanguage });
+                console.log('[Translate] translations fetched', { selectedLanguage, translations });
+
+                // Update state with all translations
+                setTranslatedText(prev => ({
+                    ...prev,
+                    ...translations
+                }));
+
+                // Cache translations in localStorage with timestamp
+                const cacheData = {
+                    language: selectedLanguage,
+                    translations: translations,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(cachedTranslationsKey, JSON.stringify(cacheData));
+
+                console.log('[Translate] state updated and cached', { selectedLanguage });
+
+            } catch (apiError) {
+                console.error('Translation API error:', apiError);
+                throw apiError; // Re-throw to be caught by outer catch
+            }
+
         } catch (error) {
             console.error('Translation error:', error);
+
+            // Fallback strategies
+            try {
+                // Try to get any cached translation for this language
+                const cachedTranslationsKey = `cachedTranslations_${selectedLanguage}`;
+                const cached = localStorage.getItem(cachedTranslationsKey);
+
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    console.log('[Translate] Using fallback cached translations');
+                    setTranslatedText(prev => ({ ...prev, ...parsed.translations }));
+                } else {
+                    // If no cache, try to get from general cache
+                    const generalCache = localStorage.getItem('cachedTranslations');
+                    if (generalCache) {
+                        const parsed = JSON.parse(generalCache);
+                        if (parsed.language === selectedLanguage) {
+                            console.log('[Translate] Using general cached translations');
+                            setTranslatedText(prev => ({ ...prev, ...parsed.translations }));
+                        }
+                    } else {
+                        // Last resort: keep current translations but mark as failed
+                        console.warn('[Translate] No fallback translations available');
+                    }
+                }
+            } catch (fallbackError) {
+                console.warn('Fallback translation failed:', fallbackError);
+            }
         } finally {
             setIsTranslating(false);
             console.log('[Translate] end', { selectedLanguage });
@@ -741,11 +1236,15 @@ function HeaderThree({ animationStage, languageValidation }) {
         setMobileMenuOpen(!mobileMenuOpen);
     };
 
-    const handleNavItemClick = () => {
+    const handleCategoryToggle = React.useCallback((categoryId) => {
+        setExpandedCategory(prev => prev === categoryId ? null : categoryId);
+    }, []);
+
+    const handleNavItemClick = React.useCallback(() => {
         if (isMobile) {
             setMobileMenuOpen(false);
         }
-    };
+    }, [isMobile]);
 
     const toggleCategory = (categoryId) => {
         setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
@@ -761,16 +1260,21 @@ function HeaderThree({ animationStage, languageValidation }) {
         setExpandedLanguageSelector(false);
     };
 
-    // Function to get current language display name
-    const getCurrentLanguageDisplay = () => {
+    // OPTIMIZED: Memoized category capitalization
+    const getCategoryDisplayName = React.useCallback((category) => {
+        return category?.name?.charAt(0).toUpperCase() + category?.name?.slice(1).toLowerCase() || '';
+    }, []);
+
+    // OPTIMIZED: Memoized current language display
+    const getCurrentLanguageDisplay = React.useCallback(() => {
         const currentLang = filteredList.find(lang => lang.hreflang === language);
         return currentLang ? currentLang.language : 'Language';
-    };
+    }, [filteredList, language]);
 
-    // Function to get current sport display name
-    const getCurrentSportDisplay = () => {
+    // OPTIMIZED: Memoized current sport display  
+    const getCurrentSportDisplay = React.useCallback(() => {
         return sport === 'cricket' ? translatedText.cricket : translatedText.football;
-    };
+    }, [sport, translatedText.cricket, translatedText.football]);
 
     const renderMobileMenu = () => (
         <>
@@ -829,44 +1333,50 @@ function HeaderThree({ animationStage, languageValidation }) {
                     </a>
 
                     {/* Mobile Dropdown Categories */}
-                    {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
-                        <div key={cat.id} className={styles.mobileDropdown}>
-                            <div
-                                className={styles.mobileDropdownHeader}
-                                onClick={() => toggleCategory(cat.id)}
-                            >
-                                <a
-                                    href={buildPath(`/blogs/pages/all-blogs?category=${cat.id}`)}
-                                    onClick={handleNavItemClick}
+                    {categoriesLoaded ? (
+                        filteredCategories.map((cat) => (
+                            <div key={cat.id} className={styles.mobileDropdown}>
+                                <div
+                                    className={styles.mobileDropdownHeader}
+                                    onClick={() => handleCategoryToggle(cat.id)}
                                 >
-                                    {capitalizeFirstLetter(cat.name)}
-                                </a>
+                                    <a
+                                        href={buildPath(`/blogs/pages/all-blogs?category=${cat.id}`)}
+                                        onClick={handleNavItemClick}
+                                    >
+                                        {getCategoryDisplayName(cat)}
+                                    </a>
+                                    {cat.subcategories?.length > 0 && (
+                                        <FaChevronDown
+                                            style={{
+                                                transform: expandedCategory === cat.id ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                transition: 'transform 0.2s ease'
+                                            }}
+                                        />
+                                    )}
+                                </div>
+
                                 {cat.subcategories?.length > 0 && (
-                                    <FaChevronDown
-                                        style={{
-                                            transform: expandedCategory === cat.id ? 'rotate(180deg)' : 'rotate(0deg)',
-                                            transition: 'transform 0.2s ease'
-                                        }}
-                                    />
+                                    <div className={`${styles.mobileSubmenu} ${expandedCategory === cat.id ? styles.open : ''}`}>
+                                        {cat.subcategories.map((sub) => (
+                                            <a
+                                                key={sub.id}
+                                                href={buildPath(`/blogs/pages/all-blogs?subcategory=${sub.id}`)}
+                                                className={styles.mobileSubmenuItem}
+                                                onClick={handleNavItemClick}
+                                            >
+                                                {getCategoryDisplayName(sub)}
+                                            </a>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
-
-                            {cat.subcategories?.length > 0 && (
-                                <div className={`${styles.mobileSubmenu} ${expandedCategory === cat.id ? styles.open : ''}`}>
-                                    {cat.subcategories.map((sub) => (
-                                        <a
-                                            key={sub.id}
-                                            href={buildPath(`/blogs/pages/all-blogs?subcategory=${sub.id}`)}
-                                            className={styles.mobileSubmenuItem}
-                                            onClick={handleNavItemClick}
-                                        >
-                                            {sub.name}
-                                        </a>
-                                    ))}
-                                </div>
-                            )}
+                        ))
+                    ) : (
+                        <div className={styles.loadingCategories}>
+                            Loading categories...
                         </div>
-                    ))}
+                    )}
 
                     <a
                         href={buildPath("/contact")}
@@ -1020,13 +1530,13 @@ function HeaderThree({ animationStage, languageValidation }) {
                             {translatedText.schedule}
                         </a>
 
-                        {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
+                        {categoriesLoaded && filteredCategories.map((cat) => (
                             <div key={cat.id} className={styles.dropdown}>
                                 <a
                                     href={buildPath(`/blogs/pages/all-blogs?category=${cat.id}`)}
                                     className={styles.navItem}
                                 >
-                                    {capitalizeFirstLetter(cat.name)} <FaChevronDown />
+                                    {getCategoryDisplayName(cat)} <FaChevronDown />
                                 </a>
 
                                 {cat.subcategories?.length > 0 && (
@@ -1037,7 +1547,7 @@ function HeaderThree({ animationStage, languageValidation }) {
                                                     href={buildPath(`/blogs/pages/all-blogs?subcategory=${sub.id}`)}
                                                     className={styles.submenuItem}
                                                 >
-                                                    {sub.name}
+                                                    {getCategoryDisplayName(sub)}
                                                 </a>
                                             </li>
                                         ))}
