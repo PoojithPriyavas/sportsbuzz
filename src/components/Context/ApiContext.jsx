@@ -1228,7 +1228,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
         try {
             const response = await axios.request(options);
             const newData = response.data;
-
+            console.log(newData, "news Data")
             // Only set state if changed
             setNews((prev) => {
                 return JSON.stringify(prev) === JSON.stringify(newData) ? prev : newData;

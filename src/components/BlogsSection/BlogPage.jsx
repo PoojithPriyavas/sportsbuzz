@@ -31,12 +31,7 @@ export default function BlogsPage({
 }) {
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
   const router = useRouter();
-
-  // Local state
-  const [filterValue, setFilterValue] = useState('all');
-  const [currentPage, setCurrentPage] = useState(initialPage);
-  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const searchParams = useSearchParams();
 
   // Add ref to track if component is mounted
   const isMountedRef = useRef(false);
@@ -59,24 +54,24 @@ export default function BlogsPage({
   } = useGlobalData();
   console.log(countryCode, "country code in blog")
 
-  const searchParams = useSearchParams();
-
-  // Get category and subcategory from URL params
+  // Parse URL parameters - these are the source of truth
   const categoryIdParam = searchParams.get('category');
-  const selectedCategoryId = categoryIdParam ? parseInt(categoryIdParam) : initialCategoryId;
-
   const subcategoryIdParam = searchParams.get('subcategory');
-  const selectedSubcategoryId = subcategoryIdParam ? parseInt(subcategoryIdParam) : initialSubcategoryId;
-
-  // Get page from URL params
   const pageParam = searchParams.get('page');
-  const urlPage = pageParam ? parseInt(pageParam) : initialPage;
-
-  // Get search term from URL
   const searchParam = searchParams.get('search');
-  const urlSearchTerm = searchParam || initialSearchTerm;
 
-  // Using static translations instead of dynamic ones
+  // Local state - synchronized with URL params
+  const [currentPage, setCurrentPage] = useState(pageParam ? parseInt(pageParam) : initialPage);
+  const [searchTerm, setSearchTerm] = useState(searchParam || initialSearchTerm);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(
+    categoryIdParam ? parseInt(categoryIdParam) : initialCategoryId
+  );
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(
+    subcategoryIdParam ? parseInt(subcategoryIdParam) : initialSubcategoryId
+  );
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Using static translations
   const [translations] = useState({
     latestBlogs: 'Latest Blogs',
     all: 'All',
@@ -94,7 +89,7 @@ export default function BlogsPage({
   const totalPages = Math.ceil(totalBlogs / ITEMS_PER_PAGE);
 
   const hasActiveFilters =
-    selectedCategoryId || selectedSubcategoryId || filterValue !== 'all' || searchTerm !== '';
+    selectedCategoryId || selectedSubcategoryId || searchTerm !== '';
 
   // Show pagination if we have next/prev URLs or if there are multiple pages
   const showPagination = nextUrl || prevUrl || totalBlogs > ITEMS_PER_PAGE;
@@ -110,16 +105,33 @@ export default function BlogsPage({
   const nextPageNumber = getPageFromUrl(nextUrl);
   const prevPageNumber = getPageFromUrl(prevUrl);
 
-  // Initialize component and sync with URL params
+  // CRITICAL: Sync local state with URL params whenever they change
   useEffect(() => {
     isMountedRef.current = true;
 
-    // Set initial state from URL params
+    const urlPage = pageParam ? parseInt(pageParam) : initialPage;
+    const urlSearch = searchParam || initialSearchTerm;
+    const urlCategory = categoryIdParam ? parseInt(categoryIdParam) : initialCategoryId;
+    const urlSubcategory = subcategoryIdParam ? parseInt(subcategoryIdParam) : initialSubcategoryId;
+
+    // Update local state if URL params have changed
+    let stateChanged = false;
+
     if (urlPage !== currentPage) {
       setCurrentPage(urlPage);
+      stateChanged = true;
     }
-    if (urlSearchTerm !== searchTerm) {
-      setSearchTerm(urlSearchTerm);
+    if (urlSearch !== searchTerm) {
+      setSearchTerm(urlSearch);
+      stateChanged = true;
+    }
+    if (urlCategory !== selectedCategoryId) {
+      setSelectedCategoryId(urlCategory);
+      stateChanged = true;
+    }
+    if (urlSubcategory !== selectedSubcategoryId) {
+      setSelectedSubcategoryId(urlSubcategory);
+      stateChanged = true;
     }
 
     // Mark as initialized after first render
@@ -127,64 +139,20 @@ export default function BlogsPage({
       setIsInitialized(true);
     }
 
+    // If state changed due to URL params, reset the fetch cache
+    if (stateChanged) {
+      lastFetchParamsRef.current = null;
+      console.log('BlogsPage: URL params changed, state synchronized');
+    }
+
     return () => {
       isMountedRef.current = false;
     };
-  }, [urlPage, urlSearchTerm, isInitialized]);
+  }, [pageParam, searchParam, categoryIdParam, subcategoryIdParam]);
 
-  // Remove the translation effect
-  // useEffect(() => {
-  //   const fetchTranslations = async () => {
-  //     if (!isMountedRef.current) return;
-  //
-  //     try {
-  //       const [
-  //         latestBlogs,
-  //         all,
-  //         latest,
-  //         searchPlaceholder,
-  //         readMore,
-  //         clearFilter,
-  //         previous,
-  //         next,
-  //       ] = await Promise.all([
-  //         translateText('Latest Blogs', 'en', language),
-  //         translateText('All', 'en', language),
-  //         translateText('Latest', 'en', language),
-  //         translateText('Search Blogs', 'en', language),
-  //         translateText('Read More', 'en', language),
-  //         translateText('Clear Filter', 'en', language),
-  //         translateText('Previous', 'en', language),
-  //         translateText('Next', 'en', language),
-  //       ]);
-  //
-  //       if (isMountedRef.current) {
-  //         setTranslations({
-  //           latestBlogs,
-  //           all,
-  //           latest,
-  //           searchPlaceholder,
-  //           readMore,
-  //           clearFilter,
-  //           previous,
-  //           next,
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.error('Translation error:', error);
-  //     }
-  //   };
-  //
-  //   fetchTranslations();
-  // }, [language, translateText]);
-
-  // SINGLE MAIN EFFECT FOR FETCHING BLOGS - PREVENTS DUPLICATE CALLS
-
+  // MAIN EFFECT FOR FETCHING BLOGS
   useEffect(() => {
-    // Only proceed if:
-    // 1. Component is mounted
-    // 2. Component is initialized (to prevent race conditions)
-    // 3. Country code is available
+    // Only proceed if ready
     if (!isMountedRef.current || !isInitialized || !countryCode?.country_code) {
       console.log('BlogsPage: Skipping blog fetch - not ready', {
         mounted: isMountedRef.current,
@@ -223,7 +191,7 @@ export default function BlogsPage({
     lastFetchParamsRef.current = currentParamsKey;
 
     // Debounce search inputs, but not other parameter changes
-    const isSearchChange = searchTerm !== urlSearchTerm;
+    const isSearchChange = searchTerm !== searchParam;
     const debounceTime = isSearchChange ? 500 : 0;
 
     const timeoutId = setTimeout(() => {
@@ -244,9 +212,15 @@ export default function BlogsPage({
     currentPage,
     countryCode?.country_code,
     fetchBlogs,
-    urlSearchTerm
+    searchParam
   ]);
 
+  // Reset cache when country code changes
+  useEffect(() => {
+    if (countryCode?.country_code) {
+      lastFetchParamsRef.current = null;
+    }
+  }, [countryCode?.country_code]);
 
   // Function to update URL without page reload
   const updateURL = (page, search, category, subcategory) => {
@@ -264,23 +238,10 @@ export default function BlogsPage({
     router.push(newURL, { scroll: false });
   };
 
-
-  useEffect(() => {
-    if (countryCode?.country_code) {
-      // Reset the cache when country code changes
-      lastFetchParamsRef.current = null;
-    }
-  }, [countryCode?.country_code]);
-
   const handleClearFilters = async () => {
     if (!isMountedRef.current) return;
 
     console.log('BlogsPage: Clearing filters');
-
-    // Clear local state
-    setFilterValue('all');
-    setSearchTerm('');
-    setCurrentPage(1);
 
     // Reset last fetch params to force a new fetch
     lastFetchParamsRef.current = null;
@@ -293,7 +254,7 @@ export default function BlogsPage({
     // Construct the correct URL with language prefix
     const newURL = `/${languagePrefix}/blogs/pages/all-blogs`;
 
-    // Update URL immediately
+    // Update URL immediately - this will trigger the URL sync effect
     router.replace(newURL, { scroll: false });
   };
 
@@ -303,7 +264,6 @@ export default function BlogsPage({
 
     if (pageNumber !== currentPage) {
       console.log('BlogsPage: Changing page to:', pageNumber);
-      setCurrentPage(pageNumber);
       updateURL(pageNumber, searchTerm, selectedCategoryId, selectedSubcategoryId);
 
       // Scroll to blog grid
@@ -338,12 +298,9 @@ export default function BlogsPage({
 
     const newSearchTerm = e.target.value;
     console.log('BlogsPage: Search term changed to:', newSearchTerm);
-    setSearchTerm(newSearchTerm);
-
-    // Reset page to 1 when searching
-    if (currentPage !== 1) {
-      setCurrentPage(1);
-    }
+    
+    // Update URL with new search term and reset to page 1
+    updateURL(1, newSearchTerm, selectedCategoryId, selectedSubcategoryId);
   };
 
   // Updated page numbers generation based on current page and total pages
@@ -391,9 +348,15 @@ export default function BlogsPage({
       nextUrl,
       prevUrl,
       nextPageNumber,
-      prevPageNumber
+      prevPageNumber,
+      urlParams: {
+        category: categoryIdParam,
+        subcategory: subcategoryIdParam,
+        page: pageParam,
+        search: searchParam
+      }
     });
-  }, [blogs, isLoading, totalBlogs, currentPage, searchTerm, selectedCategoryId, selectedSubcategoryId, countryCode?.country_code, hasActiveFilters, showPagination, isInitialized, nextUrl, prevUrl, nextPageNumber, prevPageNumber]);
+  }, [blogs, isLoading, totalBlogs, currentPage, searchTerm, selectedCategoryId, selectedSubcategoryId, countryCode?.country_code, hasActiveFilters, showPagination, isInitialized, nextUrl, prevUrl, nextPageNumber, prevPageNumber, categoryIdParam, subcategoryIdParam, pageParam, searchParam]);
 
   return (
     <>
@@ -410,7 +373,15 @@ export default function BlogsPage({
                 <h2 style={{ color: 'black' }}>{translations.latestBlogs}</h2>
 
                 <div className={styles.heading}>
-                  {/* Your heading content goes here */}
+                  {/* Display active filters */}
+                  {/* {hasActiveFilters && (
+                    <div style={{ fontSize: '14px', color: '#666', marginTop: '8px' }}>
+                      Active filters: 
+                      {selectedCategoryId && ` Category: ${selectedCategoryId}`}
+                      {selectedSubcategoryId && ` | Subcategory: ${selectedSubcategoryId}`}
+                      {searchTerm && ` | Search: "${searchTerm}"`}
+                    </div>
+                  )} */}
                 </div>
 
                 <div className={styles.rightControls}>
@@ -445,7 +416,11 @@ export default function BlogsPage({
                 <div className={styles.loadingMessage}>
                   <p>Loading blogs...</p>
                 </div>
-              ) : blogs && blogs.length > 0 ? (
+              ) : !countryCode?.country_code ? (
+                <div className={styles.loadingMessage}>
+                  <p>Initializing...</p>
+                </div>
+              ) : blogs && Array.isArray(blogs) && blogs.length > 0 ? (
                 blogs.map((blog, index) => (
                   <DynamicLink
                     key={`blog-${blog.id}-${currentPage}-${index}`}
@@ -472,10 +447,10 @@ export default function BlogsPage({
                     </div>
                   </DynamicLink>
                 ))
-              ) : countryCode?.country_code ? (
+              ) : (
                 <div className={styles.noBlogsMessage}>
                   <p>No blogs found matching your criteria.</p>
-                  {/* {hasActiveFilters && (
+                  {hasActiveFilters && (
                     <button
                       onClick={handleClearFilters}
                       className={styles.clearFilterButton}
@@ -483,16 +458,11 @@ export default function BlogsPage({
                     >
                       {translations.clearFilter}
                     </button>
-                  )} */}
-                </div>
-              ) : (
-                <div className={styles.loadingMessage}>
-                  <p>Initializing...</p>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* Updated pagination section to use API-based navigation */}
             {showPagination && !isLoading && (
               <div className={styles.pagination}>
                 <button
