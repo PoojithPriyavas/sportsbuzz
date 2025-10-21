@@ -7,7 +7,7 @@ export async function fetchTournaments(token) {
     const url = 'https://cpservm.com/gateway/marketing/datafeed/loadtree/prematch/api/v1/tournaments';
 
     const params = new URLSearchParams({
-        ref: '151',
+        ref: '192',
         sportId: '1',
     });
 

@@ -1006,6 +1006,18 @@ function HeaderThree({ animationStage, languageValidation }) {
     // IMPROVED: Handle language change with better error handling
     const handleLanguageChange = async (selectedLanguage) => {
         if (selectedLanguage === language) return;
+        const currentPath = pathname;
+        const segments = currentPath.split('/').filter(Boolean);
+        const currentLangCountry = segments[0]?.split('-')[1] || 'in';
+        const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
+        const newPath = segments.length > 1
+            ? `/${newLangCountry}/${segments.slice(1).join('/')}`
+            : `/${newLangCountry}`;
+
+        // Navigate
+        setIsNavigating(true);
+        console.log('[Router] route push start', { newPath });
+        router.push(newPath);
 
         console.log('[Language] Changing to:', selectedLanguage);
 
@@ -1037,19 +1049,7 @@ function HeaderThree({ animationStage, languageValidation }) {
             // Continue with navigation even if translation fails
         }
 
-        // Prepare URL update
-        const currentPath = pathname;
-        const segments = currentPath.split('/').filter(Boolean);
-        const currentLangCountry = segments[0]?.split('-')[1] || 'in';
-        const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
-        const newPath = segments.length > 1
-            ? `/${newLangCountry}/${segments.slice(1).join('/')}`
-            : `/${newLangCountry}`;
 
-        // Navigate
-        setIsNavigating(true);
-        console.log('[Router] route push start', { newPath });
-        router.push(newPath);
     };
 
 

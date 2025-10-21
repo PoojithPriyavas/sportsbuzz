@@ -136,6 +136,7 @@ export default function BettingCards() {
 
         for (const event of events) {
             const marketData = await fetchMarketData(accessToken, event.sportEventId);
+            console.log(marketData, "marketData")
             const baseCard = transformEventToCard(event, marketData);
             
             // Add translated fields initialized with original values
@@ -401,7 +402,7 @@ function transformEventToCard(event, marketData) {
 }
 
 async function fetchMarketData(token, sportEventId) {
-    const ref = 151;
+    const ref = 192;
     try {
         const res = await fetch(`/api/get-odds?ref=${ref}&gameId=${sportEventId}&token=${token}`);
         return res.ok ? await res.json() : null;

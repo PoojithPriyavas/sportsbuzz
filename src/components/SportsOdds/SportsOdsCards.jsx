@@ -99,7 +99,7 @@ export default function BettingCards() {
     });
 
     const { oneXTournament, oneXAccessToken, fetchOneXEventsIdData, oneXEventDetails, translateText, language } = useGlobalData();
-
+    console.log(oneXEventDetails, "oneXEventDetails")
     useEffect(() => {
         const translateLabels = async () => {
             const [
@@ -179,12 +179,14 @@ export default function BettingCards() {
 
     useEffect(() => {
         if (oneXEventDetails?.length > 0) {
+            console.log("enters this condition. of betting ods")
             setIsLoading(true);
             getTransformedCards(oneXEventDetails).then((cards) => {
                 setTransformedCards(cards);
                 setIsLoading(false);
             });
         } else {
+            console.log("enters the else condition of betting ods")
             setTransformedCards([]);
             setIsLoading(false);
         }
@@ -484,7 +486,7 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
 
                         {selectedOdd && betAmount && (
                             <div className={styles.potentialWin}>
-                                <div className={styles.potentialWinLabel} onClick={()=>window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=1119&bid=1650')}>{translatedText.potentialWinnings}</div>
+                                <div className={styles.potentialWinLabel} onClick={() => window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=1119&bid=1650')}>{translatedText.potentialWinnings}</div>
                                 <div className={styles.potentialWinAmount}>
                                     ₹{win}
                                 </div>

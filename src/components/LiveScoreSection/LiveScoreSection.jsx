@@ -15,6 +15,15 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
   
   // Track previous language to detect changes
   const previousLanguage = useRef(language);
+  
+  // Track if this is the first mount
+  const isFirstMount = useRef(true);
+  
+  // Track if initial load is complete
+  const initialLoadComplete = useRef(false);
+  
+  // Cache for translations
+  const translationCache = useRef(new Map());
 
   // Function to check if a match type has data
   const hasMatchData = (matchType) => {
@@ -37,8 +46,8 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
   useEffect(() => {
     if (!apiResponse?.typeMatches) return;
 
-    // Only initialize if translatedData is empty
-    if (translatedData.length === 0) {
+    // Only initialize if translatedData is empty and not done yet
+    if (translatedData.length === 0 && !initialLoadComplete.current) {
       const initialData = apiResponse.typeMatches.map(typeMatch => ({
         matchType: typeMatch.matchType,
         translatedMatchType: typeMatch.matchType,
@@ -55,100 +64,224 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
         }))
       }));
       setTranslatedData(initialData);
+      initialLoadComplete.current = true;
     }
   }, [apiResponse]);
 
   // Handle translations when language changes
   useEffect(() => {
     const translateMatchData = async () => {
-      if (!apiResponse?.typeMatches || translatedData.length === 0) return;
+      if (!apiResponse?.typeMatches || !initialLoadComplete.current) return;
 
-      // Check if language actually changed
+      // Check if language actually changed OR if this is first mount with non-English language
       const languageChanged = previousLanguage.current !== language;
-      if (!languageChanged) return;
+      const needsInitialTranslation = isFirstMount.current && language !== 'en';
+
+      console.log('🟢 [LiveScore] Language changed?', languageChanged, 'from', previousLanguage.current, 'to', language);
+      console.log('🟢 [LiveScore] First mount needs translation?', needsInitialTranslation);
+
+      // Skip if no change and not first mount needing translation
+      if (!languageChanged && !needsInitialTranslation) return;
+
+      // Mark first mount as complete
+      isFirstMount.current = false;
 
       previousLanguage.current = language;
+      translationCache.current.clear(); // Clear cache for new language
       setIsTranslating(true);
 
-      // Translate each type match incrementally
-      for (let typeIdx = 0; typeIdx < apiResponse.typeMatches.length; typeIdx++) {
-        const typeMatch = apiResponse.typeMatches[typeIdx];
+      try {
+        // ✅ Check localStorage for cached translations first
+        const cacheKey = `cricket_translations_${language}`;
+        const cachedData = typeof window !== 'undefined' 
+          ? localStorage.getItem(cacheKey) 
+          : null;
 
-        // Translate match type
-        const translatedMatchType = await translateText(typeMatch.matchType || '', 'en', language);
+        if (cachedData) {
+          try {
+            const parsed = JSON.parse(cachedData);
+            const cacheAge = Date.now() - parsed.timestamp;
+            
+            // Use cache if less than 1 hour old
+            if (cacheAge < 60 * 60 * 1000) {
+              console.log('🟢 [LiveScore] Using cached translations from localStorage');
+              
+              // Restore translation cache
+              parsed.translationCache.forEach(([key, value]) => {
+                translationCache.current.set(key, value);
+              });
+              
+              // Build translated data from cache
+              const cachedTranslatedData = apiResponse.typeMatches.map(typeMatch => {
+                const translatedMatchType = translationCache.current.get(`${typeMatch.matchType}_en_${language}`) || typeMatch.matchType;
 
-        // Update match type
-        setTranslatedData(prev => {
-          const updated = [...prev];
-          if (updated[typeIdx]) {
-            updated[typeIdx] = {
-              ...updated[typeIdx],
-              translatedMatchType
-            };
-          }
-          return updated;
-        });
+                return {
+                  matchType: typeMatch.matchType,
+                  translatedMatchType,
+                  seriesMatches: (typeMatch.seriesMatches || []).map(series => {
+                    const seriesName = series.seriesAdWrapper?.seriesName || '';
+                    const translatedSeriesName = seriesName
+                      ? (translationCache.current.get(`${seriesName}_en_${language}`) || seriesName)
+                      : '';
 
-        // Translate each series
-        const seriesMatches = typeMatch.seriesMatches || [];
-        for (let seriesIdx = 0; seriesIdx < seriesMatches.length; seriesIdx++) {
-          const series = seriesMatches[seriesIdx];
-          const seriesName = series.seriesAdWrapper?.seriesName || '';
-
-          // Translate series name
-          const translatedSeriesName = seriesName 
-            ? await translateText(seriesName, 'en', language)
-            : '';
-
-          // Update series name
-          setTranslatedData(prev => {
-            const updated = [...prev];
-            if (updated[typeIdx]?.seriesMatches?.[seriesIdx]) {
-              updated[typeIdx].seriesMatches[seriesIdx] = {
-                ...updated[typeIdx].seriesMatches[seriesIdx],
-                translatedSeriesName
-              };
-            }
-            return updated;
-          });
-
-          // Translate each match in the series
-          const matches = series.seriesAdWrapper?.matches || [];
-          for (let matchIdx = 0; matchIdx < matches.length; matchIdx++) {
-            const match = matches[matchIdx];
-            const info = match.matchInfo;
-
-            const [translatedTeam1Name, translatedTeam2Name, translatedMatchDesc, translatedStatus] = 
-              await Promise.all([
-                info?.team1?.teamName ? translateText(info.team1.teamName, 'en', language) : '',
-                info?.team2?.teamName ? translateText(info.team2.teamName, 'en', language) : '',
-                info?.matchDesc ? translateText(info.matchDesc, 'en', language) : '',
-                info?.status ? translateText(info.status, 'en', language) : ''
-              ]);
-
-            // Update this specific match
-            setTranslatedData(prev => {
-              const updated = [...prev];
-              if (updated[typeIdx]?.seriesMatches?.[seriesIdx]?.matches?.[matchIdx]) {
-                updated[typeIdx].seriesMatches[seriesIdx].matches[matchIdx] = {
-                  ...updated[typeIdx].seriesMatches[seriesIdx].matches[matchIdx],
-                  translatedTeam1Name,
-                  translatedTeam2Name,
-                  translatedMatchDesc,
-                  translatedStatus
+                    return {
+                      ...series,
+                      translatedSeriesName,
+                      matches: (series.seriesAdWrapper?.matches || []).map(match => {
+                        const info = match.matchInfo;
+                        return {
+                          ...match,
+                          translatedTeam1Name: info?.team1?.teamName
+                            ? (translationCache.current.get(`${info.team1.teamName}_en_${language}`) || info.team1.teamName)
+                            : '',
+                          translatedTeam2Name: info?.team2?.teamName
+                            ? (translationCache.current.get(`${info.team2.teamName}_en_${language}`) || info.team2.teamName)
+                            : '',
+                          translatedMatchDesc: info?.matchDesc
+                            ? (translationCache.current.get(`${info.matchDesc}_en_${language}`) || info.matchDesc)
+                            : '',
+                          translatedStatus: info?.status
+                            ? (translationCache.current.get(`${info.status}_en_${language}`) || info.status)
+                            : ''
+                        };
+                      })
+                    };
+                  })
                 };
-              }
-              return updated;
-            });
+              });
+              
+              setTranslatedData(cachedTranslatedData);
+              setIsTranslating(false);
+              return; // Exit early with cached data
+            }
+          } catch (parseError) {
+            console.warn('[LiveScore] Failed to parse cached translations:', parseError);
           }
         }
-      }
 
-      setIsTranslating(false);
+        // ✅ Helper function to translate with caching
+        const translateWithCache = async (text, fromLang, toLang) => {
+          if (!text) return '';
+
+          const cacheKey = `${text}_${fromLang}_${toLang}`;
+
+          // Return cached translation if exists
+          if (translationCache.current.has(cacheKey)) {
+            return translationCache.current.get(cacheKey);
+          }
+
+          // Translate and cache the result
+          const translated = await translateText(text, fromLang, toLang);
+          translationCache.current.set(cacheKey, translated);
+          return translated;
+        };
+
+        // ✅ Collect all unique texts to translate
+        const uniqueMatchTypes = new Set();
+        const uniqueSeriesNames = new Set();
+        const uniqueTeamNames = new Set();
+        const uniqueMatchDescs = new Set();
+        const uniqueStatuses = new Set();
+
+        apiResponse.typeMatches.forEach(typeMatch => {
+          if (typeMatch.matchType) uniqueMatchTypes.add(typeMatch.matchType);
+
+          (typeMatch.seriesMatches || []).forEach(series => {
+            const seriesName = series.seriesAdWrapper?.seriesName;
+            if (seriesName) uniqueSeriesNames.add(seriesName);
+
+            (series.seriesAdWrapper?.matches || []).forEach(match => {
+              const info = match.matchInfo;
+              if (info?.team1?.teamName) uniqueTeamNames.add(info.team1.teamName);
+              if (info?.team2?.teamName) uniqueTeamNames.add(info.team2.teamName);
+              if (info?.matchDesc) uniqueMatchDescs.add(info.matchDesc);
+              if (info?.status) uniqueStatuses.add(info.status);
+            });
+          });
+        });
+
+        console.log('🟢 [LiveScore] Translating:', {
+          matchTypes: uniqueMatchTypes.size,
+          series: uniqueSeriesNames.size,
+          teams: uniqueTeamNames.size,
+          descs: uniqueMatchDescs.size,
+          statuses: uniqueStatuses.size
+        });
+
+        // ✅ Translate all unique texts in parallel
+        await Promise.all([
+          ...Array.from(uniqueMatchTypes).map(text => translateWithCache(text, 'en', language)),
+          ...Array.from(uniqueSeriesNames).map(text => translateWithCache(text, 'en', language)),
+          ...Array.from(uniqueTeamNames).map(text => translateWithCache(text, 'en', language)),
+          ...Array.from(uniqueMatchDescs).map(text => translateWithCache(text, 'en', language)),
+          ...Array.from(uniqueStatuses).map(text => translateWithCache(text, 'en', language))
+        ]);
+
+        // ✅ Build fully translated data using cached translations
+        const fullyTranslatedData = apiResponse.typeMatches.map(typeMatch => {
+          const translatedMatchType = translationCache.current.get(`${typeMatch.matchType}_en_${language}`) || typeMatch.matchType;
+
+          return {
+            matchType: typeMatch.matchType,
+            translatedMatchType,
+            seriesMatches: (typeMatch.seriesMatches || []).map(series => {
+              const seriesName = series.seriesAdWrapper?.seriesName || '';
+              const translatedSeriesName = seriesName
+                ? (translationCache.current.get(`${seriesName}_en_${language}`) || seriesName)
+                : '';
+
+              return {
+                ...series,
+                translatedSeriesName,
+                matches: (series.seriesAdWrapper?.matches || []).map(match => {
+                  const info = match.matchInfo;
+                  return {
+                    ...match,
+                    translatedTeam1Name: info?.team1?.teamName
+                      ? (translationCache.current.get(`${info.team1.teamName}_en_${language}`) || info.team1.teamName)
+                      : '',
+                    translatedTeam2Name: info?.team2?.teamName
+                      ? (translationCache.current.get(`${info.team2.teamName}_en_${language}`) || info.team2.teamName)
+                      : '',
+                    translatedMatchDesc: info?.matchDesc
+                      ? (translationCache.current.get(`${info.matchDesc}_en_${language}`) || info.matchDesc)
+                      : '',
+                    translatedStatus: info?.status
+                      ? (translationCache.current.get(`${info.status}_en_${language}`) || info.status)
+                      : ''
+                  };
+                })
+              };
+            })
+          };
+        });
+
+        console.log('🟢 [LiveScore] All translations complete, updating state once');
+        console.log('🟢 [LiveScore] Cache size:', translationCache.current.size, 'translations');
+        setTranslatedData(fullyTranslatedData);
+
+        // ✅ Save translations to localStorage
+        try {
+          const cacheData = {
+            language,
+            translationCache: Array.from(translationCache.current.entries()),
+            timestamp: Date.now()
+          };
+          localStorage.setItem(`cricket_translations_${language}`, JSON.stringify(cacheData));
+          console.log('🟢 [LiveScore] Translations cached to localStorage');
+        } catch (storageError) {
+          console.warn('[LiveScore] Failed to cache translations to localStorage:', storageError);
+        }
+
+      } catch (error) {
+        console.error('[LiveScore] Translation error:', error);
+      } finally {
+        setIsTranslating(false);
+      }
     };
 
     translateMatchData();
-  }, [apiResponse, language, translateText]);
+  }, [language]); // Only depend on language
 
   // Keep a valid activeType when language changes or data updates
   useEffect(() => {
@@ -304,6 +437,21 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
 
   return (
     <div className={styles.wrapper}>
+      {isTranslating && (
+        <div style={{
+          position: 'fixed',
+          top: '60px',
+          right: '10px',
+          background: 'rgba(0,0,0,0.7)',
+          color: 'white',
+          padding: '10px 20px',
+          borderRadius: '5px',
+          zIndex: 1000
+        }}>
+          Translating Cricket...
+        </div>
+      )}
+
       <div className={styles.nav}>
         {matchTypes.map(type => (
           <span

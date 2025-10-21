@@ -180,6 +180,83 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
     // Replace the translateText function in ApiContext with this updated version
 
+    const debugTranslateText = async (textInput, from = 'en', toLang = language) => {
+        const langMap = {
+            English: 'en',
+            Malayalam: 'ml',
+        };
+        const to = langMap[toLang] || toLang;
+        const fromCode = langMap[from] || from;
+
+        // If source and target languages are the same, return the input as is
+        if (fromCode === to) {
+            if (typeof textInput === 'object' && textInput !== null && !Array.isArray(textInput)) {
+                // Handle grouped texts
+                const result = {};
+                Object.entries(textInput).forEach(([key, value]) => {
+                    result[key] = Array.isArray(value) ? value.map(item => typeof item === 'string' ? item : item.text) : value;
+                });
+                return result;
+            } else if (Array.isArray(textInput)) {
+                // Handle array of texts
+                return textInput.map(item => item.text || item);
+            } else {
+                // Handle single text
+                return textInput;
+            }
+        }
+
+        try {
+            // Handle different input formats
+            if (typeof textInput === 'object' && textInput !== null && !Array.isArray(textInput)) {
+                // New format: Handle grouped texts (for header, categories, subcategories)
+                const response = await axios.post('/api/translate', {
+                    textGroups: textInput,
+                    from: fromCode,
+                    to,
+                });
+                return response.data;
+            } else if (Array.isArray(textInput)) {
+                // Batch translation
+                const texts = textInput.map(item => ({
+                    text: typeof item === 'string' ? item : item.text
+                }));
+                const response = await axios.post('/api/debug/debug-translate', {
+                    texts,
+                    from: fromCode,
+                    to,
+                });
+                return response.data;
+            } else {
+                // Single text translation
+                const response = await axios.post('/api/debug/debug-translate', {
+                    text: textInput,
+                    from: fromCode,
+                    to,
+                });
+                return response.data;
+            }
+        } catch (error) {
+            console.error('Translation error:', error);
+            // Return original text(s) in case of error
+            if (typeof textInput === 'object' && textInput !== null && !Array.isArray(textInput)) {
+                // Handle grouped texts
+                const result = {};
+                Object.entries(textInput).forEach(([key, value]) => {
+                    result[key] = Array.isArray(value) ? value.map(item => typeof item === 'string' ? item : item.text) : value;
+                });
+                return result;
+            } else if (Array.isArray(textInput)) {
+                // Handle array of texts
+                return textInput.map(item => item.text || item);
+            } else {
+                // Handle single text
+                return textInput;
+            }
+        }
+    };
+
+
     const translateText = async (textInput, from = 'en', toLang = language) => {
         const langMap = {
             English: 'en',
@@ -625,7 +702,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
             );
 
             const results = await Promise.all(detailPromises);
-
+            console.log(results, "results of betx")
             const validDetails = results.filter(detail => detail !== null);
 
             setOneXEventDetails(validDetails);
@@ -1272,6 +1349,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 language,
                 setLanguage,
                 translateText,
+                debugTranslateText,
                 tournament,
                 oneXTournament,
                 accessToken,

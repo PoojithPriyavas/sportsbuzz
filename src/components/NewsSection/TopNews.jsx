@@ -11,6 +11,8 @@ const NewsList = () => {
     return news?.storyList?.filter(item => item.story)?.map(item => item.story) || [];
   }, [news]);
 
+  console.log(news,"news")
+
   const [translatedNews, setTranslatedNews] = useState([]);
   const [translatedHeader, setTranslatedHeader] = useState({
     title: 'Latest News',

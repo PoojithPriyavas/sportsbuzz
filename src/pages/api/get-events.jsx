@@ -8,7 +8,7 @@ export async function fetchEventsIds({ token, id }) {
     const url = 'https://cpservm.com/gateway/marketing/datafeed/loadtree/prematch/api/v1/sportEventIds';
 
     const params = new URLSearchParams({
-        ref: '151',
+        ref: '192',
         tournamentId: id,
     });
 
