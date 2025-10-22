@@ -8,7 +8,7 @@ export default async function fetchCricketDetails(req, res) {
     const options = {
         method: 'GET',
         headers: {
-            'X-RapidAPI-Key': process.env.FOOTBALL_RAPID_API_KEY,
+            'X-RapidAPI-Key': process.env.NEXT_PUBLIC_FOOTBALL_RAPID_API_KEY,
         },
     };
 

@@ -179,26 +179,37 @@ export default function TestLive() {
 
     // Global cache for ALL translations across all leagues
     const translationCache = useRef(new Map());
-    
+
     // Track which leagues have been translated for each language
     const translatedLeagues = useRef(new Map()); // Map<language, Set<leagueName>>
 
     const { pushDynamic } = useDynamicRouter();
 
     const handleMatchClick = async (eid, team1Name, team2Name) => {
-        if (setMatchTeams) {
-            setMatchTeams({
-                team1: team1Name,
-                team2: team2Name
-            });
+        try {
+            console.log("enters the match click code", { eid, team1Name, team2Name });
+
+            if (setMatchTeams) {
+                setMatchTeams({ team1: team1Name, team2: team2Name });
+            }
+
+            const detailsPromise = typeof fetchFootballDetails === 'function' ? fetchFootballDetails(eid) : Promise.resolve();
+            const lineupPromise = typeof fetchFootBallLineUp === 'function' ? fetchFootBallLineUp(eid) : Promise.resolve();
+
+            // Navigate immediately; don’t block on data fetching
+            await pushDynamic(`/football-match-details/${eid}`);
+
+            // Let the data calls complete in the background
+            await Promise.allSettled([detailsPromise, lineupPromise]);
+        } catch (error) {
+            console.error('handleMatchClick error:', error);
+            // Try to navigate anyway as a fallback
+            try {
+                await pushDynamic(`/football-match-details/${eid}`);
+            } catch (navError) {
+                console.error('Navigation fallback failed:', navError);
+            }
         }
-
-        await Promise.all([
-            fetchFootballDetails(eid),
-            fetchFootBallLineUp(eid)
-        ]);
-
-        await pushDynamic(`/football-match-details/${eid}`);
     };
 
     // ✅ USEEFFECT #1: Initialize with original data (runs once on mount)
