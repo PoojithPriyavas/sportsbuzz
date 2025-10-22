@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import styles from './TestLive.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 import { useDynamicRouter } from '@/hooks/useDynamicRouter';
@@ -162,7 +162,7 @@ function SkeletonFilterBar() {
 
 export default function TestLive() {
 
-    const { stages, language, translateText, fetchFootballDetails, fetchFootBallLineUp, setMatchTeams, debugTranslateText } = useGlobalData();
+    const { stages, language, debugTranslateText, fetchFootballDetails, fetchFootBallLineUp, setMatchTeams } = useGlobalData();
 
     const [selectedLeague, setSelectedLeague] = useState('');
     const [translatedStages, setTranslatedStages] = useState([]);
@@ -177,11 +177,11 @@ export default function TestLive() {
     // Track if initial load is complete
     const initialLoadComplete = useRef(false);
 
-    // Cache for translations to avoid duplicate API calls
+    // Global cache for ALL translations across all leagues
     const translationCache = useRef(new Map());
     
-    // Track if this is the first mount
-    const isFirstMount = useRef(true);
+    // Track which leagues have been translated for each language
+    const translatedLeagues = useRef(new Map()); // Map<language, Set<leagueName>>
 
     const { pushDynamic } = useDynamicRouter();
 
@@ -201,7 +201,7 @@ export default function TestLive() {
         await pushDynamic(`/football-match-details/${eid}`);
     };
 
-    // ✅ USEEFFECT #1: Initialize translated stages with original data (runs once on mount)
+    // ✅ USEEFFECT #1: Initialize with original data (runs once on mount)
     useEffect(() => {
         console.log("🔵 useEffect #1: Initialize stages");
 
@@ -210,7 +210,6 @@ export default function TestLive() {
             return;
         }
 
-        // Only initialize if not done yet
         if (!initialLoadComplete.current) {
             const initialStages = stages.Stages.map(stage => ({
                 ...stage,
@@ -234,115 +233,35 @@ export default function TestLive() {
         }
     }, [stages]);
 
-    // ✅ USEEFFECT #2: Handle language changes and translate ALL data in one batch
+    // ✅ USEEFFECT #2: Translate static texts when language changes
     useEffect(() => {
-        console.log("🟢 useEffect #2: Language change detected", language);
+        console.log("🟢 useEffect #2: Language change - translate static texts", language);
 
-        const translateStageData = async () => {
-            // Guard: Don't run if no data or it's the initial language
-            if (!stages?.Stages || !initialLoadComplete.current) return;
+        const translateStaticTexts = async () => {
+            if (!initialLoadComplete.current) return;
 
-            // Check if language actually changed OR if this is first mount with non-English language
             const languageChanged = previousLanguage.current !== language;
-            const needsInitialTranslation = isFirstMount.current && language !== 'en';
-            
-            console.log('🟢 Language changed?', languageChanged, 'from', previousLanguage.current, 'to', language);
-            console.log('🟢 First mount needs translation?', needsInitialTranslation);
+            if (!languageChanged) return;
 
-            // Skip if no change and not first mount needing translation
-            if (!languageChanged && !needsInitialTranslation) return;
-
-            // Mark first mount as complete
-            isFirstMount.current = false;
-
-            // Update ref to track current language and clear cache
             previousLanguage.current = language;
-            translationCache.current.clear(); // Clear cache for new language
-            setIsTranslating(true);
 
             try {
-                // ✅ Check localStorage for cached translations first
-                const cacheKey = `football_translations_${language}`;
-                const cachedData = typeof window !== 'undefined' 
-                    ? localStorage.getItem(cacheKey) 
-                    : null;
-
-                if (cachedData) {
-                    try {
-                        const parsed = JSON.parse(cachedData);
-                        const cacheAge = Date.now() - parsed.timestamp;
-                        
-                        // Use cache if less than 1 hour old
-                        if (cacheAge < 60 * 60 * 1000) {
-                            console.log('🟢 Using cached translations from localStorage');
-                            setDateLabels(parsed.dateLabels);
-                            setStaticTexts(parsed.staticTexts);
-                            
-                            // Restore translation cache
-                            parsed.translationCache.forEach(([key, value]) => {
-                                translationCache.current.set(key, value);
-                            });
-                            
-                            // Build translated stages from cache
-                            const cachedStages = stages.Stages.map(stage => {
-                                const translatedLeague = translationCache.current.get(`${stage.Cnm}_en_${language}`) || stage.Cnm || '';
-                                const translatedSubLeague = stage.Snm
-                                    ? (translationCache.current.get(`${stage.Snm}_en_${language}`) || stage.Snm)
-                                    : '';
-
-                                const translatedEvents = (stage.Events || []).map(event => {
-                                    const team1 = event.T1?.[0];
-                                    const team2 = event.T2?.[0];
-
-                                    return {
-                                        ...event,
-                                        translatedTeam1: team1?.Nm
-                                            ? (translationCache.current.get(`${team1.Nm}_en_${language}`) || team1.Nm)
-                                            : '',
-                                        translatedTeam2: team2?.Nm
-                                            ? (translationCache.current.get(`${team2.Nm}_en_${language}`) || team2.Nm)
-                                            : '',
-                                        translatedStatus: event.Eps
-                                            ? (translationCache.current.get(`${event.Eps}_en_${language}`) || event.Eps)
-                                            : ''
-                                    };
-                                });
-
-                                return {
-                                    ...stage,
-                                    translatedLeague,
-                                    translatedSubLeague,
-                                    translatedEvents
-                                };
-                            });
-                            
-                            setTranslatedStages(cachedStages);
-                            setIsTranslating(false);
-                            return; // Exit early with cached data
-                        }
-                    } catch (parseError) {
-                        console.warn('Failed to parse cached translations:', parseError);
-                    }
-                }
-
                 // ✅ Helper function to translate with caching
                 const translateWithCache = async (text, fromLang, toLang) => {
                     if (!text) return '';
 
                     const cacheKey = `${text}_${fromLang}_${toLang}`;
 
-                    // Return cached translation if exists
                     if (translationCache.current.has(cacheKey)) {
                         return translationCache.current.get(cacheKey);
                     }
 
-                    // Translate and cache the result
                     const translated = await debugTranslateText(text, fromLang, toLang);
                     translationCache.current.set(cacheKey, translated);
                     return translated;
                 };
 
-                // ✅ Step 1: Translate all static texts ONCE
+                // Only translate static texts (Today, Tomorrow, Group)
                 const [today, tomorrow, group] = await Promise.all([
                     translateWithCache('Today', 'en', language),
                     translateWithCache('Tomorrow', 'en', language),
@@ -352,13 +271,61 @@ export default function TestLive() {
                 setDateLabels({ today, tomorrow });
                 setStaticTexts({ group });
 
-                // ✅ Step 2: Collect all unique texts to translate
+                // Clear translated leagues tracker for new language
+                translatedLeagues.current.set(language, new Set());
+
+            } catch (error) {
+                console.error('Static text translation error:', error);
+            }
+        };
+
+        translateStaticTexts();
+    }, [language]);
+
+    // ✅ USEEFFECT #3: Translate selected league's data only
+    useEffect(() => {
+        console.log("🟡 useEffect #3: Translate selected league", selectedLeague);
+
+        const translateSelectedLeague = async () => {
+            if (!initialLoadComplete.current || !selectedLeague || selectedLeague === 'All') return;
+
+            // Check if this league has already been translated for current language
+            const currentLanguageLeagues = translatedLeagues.current.get(language) || new Set();
+            if (currentLanguageLeagues.has(selectedLeague)) {
+                console.log('🟡 League already translated, using cache:', selectedLeague);
+                return;
+            }
+
+            setIsTranslating(true);
+
+            try {
+                // ✅ Helper function to translate with caching
+                const translateWithCache = async (text, fromLang, toLang) => {
+                    if (!text) return '';
+
+                    const cacheKey = `${text}_${fromLang}_${toLang}`;
+
+                    if (translationCache.current.has(cacheKey)) {
+                        return translationCache.current.get(cacheKey);
+                    }
+
+                    const translated = await debugTranslateText(text, fromLang, toLang);
+                    translationCache.current.set(cacheKey, translated);
+                    return translated;
+                };
+
+                // Find stages for selected league (using ORIGINAL league name)
+                const leagueStages = stages.Stages.filter(stage => stage.Cnm === selectedLeague);
+
+                if (leagueStages.length === 0) return;
+
+                // Collect unique texts from selected league only
                 const uniqueLeagues = new Set();
                 const uniqueSubLeagues = new Set();
                 const uniqueTeams = new Set();
                 const uniqueStatuses = new Set();
 
-                stages.Stages.forEach(stage => {
+                leagueStages.forEach(stage => {
                     if (stage.Cnm) uniqueLeagues.add(stage.Cnm);
                     if (stage.Snm) uniqueSubLeagues.add(stage.Snm);
 
@@ -372,14 +339,14 @@ export default function TestLive() {
                     });
                 });
 
-                // ✅ Step 3: Translate all unique texts in parallel
-                console.log('🟢 Translating:', {
-                    leagues: uniqueLeagues.size,
+                console.log('🟡 Translating selected league:', {
+                    league: selectedLeague,
                     subLeagues: uniqueSubLeagues.size,
                     teams: uniqueTeams.size,
                     statuses: uniqueStatuses.size
                 });
 
+                // Translate all unique texts for this league
                 await Promise.all([
                     ...Array.from(uniqueLeagues).map(text => translateWithCache(text, 'en', language)),
                     ...Array.from(uniqueSubLeagues).map(text => translateWithCache(text, 'en', language)),
@@ -387,134 +354,118 @@ export default function TestLive() {
                     ...Array.from(uniqueStatuses).map(text => translateWithCache(text, 'en', language))
                 ]);
 
-                // ✅ Step 4: Build translated stages using cached translations
-                const fullyTranslatedStages = stages.Stages.map(stage => {
-                    const translatedLeague = translationCache.current.get(`${stage.Cnm}_en_${language}`) || stage.Cnm || '';
-                    const translatedSubLeague = stage.Snm
-                        ? (translationCache.current.get(`${stage.Snm}_en_${language}`) || stage.Snm)
-                        : '';
+                // Update only the translated stages for this league
+                setTranslatedStages(prevStages => {
+                    return prevStages.map(stage => {
+                        // Only update stages from the selected league
+                        if (stage.Cnm !== selectedLeague) {
+                            return stage;
+                        }
 
-                    const translatedEvents = (stage.Events || []).map(event => {
-                        const team1 = event.T1?.[0];
-                        const team2 = event.T2?.[0];
+                        const translatedLeague = translationCache.current.get(`${stage.Cnm}_en_${language}`) || stage.Cnm || '';
+                        const translatedSubLeague = stage.Snm
+                            ? (translationCache.current.get(`${stage.Snm}_en_${language}`) || stage.Snm)
+                            : '';
+
+                        const translatedEvents = (stage.Events || []).map(event => {
+                            const team1 = event.T1?.[0];
+                            const team2 = event.T2?.[0];
+
+                            return {
+                                ...event,
+                                translatedTeam1: team1?.Nm
+                                    ? (translationCache.current.get(`${team1.Nm}_en_${language}`) || team1.Nm)
+                                    : '',
+                                translatedTeam2: team2?.Nm
+                                    ? (translationCache.current.get(`${team2.Nm}_en_${language}`) || team2.Nm)
+                                    : '',
+                                translatedStatus: event.Eps
+                                    ? (translationCache.current.get(`${event.Eps}_en_${language}`) || event.Eps)
+                                    : ''
+                            };
+                        });
 
                         return {
-                            ...event,
-                            translatedTeam1: team1?.Nm
-                                ? (translationCache.current.get(`${team1.Nm}_en_${language}`) || team1.Nm)
-                                : '',
-                            translatedTeam2: team2?.Nm
-                                ? (translationCache.current.get(`${team2.Nm}_en_${language}`) || team2.Nm)
-                                : '',
-                            translatedStatus: event.Eps
-                                ? (translationCache.current.get(`${event.Eps}_en_${language}`) || event.Eps)
-                                : ''
+                            ...stage,
+                            translatedLeague,
+                            translatedSubLeague,
+                            translatedEvents
                         };
                     });
-
-                    return {
-                        ...stage,
-                        translatedLeague,
-                        translatedSubLeague,
-                        translatedEvents
-                    };
                 });
 
-                // ✅ SINGLE STATE UPDATE - Only updates once after all translations complete
-                console.log('🟢 All translations complete, updating state once');
-                console.log('🟢 Cache size:', translationCache.current.size, 'translations');
-                setTranslatedStages(fullyTranslatedStages);
+                // Mark this league as translated for current language
+                currentLanguageLeagues.add(selectedLeague);
+                translatedLeagues.current.set(language, currentLanguageLeagues);
 
-                // ✅ Save translations to localStorage
-                try {
-                    const cacheData = {
-                        language,
-                        dateLabels: { today, tomorrow },
-                        staticTexts: { group },
-                        translationCache: Array.from(translationCache.current.entries()),
-                        timestamp: Date.now()
-                    };
-                    localStorage.setItem(`football_translations_${language}`, JSON.stringify(cacheData));
-                    console.log('🟢 Translations cached to localStorage');
-                } catch (storageError) {
-                    console.warn('Failed to cache translations to localStorage:', storageError);
-                }
+                console.log('🟡 League translation complete:', selectedLeague);
 
             } catch (error) {
-                console.error('Translation error:', error);
+                console.error('League translation error:', error);
             } finally {
                 setIsTranslating(false);
             }
         };
 
-        translateStageData();
-    }, [language]); // ✅ Only depend on language, not stages or translateText
+        translateSelectedLeague();
+    }, [selectedLeague, language, stages]);
 
-    // ✅ USEEFFECT #3: Manage selected league (merged #3 and #4 logic)
+    // ✅ USEEFFECT #4: Manage selected league
     useEffect(() => {
-        console.log("🟡 useEffect #3: Manage selected league");
+        console.log("🟣 useEffect #4: Manage selected league");
 
         if (!Array.isArray(translatedStages) || translatedStages.length === 0) return;
 
-        // Helper: Get all unique leagues
+        // Get all unique leagues (use ORIGINAL names for consistency)
         const leagues = Array.from(
             new Set(
-                translatedStages
-                    .map(stage => stage.translatedLeague)
-                    .filter(Boolean)
+                stages.Stages.map(stage => stage.Cnm).filter(Boolean)
             )
         );
 
-        // Helper: Check if a league has events
         const hasEvents = (league) =>
-            translatedStages.some(
-                s =>
-                    s.translatedLeague === league &&
-                    Array.isArray(s.translatedEvents) &&
-                    s.translatedEvents.length > 0
+            stages.Stages.some(
+                s => s.Cnm === league && Array.isArray(s.Events) && s.Events.length > 0
             );
 
-        // Helper: Get first league with events
         const getFirstLeagueWithEvents = () => {
-            const stageWithEvents = translatedStages.find(
-                s => Array.isArray(s.translatedEvents) && s.translatedEvents.length > 0
+            const stageWithEvents = stages.Stages.find(
+                s => Array.isArray(s.Events) && s.Events.length > 0
             );
-            return stageWithEvents?.translatedLeague || 'All';
+            return stageWithEvents?.Cnm || 'All';
         };
 
-        // Priority 1: Restore from localStorage (only on initial load)
+        // Restore from localStorage
         const saved = typeof window !== 'undefined'
             ? localStorage.getItem('footballSelectedLeague')
             : null;
 
         if (saved && leagues.includes(saved) && (saved === 'All' || hasEvents(saved))) {
             if (selectedLeague !== saved) {
-                console.log('🟡 Restoring saved league:', saved);
+                console.log('🟣 Restoring saved league:', saved);
                 setSelectedLeague(saved);
             }
             return;
         }
 
-        // Priority 2: Fix invalid selection (league no longer exists after translation)
+        // Fix invalid selection
         if (selectedLeague && selectedLeague !== 'All' && !leagues.includes(selectedLeague)) {
             const newLeague = getFirstLeagueWithEvents();
-            console.log('🟡 Invalid league selection, switching to:', newLeague);
+            console.log('🟣 Invalid league selection, switching to:', newLeague);
             setSelectedLeague(newLeague);
             return;
         }
 
-        // Priority 3: Auto-select if nothing is selected
+        // Auto-select if nothing is selected
         if (!selectedLeague) {
             const newLeague = getFirstLeagueWithEvents();
-            console.log('🟡 Auto-selecting first league:', newLeague);
+            console.log('🟣 Auto-selecting first league:', newLeague);
             setSelectedLeague(newLeague);
         }
-    }, [translatedStages]); // ✅ Only depend on translatedStages
+    }, [translatedStages, stages]);
 
-    // ✅ USEEFFECT #4: Persist selected league to localStorage
+    // ✅ USEEFFECT #5: Persist selected league to localStorage
     useEffect(() => {
-        console.log("🟣 useEffect #4: Persist to localStorage", selectedLeague);
-
         if (selectedLeague && typeof window !== 'undefined') {
             localStorage.setItem('footballSelectedLeague', selectedLeague);
         }
@@ -534,7 +485,8 @@ export default function TestLive() {
         );
     }
 
-    const allLeagues = translatedStages.map(stage => stage.translatedLeague).filter(Boolean);
+    // Get leagues using ORIGINAL names for consistency
+    const allLeagues = stages.Stages.map(stage => stage.Cnm).filter(Boolean);
     const uniqueLeagues = Array.from(new Set(allLeagues));
     const topLeagues = uniqueLeagues.slice(0, 5);
     const otherLeagues = uniqueLeagues.slice(5);
@@ -592,7 +544,7 @@ export default function TestLive() {
 
             <div className={styles.cardsContainer}>
                 {translatedStages
-                    .filter(stage => selectedLeague === 'All' || stage.translatedLeague === selectedLeague)
+                    .filter(stage => selectedLeague === 'All' || stage.Cnm === selectedLeague)
                     .map((stage) =>
                         stage.translatedEvents?.map((event) => {
                             const team1 = event.T1?.[0];
