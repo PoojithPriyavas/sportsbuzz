@@ -1,0 +1,339 @@
+[
+  {
+    "hreflang": "en",
+    "translatedText": {
+      "bettingOdds": "Betting Odds",
+      "allTournaments": "All Tournaments",
+      "loading": "Loading events...",
+      "noEvents": "No events available",
+      "matchWinner": "Match Winner",
+      "live": "Live",
+      "vs": "VS",
+      "enterStake": "Enter stake amount",
+      "placeBet": "Place Bet",
+      "potentialWinnings": "Potential Winnings",
+      "selectOdds": "Select your odds and enter stake to place your bet",
+      "betSuccess": "Play responsibly at your own risk",
+      "team1Win": "Team 1 Win",
+      "draw": "Draw",
+      "team2Win": "Team 2 Win",
+      "potentialProfit": "Potential Profit"
+    }
+  },
+  {
+    "hreflang": "de",
+    "translatedText": {
+      "bettingOdds": "Wettquoten",
+      "allTournaments": "Alle Turniere",
+      "loading": "Ereignisse werden geladen...",
+      "noEvents": "Keine Ereignisse verfügbar",
+      "matchWinner": "Spielsieger",
+      "live": "Live",
+      "vs": "GEGEN",
+      "enterStake": "Einsatzbetrag eingeben",
+      "placeBet": "Wette platzieren",
+      "potentialWinnings": "Möglicher Gewinn",
+      "selectOdds": "Wählen Sie Ihre Quoten und geben Sie den Einsatz ein, um Ihre Wette zu platzieren",
+      "betSuccess": "Spielen Sie verantwortungsvoll auf eigenes Risiko",
+      "team1Win": "Team 1 gewinnt",
+      "draw": "Unentschieden",
+      "team2Win": "Team 2 gewinnt",
+      "potentialProfit": "Möglicher Gewinn"
+    }
+  },
+  {
+    "hreflang": "es",
+    "translatedText": {
+      "bettingOdds": "Cuotas de Apuestas",
+      "allTournaments": "Todos los Torneos",
+      "loading": "Cargando eventos...",
+      "noEvents": "No hay eventos disponibles",
+      "matchWinner": "Ganador del Partido",
+      "live": "En Vivo",
+      "vs": "VS",
+      "enterStake": "Ingresar monto de la apuesta",
+      "placeBet": "Realizar Apuesta",
+      "potentialWinnings": "Ganancias Potenciales",
+      "selectOdds": "Selecciona tus cuotas e ingresa el monto para realizar tu apuesta",
+      "betSuccess": "Juega responsablemente bajo tu propio riesgo",
+      "team1Win": "Victoria del Equipo 1",
+      "draw": "Empate",
+      "team2Win": "Victoria del Equipo 2",
+      "potentialProfit": "Beneficio Potencial"
+    }
+  },
+  {
+    "hreflang": "fr",
+    "translatedText": {
+      "bettingOdds": "Cotes de Paris",
+      "allTournaments": "Tous les Tournois",
+      "loading": "Chargement des événements...",
+      "noEvents": "Aucun événement disponible",
+      "matchWinner": "Vainqueur du Match",
+      "live": "En Direct",
+      "vs": "CONTRE",
+      "enterStake": "Entrez le montant de la mise",
+      "placeBet": "Placer le Pari",
+      "potentialWinnings": "Gains Potentiels",
+      "selectOdds": "Sélectionnez vos cotes et entrez la mise pour placer votre pari",
+      "betSuccess": "Jouez de manière responsable à vos propres risques",
+      "team1Win": "Victoire Équipe 1",
+      "draw": "Match Nul",
+      "team2Win": "Victoire Équipe 2",
+      "potentialProfit": "Bénéfice Potentiel"
+    }
+  },
+  {
+    "hreflang": "pt",
+    "translatedText": {
+      "bettingOdds": "Odds de Apostas",
+      "allTournaments": "Todos os Torneios",
+      "loading": "Carregando eventos...",
+      "noEvents": "Nenhum evento disponível",
+      "matchWinner": "Vencedor da Partida",
+      "live": "Ao Vivo",
+      "vs": "VS",
+      "enterStake": "Insira o valor da aposta",
+      "placeBet": "Fazer Aposta",
+      "potentialWinnings": "Ganhos Potenciais",
+      "selectOdds": "Selecione suas odds e insira o valor para fazer sua aposta",
+      "betSuccess": "Jogue com responsabilidade por sua conta e risco",
+      "team1Win": "Vitória do Time 1",
+      "draw": "Empate",
+      "team2Win": "Vitória do Time 2",
+      "potentialProfit": "Lucro Potencial"
+    }
+  },
+  {
+    "hreflang": "it",
+    "translatedText": {
+      "bettingOdds": "Quote Scommesse",
+      "allTournaments": "Tutti i Tornei",
+      "loading": "Caricamento eventi...",
+      "noEvents": "Nessun evento disponibile",
+      "matchWinner": "Vincitore Incontro",
+      "live": "Live",
+      "vs": "CONTRO",
+      "enterStake": "Inserisci importo puntata",
+      "placeBet": "Piazza Scommessa",
+      "potentialWinnings": "Vincite Potenziali",
+      "selectOdds": "Seleziona le tue quote e inserisci l'importo per piazzare la scommessa",
+      "betSuccess": "Gioca responsabilmente a tuo rischio",
+      "team1Win": "Vittoria Squadra 1",
+      "draw": "Pareggio",
+      "team2Win": "Vittoria Squadra 2",
+      "potentialProfit": "Profitto Potenziale"
+    }
+  },
+  {
+    "hreflang": "el",
+    "translatedText": {
+      "bettingOdds": "Ποσοστά Στοιχήματος",
+      "allTournaments": "Όλα τα Τουρνουά",
+      "loading": "Φόρτωση εκδηλώσεων...",
+      "noEvents": "Δεν υπάρχουν διαθέσιμες εκδηλώσεις",
+      "matchWinner": "Νικητής Αγώνα",
+      "live": "Ζωντανά",
+      "vs": "ΕΝΑΝΤΙΟΝ",
+      "enterStake": "Εισάγετε ποσό στοιχήματος",
+      "placeBet": "Τοποθετήστε Στοίχημα",
+      "potentialWinnings": "Δυνητικά Κέρδη",
+      "selectOdds": "Επιλέξτε τα ποσοστά σας και εισάγετε το ποσό για να τοποθετήσετε το στοίχημά σας",
+      "betSuccess": "Παίξτε υπεύθυνα με δικό σας ρίσκο",
+      "team1Win": "Νίκη Ομάδας 1",
+      "draw": "Ισοπαλία",
+      "team2Win": "Νίκη Ομάδας 2",
+      "potentialProfit": "Δυνητικό Κέρδος"
+    }
+  },
+  {
+    "hreflang": "hu",
+    "translatedText": {
+      "bettingOdds": "Fogadási Odds",
+      "allTournaments": "Minden Verseny",
+      "loading": "Események betöltése...",
+      "noEvents": "Nincsenek elérhető események",
+      "matchWinner": "Mérkőzés Győztese",
+      "live": "Élő",
+      "vs": "ELLEN",
+      "enterStake": "Adja meg a tét összegét",
+      "placeBet": "Fogadás Leadása",
+      "potentialWinnings": "Lehetséges Nyeremény",
+      "selectOdds": "Válassza ki az odds-okat és adja meg a tétet a fogadás leadásához",
+      "betSuccess": "Felelősségteljesen játszon saját kockázatára",
+      "team1Win": "1. Csapat Győzelme",
+      "draw": "Döntetlen",
+      "team2Win": "2. Csapat Győzelme",
+      "potentialProfit": "Lehetséges Nyereség"
+    }
+  },
+  {
+    "hreflang": "ar",
+    "translatedText": {
+      "bettingOdds": "احتمالات الرهان",
+      "allTournaments": "جميع البطولات",
+      "loading": "جاري تحميل الأحداث...",
+      "noEvents": "لا توجد أحداث متاحة",
+      "matchWinner": "فائز المباراة",
+      "live": "مباشر",
+      "vs": "مقابل",
+      "enterStake": "أدخل مبلغ الرهان",
+      "placeBet": "وضع الرهان",
+      "potentialWinnings": "الأرباح المحتملة",
+      "selectOdds": "اختر احتمالاتك وأدخل المبلغ لوضع رهانك",
+      "betSuccess": "العب بمسؤولية على مسؤوليتك الخاصة",
+      "team1Win": "فوز الفريق 1",
+      "draw": "تعادل",
+      "team2Win": "فوز الفريق 2",
+      "potentialProfit": "ربح محتمل"
+    }
+  },
+  {
+    "hreflang": "hi",
+    "translatedText": {
+      "bettingOdds": "सट्टेबाजी की बाधाएं",
+      "allTournaments": "सभी टूर्नामेंट",
+      "loading": "इवेंट लोड हो रहे हैं...",
+      "noEvents": "कोई इवेंट उपलब्ध नहीं है",
+      "matchWinner": "मैच विजेता",
+      "live": "लाइव",
+      "vs": "बनाम",
+      "enterStake": "दांव की राशि दर्ज करें",
+      "placeBet": "दांव लगाएं",
+      "potentialWinnings": "संभावित जीत",
+      "selectOdds": "अपनी बाधाओं का चयन करें और अपना दांव लगाने के लिए राशि दर्ज करें",
+      "betSuccess": "अपने जोखिम पर जिम्मेदारी से खेलें",
+      "team1Win": "टीम 1 की जीत",
+      "draw": "ड्रा",
+      "team2Win": "टीम 2 की जीत",
+      "potentialProfit": "संभावित लाभ"
+    }
+  },
+  {
+    "hreflang": "zh",
+    "translatedText": {
+      "bettingOdds": "投注赔率",
+      "allTournaments": "所有锦标赛",
+      "loading": "加载活动中...",
+      "noEvents": "没有可用的活动",
+      "matchWinner": "比赛胜者",
+      "live": "直播",
+      "vs": "对战",
+      "enterStake": "输入投注金额",
+      "placeBet": "下注",
+      "potentialWinnings": "潜在奖金",
+      "selectOdds": "选择您的赔率并输入金额以下注",
+      "betSuccess": "负责任地游戏，风险自负",
+      "team1Win": "队伍1获胜",
+      "draw": "平局",
+      "team2Win": "队伍2获胜",
+      "potentialProfit": "潜在利润"
+    }
+  },
+  {
+    "hreflang": "ja",
+    "translatedText": {
+      "bettingOdds": "ベッティングオッズ",
+      "allTournaments": "すべてのトーナメント",
+      "loading": "イベントを読み込んでいます...",
+      "noEvents": "利用可能なイベントがありません",
+      "matchWinner": "試合の勝者",
+      "live": "ライブ",
+      "vs": "対",
+      "enterStake": "賭け金額を入力",
+      "placeBet": "ベットする",
+      "potentialWinnings": "予想払戻金",
+      "selectOdds": "オッズを選択して金額を入力してベットしてください",
+      "betSuccess": "自己責任で責任を持ってプレイしてください",
+      "team1Win": "チーム1の勝利",
+      "draw": "引き分け",
+      "team2Win": "チーム2の勝利",
+      "potentialProfit": "予想利益"
+    }
+  },
+  {
+    "hreflang": "ru",
+    "translatedText": {
+      "bettingOdds": "Коэффициенты ставок",
+      "allTournaments": "Все турниры",
+      "loading": "Загрузка событий...",
+      "noEvents": "Нет доступных событий",
+      "matchWinner": "Победитель матча",
+      "live": "Прямой эфир",
+      "vs": "ПРОТИВ",
+      "enterStake": "Введите сумму ставки",
+      "placeBet": "Сделать ставку",
+      "potentialWinnings": "Потенциальный выигрыш",
+      "selectOdds": "Выберите коэффициенты и введите сумму для размещения ставки",
+      "betSuccess": "Играйте ответственно на свой страх и риск",
+      "team1Win": "Победа команды 1",
+      "draw": "Ничья",
+      "team2Win": "Победа команды 2",
+      "potentialProfit": "Потенциальная прибыль"
+    }
+  },
+  {
+    "hreflang": "tr",
+    "translatedText": {
+      "bettingOdds": "Bahis Oranları",
+      "allTournaments": "Tüm Turnuvalar",
+      "loading": "Etkinlikler yükleniyor...",
+      "noEvents": "Kullanılabilir etkinlik yok",
+      "matchWinner": "Maç Galibi",
+      "live": "Canlı",
+      "vs": "KARŞI",
+      "enterStake": "Bahis miktarını girin",
+      "placeBet": "Bahis Yap",
+      "potentialWinnings": "Potansiyel Kazançlar",
+      "selectOdds": "Oranlarınızı seçin ve bahis yapmak için miktarı girin",
+      "betSuccess": "Kendi riskinizle sorumlu bir şekilde oynayın",
+      "team1Win": "Takım 1 Kazanır",
+      "draw": "Beraberlik",
+      "team2Win": "Takım 2 Kazanır",
+      "potentialProfit": "Potansiyel Kar"
+    }
+  },
+  {
+    "hreflang": "nl",
+    "translatedText": {
+      "bettingOdds": "Weddenschap Odds",
+      "allTournaments": "Alle Toernooien",
+      "loading": "Evenementen laden...",
+      "noEvents": "Geen evenementen beschikbaar",
+      "matchWinner": "Wedstrijd Winnaar",
+      "live": "Live",
+      "vs": "TEGEN",
+      "enterStake": "Voer inzetbedrag in",
+      "placeBet": "Plaats Weddenschap",
+      "potentialWinnings": "Potentiële Winst",
+      "selectOdds": "Selecteer uw odds en voer het bedrag in om uw weddenschap te plaatsen",
+      "betSuccess": "Speel verantwoord op eigen risico",
+      "team1Win": "Team 1 Wint",
+      "draw": "Gelijkspel",
+      "team2Win": "Team 2 Wint",
+      "potentialProfit": "Potentiële Winst"
+    }
+  },
+  {
+    "hreflang": "pl",
+    "translatedText": {
+      "bettingOdds": "Kursy Zakładów",
+      "allTournaments": "Wszystkie Turnieje",
+      "loading": "Ładowanie wydarzeń...",
+      "noEvents": "Brak dostępnych wydarzeń",
+      "matchWinner": "Zwycięzca Meczu",
+      "live": "Na Żywo",
+      "vs": "PRZECIW",
+      "enterStake": "Wprowadź kwotę zakładu",
+      "placeBet": "Postaw Zakład",
+      "potentialWinnings": "Potencjalna Wygrana",
+      "selectOdds": "Wybierz kursy i wprowadź kwotę, aby postawić zakład",
+      "betSuccess": "Graj odpowiedzialnie na własne ryzyko",
+      "team1Win": "Zwycięstwo Drużyny 1",
+      "draw": "Remis",
+      "team2Win": "Zwycięstwo Drużyny 2",
+      "potentialProfit": "Potencjalny Zysk"
+    }
+  }
+]
+      

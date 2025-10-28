@@ -1,16 +1,176 @@
 // components/FootballOddsCard.jsx
 import React from 'react';
 import styles from './SportsOds.module.css';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useGlobalData } from '../Context/ApiContext';
+import bettingOddsTranslations from './bettingOdds.json'; // Import the JSON file
+
+// Cache configuration
+const CACHE_CONFIG = {
+    DURATION: 5 * 60 * 1000, // 5 minutes
+    TRANSLATION_DURATION: 24 * 60 * 60 * 1000, // 24 hours for translations
+    KEYS: {
+        TOURNAMENT: 'betting_selectedTournament',
+        CARDS: 'betting_transformedCards',
+        TIMESTAMP: 'betting_cacheTimestamp',
+        EVENT_DETAILS: 'betting_eventDetails',
+        TRANSLATIONS: 'betting_translations_'
+    }
+};
+
+// Cache utility functions
+const CacheManager = {
+    set: (key, value) => {
+        try {
+            sessionStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {
+            console.warn('Cache set failed:', e);
+        }
+    },
+    
+    get: (key) => {
+        try {
+            const item = sessionStorage.getItem(key);
+            return item ? JSON.parse(item) : null;
+        } catch (e) {
+            console.warn('Cache get failed:', e);
+            return null;
+        }
+    },
+    
+    remove: (key) => {
+        try {
+            sessionStorage.removeItem(key);
+        } catch (e) {
+            console.warn('Cache remove failed:', e);
+        }
+    },
+    
+    isValid: (timestamp, customDuration) => {
+        if (!timestamp) return false;
+        const duration = customDuration || CACHE_CONFIG.DURATION;
+        return Date.now() - timestamp < duration;
+    },
+    
+    clear: () => {
+        Object.values(CACHE_CONFIG.KEYS).forEach(key => {
+            CacheManager.remove(key);
+        });
+    }
+};
+
+// Translation Manager - Centralized translation with JSON and caching
+const TranslationManager = {
+    defaultTexts: {
+        bettingOdds: 'Betting Odds',
+        allTournaments: 'All Tournaments',
+        loading: 'Loading events...',
+        loadingSubtext: 'Please wait while we fetch the latest betting odds',
+        noEvents: 'No events available',
+        matchWinner: 'Match Winner',
+        live: 'Live',
+        vs: 'VS',
+        enterStake: 'Enter stake amount',
+        placeBet: 'Place Bet',
+        potentialWinnings: 'Potential Winnings',
+        selectOdds: 'Select your odds and enter stake to place your bet',
+        betSuccess: 'Play responsibly at your own risk',
+        team1Win: 'Team 1 Win',
+        draw: 'Draw',
+        team2Win: 'Team 2 Win',
+        potentialProfit: 'Potential Profit'
+    },
+
+    getCacheKey: (language) => {
+        return `${CACHE_CONFIG.KEYS.TRANSLATIONS}${language}`;
+    },
+
+    loadFromCache: (language) => {
+        const cacheKey = TranslationManager.getCacheKey(language);
+        const cached = CacheManager.get(cacheKey);
+        
+        if (cached && CacheManager.isValid(cached.timestamp, CACHE_CONFIG.TRANSLATION_DURATION)) {
+            console.log(`✓ Loaded translations from cache for language: ${language}`);
+            return cached.translations;
+        }
+        
+        return null;
+    },
+
+    saveToCache: (language, translations) => {
+        const cacheKey = TranslationManager.getCacheKey(language);
+        CacheManager.set(cacheKey, {
+            translations,
+            timestamp: Date.now()
+        });
+        console.log(`✓ Saved translations to cache for language: ${language}`);
+    },
+
+    // Get translations from JSON file by language code
+    getFromJSON: (language) => {
+        const translationEntry = bettingOddsTranslations.find(
+            entry => entry.hreflang === language
+        );
+        
+        if (translationEntry) {
+            console.log(`✓ Loaded translations from JSON for language: ${language}`);
+            return translationEntry.translatedText;
+        }
+        
+        return null;
+    },
+
+    translate: async (language, translateTextFn) => {
+        // Return default English if language is 'en'
+        if (language === 'en') {
+            return TranslationManager.defaultTexts;
+        }
+
+        // Try to load from cache first
+        const cached = TranslationManager.loadFromCache(language);
+        if (cached) {
+            return cached;
+        }
+
+        // Try to get from JSON file
+        const jsonTranslations = TranslationManager.getFromJSON(language);
+        if (jsonTranslations) {
+            // Save to cache for faster subsequent access
+            TranslationManager.saveToCache(language, jsonTranslations);
+            return jsonTranslations;
+        }
+
+        // If not in JSON, fetch translations via API
+        console.log(`⟳ Fetching translations via API for language: ${language}`);
+        
+        try {
+            const translationPromises = Object.entries(TranslationManager.defaultTexts).map(
+                async ([key, text]) => {
+                    const translated = await translateTextFn(text, 'en', language);
+                    return [key, translated];
+                }
+            );
+
+            const translatedEntries = await Promise.all(translationPromises);
+            const translations = Object.fromEntries(translatedEntries);
+
+            // Save to cache
+            TranslationManager.saveToCache(language, translations);
+
+            return translations;
+        } catch (error) {
+            console.error('Translation failed, using defaults:', error);
+            return TranslationManager.defaultTexts;
+        }
+    }
+};
 
 // Skeleton Loader Component
 const SkeletonLoader = ({ styles }) => {
     return (
         <div className={styles.skeletonContainer}>
-            {[1, 2,].map((index) => (
+            {[1, 2].map((index) => (
                 <div key={index} className={styles.skeletonCard}>
-                    {/* Header Skeleton */}
                     <div className={styles.skeletonHeader}>
                         <div className={styles.skeletonHeaderContent}>
                             <div className={styles.skeletonPoweredBy}>
@@ -20,15 +180,10 @@ const SkeletonLoader = ({ styles }) => {
                             <div className={styles.skeletonDate}></div>
                         </div>
                     </div>
-
-                    {/* Body Skeleton */}
                     <div className={styles.skeletonBody}>
-                        {/* League Row */}
                         <div className={styles.skeletonLeagueRow}>
                             <div className={styles.skeletonLeagueTitle}></div>
                         </div>
-
-                        {/* Teams Row */}
                         <div className={styles.skeletonTeamsRow}>
                             <div className={styles.skeletonTeamLeft}>
                                 <div className={styles.skeletonTeamCircle}></div>
@@ -39,16 +194,12 @@ const SkeletonLoader = ({ styles }) => {
                                 <div className={styles.skeletonTeamCircle}></div>
                             </div>
                         </div>
-
-                        {/* Odds Row */}
                         <div className={styles.skeletonOddsRow}>
                             <div className={styles.skeletonOddButton}></div>
                             <div className={styles.skeletonOddButton}></div>
                             <div className={styles.skeletonOddButton}></div>
                         </div>
                     </div>
-
-                    {/* Footer Skeleton */}
                     <div className={styles.skeletonFooter}>
                         <div className={styles.skeletonFooterText}></div>
                     </div>
@@ -69,6 +220,79 @@ const LoadingMessage = ({ message, subMessage, styles }) => {
     );
 };
 
+// Market data fetch with caching
+async function fetchMarketData(token, sportEventId) {
+    const cacheKey = `market_${sportEventId}`;
+    const cached = CacheManager.get(cacheKey);
+    
+    if (cached && CacheManager.isValid(cached.timestamp)) {
+        return cached.data;
+    }
+
+    const ref = 320;
+    try {
+        const res = await fetch(`/api/get-onex-odds?ref=${ref}&gameId=${sportEventId}&token=${token}`);
+        const data = res.ok ? await res.json() : null;
+        
+        if (data) {
+            CacheManager.set(cacheKey, {
+                data,
+                timestamp: Date.now()
+            });
+        }
+        
+        return data;
+    } catch (err) {
+        console.error('fetchMarketData error:', err);
+        return null;
+    }
+}
+
+// Transform event to card format
+function transformEventToCard(event, marketData) {
+    const isLive = event.waitingLive || event.period > 0;
+    const startDate = new Date(event.startDate * 1000);
+    const defaultOdds = [
+        { label: 'W1', value: 2.1 },
+        { label: 'X', value: 3.2 },
+        { label: 'W2', value: 2.8 }
+    ];
+
+    let odds = defaultOdds;
+
+    if (marketData?.items?.length) {
+        const desired = ['W1', 'X', 'W2'];
+        odds = marketData.items
+            .filter(item => desired.includes(item.displayMulti?.en))
+            .map(item => ({
+                label: item.displayMulti.en,
+                value: item.oddsMarket
+            }));
+    }
+
+    return {
+        id: event.sportEventId,
+        logo: '🏆',
+        provider: '22bet',
+        isLive,
+        matchType: event.tournamentNameLocalization || 'Tournament',
+        matchInfo: `${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`,
+        team1: {
+            code: event.opponent1NameLocalization?.slice(0, 3).toUpperCase() || 'T1',
+            name: event.opponent1NameLocalization || 'Team 1',
+            logo: event.imageOpponent1[0]
+        },
+        team2: {
+            code: event.opponent2NameLocalization?.slice(0, 3).toUpperCase() || 'T2',
+            name: event.opponent2NameLocalization || 'Team 2',
+            logo: event.imageOpponent2[0]
+        },
+        oddsTitle: 'Match Winner',
+        odds,
+        link: event.link
+    };
+}
+
 export default function BettingCards() {
     const scrollRef = useRef(null);
     const dropdownRef = useRef(null);
@@ -77,130 +301,162 @@ export default function BettingCards() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [transformedCards, setTransformedCards] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [translatedText, setTranslatedText] = useState({
-        bettingOdds: 'Betting Odds',
-        allTournaments: 'All Tournaments',
-        loading: 'Loading events...',
-        loadingSubtext: 'Please wait while we fetch the latest betting odds',
-        noEvents: 'No events available',
-        matchWinner: 'Match Winner',
-        live: 'Live',
-        vs: 'VS',
-        enterStake: 'Enter stake amount',
-        placeBet: 'Place Bet',
-        potentialWinnings: 'Potential Winnings',
-        selectOdds: 'Select your odds and enter stake to place your bet',
-        // betSuccess: '✓ Bet Placed Successfully!',
-        betSuccess: 'Play responsibly at your own risk',
-        team1Win: 'Team 1 Win',
-        draw: 'Draw',
-        team2Win: 'Team 2 Win',
-        potentialProfit: 'Potential Profit'
-    });
+    const [lastFetchTime, setLastFetchTime] = useState(0);
+    const [dataInitialized, setDataInitialized] = useState(false);
+    const [translatedText, setTranslatedText] = useState(TranslationManager.defaultTexts);
+    const [translationsLoading, setTranslationsLoading] = useState(false);
 
     const { oneXTournament, oneXAccessToken, fetchOneXEventsIdData, oneXEventDetails, translateText, language } = useGlobalData();
-    console.log(oneXEventDetails, "oneXEventDetails")
-    useEffect(() => {
-        const translateLabels = async () => {
-            const [
-                bettingOdds, allTournaments, loading, loadingSubtext, noEvents, matchWinner, live,
-                vs, enterStake, placeBet, potentialWinnings, selectOdds, betSuccess,
-                team1Win, draw, team2Win, potentialProfit
-            ] = await Promise.all([
-                translateText('Betting Odds', 'en', language),
-                translateText('All Tournaments', 'en', language),
-                translateText('Loading events...', 'en', language),
-                translateText('Please wait while we fetch the latest betting odds', 'en', language),
-                translateText('No events available', 'en', language),
-                translateText('Match Winner', 'en', language),
-                translateText('Live', 'en', language),
-                translateText('VS', 'en', language),
-                translateText('Enter stake amount', 'en', language),
-                translateText('Place Bet', 'en', language),
-                translateText('Potential Winnings', 'en', language),
-                translateText('Select your odds and enter stake to place your bet', 'en', language),
-                // translateText('✓ Bet Placed Successfully!', 'en', language),
-                translateText('Play responsibly at your own risk!', 'en', language),
-                translateText('Team 1 Win', 'en', language),
-                translateText('Draw', 'en', language),
-                translateText('Team 2 Win', 'en', language),
-                translateText('Potential Profit', 'en', language),
-            ]);
 
-            setTranslatedText({
-                bettingOdds, allTournaments, loading, loadingSubtext, noEvents, matchWinner, live,
-                vs, enterStake, placeBet, potentialWinnings, selectOdds, betSuccess,
-                team1Win, draw, team2Win, potentialProfit
-            });
-        };
-
-        translateLabels();
-    }, [language, translateText]);
-
-    const getAllTournaments = () => {
+    // Memoize tournaments list
+    const allTournaments = useMemo(() => {
         if (!oneXTournament?.items) return [];
         return oneXTournament.items.map(item => ({
             id: item.tournamentId,
             name: item.tournamentNameLocalization,
             image: item.tournamentImage
         }));
-    };
+    }, [oneXTournament]);
 
-    const allTournaments = getAllTournaments();
+    // Optimized translation effect with JSON priority and caching
+    useEffect(() => {
+        let isMounted = true;
 
-    const getSelectedTournamentName = () => {
+        const loadTranslations = async () => {
+            setTranslationsLoading(true);
+            
+            try {
+                const translations = await TranslationManager.translate(language, translateText);
+                
+                if (isMounted) {
+                    setTranslatedText(translations);
+                    setTranslationsLoading(false);
+                }
+            } catch (error) {
+                console.error('Failed to load translations:', error);
+                if (isMounted) {
+                    setTranslatedText(TranslationManager.defaultTexts);
+                    setTranslationsLoading(false);
+                }
+            }
+        };
+
+        loadTranslations();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [language, translateText]);
+
+    // Get transformed cards with caching
+    const getTransformedCards = useCallback(async (events) => {
+        if (!Array.isArray(events)) return [];
+        
+        const cards = await Promise.all(
+            events.map(async (event) => {
+                const marketData = await fetchMarketData(oneXAccessToken, event.sportEventId);
+                return transformEventToCard(event, marketData);
+            })
+        );
+
+        return cards;
+    }, [oneXAccessToken]);
+
+    // Initialize data from cache or fetch fresh
+    useEffect(() => {
+        if (dataInitialized) return;
+
+        const cachedTournament = CacheManager.get(CACHE_CONFIG.KEYS.TOURNAMENT);
+        const cachedCards = CacheManager.get(CACHE_CONFIG.KEYS.CARDS);
+        const cachedTimestamp = CacheManager.get(CACHE_CONFIG.KEYS.TIMESTAMP);
+
+        // Check if cache is valid
+        if (CacheManager.isValid(cachedTimestamp) && cachedCards && cachedTournament) {
+            console.log('✓ Loading betting data from cache');
+            setSelectedTournament(cachedTournament);
+            setTransformedCards(cachedCards);
+            setIsLoading(false);
+            setDataInitialized(true);
+            setLastFetchTime(cachedTimestamp);
+            return;
+        }
+
+        // Cache invalid or missing - fetch fresh data
+        if (allTournaments.length > 0 && oneXAccessToken) {
+            console.log('⟳ Cache invalid or missing - fetching fresh betting data');
+            const firstTournamentId = allTournaments[0].id;
+            setSelectedTournament(firstTournamentId);
+            setIsLoading(true);
+            fetchOneXEventsIdData(oneXAccessToken, firstTournamentId);
+            setDataInitialized(true);
+        }
+    }, [allTournaments, oneXAccessToken, fetchOneXEventsIdData, dataInitialized]);
+
+    // Process event details when they change
+    useEffect(() => {
+        if (!oneXEventDetails || oneXEventDetails.length === 0) {
+            setTransformedCards([]);
+            setIsLoading(false);
+            return;
+        }
+
+        const processEvents = async () => {
+            console.log('⟳ Processing event details');
+            setIsLoading(true);
+            
+            const cards = await getTransformedCards(oneXEventDetails);
+            const timestamp = Date.now();
+            
+            setTransformedCards(cards);
+            setIsLoading(false);
+            setLastFetchTime(timestamp);
+
+            // Save to cache
+            CacheManager.set(CACHE_CONFIG.KEYS.CARDS, cards);
+            CacheManager.set(CACHE_CONFIG.KEYS.TOURNAMENT, selectedTournament);
+            CacheManager.set(CACHE_CONFIG.KEYS.TIMESTAMP, timestamp);
+            CacheManager.set(CACHE_CONFIG.KEYS.EVENT_DETAILS, oneXEventDetails);
+        };
+
+        processEvents();
+    }, [oneXEventDetails, getTransformedCards, selectedTournament]);
+
+    // Tournament change handler with debouncing
+    const handleTournamentChange = useCallback((tournamentId) => {
+        const now = Date.now();
+        const MIN_INTERVAL = 1000; // 1 second debounce
+
+        if (now - lastFetchTime < MIN_INTERVAL) {
+            console.log('⏸ Debouncing tournament change');
+            return;
+        }
+
+        console.log('⟳ Changing tournament to:', tournamentId);
+        
+        // Clear relevant cache
+        CacheManager.remove(CACHE_CONFIG.KEYS.CARDS);
+        CacheManager.remove(CACHE_CONFIG.KEYS.EVENT_DETAILS);
+        
+        setIsLoading(true);
+        setSelectedTournament(tournamentId);
+        setIsDropdownOpen(false);
+        setPaused(true);
+        
+        fetchOneXEventsIdData(oneXAccessToken, tournamentId);
+        
+        setTimeout(() => setPaused(false), 2000);
+    }, [lastFetchTime, oneXAccessToken, fetchOneXEventsIdData]);
+
+    // Get selected tournament name
+    const selectedTournamentName = useMemo(() => {
         if (!selectedTournament || selectedTournament === 'all') {
             return translatedText.allTournaments;
         }
         const selected = allTournaments.find(t => t.id === selectedTournament);
         return selected?.name || translatedText.allTournaments;
-    };
+    }, [selectedTournament, allTournaments, translatedText.allTournaments]);
 
-    useEffect(() => {
-        if (!selectedTournament && allTournaments.length > 0) {
-            const firstTournamentId = allTournaments[0].id;
-            setSelectedTournament(firstTournamentId);
-            setIsLoading(true);
-            fetchOneXEventsIdData(oneXAccessToken, firstTournamentId);
-        }
-    }, [allTournaments, selectedTournament, oneXAccessToken, fetchOneXEventsIdData]);
-
-    const getTransformedCards = async (events) => {
-        if (!Array.isArray(events)) return [];
-        const cards = [];
-
-        for (const event of events) {
-            const marketData = await fetchMarketData(oneXAccessToken, event.sportEventId);
-            cards.push(transformEventToCard(event, marketData));
-        }
-
-        return cards;
-    };
-
-    useEffect(() => {
-        if (oneXEventDetails?.length > 0) {
-            console.log("enters this condition. of betting ods")
-            setIsLoading(true);
-            getTransformedCards(oneXEventDetails).then((cards) => {
-                setTransformedCards(cards);
-                setIsLoading(false);
-            });
-        } else {
-            console.log("enters the else condition of betting ods")
-            setTransformedCards([]);
-            setIsLoading(false);
-        }
-    }, [oneXEventDetails, oneXAccessToken]);
-
-    const handleTournamentChange = (tournamentId) => {
-        setIsLoading(true);
-        fetchOneXEventsIdData(oneXAccessToken, tournamentId);
-        setSelectedTournament(tournamentId);
-        setIsDropdownOpen(false);
-        setPaused(true);
-        setTimeout(() => setPaused(false), 2000);
-    };
-
+    // Auto-scroll effect
     useEffect(() => {
         const container = scrollRef.current;
         if (!container || paused || transformedCards.length === 0 || isLoading) return;
@@ -215,6 +471,7 @@ export default function BettingCards() {
         return () => clearInterval(interval);
     }, [paused, transformedCards, isLoading]);
 
+    // Click outside dropdown handler
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -240,7 +497,7 @@ export default function BettingCards() {
                                         <span>{translatedText.allTournaments}</span>
                                     </>
                                 ) : (
-                                    <span>{getSelectedTournamentName()}</span>
+                                    <span>{selectedTournamentName}</span>
                                 )}
                             </div>
                             <div className={`${styles.dropdownArrow} ${isDropdownOpen ? styles.open : ''}`}>
@@ -300,92 +557,34 @@ export default function BettingCards() {
     );
 }
 
-// ... rest of your existing functions (transformEventToCard, fetchMarketData, SportsOddsCard)
-function transformEventToCard(event, marketData) {
-    // console.log(event.imageOpponent2[0], "eve");
-    // console.log(marketData, "market dtaaasd")
-    const isLive = event.waitingLive || event.period > 0;
-    const startDate = new Date(event.startDate * 1000);
-    const defaultOdds = [
-        { label: 'W1', value: 2.1 },
-        { label: 'X', value: 3.2 },
-        { label: 'W2', value: 2.8 }
-    ];
-
-    let odds = defaultOdds;
-
-    if (marketData?.items?.length) {
-        const desired = ['W1', 'X', 'W2'];
-        odds = marketData.items
-            .filter(item => desired.includes(item.displayMulti?.en))
-            .map(item => ({
-                label: item.displayMulti.en,
-                value: item.oddsMarket
-            }));
-    }
-
-    return {
-        id: event.sportEventId,
-        logo: '🏆',
-        provider: '22bet',
-        isLive,
-        matchType: event.tournamentNameLocalization || 'Tournament',
-        matchInfo: `${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`,
-        team1: {
-            code: event.opponent1NameLocalization?.slice(0, 3).toUpperCase() || 'T1',
-            name: event.opponent1NameLocalization || 'Team 1',
-            logo: event.imageOpponent1[0]
-        },
-        team2: {
-            code: event.opponent2NameLocalization?.slice(0, 3).toUpperCase() || 'T2',
-            name: event.opponent2NameLocalization || 'Team 2',
-            logo: event.imageOpponent2[0]
-        },
-        oddsTitle: 'Match Winner',
-        odds,
-        link: event.link
-    };
-}
-
-async function fetchMarketData(token, sportEventId) {
-    const ref = 320;
-    try {
-        const res = await fetch(`/api/get-onex-odds?ref=${ref}&gameId=${sportEventId}&token=${token}`);
-        return res.ok ? await res.json() : null;
-    } catch (err) {
-        console.error('fetchMarketData error:', err);
-        return null;
-    }
-}
-
-const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced }) => {
-    // console.log(card, "craddrssdsdsd")
+const SportsOddsCard = React.memo(({ card, styles, translatedText, onSelectOdd, onBetPlaced }) => {
     const [selectedOdd, setSelectedOdd] = useState(null);
     const [betAmount, setBetAmount] = useState('');
     const [win, setWin] = useState('0.00');
     const [success, setSuccess] = useState(false);
     const [showBettingSection, setShowBettingSection] = useState(false);
 
-    const handleSelect = (odd) => {
+    const handleSelect = useCallback((odd) => {
         setSelectedOdd(odd);
         setShowBettingSection(true);
         onSelectOdd();
-        if (betAmount) calculateWin(betAmount, odd.value);
-    };
+        if (betAmount) {
+            const winnings = parseFloat(betAmount) * odd.value;
+            setWin(winnings.toFixed(2));
+        }
+    }, [betAmount, onSelectOdd]);
 
-    const handleAmount = (e) => {
+    const handleAmount = useCallback((e) => {
         const amount = e.target.value;
         if (amount < 0) return;
         setBetAmount(amount);
-        if (selectedOdd) calculateWin(amount, selectedOdd.value);
-    };
+        if (selectedOdd) {
+            const winnings = parseFloat(amount || 0) * selectedOdd.value;
+            setWin(winnings.toFixed(2));
+        }
+    }, [selectedOdd]);
 
-    const calculateWin = (amount, oddValue) => {
-        const winnings = parseFloat(amount || 0) * oddValue;
-        setWin(winnings.toFixed(2));
-    };
-
-    const placeBet = () => {
+    const placeBet = useCallback(() => {
         if (selectedOdd && betAmount > 0) {
             setSuccess(true);
             onBetPlaced();
@@ -395,38 +594,31 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                 setWin('0.00');
                 setSuccess(false);
                 setShowBettingSection(false);
-                // setTimeout(() => {
                 window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=1119&bid=1650');
-                // }, 1000);
             }, 500);
         }
-    };
+    }, [selectedOdd, betAmount, onBetPlaced]);
 
-    const getOddLabel = (type) => {
+    const getOddLabel = useCallback((type) => {
         switch (type) {
             case 'W1': return translatedText.team1Win;
             case 'X': return translatedText.draw;
             case 'W2': return translatedText.team2Win;
             default: return type;
         }
-    };
+    }, [translatedText]);
 
     return (
         <div className={styles.card}>
-            {/* Header */}
             <div className={styles.header}>
                 <div className={styles.headerRow}>
                     <div className={styles.poweredBy}>
-                        {/* <div className={styles.logoCircle}>
-                            <span className={styles.logoText}>1X</span>
-                        </div> */}
                         <span className={styles.poweredText}>POWERED BY Betlabel</span>
                     </div>
                     <span className={styles.date}>{card.matchInfo}</span>
                 </div>
             </div>
 
-            {/* Main */}
             <div className={styles.body}>
                 <div className={styles.leagueRow}>
                     <h2 className={styles.league}>{card.matchType}</h2>
@@ -435,8 +627,24 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                 <div className={styles.teamsRow}>
                     <div className={styles.teamLeft}>
                         <div className={styles.abbrCircle}>
-                            {/* {card.team1.code} */}
-                            <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team1.logo}`} alt={card.team1.name} className={styles.teamLogo} />
+                             {card.team1.logo ? (
+                                <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team1.logo}`} alt={card.team1.name} className={styles.teamLogo} />
+                            ) : (
+                                <div style={{
+                                    height: '3rem',
+                                    width: '3rem',
+                                    background: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '2px dashed #d0d0d0',
+                                    position: 'relative',
+                                    overflow: 'hidden'
+                                }}>
+                                    <span style={{ fontSize: '1.5rem', color: '#9e9e9e' }}>⚽</span>
+                                </div>
+                            )}
                         </div>
                         <span className={styles.teamName}>{card.team1.name}</span>
                     </div>
@@ -444,8 +652,24 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                     <div className={styles.teamRight}>
                         <span className={styles.teamName} style={{ textAlign: "end" }}>{card.team2.name}</span>
                         <div className={styles.abbrCircleRight}>
-                            {/* {card.team2.code} */}
-                            <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogo} />
+                             {card.team2.logo ? (
+                                <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogo} />
+                            ) : (
+                                <div style={{
+                                    height: '3rem',
+                                    width: '3rem',
+                                    background: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '2px dashed #d0d0d0',
+                                    position: 'relative',
+                                    overflow: 'hidden'
+                                }}>
+                                    <span style={{ fontSize: '1.5rem', color: '#9e9e9e' }}>⚽</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -486,7 +710,12 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
 
                         {selectedOdd && betAmount && (
                             <div className={styles.potentialWin}>
-                                <div className={styles.potentialWinLabel} onClick={() => window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=1119&bid=1650')}>{translatedText.potentialWinnings}</div>
+                                <div 
+                                    className={styles.potentialWinLabel} 
+                                    onClick={() => window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=1119&bid=1650')}
+                                >
+                                    {translatedText.potentialWinnings}
+                                </div>
                                 <div className={styles.potentialWinAmount}>
                                     ₹{win}
                                 </div>
@@ -495,7 +724,6 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                     </div>
                 )}
 
-                {/* Live */}
                 {card.isLive && (
                     <div className={styles.live}>
                         <div className={styles.livePulse}></div>
@@ -503,6 +731,7 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
                     </div>
                 )}
             </div>
+            
             <div className={styles.betHistory}>
                 {success ? (
                     <span style={{ color: '#22c55e' }}>
@@ -515,4 +744,4 @@ const SportsOddsCard = ({ card, styles, translatedText, onSelectOdd, onBetPlaced
             </div>
         </div>
     );
-};
+});

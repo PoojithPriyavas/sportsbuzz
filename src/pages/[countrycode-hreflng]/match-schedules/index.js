@@ -23,6 +23,7 @@ import HeaderThree from "@/components/Header/HeaderThree";
 import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
+import CountryLayout from "@/components/layouts/CountryLayout";
 export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
     // console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
@@ -146,12 +147,9 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
             <Head>
                 <title>Match Schedules – Live Cricket, Football and Betting Odds</title>
                 <meta name="description" content="Stay ahead with the latest match schedules, betting odds, and sports predictions. Bet on your favorite games with expert insights and top gambling odds. Never miss a game" />
-                <meta name="keywords" content="Today Match schedule, Upcoming matches Cricket, Tomorrow Match schedule, La liga Match schedule, upcoming match schedules, Spanish leauge match schedules, FIFA match schedules, match schedule, upcoming matches, upcoming match detail, list of upcoming matches, match results, match reports, statistics, match scorecards, upcoming football matches, football today, football fixtures, football results today, yesterday's football results" />
                 <link rel="alternate" href="https://sportsbuz.com/match-schedules/" hreflang="x-default" />
             </Head>
-            {/* <Header /> */}
-            {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
-            <HeaderThree animationStage={animationStage} />
+            {/* Removed inline HeaderThree; provided by CountryLayout */}
             <div className='container'>
                 {sport === 'cricket' ? (
                     <>
@@ -161,7 +159,6 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                     <>
                         {stages && <TestLive />}
                     </>
-
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
@@ -184,26 +181,22 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                         {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
+                        {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
                         <SportsOdsMegaPari />
                     </div>
                 </div>
                 <div className={styles.mainContent}>
-                    <div className={styles.leftSection}>
-
-                    </div>
-
-                    <div className={styles.rightSection}>
-
-                        {/* <UpcomingMatches /> */}
-                        {/* <div className={styles.bannerPlaceholder}>Multiple Banner Part</div> */}
-
-                    </div>
+                    <div className={styles.leftSection}></div>
+                    <div className={styles.rightSection}></div>
                 </div>
                 <BettingAppsRecentTable />
-
             </div>
-            <FooterTwo />
+            {/* Removed inline FooterTwo; provided by CountryLayout */}
         </>
     )
+}
+
+// Attach shared layout: HeaderThree → content → FooterTwo
+MatchSchedulerScreen.getLayout = function getLayout(page) {
+    return <CountryLayout>{page}</CountryLayout>;
 }

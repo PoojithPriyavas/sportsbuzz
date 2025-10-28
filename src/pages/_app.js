@@ -8,6 +8,7 @@ import "@/styles/globals.css";
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
+  const getLayout = Component.getLayout || ((page) => page);
 
   useEffect(() => {
     const handleRouteChange = (url) => {
@@ -24,7 +25,6 @@ export default function App({ Component, pageProps }) {
     <DataProvider>
       {/* Client-side redirect handler */}
       <RedirectHandler />
-      
       {/* Load GA script */}
       <Script
         strategy="afterInteractive"
@@ -44,7 +44,7 @@ export default function App({ Component, pageProps }) {
           `,
         }}
       />
-      <Component {...pageProps} />
+      {getLayout(<Component {...pageProps} />)}
     </DataProvider>
   );
 }

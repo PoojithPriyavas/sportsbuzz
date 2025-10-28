@@ -21,6 +21,7 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import HeaderThree from "@/components/Header/HeaderThree";
+import CountryLayout from "@/components/layouts/CountryLayout";
 
 export default function CricketMatchDetails() {
     const { getCricketDetails, cricketDetails, location, countryCode, activeOddBanners, bannerLoading } = useGlobalData();
@@ -96,8 +97,7 @@ export default function CricketMatchDetails() {
                 <title>Match Details</title>
                 <meta name="description" content="Your site description here" />
             </Head>
-            <HeaderThree animationStage={animationStage} />
-
+            {/* Removed inline HeaderThree; provided by CountryLayout */}
             <div className='container'>
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
@@ -118,7 +118,12 @@ export default function CricketMatchDetails() {
                     </div> */}
                 </div>
             </div>
-            <FooterTwo />
+            {/* Removed inline FooterTwo; provided by CountryLayout */}
         </>
     );
+}
+
+// Attach shared layout: HeaderThree → content → FooterTwo
+CricketMatchDetails.getLayout = function getLayout(page) {
+    return <CountryLayout>{page}</CountryLayout>;
 }

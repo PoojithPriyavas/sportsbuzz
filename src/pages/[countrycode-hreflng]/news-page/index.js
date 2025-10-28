@@ -9,6 +9,7 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
 import HeaderThree from "@/components/Header/HeaderThree";
+import CountryLayout from "@/components/layouts/CountryLayout";
 
 export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
@@ -130,12 +131,16 @@ export default function NewsData({ countryDataHome, locationDataHome, resolvedUr
                 <title>Sports Buzz | News</title>
                 <meta name="description" content="Your site description here" />
             </Head>
-            <HeaderThree animationStage={animationStage} />
+            {/* Removed inline HeaderThree; now provided by CountryLayout */}
             <div className='container'>
                 {/* <LiveScores /> */}
                 <BlogsPage blogs={blogs} />
             </div>
-            <FooterTwo />
+            {/* Removed inline FooterTwo; now provided by CountryLayout */}
         </>
     )
+}
+
+NewsData.getLayout = function getLayout(page) {
+    return <CountryLayout>{page}</CountryLayout>;
 }

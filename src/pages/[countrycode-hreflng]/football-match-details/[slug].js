@@ -22,6 +22,7 @@ import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import axios from "axios";
 import HeaderThree from "@/components/Header/HeaderThree";
+import CountryLayout from "@/components/layouts/CountryLayout";
 
 export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
@@ -161,8 +162,7 @@ export default function FootballMatchDetails({ countryDataHome, locationDataHome
                 <title>Match Details</title>
                 <meta name="description" content="Your site description here" />
             </Head>
-            {/* <Header /> */}
-            <HeaderThree animationStage={animationStage} />
+            {/* Removed inline HeaderThree; provided by CountryLayout */}
 
             <div className='container'>
                 {/* <LiveScores /> */}
@@ -189,10 +189,13 @@ export default function FootballMatchDetails({ countryDataHome, locationDataHome
 
                     </div>
                 </div>
-
-
             </div>
-            <FooterTwo />
+            {/* Removed inline FooterTwo; provided by CountryLayout */}
         </>
     )
+}
+
+// Attach shared layout: HeaderThree → content → FooterTwo
+FootballMatchDetails.getLayout = function getLayout(page) {
+    return <CountryLayout>{page}</CountryLayout>;
 }

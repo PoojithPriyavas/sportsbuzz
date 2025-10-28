@@ -64,9 +64,9 @@ export const DataProvider = ({ children, countryDataHome }) => {
     const [currentTimezone, setCurrentTimezone] = useState('+0.00');
 
     const getTimezoneByCountryCode = (code) => {
-        console.log(code, "code in country data")
+        // console.log(code, "code in country data")
         const country = countryTimezones.find(item => item[0] === code);
-        console.log(country, "countrydfdfgdfgd")
+        // console.log(country, "countrydfdfgdfgd")
         return country ? country[1] : '+0.00';
     };
 
@@ -140,7 +140,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
             }
 
             // Ultimate fallback to static data if everything else fails
-            console.log('Using Sri Lanka as fallback due to error:', error);
+            // console.log('Using Sri Lanka as fallback due to error:', error);
             setCountryCode(sriLankaFallbackData);
             setCurrentTimezone(getTimezoneByCountryCode(sriLankaFallbackData.country_code));
         }

@@ -9,6 +9,7 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 import { useRouter } from "next/router";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import { fetchBlogsSSR } from "@/lib/ftechBlogsSSR";
+import CountryLayout from "@/components/layouts/CountryLayout";
 
 import axios from 'axios';
 import HeaderThree from "@/components/Header/HeaderThree";
@@ -370,61 +371,16 @@ export default function BlogPages({
                 <link rel="alternate" href="https://sportsbuz.com/blogs/pages/1" hreflang="x-default" />
             </Head>
 
-            <HeaderThree animationStage={animationStage} />
+            {/* Removed inline HeaderThree; provided by CountryLayout */}
             <div className='container'>
                 <BlogsPage blogs={blogs} />
             </div>
-            <FooterTwo />
-
-            {/* Optional: Language and Country selectors for testing */}
-            {/* {process.env.NODE_ENV === 'development' && (
-                <div style={{
-                    position: 'fixed',
-                    bottom: '20px',
-                    right: '20px',
-                    backgroundColor: '#f0f0f0',
-                    padding: '15px',
-                    borderRadius: '8px',
-                    border: '1px solid #ccc',
-                    minWidth: '250px'
-                }}>
-                    <div style={{ marginBottom: '10px' }}>
-                        <label style={{ display: 'block', marginBottom: '5px' }}>Current: {countryPart?.toUpperCase()}-{langPart?.toUpperCase()}</label>
-                    </div>
-                    
-                    <div style={{ marginBottom: '10px' }}>
-                        <label style={{ display: 'block', marginBottom: '5px' }}>Change Country: </label>
-                        <select 
-                            value={countryPart || ''} 
-                            onChange={(e) => handleCountryChange(e.target.value)}
-                            style={{ width: '100%', padding: '5px' }}
-                        >
-                            <option value="">Select Country</option>
-                            {availableCountries.map((country, index) => (
-                                <option key={index} value={country.country_code}>
-                                    {country.country} ({country.country_code.toUpperCase()})
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '5px' }}>Change Language: </label>
-                        <select 
-                            value={langPart || ''} 
-                            onChange={(e) => handleLanguageChange(e.target.value)}
-                            style={{ width: '100%', padding: '5px' }}
-                        >
-                            <option value="">Select Language</option>
-                            {supportedLanguagesForCountry.map((lang, index) => (
-                                <option key={index} value={lang.hreflang}>
-                                    {lang.language} ({lang.hreflang})
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-            )} */}
+            {/* Removed inline FooterTwo; provided by CountryLayout */}
         </>
     )
+}
+
+// Attach shared layout: HeaderThree → content → FooterTwo
+BlogPages.getLayout = function getLayout(page) {
+    return <CountryLayout>{page}</CountryLayout>;
 }

@@ -14,6 +14,7 @@ import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
 import HeaderThree from "@/components/Header/HeaderThree";
 import { useGlobalData } from "@/components/Context/ApiContext";
+import CountryLayout from "@/components/layouts/CountryLayout";
 export async function getServerSideProps(context) {
     // Extract resolvedUrl at the top level, outside the try block
     const { resolvedUrl } = context;
@@ -132,14 +133,12 @@ export default function blogDetailsMain({ countryDataHome, locationDataHome, res
     }, [showOtherDivs]);
     return (
         <>
-
-            <HeaderThree animationStage={animationStage} />
+            {/* Removed inline HeaderThree; provided by CountryLayout */}
             {/* <div className="container">
                 <NewsSectionCards />
             </div> */}
 
             <div className={` ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
-
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
                         <NewsSectionCards />
@@ -151,7 +150,7 @@ export default function blogDetailsMain({ countryDataHome, locationDataHome, res
                                 <JoinTelegramButton />
                             </div>
                             <div className={styles.fourthColumnRight}>
-                             {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
+                                {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
                             </div>
                         </div>
                         {/* {sport === 'cricket' ? (
@@ -164,7 +163,12 @@ export default function blogDetailsMain({ countryDataHome, locationDataHome, res
                     </div>
                 </div>
             </div>
-            <FooterTwo />
+            {/* Removed inline FooterTwo; provided by CountryLayout */}
         </>
     )
+}
+
+// Attach shared layout: HeaderThree → content → FooterTwo
+blogDetailsMain.getLayout = function getLayout(page) {
+    return <CountryLayout>{page}</CountryLayout>;
 }

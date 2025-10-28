@@ -18,6 +18,7 @@ import {
 import { useGlobalData } from '../Context/ApiContext';
 import { usePathHelper } from '@/hooks/usePathHelper';
 import { useRouter } from 'next/router';
+import footerTranslations from './footer.json'; // Import the JSON file
 
 const FooterTwo = () => {
     const { translateText, language, settings, sport, setSport, blogCategories } = useGlobalData();
@@ -34,7 +35,6 @@ const FooterTwo = () => {
         blogCategories: 'Blog Categories',
         contactInfo: 'Contact Info',
         home: 'Home',
-        // liveScores: 'Live Scores',
         blogs: 'Blogs',
         bestApps: 'Best Betting Apps',
         contactUs: 'Contact Us',
@@ -54,7 +54,26 @@ const FooterTwo = () => {
         description: 'Your ultimate destination for live cricket & football scores, match predictions, betting tips, and comprehensive sports analysis. Stay updated with the latest sports news and insights.'
     });
 
-    // Translate blog categories individually
+    // Helper function to get translation from JSON or API
+    const getTranslation = async (key, defaultText) => {
+        // Find the translation object for the current language
+        const languageData = footerTranslations.find(item => item.hreflang === language);
+        
+        // If translation exists in JSON, use it
+        if (languageData && languageData.translatedText[key]) {
+            return languageData.translatedText[key];
+        }
+        
+        // Otherwise, fall back to API translation
+        try {
+            return await translateText(defaultText, 'en', language);
+        } catch (error) {
+            console.error(`Error translating ${key}:`, error);
+            return defaultText;
+        }
+    };
+
+    // Translate blog categories individually (remains the same)
     useEffect(() => {
         const translateBlogCategories = async () => {
             if (!blogCategories || blogCategories.length === 0) return;
@@ -86,32 +105,32 @@ const FooterTwo = () => {
         translateBlogCategories();
     }, [blogCategories, language, translateText]);
 
-    // Translate footer text individually
+    // Translate footer text using JSON first, then API fallback
     useEffect(() => {
         const translateFooterTexts = async () => {
             try {
                 const translations = {
-                    quickLinks: await translateText('Quick Links', 'en', language),
-                    sports: await translateText('Sports', 'en', language),
-                    blogCategories: await translateText('Blog Categories', 'en', language),
-                    contactInfo: await translateText('Contact Info', 'en', language),
-                    home: await translateText('Home', 'en', language),
-                    blogs: await translateText('Blogs', 'en', language),
-                    bestApps: await translateText('Best Betting Apps', 'en', language),
-                    contactUs: await translateText('Contact Us', 'en', language),
-                    cricket: await translateText('Cricket', 'en', language),
-                    football: await translateText('Football', 'en', language),
-                    featured: await translateText('Featured', 'en', language),
-                    matchAnalysis: await translateText('Match Analysis', 'en', language),
-                    bettingTips: await translateText('Betting Tips', 'en', language),
-                    playerStats: await translateText('Player Stats', 'en', language),
-                    news: await translateText('Sports News', 'en', language),
-                    availability: await translateText('24/7 Sports Updates', 'en', language),
-                    copyright: await translateText('© 2025 SportsBuz. All rights reserved.', 'en', language),
-                    disclaimer: await translateText('Play responsibly. 18+ only. Gambling can be addictive.', 'en', language),
-                    terms: await translateText('Terms of Use', 'en', language),
-                    privacy: await translateText('Privacy Policy', 'en', language),
-                    description: await translateText('Your ultimate destination for live cricket & football scores, match predictions, betting tips, and comprehensive sports analysis. Stay updated with the latest sports news and insights.', 'en', language)
+                    quickLinks: await getTranslation('quickLinks', 'Quick Links'),
+                    sports: await getTranslation('sports', 'Sports'),
+                    blogCategories: await getTranslation('blogCategories', 'Blog Categories'),
+                    contactInfo: await getTranslation('contactInfo', 'Contact Info'),
+                    home: await getTranslation('home', 'Home'),
+                    blogs: await getTranslation('blogs', 'Blogs'),
+                    bestApps: await getTranslation('bestApps', 'Best Betting Apps'),
+                    contactUs: await getTranslation('contactUs', 'Contact Us'),
+                    cricket: await getTranslation('cricket', 'Cricket'),
+                    football: await getTranslation('football', 'Football'),
+                    featured: await getTranslation('featured', 'Featured'),
+                    matchAnalysis: await getTranslation('matchAnalysis', 'Match Analysis'),
+                    bettingTips: await getTranslation('bettingTips', 'Betting Tips'),
+                    playerStats: await getTranslation('playerStats', 'Player Stats'),
+                    news: await getTranslation('news', 'Sports News'),
+                    availability: await getTranslation('availability', '24/7 Sports Updates'),
+                    copyright: await getTranslation('copyright', '© 2025 SportsBuz. All rights reserved.'),
+                    disclaimer: await getTranslation('disclaimer', 'Play responsibly. 18+ only. Gambling can be addictive.'),
+                    terms: await getTranslation('terms', 'Terms of Use'),
+                    privacy: await getTranslation('privacy', 'Privacy Policy'),
+                    description: await getTranslation('description', 'Your ultimate destination for live cricket & football scores, match predictions, betting tips, and comprehensive sports analysis. Stay updated with the latest sports news and insights.')
                 };
 
                 setTranslatedText(prev => ({
@@ -125,7 +144,7 @@ const FooterTwo = () => {
         };
 
         translateFooterTexts();
-    }, [language, translateText, contact.email]);
+    }, [language, contact.email]);
 
     useEffect(() => {
         const checkIfMobile = () => {
@@ -189,7 +208,6 @@ const FooterTwo = () => {
                         <h3 className={styles.title}>{translatedText.quickLinks}</h3>
                         <ul className={styles.linkList}>
                             <li><a href={buildPath("/")}>{translatedText.home}</a></li>
-                            {/* <li><a href={buildPath("/live-scores")}>{translatedText.liveScores}</a></li> */}
                             <li><a href={buildPath("/best-betting-apps/current")}>{translatedText.bestApps}</a></li>
                             <li><a href={buildPath("/blogs/pages/all-blogs")}>{translatedText.blogs}</a></li>
                             <li><a href={buildPath("/contact")}>{translatedText.contactUs}</a></li>
@@ -223,18 +241,6 @@ const FooterTwo = () => {
                                         <a href={buildPath(`/blogs/pages/all-blogs?category=${category.id}`)}>
                                             {category.name}
                                         </a>
-                                        {/* If you want to show subcategories as well, uncomment below */}
-                                        {/* {category.subcategories && category.subcategories.length > 0 && (
-                                            <ul className={styles.subCategoryList}>
-                                                {category.subcategories.map((sub) => (
-                                                    <li key={sub.id}>
-                                                        <a href={buildPath(`/blogs/pages/all-blogs?subcategory=${sub.id}`)}>
-                                                            {sub.name}
-                                                        </a>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )} */}
                                     </li>
                                 ))
                             ) : (

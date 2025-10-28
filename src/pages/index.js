@@ -78,7 +78,7 @@ export async function getServerSideProps(context) {
 }
 
 export default function Home({ locationDataHome, isLocalhost }) {
-  console.log(locationDataHome, "location data home")
+  // console.log(locationDataHome, "location data home")
   const {
     blogCategories,
     blogs,
@@ -95,12 +95,12 @@ export default function Home({ locationDataHome, isLocalhost }) {
     activeEvenBanners,
     bannerLoading
   } = useGlobalData();
-  console.log(apiResponse,"api response")
-  console.log(blogs, "blogs in index")
+  // console.log(apiResponse,"api response")
+  // console.log(blogs, "blogs in index")
 
   const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
 
-  console.log(sections, "best betting apps console");
+  // console.log(sections, "best betting apps console");
 
   const [loading, setLoading] = useState(true);
   const [animationStage, setAnimationStage] = useState('loading');
@@ -178,15 +178,15 @@ export default function Home({ locationDataHome, isLocalhost }) {
   // Generate hreflang links only if locationDataHome is available
   const generateHreflangLinks = () => {
     if (!locationDataHome || !Array.isArray(locationDataHome)) {
-      console.warn('No location data available for hreflang generation');
+      // console.warn('No location data available for hreflang generation');
       return [];
     }
 
     return locationDataHome.map(({ hreflang, country_code }) => {
-      console.log(hreflang, "href lang home")
+      // console.log(hreflang, "href lang home")
       const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
       const fullHrefLang = `${hreflang}-${country_code}`;
-      console.log('Generated hreflang link:', { href, fullHrefLang });
+      // console.log('Generated hreflang link:', { href, fullHrefLang });
 
       return {
         key: fullHrefLang,

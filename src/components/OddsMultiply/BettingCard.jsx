@@ -2,18 +2,20 @@ import React, { useState, useRef, useEffect } from 'react';
 import styles from './BettingCard.module.css';
 import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/router';
+import bettingTranslations from './bettingOds.json';
 
 export default function BettingCards() {
     const scrollRef = useRef(null);
     const dropdownRef = useRef(null);
     const inactivityTimerRef = useRef(null);
     const previousLanguage = useRef(null);
-    
+
     const [paused, setPaused] = useState(false);
     const [selectedTournament, setSelectedTournament] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [transformedCards, setTransformedCards] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isTranslating, setIsTranslating] = useState(false);
 
     const [translatedText, setTranslatedText] = useState({
         bettingOdds: 'Betting Odds',
@@ -34,7 +36,42 @@ export default function BettingCards() {
         potentialProfit: 'Potential Profit'
     });
 
-    const { tournament, accessToken, fetchEventsIdData, eventDetails, translateText, language } = useGlobalData();
+    const { tournament, accessToken, fetchEventsIdData, eventDetails, translateText, debugTranslateText, language, location } = useGlobalData();
+
+    // Helper function to get translation from JSON or API
+    const getTranslation = async (text, targetLanguage) => {
+        const languageData = bettingTranslations.find(
+            item => item.hreflang === targetLanguage
+        );
+
+        if (languageData && languageData.translatedText) {
+            const keyMapping = {
+                'Betting Odds': 'bettingOdds',
+                'All Tournaments': 'allTournaments',
+                'Loading events...': 'loading',
+                'No events available': 'noEvents',
+                'Match Winner': 'matchWinner',
+                'Live': 'live',
+                'VS': 'vs',
+                'Enter stake amount': 'enterStake',
+                'Place Bet': 'placeBet',
+                'Potential Winnings': 'potentialWinnings',
+                'Select your odds and enter stake to place your bet': 'selectOdds',
+                'Play responsibly at your own risk!': 'betSuccess',
+                'Team 1 Win': 'team1Win',
+                'Draw': 'draw',
+                'Team 2 Win': 'team2Win',
+                'Potential Profit': 'potentialProfit'
+            };
+
+            const jsonKey = keyMapping[text];
+            if (jsonKey && languageData.translatedText[jsonKey]) {
+                return languageData.translatedText[jsonKey];
+            }
+        }
+
+        return await debugTranslateText(text, 'en', targetLanguage);
+    };
 
     const startInactivityTimer = () => {
         if (inactivityTimerRef.current) {
@@ -66,42 +103,46 @@ export default function BettingCards() {
     // Translate UI labels
     useEffect(() => {
         const translateLabels = async () => {
-            // Check if language actually changed
             if (previousLanguage.current === language) return;
+            setIsTranslating(true);
             previousLanguage.current = language;
 
-            const [
-                bettingOdds, allTournaments, loading, noEvents, matchWinner, live,
-                vs, enterStake, placeBet, potentialWinnings, selectOdds, betSuccess,
-                team1Win, draw, team2Win, potentialProfit
-            ] = await Promise.all([
-                translateText('Betting Odds', 'en', language),
-                translateText('All Tournaments', 'en', language),
-                translateText('Loading events...', 'en', language),
-                translateText('No events available', 'en', language),
-                translateText('Match Winner', 'en', language),
-                translateText('Live', 'en', language),
-                translateText('VS', 'en', language),
-                translateText('Enter stake amount', 'en', language),
-                translateText('Place Bet', 'en', language),
-                translateText('Potential Winnings', 'en', language),
-                translateText('Select your odds and enter stake to place your bet', 'en', language),
-                translateText('Play responsibly at your own risk!', 'en', language),
-                translateText('Team 1 Win', 'en', language),
-                translateText('Draw', 'en', language),
-                translateText('Team 2 Win', 'en', language),
-                translateText('Potential Profit', 'en', language),
-            ]);
+            try {
+                const [
+                    bettingOdds, allTournaments, loading, noEvents, matchWinner, live,
+                    vs, enterStake, placeBet, potentialWinnings, selectOdds, betSuccess,
+                    team1Win, draw, team2Win, potentialProfit
+                ] = await Promise.all([
+                    getTranslation('Betting Odds', language),
+                    getTranslation('All Tournaments', language),
+                    getTranslation('Loading events...', language),
+                    getTranslation('No events available', language),
+                    getTranslation('Match Winner', language),
+                    getTranslation('Live', language),
+                    getTranslation('VS', language),
+                    getTranslation('Enter stake amount', language),
+                    getTranslation('Place Bet', language),
+                    getTranslation('Potential Winnings', language),
+                    getTranslation('Select your odds and enter stake to place your bet', language),
+                    getTranslation('Play responsibly at your own risk!', language),
+                    getTranslation('Team 1 Win', language),
+                    getTranslation('Draw', language),
+                    getTranslation('Team 2 Win', language),
+                    getTranslation('Potential Profit', language),
+                ]);
 
-            setTranslatedText({
-                bettingOdds, allTournaments, loading, noEvents, matchWinner, live,
-                vs, enterStake, placeBet, potentialWinnings, selectOdds, betSuccess,
-                team1Win, draw, team2Win, potentialProfit
-            });
+                setTranslatedText({
+                    bettingOdds, allTournaments, loading, noEvents, matchWinner, live,
+                    vs, enterStake, placeBet, potentialWinnings, selectOdds, betSuccess,
+                    team1Win, draw, team2Win, potentialProfit
+                });
+            } finally {
+                setIsTranslating(false);
+            }
         };
 
         translateLabels();
-    }, [language, translateText]);
+    }, [language, debugTranslateText]);
 
     const getAllTournaments = () => {
         if (!tournament?.items) return [];
@@ -130,24 +171,30 @@ export default function BettingCards() {
         }
     }, [allTournaments, selectedTournament, accessToken, fetchEventsIdData]);
 
+    // ✅ OPTIMIZED: Fetch all market data in parallel
     const getTransformedCards = async (events) => {
         if (!Array.isArray(events)) return [];
-        const cards = [];
 
-        for (const event of events) {
-            const marketData = await fetchMarketData(accessToken, event.sportEventId);
-            console.log(marketData, "marketData")
+        // Fetch ALL market data in parallel instead of sequentially
+        const marketDataPromises = events.map(event =>
+            fetchMarketData(accessToken, event.sportEventId)
+        );
+
+        const marketDataResults = await Promise.all(marketDataPromises);
+
+        // Now transform all cards with their market data
+        const cards = events.map((event, index) => {
+            const marketData = marketDataResults[index];
             const baseCard = transformEventToCard(event, marketData);
-            
-            // Add translated fields initialized with original values
-            cards.push({
+
+            return {
                 ...baseCard,
                 translatedMatchType: baseCard.matchType,
                 translatedTeam1Name: baseCard.team1.name,
                 translatedTeam2Name: baseCard.team2.name,
                 translatedOddsTitle: baseCard.oddsTitle
-            });
-        }
+            };
+        });
 
         return cards;
     };
@@ -165,43 +212,46 @@ export default function BettingCards() {
         }
     }, [eventDetails, accessToken]);
 
-    // Translate card content when language changes
+    // ✅ OPTIMIZED: Translate all cards at once, batch state update
     useEffect(() => {
         const translateCardContent = async () => {
             if (!transformedCards || transformedCards.length === 0) return;
             if (previousLanguage.current === language) return;
+            setIsTranslating(true);
 
-            // Translate each card incrementally
-            for (let cardIdx = 0; cardIdx < transformedCards.length; cardIdx++) {
-                const card = transformedCards[cardIdx];
+            try {
+                const translationPromises = transformedCards.map(async (card) => {
+                    const [translatedMatchType, translatedTeam1Name, translatedTeam2Name, translatedOddsTitle] =
+                        await Promise.all([
+                            card.matchType ? debugTranslateText(card.matchType, 'en', language) : card.matchType,
+                            card.team1.name ? debugTranslateText(card.team1.name, 'en', language) : card.team1.name,
+                            card.team2.name ? debugTranslateText(card.team2.name, 'en', language) : card.team2.name,
+                            card.oddsTitle ? getTranslation('Match Winner', language) : card.oddsTitle
+                        ]);
 
-                const [translatedMatchType, translatedTeam1Name, translatedTeam2Name, translatedOddsTitle] = 
-                    await Promise.all([
-                        card.matchType ? translateText(card.matchType, 'en', language) : card.matchType,
-                        card.team1.name ? translateText(card.team1.name, 'en', language) : card.team1.name,
-                        card.team2.name ? translateText(card.team2.name, 'en', language) : card.team2.name,
-                        card.oddsTitle ? translateText(card.oddsTitle, 'en', language) : card.oddsTitle
-                    ]);
-
-                // Update this specific card
-                setTransformedCards(prev => {
-                    const updated = [...prev];
-                    if (updated[cardIdx]) {
-                        updated[cardIdx] = {
-                            ...updated[cardIdx],
-                            translatedMatchType,
-                            translatedTeam1Name,
-                            translatedTeam2Name,
-                            translatedOddsTitle
-                        };
-                    }
-                    return updated;
+                    return {
+                        translatedMatchType,
+                        translatedTeam1Name,
+                        translatedTeam2Name,
+                        translatedOddsTitle
+                    };
                 });
+
+                const translations = await Promise.all(translationPromises);
+
+                setTransformedCards(prev =>
+                    prev.map((card, index) => ({
+                        ...card,
+                        ...translations[index]
+                    }))
+                );
+            } finally {
+                setIsTranslating(false);
             }
         };
 
         translateCardContent();
-    }, [transformedCards.length, language, translateText]);
+    }, [transformedCards.length, language, debugTranslateText]);
 
     const handleTournamentChange = (tournamentId) => {
         setIsLoading(true);
@@ -330,7 +380,7 @@ export default function BettingCards() {
             </div>
 
             <div className={styles.cardsContainer} ref={scrollRef}>
-                {isLoading ? (
+                {(isLoading && !isTranslating) ? (
                     <>
                         <SkeletonCard />
                         <SkeletonCard />
@@ -358,6 +408,7 @@ export default function BettingCards() {
 }
 
 function transformEventToCard(event, marketData) {
+    console.log(event, "event datat")
     const isLive = event.waitingLive || event.period > 0;
     const startDate = new Date(event.startDate * 1000);
     const defaultOdds = [
@@ -413,6 +464,7 @@ async function fetchMarketData(token, sportEventId) {
 }
 
 function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced }) {
+    console.log(card, "cards")
     const [selectedOdd, setSelectedOdd] = useState(null);
     const [betAmount, setBetAmount] = useState('');
     const [win, setWin] = useState('0.00');
@@ -496,14 +548,50 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                 <div className={styles.teamsContainer}>
                     <div className={styles.team}>
                         <div className={styles.teamLogo}>
-                            <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team1.logo}`} alt={card.team1.name} className={styles.teamLogoImg} />
+                            {card.team1.logo ? (
+                                <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team1.logo}`} alt={card.team1.name} className={styles.teamLogoImg} />
+                            ) : (
+                                <div style={{
+                                    height: '3rem',
+                                    width: '3rem',
+                                    background: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '2px dashed #d0d0d0',
+                                    position: 'relative',
+                                    overflow: 'hidden'
+                                }}>
+                                    <span style={{ fontSize: '1.5rem', color: '#9e9e9e' }}>⚽</span>
+                                </div>
+                            )}
+
                         </div>
                         <div className={styles.teamName}>{card.translatedTeam1Name}</div>
                     </div>
                     <div className={styles.vs}>{translatedText.vs}</div>
                     <div className={styles.team}>
                         <div className={`${styles.teamLogo} ${styles.away}`}>
-                            <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogoImg} />
+                            {card.team2.logo ? (
+                                <img src={`https://nimblecd.com/sfiles/logo_teams/${card.team2.logo}`} alt={card.team2.name} className={styles.teamLogoImg} />
+                            ) : (
+                                <div style={{
+                                    height: '3rem',
+                                    width: '3rem',
+                                    background: 'linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%)',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '2px dashed #d0d0d0',
+                                    position: 'relative',
+                                    overflow: 'hidden'
+                                }}>
+                                    <span style={{ fontSize: '1.5rem', color: '#9e9e9e' }}>⚽</span>
+                                </div>
+                            )}
+
                         </div>
                         <div className={styles.teamName}>{card.translatedTeam2Name}</div>
                     </div>

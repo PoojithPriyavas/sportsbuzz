@@ -13,7 +13,6 @@ import { useEffect, useState } from "react";
 import TestLive from "@/components/LiveScoreSection/TestLive";
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
-import FooterTwo from "@/components/Footer/Footer";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 import RecentAppsDetails from "@/components/BestBettingRecentApps/RecetDetail";
@@ -21,7 +20,7 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 import { fetchBestBettingAppsSSR } from "@/lib/fetchBestBettingAppsSSR";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
-import HeaderThree from "@/components/Header/HeaderThree";
+import CountryLayout from "@/components/layouts/CountryLayout";
 
 
 export async function getServerSideProps(context) {
@@ -208,6 +207,7 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
             {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
             <HeaderThree animationStage={animationStage} />
 
+            {/* HeaderThree moved to CountryLayout */}
             <div className='container'>
                 {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
@@ -218,7 +218,6 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
                     <>
                         {stages && <TestLive />}
                     </>
-
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
@@ -246,9 +245,14 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
                 </div>
 
                 <BettingAppsRecentTable bestSections={bestSections} countryCode={countryCode} />
-
             </div>
-            <FooterTwo countryCode={countryCode} />
+
+            {/* FooterTwo moved to CountryLayout */}
         </>
     )
+}
+
+// Attach shared layout: HeaderThree → content → FooterTwo
+BestBettingApps.getLayout = function getLayout(page) {
+    return <CountryLayout>{page}</CountryLayout>;
 }

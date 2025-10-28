@@ -22,7 +22,7 @@ import TestHeader from "@/components/Header/TestHeader";
 import FooterTwo from "@/components/Footer/Footer";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
-import HeaderThree from "@/components/Header/HeaderThree";
+import CountryLayout from "@/components/layouts/CountryLayout";
 export async function getServerSideProps(context) {
   // Log the request origin (helpful for debugging)
   // console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
@@ -144,7 +144,7 @@ export default function ContactUs({ countryDataHome, locationDataHome, resolvedU
         <link rel="alternate" href="https://sportsbuz.com/contact/" hreflang="x-default" />
       </Head>
       {/* <Header /> */}
-      <HeaderThree animationStage={animationStage} />
+      {/* Removed inline HeaderThree; provided by CountryLayout */}
       {/* <TestHeader /> */}
 
       <Hero countryCode={countryDataHome} />
@@ -153,10 +153,12 @@ export default function ContactUs({ countryDataHome, locationDataHome, resolvedU
         {/* <TestLive /> */}
 
         <Contact />
-
-
       </div>
-      <FooterTwo />
+      {/* Removed inline FooterTwo; provided by CountryLayout */}
     </>
   )
+}
+
+ContactUs.getLayout = function getLayout(page) {
+    return <CountryLayout>{page}</CountryLayout>;
 }

@@ -52,7 +52,7 @@ export default function BlogsPage({
     nextUrl,
     prevUrl,
   } = useGlobalData();
-  console.log(countryCode, "country code in blog")
+  // console.log(countryCode, "country code in blog")
 
   // Parse URL parameters - these are the source of truth
   const categoryIdParam = searchParams.get('category');
@@ -142,7 +142,7 @@ export default function BlogsPage({
     // If state changed due to URL params, reset the fetch cache
     if (stateChanged) {
       lastFetchParamsRef.current = null;
-      console.log('BlogsPage: URL params changed, state synchronized');
+      // console.log('BlogsPage: URL params changed, state synchronized');
     }
 
     return () => {
@@ -154,11 +154,11 @@ export default function BlogsPage({
   useEffect(() => {
     // Only proceed if ready
     if (!isMountedRef.current || !isInitialized || !countryCode?.country_code) {
-      console.log('BlogsPage: Skipping blog fetch - not ready', {
-        mounted: isMountedRef.current,
-        initialized: isInitialized,
-        countryCode: countryCode?.country_code
-      });
+      // console.log('BlogsPage: Skipping blog fetch - not ready', {
+      //   mounted: isMountedRef.current,
+      //   initialized: isInitialized,
+      //   countryCode: countryCode?.country_code
+      // });
       return;
     }
 
@@ -183,7 +183,7 @@ export default function BlogsPage({
 
     // Check if this exact same call was already made
     if (lastFetchParamsRef.current === currentParamsKey) {
-      console.log('BlogsPage: Skipping duplicate fetch with same params:', currentParamsKey);
+      // console.log('BlogsPage: Skipping duplicate fetch with same params:', currentParamsKey);
       return;
     }
 
@@ -197,8 +197,8 @@ export default function BlogsPage({
     const timeoutId = setTimeout(() => {
       if (!isMountedRef.current) return;
 
-      console.log('BlogsPage: Fetching blogs with params:', fetchParams);
-      console.log('BlogsPage: Params key:', currentParamsKey);
+      // console.log('BlogsPage: Fetching blogs with params:', fetchParams);
+      // console.log('BlogsPage: Params key:', currentParamsKey);
 
       fetchBlogs(fetchParams);
     }, debounceTime);
@@ -241,7 +241,7 @@ export default function BlogsPage({
   const handleClearFilters = async () => {
     if (!isMountedRef.current) return;
 
-    console.log('BlogsPage: Clearing filters');
+    // console.log('BlogsPage: Clearing filters');
 
     // Reset last fetch params to force a new fetch
     lastFetchParamsRef.current = null;
@@ -263,7 +263,7 @@ export default function BlogsPage({
     if (!isMountedRef.current || !pageNumber) return;
 
     if (pageNumber !== currentPage) {
-      console.log('BlogsPage: Changing page to:', pageNumber);
+      // console.log('BlogsPage: Changing page to:', pageNumber);
       updateURL(pageNumber, searchTerm, selectedCategoryId, selectedSubcategoryId);
 
       // Scroll to blog grid
@@ -297,7 +297,7 @@ export default function BlogsPage({
     if (!isMountedRef.current) return;
 
     const newSearchTerm = e.target.value;
-    console.log('BlogsPage: Search term changed to:', newSearchTerm);
+    // console.log('BlogsPage: Search term changed to:', newSearchTerm);
     
     // Update URL with new search term and reset to page 1
     updateURL(1, newSearchTerm, selectedCategoryId, selectedSubcategoryId);
@@ -332,31 +332,31 @@ export default function BlogsPage({
   };
 
   // Debug logging effect
-  useEffect(() => {
-    console.log('BlogsPage State Update:', {
-      blogs: blogs?.length || 0,
-      isLoading,
-      totalBlogs,
-      currentPage,
-      searchTerm,
-      selectedCategoryId,
-      selectedSubcategoryId,
-      countryCode: countryCode?.country_code,
-      hasActiveFilters,
-      showPagination,
-      isInitialized,
-      nextUrl,
-      prevUrl,
-      nextPageNumber,
-      prevPageNumber,
-      urlParams: {
-        category: categoryIdParam,
-        subcategory: subcategoryIdParam,
-        page: pageParam,
-        search: searchParam
-      }
-    });
-  }, [blogs, isLoading, totalBlogs, currentPage, searchTerm, selectedCategoryId, selectedSubcategoryId, countryCode?.country_code, hasActiveFilters, showPagination, isInitialized, nextUrl, prevUrl, nextPageNumber, prevPageNumber, categoryIdParam, subcategoryIdParam, pageParam, searchParam]);
+  // useEffect(() => {
+  //   console.log('BlogsPage State Update:', {
+  //     blogs: blogs?.length || 0,
+  //     isLoading,
+  //     totalBlogs,
+  //     currentPage,
+  //     searchTerm,
+  //     selectedCategoryId,
+  //     selectedSubcategoryId,
+  //     countryCode: countryCode?.country_code,
+  //     hasActiveFilters,
+  //     showPagination,
+  //     isInitialized,
+  //     nextUrl,
+  //     prevUrl,
+  //     nextPageNumber,
+  //     prevPageNumber,
+  //     urlParams: {
+  //       category: categoryIdParam,
+  //       subcategory: subcategoryIdParam,
+  //       page: pageParam,
+  //       search: searchParam
+  //     }
+  //   });
+  // }, [blogs, isLoading, totalBlogs, currentPage, searchTerm, selectedCategoryId, selectedSubcategoryId, countryCode?.country_code, hasActiveFilters, showPagination, isInitialized, nextUrl, prevUrl, nextPageNumber, prevPageNumber, categoryIdParam, subcategoryIdParam, pageParam, searchParam]);
 
   return (
     <>

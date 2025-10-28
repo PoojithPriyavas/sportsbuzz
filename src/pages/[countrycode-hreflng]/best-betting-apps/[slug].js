@@ -21,7 +21,7 @@ import { useRouter } from "next/router";
 import { fetchBettingAppsSSR } from '@/lib/fetchBettingAppsSSR';
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
-import HeaderThree from "@/components/Header/HeaderThree";
+import CountryLayout from "@/components/layouts/CountryLayout";
 
 export async function getServerSideProps({ req, resolvedUrl }) {
     // Parse the cookie to get country code
@@ -225,10 +225,7 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
                 <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
             </Head>
 
-            {/* <Header /> */}
-            {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
-            <HeaderThree animationStage={animationStage} />
-
+            {/* Removed inline HeaderThree; provided by CountryLayout */}
             <div className='container'>
                 {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
@@ -239,7 +236,6 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
                     <>
                         {stages && <TestLive />}
                     </>
-
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
@@ -284,7 +280,12 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
                 <BettingAppsRecentTable bestSections={bestSections} countryCode={countryCode} />
 
             </div>
-            <FooterTwo />
+            {/* Removed inline FooterTwo; provided by CountryLayout */}
         </>
     )
+}
+
+// Attach shared layout: HeaderThree → content → FooterTwo
+BestBettingApps.getLayout = function getLayout(page) {
+    return <CountryLayout>{page}</CountryLayout>;
 }

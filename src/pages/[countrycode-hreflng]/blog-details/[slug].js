@@ -4,16 +4,15 @@
 import React, { useState, useEffect } from "react";
 import BlogDetailsPage from "@/components/BlogsSection/BlogDetails";
 import Header from "@/components/Loader/Loader";
-import FooterTwo from "@/components/Footer/Footer";
 import Head from "next/head";
 import styles from '../../../styles/Home.module.css';
-// import { getBlogData } from "@/lib/blogs"; // create this to fetch blogs
 import { useGlobalData } from '@/components/Context/ApiContext';
 import HeaderTwo from "@/components/Header/HeaderTwo";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
 import { useParams } from "next/navigation";
 import HeaderThree from "@/components/Header/HeaderThree";
+import CountryLayout from "@/components/layouts/CountryLayout";
 
 export async function getServerSideProps(context) {
     const { resolvedUrl } = context;
@@ -141,14 +140,14 @@ export default function BlogDetailsMain({ blog, locationDataHome, resolvedUrl })
                 <meta property="og:title" content={blog.meta_title} />
                 <meta property="og:description" content={blog.meta_desc} />
                 <meta property="og:image" content={blog.image_big || blog.image} />
-                
             </Head>
-            {/* <Header /> */}
-            <HeaderThree animationStage={animationStage} />
             <div className={` ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
                 <BlogDetailsPage blog={blog} countryCode={countryCode}/>
             </div>
-            {showOtherDivs && <FooterTwo />}
         </>
     );
+}
+
+BlogDetailsMain.getLayout = function getLayout(page) {
+    return <CountryLayout>{page}</CountryLayout>;
 }
