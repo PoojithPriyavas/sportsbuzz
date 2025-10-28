@@ -232,7 +232,7 @@ const FooterTwo = () => {
                     </div>
 
                     {/* Column 4 - Dynamic Blog Categories */}
-                    <div className={styles.col}>
+                    {/* <div className={styles.col}>
                         <h3 className={styles.title}>{translatedText.blogCategories}</h3>
                         <ul className={styles.linkList}>
                             {translatedBlogCategories && translatedBlogCategories.length > 0 ? (
@@ -251,7 +251,7 @@ const FooterTwo = () => {
                                 </>
                             )}
                         </ul>
-                    </div>
+                    </div> */}
 
                     {/* Column 5 - Contact Info */}
                     <div className={styles.col}>
