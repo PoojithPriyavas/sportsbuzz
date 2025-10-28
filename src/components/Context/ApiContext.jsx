@@ -363,7 +363,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
         try {
             // Handle different input formats
             if (typeof textInput === 'object' && textInput !== null && !Array.isArray(textInput)) {
-                // New format: Handle grouped texts (for header, categories, subcategories)
+                // New format: Handle grouped texts (for categories, subcategories)
                 const response = await axios.post('/api/translate', {
                     textGroups: textInput,
                     from: fromCode,
@@ -371,16 +371,34 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 });
                 return response.data;
             } else if (Array.isArray(textInput)) {
-                // Batch translation
-                const texts = textInput.map(item => ({
-                    text: typeof item === 'string' ? item : item.text
-                }));
+                // Batch translation with de-duplication and order mapping
+                const originalTexts = textInput
+                    .map(item => (typeof item === 'string' ? item : item?.text))
+                    .filter(Boolean);
+
+                const uniqueTexts = [];
+                const seen = new Set();
+                for (const t of originalTexts) {
+                    if (!seen.has(t)) {
+                        uniqueTexts.push(t);
+                        seen.add(t);
+                    }
+                }
+
                 const response = await axios.post('/api/translate', {
-                    texts,
+                    texts: uniqueTexts.map(text => ({ text })),
                     from: fromCode,
                     to,
                 });
-                return response.data;
+
+                const translatedUnique = response.data || [];
+                const translationMap = {};
+                uniqueTexts.forEach((t, idx) => {
+                    translationMap[t] = translatedUnique[idx] ?? t;
+                });
+
+                // Map back to original order/length
+                return originalTexts.map(t => translationMap[t] ?? t);
             } else {
                 // Single text translation
                 const response = await axios.post('/api/translate', {

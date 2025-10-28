@@ -5,11 +5,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useGlobalData } from '../Context/ApiContext';
 import { FaMoon, FaSun, FaChevronDown, FaBars, FaTimes } from 'react-icons/fa';
 import { usePathHelper } from '@/hooks/usePathHelper';
-
 import FeaturedButton from '../FeaturedButton/FeaturedButton';
-
-
 import DynamicLink from '../Common/DynamicLink';
+import bettingOds from './bettingOds.json';
 
 function getCookie(name) {
     if (typeof document === 'undefined') return null;
@@ -118,6 +116,102 @@ function HeaderThree({ animationStage, languageValidation }) {
     // New: hold the selected language until the URL updates
     const [pendingLanguage, setPendingLanguage] = useState(null);
     const router = useRouter();
+    
+    // Defaults for header labels (English source strings)
+    const defaultHeaderLabels = {
+        home: 'Home',
+        apps: 'Best Betting Apps',
+        news: 'News',
+        schedule: 'Match Schedules',
+        cricket: 'Cricket',
+        football: 'Football',
+        contact: 'Contact Us',
+        language: 'Language',
+        sport: 'Sport'
+    };
+    
+    // Helper: get static translations for a language from bettingOds.json
+    const getStaticTranslationsForLanguage = (lang) => {
+        try {
+            const entry = Array.isArray(bettingOds)
+                ? bettingOds.find(item => item?.hreflang === lang)
+                : null;
+            return entry?.translatedText || null;
+        } catch (e) {
+            console.warn('Error reading bettingOds.json:', e);
+            return null;
+        }
+    };
+    
+    // Helper: translate header labels using static JSON first, then fallback to translateText per key
+    const translateHeaderLabels = async (selectedLanguage) => {
+        const staticMap = getStaticTranslationsForLanguage(selectedLanguage);
+    
+        // If English, short-circuit to defaults
+        if (selectedLanguage === 'en') {
+            setTranslatedText({ ...defaultHeaderLabels });
+            try {
+                localStorage.setItem(
+                    `cachedTranslations_${selectedLanguage}`,
+                    JSON.stringify({
+                        language: selectedLanguage,
+                        translations: { ...defaultHeaderLabels },
+                        timestamp: Date.now()
+                    })
+                );
+            } catch (cacheError) {
+                console.warn('Failed to cache English translations:', cacheError);
+            }
+            return;
+        }
+    
+        const keys = Object.keys(defaultHeaderLabels);
+        
+        // Collect only the missing keys to batch translate
+        const keysToTranslate = keys.filter(
+            key => !(staticMap && typeof staticMap[key] === 'string' && staticMap[key].trim() !== '')
+        );
+        const textsToTranslate = keysToTranslate.map(key => defaultHeaderLabels[key]);
+
+        let translatedResults = [];
+        if (textsToTranslate.length > 0) {
+            try {
+                translatedResults = await translateText(textsToTranslate, 'en', selectedLanguage);
+            } catch (err) {
+                console.warn('translateText batch failed for header labels', err);
+                translatedResults = textsToTranslate; // final fallback
+            }
+        }
+
+        const results = {};
+        let idx = 0;
+        for (const key of keys) {
+            if (staticMap && typeof staticMap[key] === 'string' && staticMap[key].trim() !== '') {
+                results[key] = staticMap[key];
+            } else if (keysToTranslate.includes(key)) {
+                results[key] = translatedResults[idx] || defaultHeaderLabels[key];
+                idx += 1;
+            } else {
+                results[key] = defaultHeaderLabels[key];
+            }
+        }
+    
+        setTranslatedText(results);
+    
+        // Cache final result
+        try {
+            localStorage.setItem(
+                `cachedTranslations_${selectedLanguage}`,
+                JSON.stringify({
+                    language: selectedLanguage,
+                    translations: results,
+                    timestamp: Date.now()
+                })
+            );
+        } catch (cacheError) {
+            console.warn('Failed to cache header translations:', cacheError);
+        }
+    };
 
     // Use the usePathHelper hook
     const { pathPrefix, buildPath } = usePathHelper();
@@ -139,7 +233,13 @@ function HeaderThree({ animationStage, languageValidation }) {
 
     const [translatedCategories, setTranslatedCategories] = useState([]);
     const [categoriesLoaded, setCategoriesLoaded] = useState(false);
-    const [categoriesCacheKey, setCategoriesCacheKey] = useState('')
+    const [categoriesCacheKey, setCategoriesCacheKey] = useState('');
+    // Keep an immutable source list for translations
+    const [sourceCategories, setSourceCategories] = useState([]);
+    // Prevent duplicate translation calls
+    const isTranslatingCategoriesRef = useRef(false);
+    const lastCategoriesLangRef = useRef(null);
+    const translateCategoriesTimeoutRef = useRef(null)
 
     // GSAP refs
     const containerRef = useRef(null);
@@ -176,7 +276,8 @@ function HeaderThree({ animationStage, languageValidation }) {
         setCountryData,
         setHreflang,
         country,
-        setCountry
+        setCountry,
+        translateText
     } = useGlobalData();
     console.log(blogCategories, "blog categories in header")
 
@@ -250,6 +351,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         if (newCacheKey !== categoriesCacheKey) {
             console.log('[Categories] Updating categories cache');
             setTranslatedCategories(blogCategories);
+            setSourceCategories(blogCategories);
             setCategoriesCacheKey(newCacheKey);
             setCategoriesLoaded(true);
 
@@ -292,6 +394,7 @@ function HeaderThree({ animationStage, languageValidation }) {
                 if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
                     console.log('[Categories] Loading categories from cache');
                     setTranslatedCategories(parsed.categories);
+                    setSourceCategories(parsed.categories);
                     setCategoriesCacheKey(parsed.cacheKey);
                     setCategoriesLoaded(true);
                 }
@@ -306,23 +409,24 @@ function HeaderThree({ animationStage, languageValidation }) {
         return translatedCategories.filter((cat) => cat.featured === false);
     }, [translatedCategories, categoriesLoaded]);
 
-    // OPTIMIZED: Batch categories translation - single API call with English handling
+    // Only translate categories; single call per language change with debounce and guards
     useEffect(() => {
-        const translateCategories = async () => {
-            if (!categoriesLoaded || !translatedCategories.length || !isUserChangingLanguage) return;
+        const doTranslateCategories = async () => {
+            if (!categoriesLoaded || !isUserChangingLanguage || !pendingLanguage) return;
+            if (lastCategoriesLangRef.current === language) return;
+
+            const cachedKey = `translatedCategories_${language}`;
 
             try {
-                console.log('[Categories] Batch translating categories for language:', language);
+                isTranslatingCategoriesRef.current = true;
+                console.log('[Categories] Translating for language:', language);
 
-                // Check if we already have translated categories cached
-                const cachedCategoriesKey = `translatedCategories_${language}`;
-                const cached = localStorage.getItem(cachedCategoriesKey);
-
+                // Use cached if fresh
+                const cached = localStorage.getItem(cachedKey);
                 if (cached) {
                     try {
                         const parsed = JSON.parse(cached);
-                        if (Date.now() - parsed.timestamp < 60 * 60 * 1000) { // 1 hour cache
-                            console.log('[Categories] Using cached translated categories');
+                        if (Date.now() - parsed.timestamp < 60 * 60 * 1000) {
                             setTranslatedCategories(parsed.categories);
                             return;
                         }
@@ -331,29 +435,16 @@ function HeaderThree({ animationStage, languageValidation }) {
                     }
                 }
 
-                // 🆕 SPECIAL HANDLING FOR ENGLISH: No translation needed
+                // English short-circuit
                 if (language === 'en') {
-                    console.log('[Categories] English detected, loading original categories');
-
-                    // Load original categories from blogCategories or cache
-                    let originalCategories = blogCategories;
-                    if (!originalCategories || originalCategories.length === 0) {
-                        const cachedOriginal = localStorage.getItem('cachedCategories');
-                        if (cachedOriginal) {
-                            const parsed = JSON.parse(cachedOriginal);
-                            originalCategories = parsed.categories;
-                        }
-                    }
-
-                    if (originalCategories && originalCategories.length > 0) {
-                        setTranslatedCategories(originalCategories);
-
-                        // Cache the English version too for consistency
+                    const originals = sourceCategories?.length ? sourceCategories : blogCategories;
+                    if (originals && originals.length > 0) {
+                        setTranslatedCategories(originals);
                         try {
-                            localStorage.setItem(cachedCategoriesKey, JSON.stringify({
-                                categories: originalCategories,
+                            localStorage.setItem(cachedKey, JSON.stringify({
+                                categories: originals,
                                 timestamp: Date.now(),
-                                language: language
+                                language
                             }));
                         } catch (cacheError) {
                             console.warn('Failed to cache English categories:', cacheError);
@@ -362,167 +453,141 @@ function HeaderThree({ animationStage, languageValidation }) {
                     return;
                 }
 
-                // For non-English languages: proceed with translation
-                console.log('[Categories] Translating to non-English language:', language);
+                // Build payload only from sourceCategories to avoid re-translating translated labels
+                const categoriesSource = (sourceCategories && sourceCategories.length > 0)
+                    ? sourceCategories
+                    : (blogCategories || []);
 
-                // Collect ALL unique category and subcategory names for batch translation
-                const allTextsToTranslate = new Set();
-
-                translatedCategories.forEach(category => {
-                    // Add category name if it needs translation
+                const allTexts = new Set();
+                categoriesSource.forEach(category => {
                     if (category.name && category.name.trim() !== '' && category.name !== 'Home') {
-                        allTextsToTranslate.add(category.name);
+                        allTexts.add(category.name);
                     }
-
-                    // Add all subcategory names
                     if (category.subcategories?.length > 0) {
                         category.subcategories.forEach(sub => {
                             if (sub.name && sub.name.trim() !== '') {
-                                allTextsToTranslate.add(sub.name);
+                                allTexts.add(sub.name);
                             }
                         });
                     }
                 });
 
-                // Convert Set to Array for API call
-                const uniqueTexts = Array.from(allTextsToTranslate);
-
+                const uniqueTexts = Array.from(allTexts);
                 if (uniqueTexts.length === 0) {
                     console.log('[Categories] No texts to translate');
                     return;
                 }
 
-                console.log(`[Categories] Batch translating ${uniqueTexts.length} unique texts`);
-
-                // SINGLE API CALL for all translations
-                const textsToTranslate = uniqueTexts.map(text => ({ text }));
+                // Single API call for all category and subcategory names
+                const payload = uniqueTexts.map(text => ({ text }));
                 const translatedResults = await retryTranslation(
                     () => Promise.race([
-                        translateHeaders(textsToTranslate, 'en', language),
+                        translateHeaders(payload, 'en', language),
                         new Promise((_, reject) =>
                             setTimeout(() => reject(new Error('Translation timeout')), 15000)
                         )
                     ])
                 );
 
-                // Create a mapping of original text -> translated text
                 const translationMap = {};
-                uniqueTexts.forEach((originalText, index) => {
-                    translationMap[originalText] = translatedResults[index] || originalText;
+                uniqueTexts.forEach((t, idx) => {
+                    translationMap[t] = translatedResults[idx] || t;
                 });
 
-                console.log('[Categories] Translation map created:', translationMap);
-
-                // Apply translations to all categories and subcategories
-                const updatedCategories = translatedCategories.map(category => {
-                    // Translate category name
-                    const translatedCategoryName = translationMap[category.name] || category.name;
-
-                    // Translate subcategories
-                    const translatedSubcategories = category.subcategories?.map(sub => ({
+                const updatedCategories = categoriesSource.map(category => ({
+                    ...category,
+                    name: translationMap[category.name] || category.name,
+                    subcategories: (category.subcategories || []).map(sub => ({
                         ...sub,
                         name: translationMap[sub.name] || sub.name
-                    })) || [];
-
-                    return {
-                        ...category,
-                        name: translatedCategoryName,
-                        subcategories: translatedSubcategories
-                    };
-                });
+                    }))
+                }));
 
                 setTranslatedCategories(updatedCategories);
 
-                // Cache the translated categories
                 try {
-                    localStorage.setItem(cachedCategoriesKey, JSON.stringify({
+                    localStorage.setItem(cachedKey, JSON.stringify({
                         categories: updatedCategories,
                         timestamp: Date.now(),
-                        language: language
+                        language
                     }));
                 } catch (cacheError) {
                     console.warn('Failed to cache translated categories:', cacheError);
                 }
-
-                console.log('[Categories] Batch category translation completed');
-
             } catch (error) {
                 console.error('Batch category translation error:', error);
+                // Fallback: still do a single batched call, not per-item
+                try {
+                    const categoriesSource = (sourceCategories && sourceCategories.length > 0)
+                        ? sourceCategories
+                        : (blogCategories || []);
 
-                // Fallback: try individual translations if batch fails
-                console.log('[Categories] Falling back to individual translations');
-                await fallbackIndividualTranslation();
-            }
-        };
-
-        // Fallback function for individual translations if batch fails
-        const fallbackIndividualTranslation = async () => {
-            try {
-                // 🆕 SPECIAL HANDLING FOR ENGLISH IN FALLBACK TOO
-                if (language === 'en') {
-                    console.log('[Categories] English detected in fallback, loading original categories');
-                    let originalCategories = blogCategories;
-                    if (!originalCategories || originalCategories.length === 0) {
-                        const cachedOriginal = localStorage.getItem('cachedCategories');
-                        if (cachedOriginal) {
-                            const parsed = JSON.parse(cachedOriginal);
-                            originalCategories = parsed.categories;
+                    const allTexts = [];
+                    categoriesSource.forEach(category => {
+                        if (category.name && category.name.trim() !== '' && category.name !== 'Home') {
+                            allTexts.push(category.name);
                         }
-                    }
-                    if (originalCategories && originalCategories.length > 0) {
-                        setTranslatedCategories(originalCategories);
-                    }
-                    return;
-                }
-
-                const translationPromises = translatedCategories.map(async (category) => {
-                    try {
-                        // Translate category name
-                        const [translatedName] = await retryTranslation(
-                            () => translateHeaders([{ text: category.name }], 'en', language)
-                        );
-
-                        // Translate subcategories if they exist
-                        let translatedSubcategories = category.subcategories;
                         if (category.subcategories?.length > 0) {
-                            const subTranslationPromises = category.subcategories.map(async (sub) => {
-                                try {
-                                    const [translatedSubName] = await retryTranslation(
-                                        () => translateHeaders([{ text: sub.name }], 'en', language)
-                                    );
-                                    return { ...sub, name: translatedSubName || sub.name };
-                                } catch (error) {
-                                    console.warn(`Failed to translate subcategory "${sub.name}":`, error);
-                                    return sub;
+                            category.subcategories.forEach(sub => {
+                                if (sub.name && sub.name.trim() !== '') {
+                                    allTexts.push(sub.name);
                                 }
                             });
-
-                            translatedSubcategories = await Promise.all(subTranslationPromises);
                         }
+                    });
 
-                        return {
-                            ...category,
-                            name: translatedName || category.name,
-                            subcategories: translatedSubcategories
-                        };
-                    } catch (error) {
-                        console.warn(`Failed to translate category "${category.name}":`, error);
-                        return category;
-                    }
-                });
+                    const uniqueTexts = Array.from(new Set(allTexts));
+                    if (uniqueTexts.length === 0) return;
 
-                const translated = await Promise.all(translationPromises);
-                setTranslatedCategories(translated);
+                    const translatedResults = await retryTranslation(
+                        () => translateHeaders(uniqueTexts.map(text => ({ text })), 'en', language)
+                    );
 
-            } catch (fallbackError) {
-                console.error('Fallback translation also failed:', fallbackError);
+                    const translationMap = {};
+                    uniqueTexts.forEach((t, idx) => {
+                        translationMap[t] = translatedResults[idx] || t;
+                    });
+
+                    const updatedCategories = categoriesSource.map(category => ({
+                        ...category,
+                        name: translationMap[category.name] || category.name,
+                        subcategories: (category.subcategories || []).map(sub => ({
+                            ...sub,
+                            name: translationMap[sub.name] || sub.name
+                        }))
+                    }));
+
+                    setTranslatedCategories(updatedCategories);
+                } catch (fallbackError) {
+                    console.error('Fallback translation also failed:', fallbackError);
+                }
+            } finally {
+                isTranslatingCategoriesRef.current = false;
+                lastCategoriesLangRef.current = language;
             }
         };
 
-        if (isUserChangingLanguage && pendingLanguage) {
-            translateCategories();
+        const schedule = () => {
+            if (translateCategoriesTimeoutRef.current) {
+                clearTimeout(translateCategoriesTimeoutRef.current);
+            }
+            translateCategoriesTimeoutRef.current = setTimeout(() => {
+                if (!isTranslatingCategoriesRef.current) {
+                    doTranslateCategories();
+                }
+            }, 150);
+        };
+
+        if (isUserChangingLanguage && pendingLanguage && categoriesLoaded) {
+            schedule();
         }
-    }, [language, isUserChangingLanguage, pendingLanguage, categoriesLoaded, translatedCategories, translateHeaders, blogCategories]);
+
+        return () => {
+            if (translateCategoriesTimeoutRef.current) {
+                clearTimeout(translateCategoriesTimeoutRef.current);
+            }
+        };
+    }, [language, isUserChangingLanguage, pendingLanguage, categoriesLoaded, sourceCategories, blogCategories, translateHeaders]);
 
 
     // NEW: Load translations on component mount
@@ -1058,162 +1123,36 @@ function HeaderThree({ animationStage, languageValidation }) {
 
 
     // Separate translation logic into its own function
-    // OPTIMIZED: Improved translation function with better error handling
-    // OPTIMIZED: Improved translation function with retry mechanism
+    // OPTIMIZED: Improved translation function to only translate categories, not header labels
     const translateContent = async (selectedLanguage) => {
         try {
             console.log('[Translate] start', { selectedLanguage });
             setIsTranslating(true);
 
+            // Resolve header labels via bettingOds.json, fallback batch translateText
+            await translateHeaderLabels(selectedLanguage);
 
-            // 🆕 SPECIAL HANDLING FOR ENGLISH
-            if (selectedLanguage === 'en') {
-                console.log('[Translate] English selected, resetting to original texts');
-
-                // Reset to original English texts
-                const originalTranslations = {
-                    home: 'Home',
-                    apps: 'Best Betting Apps',
-                    news: 'News',
-                    schedule: 'Match Schedules',
-                    cricket: 'Cricket',
-                    football: 'Football',
-                    contact: 'Contact Us',
-                    language: 'Language',
-                    sport: 'Sport'
-                };
-
-                setTranslatedText(originalTranslations);
-
-                // Cache the English translations
-                try {
-                    const cacheData = {
-                        language: selectedLanguage,
-                        translations: originalTranslations,
-                        timestamp: Date.now()
-                    };
-                    localStorage.setItem(`cachedTranslations_${selectedLanguage}`, JSON.stringify(cacheData));
-                } catch (cacheError) {
-                    console.warn('Failed to cache English translations:', cacheError);
-                }
-
-                return; // Exit early for English
-            }
-
-            // Check if we already have cached translations for this language
+            // Keep categories translation logic separate (no change)
+            console.log('[Translate] Header labels resolved; categories translation unchanged.');
+            
+            // Keep current header labels (or previously cached) without API calls
             const cachedTranslationsKey = `cachedTranslations_${selectedLanguage}`;
             const cached = localStorage.getItem(cachedTranslationsKey);
-
             if (cached) {
                 try {
                     const parsed = JSON.parse(cached);
-                    // Use cache if it's less than 1 hour old
                     if (Date.now() - parsed.timestamp < 60 * 60 * 1000) {
-                        console.log('[Translate] Using cached translations');
                         setTranslatedText(prev => ({
                             ...prev,
                             ...parsed.translations
                         }));
-                        return; // Exit early if we have valid cache
                     }
                 } catch (e) {
                     console.warn('Failed to parse cached translations:', e);
                 }
             }
-
-            // Batch all translation requests together for better performance
-            const translationTexts = [
-                'Home',
-                'Best Betting Apps',
-                'News',
-                'Match Schedules',
-                'Cricket',
-                'Football',
-                'Contact',
-                // 'Language',
-                // 'Sport'
-            ];
-
-            // Single API call for all translations with timeout and retry
-            const textsToTranslate = translationTexts.map(text => ({ text }));
-
-            try {
-                // Use retry mechanism for the main translation call
-                const translatedResults = await retryTranslation(
-                    () => Promise.race([
-                        translateHeaders(textsToTranslate, 'en', selectedLanguage),
-                        new Promise((_, reject) =>
-                            setTimeout(() => reject(new Error('Translation timeout')), 10000)
-                        )
-                    ])
-                );
-
-                // Map results to translation keys
-                const translations = {
-                    home: translatedResults[0] || 'Home',
-                    apps: translatedResults[1] || 'Best Betting Apps',
-                    news: translatedResults[2] || 'News',
-                    schedule: translatedResults[3] || 'Match Schedules',
-                    cricket: translatedResults[4] || 'Cricket',
-                    football: translatedResults[5] || 'Football',
-                    contact: translatedResults[6] || 'Contact',
-                    // language: translatedResults[7] || 'Language',
-                    // sport: translatedResults[8] || 'Sport'
-                };
-
-                console.log('[Translate] translations fetched', { selectedLanguage, translations });
-
-                // Update state with all translations
-                setTranslatedText(prev => ({
-                    ...prev,
-                    ...translations
-                }));
-
-                // Cache translations in localStorage with timestamp
-                const cacheData = {
-                    language: selectedLanguage,
-                    translations: translations,
-                    timestamp: Date.now()
-                };
-                localStorage.setItem(cachedTranslationsKey, JSON.stringify(cacheData));
-
-                console.log('[Translate] state updated and cached', { selectedLanguage });
-
-            } catch (apiError) {
-                console.error('Translation API error:', apiError);
-                throw apiError; // Re-throw to be caught by outer catch
-            }
-
         } catch (error) {
             console.error('Translation error:', error);
-
-            // Fallback strategies
-            try {
-                // Try to get any cached translation for this language
-                const cachedTranslationsKey = `cachedTranslations_${selectedLanguage}`;
-                const cached = localStorage.getItem(cachedTranslationsKey);
-
-                if (cached) {
-                    const parsed = JSON.parse(cached);
-                    console.log('[Translate] Using fallback cached translations');
-                    setTranslatedText(prev => ({ ...prev, ...parsed.translations }));
-                } else {
-                    // If no cache, try to get from general cache
-                    const generalCache = localStorage.getItem('cachedTranslations');
-                    if (generalCache) {
-                        const parsed = JSON.parse(generalCache);
-                        if (parsed.language === selectedLanguage) {
-                            console.log('[Translate] Using general cached translations');
-                            setTranslatedText(prev => ({ ...prev, ...parsed.translations }));
-                        }
-                    } else {
-                        // Last resort: keep current translations but mark as failed
-                        console.warn('[Translate] No fallback translations available');
-                    }
-                }
-            } catch (fallbackError) {
-                console.warn('Fallback translation failed:', fallbackError);
-            }
         } finally {
             setIsTranslating(false);
             console.log('[Translate] end', { selectedLanguage });

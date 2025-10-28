@@ -1,0 +1,226 @@
+[
+    {
+        "hreflang": "en",
+        "translatedText": {
+            "matchSchedule": "Match Schedule",
+            "selectDate": "Select a date to view matches",
+            "loadingTimezone": "Loading timezone...",
+            "loadingMatches": "Loading matches...",
+            "noMatches": "No matches found for the selected date and league",
+            "allLeagues": "All Leagues",
+            "loadingDates": "Loading dates...",
+            "vs": "VS",
+            "upcoming": "upcoming"
+        }
+    },
+    {
+        "hreflang": "de",
+        "translatedText": {
+            "matchSchedule": "Spielplan",
+            "selectDate": "Wählen Sie ein Datum, um Spiele anzuzeigen",
+            "loadingTimezone": "Zeitzone wird geladen...",
+            "loadingMatches": "Spiele werden geladen...",
+            "noMatches": "Keine Spiele für das ausgewählte Datum und die Liga gefunden",
+            "allLeagues": "Alle Ligen",
+            "loadingDates": "Daten werden geladen...",
+            "vs": "GEGEN",
+            "upcoming": "bevorstehend"
+        }
+    },
+    {
+        "hreflang": "es",
+        "translatedText": {
+            "matchSchedule": "Calendario de Partidos",
+            "selectDate": "Seleccione una fecha para ver partidos",
+            "loadingTimezone": "Cargando zona horaria...",
+            "loadingMatches": "Cargando partidos...",
+            "noMatches": "No se encontraron partidos para la fecha y liga seleccionadas",
+            "allLeagues": "Todas las Ligas",
+            "loadingDates": "Cargando fechas...",
+            "vs": "VS",
+            "upcoming": "próximos"
+        }
+    },
+    {
+        "hreflang": "fr",
+        "translatedText": {
+            "matchSchedule": "Calendrier des Matchs",
+            "selectDate": "Sélectionnez une date pour voir les matchs",
+            "loadingTimezone": "Chargement du fuseau horaire...",
+            "loadingMatches": "Chargement des matchs...",
+            "noMatches": "Aucun match trouvé pour la date et la ligue sélectionnées",
+            "allLeagues": "Toutes les Ligues",
+            "loadingDates": "Chargement des dates...",
+            "vs": "CONTRE",
+            "upcoming": "à venir"
+        }
+    },
+    {
+        "hreflang": "pt",
+        "translatedText": {
+            "matchSchedule": "Calendário de Partidas",
+            "selectDate": "Selecione uma data para ver partidas",
+            "loadingTimezone": "Carregando fuso horário...",
+            "loadingMatches": "Carregando partidas...",
+            "noMatches": "Nenhuma partida encontrada para a data e liga selecionadas",
+            "allLeagues": "Todas as Ligas",
+            "loadingDates": "Carregando datas...",
+            "vs": "VS",
+            "upcoming": "próximos"
+        }
+    },
+    {
+        "hreflang": "it",
+        "translatedText": {
+            "matchSchedule": "Calendario Partite",
+            "selectDate": "Seleziona una data per visualizzare le partite",
+            "loadingTimezone": "Caricamento fuso orario...",
+            "loadingMatches": "Caricamento partite...",
+            "noMatches": "Nessuna partita trovata per la data e il campionato selezionati",
+            "allLeagues": "Tutti i Campionati",
+            "loadingDates": "Caricamento date...",
+            "vs": "CONTRO",
+            "upcoming": "in arrivo"
+        }
+    },
+    {
+        "hreflang": "el",
+        "translatedText": {
+            "matchSchedule": "Πρόγραμμα Αγώνων",
+            "selectDate": "Επιλέξτε ημερομηνία για να δείτε αγώνες",
+            "loadingTimezone": "Φόρτωση ζώνης ώρας...",
+            "loadingMatches": "Φόρτωση αγώνων...",
+            "noMatches": "Δεν βρέθηκαν αγώνες για την επιλεγμένη ημερομηνία και κατηγορία",
+            "allLeagues": "Όλες οι Κατηγορίες",
+            "loadingDates": "Φόρτωση ημερομηνιών...",
+            "vs": "ΕΝΑΝΤΙ",
+            "upcoming": "επερχόμενος"
+        }
+    },
+    {
+        "hreflang": "hu",
+        "translatedText": {
+            "matchSchedule": "Mérkőzés Menetrend",
+            "selectDate": "Válasszon dátumot a mérkőzések megtekintéséhez",
+            "loadingTimezone": "Időzóna betöltése...",
+            "loadingMatches": "Mérkőzések betöltése...",
+            "noMatches": "Nem található mérkőzés a kiválasztott dátumra és ligára",
+            "allLeagues": "Minden Liga",
+            "loadingDates": "Dátumok betöltése...",
+            "vs": "ELLEN",
+            "upcoming": "következő"
+        }
+    },
+    {
+        "hreflang": "ar",
+        "translatedText": {
+            "matchSchedule": "جدول المباريات",
+            "selectDate": "حدد تاريخًا لعرض المباريات",
+            "loadingTimezone": "جاري تحميل المنطقة الزمنية...",
+            "loadingMatches": "جاري تحميل المباريات...",
+            "noMatches": "لم يتم العثور على مباريات للتاريخ والدوري المحددين",
+            "allLeagues": "جميع الدوريات",
+            "loadingDates": "جاري تحميل التواريخ...",
+            "vs": "مقابل",
+            "upcoming": "القادم"
+        }
+    },
+    {
+        "hreflang": "hi",
+        "translatedText": {
+            "matchSchedule": "मैच शेड्यूल",
+            "selectDate": "मैच देखने के लिए एक तारीख चुनें",
+            "loadingTimezone": "समय क्षेत्र लोड हो रहा है...",
+            "loadingMatches": "मैच लोड हो रहे हैं...",
+            "noMatches": "चयनित तारीख और लीग के लिए कोई मैच नहीं मिला",
+            "allLeagues": "सभी लीग",
+            "loadingDates": "तारीखें लोड हो रही हैं...",
+            "vs": "बनाम",
+            "upcoming": "आगामी"
+        }
+    },
+    {
+        "hreflang": "zh",
+        "translatedText": {
+            "matchSchedule": "比赛日程",
+            "selectDate": "选择日期查看比赛",
+            "loadingTimezone": "加载时区...",
+            "loadingMatches": "加载比赛...",
+            "noMatches": "未找到所选日期和联赛的比赛",
+            "allLeagues": "所有联赛",
+            "loadingDates": "加载日期...",
+            "vs": "对阵",
+            "upcoming": "即将开始"
+        }
+    },
+    {
+        "hreflang": "ja",
+        "translatedText": {
+            "matchSchedule": "試合スケジュール",
+            "selectDate": "試合を表示する日付を選択",
+            "loadingTimezone": "タイムゾーンを読み込み中...",
+            "loadingMatches": "試合を読み込み中...",
+            "noMatches": "選択した日付とリーグに試合が見つかりません",
+            "allLeagues": "すべてのリーグ",
+            "loadingDates": "日付を読み込み中...",
+            "vs": "対",
+            "upcoming": "今後の"
+        }
+    },
+    {
+        "hreflang": "ru",
+        "translatedText": {
+            "matchSchedule": "Расписание Матчей",
+            "selectDate": "Выберите дату для просмотра матчей",
+            "loadingTimezone": "Загрузка часового пояса...",
+            "loadingMatches": "Загрузка матчей...",
+            "noMatches": "Матчи не найдены для выбранной даты и лиги",
+            "allLeagues": "Все Лиги",
+            "loadingDates": "Загрузка дат...",
+            "vs": "ПРОТИВ",
+            "upcoming": "предстоящий"
+        }
+    },
+    {
+        "hreflang": "tr",
+        "translatedText": {
+            "matchSchedule": "Maç Programı",
+            "selectDate": "Maçları görüntülemek için bir tarih seçin",
+            "loadingTimezone": "Saat dilimi yükleniyor...",
+            "loadingMatches": "Maçlar yükleniyor...",
+            "noMatches": "Seçilen tarih ve lig için maç bulunamadı",
+            "allLeagues": "Tüm Ligler",
+            "loadingDates": "Tarihler yükleniyor...",
+            "vs": "KARŞI",
+            "upcoming": "yaklaşan"
+        }
+    },
+    {
+        "hreflang": "nl",
+        "translatedText": {
+            "matchSchedule": "Wedstrijdschema",
+            "selectDate": "Selecteer een datum om wedstrijden te bekijken",
+            "loadingTimezone": "Tijdzone laden...",
+            "loadingMatches": "Wedstrijden laden...",
+            "noMatches": "Geen wedstrijden gevonden voor de geselecteerde datum en competitie",
+            "allLeagues": "Alle Competities",
+            "loadingDates": "Data laden...",
+            "vs": "TEGEN",
+            "upcoming": "aankomend"
+        }
+    },
+    {
+        "hreflang": "pl",
+        "translatedText": {
+            "matchSchedule": "Harmonogram Meczów",
+            "selectDate": "Wybierz datę, aby zobaczyć mecze",
+            "loadingTimezone": "Ładowanie strefy czasowej...",
+            "loadingMatches": "Ładowanie meczów...",
+            "noMatches": "Nie znaleziono meczów dla wybranej daty i ligi",
+            "allLeagues": "Wszystkie Ligi",
+            "loadingDates": "Ładowanie dat...",
+            "vs": "PRZECIW",
+            "upcoming": "nadchodzący"
+        }
+    }
+]

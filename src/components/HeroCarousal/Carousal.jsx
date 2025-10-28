@@ -38,14 +38,14 @@ export default function HeroCarousal() {
   useEffect(() => {
     // Skip fetching if we don't have a valid countryCode yet
     if (!countryCode?.location?.id) return;
-    
+
     const fetchBanners = async () => {
       try {
         // Only show loading state on first load
         if (!hasLoaded) {
           setIsLoading(true);
         }
-        
+
         const url = new URL('https://admin.sportsbuz.com/api/banners');
         url.searchParams.append('country_code', countryCode.location.id);
 
@@ -53,10 +53,10 @@ export default function HeroCarousal() {
         const data = await res.json();
         const countryWiseBanner = data.filter(b => b.location === countryCode.location.id);
         const activeBanners = countryWiseBanner.filter(b => b.is_active === 'Active');
-        
+
         // Update banners
         setBanners(activeBanners.sort((a, b) => a.order_by - b.order_by));
-        
+
         // Mark that we've successfully loaded data at least once
         setHasLoaded(true);
       } catch (error) {
@@ -102,42 +102,46 @@ export default function HeroCarousal() {
   };
 
   return (
-    <div className={styles.carouselWrapper} style={{ marginTop: '20px' }}>
-      <Swiper
-        ref={swiperRef}
-        modules={[Autoplay, Navigation, Pagination]}
-        autoplay={banners.length > 1 ? {
-          delay: 4000,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: false,
-        } : false} // Only enable autoplay if more than 1 banner
-        loop={banners.length > 1} // Only enable loop if more than 1 banner
-        pagination={{ clickable: true }}
-        className={styles.swiperContainer}
-        onSwiper={(swiper) => {
-          // Ensure autoplay starts after swiper is initialized
-          setTimeout(() => {
-            handleAutoplayStart(swiper);
-          }, 100);
-        }}
-        onAfterInit={(swiper) => {
-          // Additional fallback to start autoplay
-          handleAutoplayStart(swiper);
-        }}
-      >
-        {banners.map((banner, index) => (
-          <SwiperSlide key={banner.id}>
-            <a href={banner.url} target="_blank" rel="noopener noreferrer">
-              <img
-                src={isMobile ? banner.mobile_image : banner.image}
-                className={styles.slideImage}
-                alt={`Banner ${index + 1}`}
-                loading={index === 0 ? 'eager' : 'lazy'} 
-              />
-            </a>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
+    <>
+      {banners.length > 0 &&
+        <div className={styles.carouselWrapper} style={{ marginTop: '20px' }}>
+          <Swiper
+            ref={swiperRef}
+            modules={[Autoplay, Navigation, Pagination]}
+            autoplay={banners.length > 1 ? {
+              delay: 4000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: false,
+            } : false} // Only enable autoplay if more than 1 banner
+            loop={banners.length > 1} // Only enable loop if more than 1 banner
+            pagination={{ clickable: true }}
+            className={styles.swiperContainer}
+            onSwiper={(swiper) => {
+              // Ensure autoplay starts after swiper is initialized
+              setTimeout(() => {
+                handleAutoplayStart(swiper);
+              }, 100);
+            }}
+            onAfterInit={(swiper) => {
+              // Additional fallback to start autoplay
+              handleAutoplayStart(swiper);
+            }}
+          >
+            {banners.map((banner, index) => (
+              <SwiperSlide key={banner.id}>
+                <a href={banner.url} target="_blank" rel="noopener noreferrer">
+                  <img
+                    src={isMobile ? banner.mobile_image : banner.image}
+                    className={styles.slideImage}
+                    alt={`Banner ${index + 1}`}
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                  />
+                </a>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>}
+    </>
+
   );
 }

@@ -6,6 +6,7 @@ import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/navigation';
 import { matchCards } from '../OddsMultiply/matchesData';
 import { useDynamicRouter } from '@/hooks/useDynamicRouter';
+import matchSchedulerTranslations from './matchScheduler.json';
 
 // Spinner Loader Component
 const Spinner = ({ size = 'medium', text = 'Loading...' }) => {
@@ -86,35 +87,71 @@ export default function MatchScheduler() {
         upcoming: 'upcoming'
     });
 
+    // Define defaults for consistent key mapping
+    const defaultLabels = {
+        matchSchedule: 'Match Schedule',
+        selectDate: 'Select a date to view matches',
+        loadingTimezone: 'Loading timezone...',
+        loadingMatches: 'Loading matches...',
+        noMatches: 'No matches found for the selected date and league',
+        allLeagues: 'All Leagues',
+        loadingDates: 'Loading dates...',
+        vs: 'VS',
+        upcoming: 'upcoming'
+    };
+
     // Update the translation useEffect
     useEffect(() => {
         const translateLabels = async () => {
             try {
-                // Translate each text individually
-                const translations = {
-                    matchSchedule: await translateText('Match Schedule', 'en', language),
-                    selectDate: await translateText('Select a date to view matches', 'en', language),
-                    loadingTimezone: await translateText('Loading timezone...', 'en', language),
-                    loadingMatches: await translateText('Loading matches...', 'en', language),
-                    noMatches: await translateText('No matches found for the selected date and league', 'en', language),
-                    allLeagues: await translateText('All Leagues', 'en', language),
-                    loadingDates: await translateText('Loading dates...', 'en', language),
-                    vs: await translateText('VS', 'en', language),
-                    upcoming: await translateText('upcoming', 'en', language)
-                };
+                // Short-circuit English
+                if (language === 'en') {
+                    setTranslatedText({ ...defaultLabels });
+                    localStorage.setItem('matchSchedulerTranslations', JSON.stringify({
+                        language,
+                        translations: { ...defaultLabels }
+                    }));
+                    return;
+                }
 
-                // Update translations in state
+                const languageData = matchSchedulerTranslations.find(item => item.hreflang === language);
+                const keys = Object.keys(defaultLabels);
+
+                // Determine missing keys to translate via API
+                const keysToTranslate = keys.filter(
+                    key => !(languageData && languageData.translatedText && typeof languageData.translatedText[key] === 'string' && languageData.translatedText[key].trim() !== '')
+                );
+
+                // Batch translate only missing keys
+                const textsToTranslate = keysToTranslate.map(key => defaultLabels[key]);
+                let translatedResults = [];
+                if (textsToTranslate.length > 0) {
+                    translatedResults = await translateText(textsToTranslate, 'en', language);
+                }
+
+                // Merge final results
+                const finalTranslations = {};
+                let idx = 0;
+                for (const key of keys) {
+                    if (languageData && languageData.translatedText && languageData.translatedText[key]) {
+                        finalTranslations[key] = languageData.translatedText[key];
+                    } else if (keysToTranslate.includes(key)) {
+                        finalTranslations[key] = translatedResults[idx] || defaultLabels[key];
+                        idx += 1;
+                    } else {
+                        finalTranslations[key] = defaultLabels[key];
+                    }
+                }
+
                 setTranslatedText(prev => ({
                     ...prev,
-                    ...translations
+                    ...finalTranslations
                 }));
 
-                // Cache translations
                 localStorage.setItem('matchSchedulerTranslations', JSON.stringify({
-                    language: language,
-                    translations: translations
+                    language,
+                    translations: finalTranslations
                 }));
-
             } catch (error) {
                 console.error('Error translating match scheduler labels:', error);
             }
@@ -131,7 +168,6 @@ export default function MatchScheduler() {
                         ...parsed.translations
                     }));
                 } else {
-                    // Language changed, update translations
                     translateLabels();
                 }
             } catch (error) {
@@ -267,6 +303,23 @@ export default function MatchScheduler() {
 
     const matchData = transformMatchData();
 
+    // Auto-select first league with matches for the current date
+    useEffect(() => {
+        const comps = selectedDate ? (matchData[selectedDate] || []) : [];
+        if (activeLeague === '' && comps.length > 0) {
+            const firstValid = comps.find(
+                c => Array.isArray(c.matches) && c.matches.length > 0 && c.competition
+            );
+            if (firstValid) {
+                setActiveLeague(firstValid.competition);
+            }
+        } else if (activeLeague && !comps.some(c => c.competition === activeLeague)) {
+            const firstValid = comps.find(
+                c => Array.isArray(c.matches) && c.matches.length > 0 && c.competition
+            );
+            setActiveLeague(firstValid ? firstValid.competition : '');
+        }
+    }, [selectedDate, matchData]);
     const displayMatches = useCallback((date) => {
         if (!date) return [];
         let matches = matchData[date] || [];

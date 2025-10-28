@@ -1,0 +1,181 @@
+[
+    {
+        "hreflang": "en",
+        "translatedText": {
+            "home": "Home",
+            "apps": "Best Betting Apps",
+            "news": "News",
+            "schedule": "Match Schedules",
+            "cricket": "Cricket",
+            "football": "Football",
+            "contact": "Contact Us",
+            "language": "Language",
+            "sport": "Sport"
+        }
+    },
+    {
+        "hreflang": "de",
+        "translatedText": {
+            "home": "Startseite",
+            "apps": "Beste Wett-Apps",
+            "schedule": "Spielpläne",
+            "contact": "Kontaktieren Sie uns",
+            "language": "Sprache",
+            "sport": "Sport"
+        }
+    },
+    {
+        "hreflang": "es",
+        "translatedText": {
+            "home": "Inicio",
+            "apps": "Mejores Apps de Apuestas",
+            "schedule": "Calendarios de Partidos",
+            "contact": "Contáctenos",
+            "language": "Idioma",
+            "sport": "Deporte"
+        }
+    },
+    {
+        "hreflang": "fr",
+        "translatedText": {
+            "home": "Accueil",
+            "apps": "Meilleures Applications de Paris",
+            "schedule": "Calendriers des Matchs",
+            "contact": "Contactez-nous",
+            "language": "Langue",
+            "sport": "Sport"
+        }
+    },
+    {
+        "hreflang": "pt",
+        "translatedText": {
+            "home": "Início",
+            "apps": "Melhores Apps de Apostas",
+            "schedule": "Calendários de Partidas",
+            "contact": "Contate-nos",
+            "language": "Idioma",
+            "sport": "Esporte"
+        }
+    },
+    {
+        "hreflang": "it",
+        "translatedText": {
+            "home": "Home",
+            "apps": "Migliori App di Scommesse",
+            "schedule": "Calendari Partite",
+            "contact": "Contattaci",
+            "language": "Lingua",
+            "sport": "Sport"
+        }
+    },
+    {
+        "hreflang": "el",
+        "translatedText": {
+            "home": "Αρχική",
+            "apps": "Καλύτερες Εφαρμογές Στοιχήματος",
+            "schedule": "Πρόγραμμα Αγώνων",
+            "contact": "Επικοινωνήστε μαζί μας",
+            "language": "Γλώσσα",
+            "sport": "Άθλημα"
+        }
+    },
+    {
+        "hreflang": "hu",
+        "translatedText": {
+            "home": "Főoldal",
+            "apps": "Legjobb Fogadási Alkalmazások",
+            "schedule": "Mérkőzés Menetrendek",
+            "contact": "Lépjen kapcsolatba velünk",
+            "language": "Nyelv",
+            "sport": "Sport"
+        }
+    },
+    {
+        "hreflang": "ar",
+        "translatedText": {
+            "home": "الصفحة الرئيسية",
+            "apps": "أفضل تطبيقات الرهان",
+            "schedule": "جداول المباريات",
+            "contact": "اتصل بنا",
+            "language": "اللغة",
+            "sport": "رياضة"
+        }
+    },
+    {
+        "hreflang": "hi",
+        "translatedText": {
+            "home": "होम",
+            "apps": "सर्वश्रेष्ठ सट्टेबाजी ऐप्स",
+            "schedule": "मैच शेड्यूल",
+            "contact": "संपर्क करें",
+            "language": "भाषा",
+            "sport": "खेल"
+        }
+    },
+    {
+        "hreflang": "zh",
+        "translatedText": {
+            "home": "首页",
+            "apps": "最佳投注应用",
+            "schedule": "比赛赛程",
+            "contact": "联系我们",
+            "language": "语言",
+            "sport": "体育"
+        }
+    },
+    {
+        "hreflang": "ja",
+        "translatedText": {
+            "home": "ホーム",
+            "apps": "ベストベッティングアプリ",
+            "schedule": "試合スケジュール",
+            "contact": "お問い合わせ",
+            "language": "言語",
+            "sport": "スポーツ"
+        }
+    },
+    {
+        "hreflang": "ru",
+        "translatedText": {
+            "home": "Главная",
+            "apps": "Лучшие приложения для ставок",
+            "schedule": "Расписания матчей",
+            "contact": "Свяжитесь с нами",
+            "language": "Язык",
+            "sport": "Спорт"
+        }
+    },
+    {
+        "hreflang": "tr",
+        "translatedText": {
+            "home": "Ana Sayfa",
+            "apps": "En İyi Bahis Uygulamaları",
+            "schedule": "Maç Programları",
+            "contact": "Bize Ulaşın",
+            "language": "Dil",
+            "sport": "Spor"
+        }
+    },
+    {
+        "hreflang": "nl",
+        "translatedText": {
+            "home": "Home",
+            "apps": "Beste Weddenschap Apps",
+            "schedule": "Wedstrijd Roosters",
+            "contact": "Neem contact op",
+            "language": "Taal",
+            "sport": "Sport"
+        }
+    },
+    {
+        "hreflang": "pl",
+        "translatedText": {
+            "home": "Strona główna",
+            "apps": "Najlepsze Aplikacje do Zakładów",
+            "schedule": "Harmonogramy Meczów",
+            "contact": "Skontaktuj się z nami",
+            "language": "Język",
+            "sport": "Sport"
+        }
+    }
+]

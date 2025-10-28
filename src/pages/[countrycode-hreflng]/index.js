@@ -260,7 +260,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                                                 <NewsList />
                                             </div>
                                         )}
-                                        {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
+
                                     </div>
                                     <div className={styles.centerSplit}>
                                         <BlogSection blogs={blogs} />
@@ -287,6 +287,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                                 )}
 
                                 <SportsOdsMegaPari />
+                                {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
                             </div>
                         </div>
                     </div>
