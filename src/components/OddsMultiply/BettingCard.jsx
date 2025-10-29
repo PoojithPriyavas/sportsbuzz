@@ -507,6 +507,7 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
     };
 
     const potentialClick = () => {
+        console.log("potential click is being called");
         window.open('https://moy.auraodin.com/redirect.aspx?pid=145116&lpid=17&bid=1484', '_blank');
 
         setTimeout(() => {
@@ -635,8 +636,12 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                         </div>
 
                         {betAmount && parseFloat(betAmount) > 0 && (
-                            <div className={styles.potentialWin} style={{ cursor: 'pointer' }}>
-                                <div className={styles.potentialWinLabel} onClick={() => potentialClick()}>
+                            <div
+                                className={styles.potentialWin}
+                                style={{ cursor: 'pointer', zIndex: '1000' }}
+                                onClick={potentialClick}
+                            >
+                                <div className={styles.potentialWinLabel}>
                                     {translatedText.potentialWinnings}
                                 </div>
                                 <div className={styles.potentialWinAmount}>₹{win}</div>
