@@ -163,7 +163,7 @@
 .description > ol > li {
   counter-increment: faq-counter;
   margin-bottom: 1.5rem;
-    padding: 1.25rem 1rem 1.25rem 3rem;
+    padding: 1.25rem 1rem 1.25rem 4rem;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -490,7 +490,7 @@
 
 @media (max-width: 768px) {
   .blogContent {
-    padding: 1rem 0.75rem;
+    padding: 0rem;
   }
 
   .description {
@@ -543,7 +543,7 @@
 
 @media (max-width: 480px) {
   .blogContent {
-    padding: 0.75rem 0.5rem;
+    padding: 0rem;
   }
 
   .title {

@@ -17,7 +17,7 @@
 
 .blogContent {
   color: black;
-  padding: 1rem;
+  /* padding: 1rem; */
 }
 
 :global(.dark-theme) .blogContent {

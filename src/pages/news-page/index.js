@@ -66,7 +66,7 @@ export default function NewsData() {
             <HeaderTwo animationStage={animationStage} />
             <div className='container'>
                 {/* <LiveScores /> */}
-                <BlogsPage blogs={blogs} />
+                {/* <BlogsPage blogs={blogs} /> */}
             </div>
             <FooterTwo />
         </>

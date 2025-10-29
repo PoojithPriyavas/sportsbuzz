@@ -148,7 +148,7 @@ export default function ContactUs({ countryDataHome, locationDataHome, resolvedU
       {/* <TestHeader /> */}
 
       <Hero countryCode={countryDataHome} />
-      <div className='container'>
+      <div >
         {/* <LiveScores /> */}
         {/* <TestLive /> */}
 

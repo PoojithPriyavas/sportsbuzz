@@ -208,7 +208,7 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
             <HeaderThree animationStage={animationStage} />
 
             {/* HeaderThree moved to CountryLayout */}
-            <div className='container'>
+            <div className='container'  style={{ paddingRight: '0rem', paddingLeft: '0rem' }}>
                 {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
                     <>

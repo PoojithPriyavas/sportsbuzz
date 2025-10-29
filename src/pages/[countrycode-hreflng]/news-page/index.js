@@ -134,7 +134,7 @@ export default function NewsData({ countryDataHome, locationDataHome, resolvedUr
             {/* Removed inline HeaderThree; now provided by CountryLayout */}
             <div className='container'>
                 {/* <LiveScores /> */}
-                <BlogsPage blogs={blogs} />
+                {/* <BlogsPage blogs={blogs} /> */}
             </div>
             {/* Removed inline FooterTwo; now provided by CountryLayout */}
         </>

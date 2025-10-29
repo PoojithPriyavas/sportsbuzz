@@ -739,7 +739,7 @@
 /* Medium Tablets */
 @media (max-width: 768px) {
   .wrapper {
-    padding: 0 10px;
+    /* padding: 0 10px; */
   }
   
   /* Hide desktop table, show mobile cards */

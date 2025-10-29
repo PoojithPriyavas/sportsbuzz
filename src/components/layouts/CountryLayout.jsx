@@ -9,7 +9,7 @@ export default function CountryLayout({ children }) {
   return (
     <>
       <HeaderThree />
-      <main className="container">
+      <main >
         {children}
       </main>
       <FooterTwo countryCode={countryCode} />

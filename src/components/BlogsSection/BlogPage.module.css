@@ -137,12 +137,15 @@
   background: linear-gradient(135deg, #f8f9fa, #e9ecef);
   border-radius: clamp(20px, 5vw, 25px);
   padding: clamp(0.3rem, 1.5vw, 0.5rem) clamp(0.8rem, 2.5vw, 1.2rem);
-  width: clamp(200px, 30vw, 350px); /* Set max-width with clamp */
+  width: clamp(200px, 30vw, 350px);
+  /* Set max-width with clamp */
   height: clamp(40px, 10vw, 48px);
   border: 2px solid transparent;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
+
+  padding-right: 7px !important;
 }
 
 :global(.dark-theme) .searchWrapper {
@@ -164,8 +167,9 @@
 
 .searchIcon {
   font-size: clamp(0.8rem, 2vw, 1rem);
-  color: #6c757d;
-  margin-right: clamp(0.5rem, 1.5vw, 0.8rem);
+  /* color: #6c757d; */
+  color: #fffffff0;
+  /* margin-right: clamp(0.5rem, 1.5vw, 0.8rem); */
   flex-shrink: 0;
   transition: color 0.3s ease;
 }
@@ -180,7 +184,8 @@
   background: transparent;
   font-size: clamp(0.85rem, 2.2vw, 1rem);
   flex: 1;
-  min-width: 0; /* Important for preventing overflow */
+  min-width: 0;
+  /* Important for preventing overflow */
   color: #333;
   transition: color 0.3s ease;
 }
@@ -206,12 +211,12 @@
     align-items: stretch;
     gap: 0.75rem;
   }
-  
+
   .rightControls {
     justify-content: space-between;
     width: 100%;
   }
-  
+
   .searchWrapper {
     width: clamp(150px, 50vw, 250px);
   }
@@ -221,25 +226,25 @@
   .controls {
     gap: 0.5rem;
   }
-  
+
   .rightControls {
     flex-direction: column;
     align-items: stretch;
     gap: 0.5rem;
   }
-  
+
   .clearFilterButton {
     padding: 0.5rem 0.75rem;
     font-size: 0.8rem;
     align-self: flex-start;
   }
-  
+
   .professionalSelect {
     min-width: 90px;
     font-size: 0.8rem;
     align-self: flex-start;
   }
-  
+
   .searchWrapper {
     height: 42px;
     padding: 0.4rem 1rem;

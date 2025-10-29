@@ -103,6 +103,7 @@ export default function BlogPages({
     resolvedUrl,
     isLocalhost,
 }) {
+    console.log(blogs," blogs from ssr")
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
     const router = useRouter();
     const [isValidating, setIsValidating] = useState(false);
@@ -372,9 +373,9 @@ export default function BlogPages({
             </Head>
 
             {/* Removed inline HeaderThree; provided by CountryLayout */}
-            <div className='container'>
+            <>
                 <BlogsPage blogs={blogs} />
-            </div>
+            </>
             {/* Removed inline FooterTwo; provided by CountryLayout */}
         </>
     )

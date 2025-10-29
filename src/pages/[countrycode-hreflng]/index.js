@@ -95,7 +95,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
         bannerLoading,
 
     } = useGlobalData();
-    console.log(apiResponse, "api response")
+    console.log(blogs, "blogs from api response")
     console.log(locationDataHome, "location data for best betting apps")
     // console.log(blogs, "blogs in country home")
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
