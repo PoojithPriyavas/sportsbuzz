@@ -308,6 +308,17 @@ export default function SportsOdsMegaPari() {
 
     const { oneXTournament, oneXAccessToken, fetchOneXEventsIdData, oneXEventDetails, translateText, language } = useGlobalData();
 
+    // Debug logging
+    console.log('=== MegaPari Render ===', {
+        oneXAccessToken: !!oneXAccessToken,
+        allTournamentsCount: oneXTournament?.items?.length || 0,
+        oneXEventDetailsCount: oneXEventDetails?.length || 0,
+        transformedCardsCount: transformedCards.length,
+        isLoading,
+        dataInitialized,
+        selectedTournament
+    });
+
     // Memoize tournaments list
     const allTournaments = useMemo(() => {
         if (!oneXTournament?.items) return [];
@@ -370,8 +381,15 @@ export default function SportsOdsMegaPari() {
         const cachedCards = CacheManager.get(CACHE_CONFIG.KEYS.CARDS);
         const cachedTimestamp = CacheManager.get(CACHE_CONFIG.KEYS.TIMESTAMP);
 
-        // Check if cache is valid
-        if (CacheManager.isValid(cachedTimestamp) && cachedCards && cachedTournament) {
+        console.log('📦 MegaPari Cache check:', {
+            hasCachedTournament: !!cachedTournament,
+            cachedCardsLength: cachedCards?.length || 0,
+            cacheValid: CacheManager.isValid(cachedTimestamp),
+            timestamp: cachedTimestamp
+        });
+
+        // Check if cache is valid AND has data
+        if (CacheManager.isValid(cachedTimestamp) && cachedCards && cachedCards.length > 0 && cachedTournament) {
             console.log('✓ Loading Megapari data from cache');
             setSelectedTournament(cachedTournament);
             setTransformedCards(cachedCards);
@@ -381,45 +399,76 @@ export default function SportsOdsMegaPari() {
             return;
         }
 
-        // Cache invalid or missing - fetch fresh data
+        // Cache invalid, missing, or empty - fetch fresh data
         if (allTournaments.length > 0 && oneXAccessToken) {
             console.log('⟳ Cache invalid or missing - fetching fresh Megapari data');
+            console.log('📋 Available tournaments:', allTournaments.map(t => ({ id: t.id, name: t.name })));
+            
             const firstTournamentId = allTournaments[0].id;
+            console.log('🎯 Fetching data for tournament:', firstTournamentId);
+            
             setSelectedTournament(firstTournamentId);
             setIsLoading(true);
             fetchOneXEventsIdData(oneXAccessToken, firstTournamentId);
             setDataInitialized(true);
+        } else {
+            console.warn('⚠ Cannot initialize Megapari:', {
+                hasTournaments: allTournaments.length > 0,
+                hasToken: !!oneXAccessToken
+            });
         }
     }, [allTournaments, oneXAccessToken, fetchOneXEventsIdData, dataInitialized]);
 
     // Process event details when they change
     useEffect(() => {
+        console.log('🔄 MegaPari Event details changed:', {
+            hasDetails: !!oneXEventDetails,
+            detailsLength: oneXEventDetails?.length || 0,
+            dataInitialized
+        });
+
         if (!oneXEventDetails || oneXEventDetails.length === 0) {
-            setTransformedCards([]);
-            setIsLoading(false);
+            // Only set empty cards after initialization to avoid premature "no events" message
+            if (dataInitialized) {
+                console.log('⚠ No event details available after initialization');
+                setTransformedCards([]);
+                setIsLoading(false);
+            }
             return;
         }
 
         const processEvents = async () => {
-            console.log('⟳ Processing Megapari event details');
+            console.log('⟳ Processing Megapari event details:', oneXEventDetails.length, 'events');
             setIsLoading(true);
 
-            const cards = await getTransformedCards(oneXEventDetails);
-            const timestamp = Date.now();
+            try {
+                const cards = await getTransformedCards(oneXEventDetails);
+                const timestamp = Date.now();
 
-            setTransformedCards(cards);
-            setIsLoading(false);
-            setLastFetchTime(timestamp);
+                console.log('✓ Processed Megapari cards:', cards.length);
 
-            // Save to cache
-            CacheManager.set(CACHE_CONFIG.KEYS.CARDS, cards);
-            CacheManager.set(CACHE_CONFIG.KEYS.TOURNAMENT, selectedTournament);
-            CacheManager.set(CACHE_CONFIG.KEYS.TIMESTAMP, timestamp);
-            CacheManager.set(CACHE_CONFIG.KEYS.EVENT_DETAILS, oneXEventDetails);
+                setTransformedCards(cards);
+                setIsLoading(false);
+                setLastFetchTime(timestamp);
+
+                // Save to cache only if we have cards
+                if (cards.length > 0) {
+                    console.log('💾 Saving Megapari to cache');
+                    CacheManager.set(CACHE_CONFIG.KEYS.CARDS, cards);
+                    CacheManager.set(CACHE_CONFIG.KEYS.TOURNAMENT, selectedTournament);
+                    CacheManager.set(CACHE_CONFIG.KEYS.TIMESTAMP, timestamp);
+                    CacheManager.set(CACHE_CONFIG.KEYS.EVENT_DETAILS, oneXEventDetails);
+                } else {
+                    console.warn('⚠ No Megapari cards to save to cache');
+                }
+            } catch (error) {
+                console.error('❌ Error processing Megapari events:', error);
+                setIsLoading(false);
+            }
         };
 
         processEvents();
-    }, [oneXEventDetails, getTransformedCards, selectedTournament]);
+    }, [oneXEventDetails, getTransformedCards, selectedTournament, dataInitialized]);
 
     // Tournament change handler with debouncing
     const handleTournamentChange = useCallback((tournamentId) => {
@@ -431,7 +480,7 @@ export default function SportsOdsMegaPari() {
             return;
         }
 
-        console.log('⟳ Changing tournament to:', tournamentId);
+        console.log('⟳ Changing Megapari tournament to:', tournamentId);
 
         // Clear relevant cache
         CacheManager.remove(CACHE_CONFIG.KEYS.CARDS);

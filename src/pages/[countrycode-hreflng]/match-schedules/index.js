@@ -24,6 +24,7 @@ import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
 import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 import CountryLayout from "@/components/layouts/CountryLayout";
+import SportsOddsList from "@/components/SportsOdds/SportsOdsList";
 export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
     // console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
@@ -75,10 +76,10 @@ export async function getServerSideProps(context) {
             name: error.name,
             stack: error.stack
         });
-        
+
         // FIXED: Make sure resolvedUrl is available in the error case too
         const { resolvedUrl } = context;
-        
+
         return {
             props: {
                 countryDataHome: null,
@@ -183,6 +184,7 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                         )}
                         {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
                         <SportsOdsMegaPari />
+                        {/* <SportsOddsList /> */}
                     </div>
                 </div>
                 <div className={styles.mainContent}>

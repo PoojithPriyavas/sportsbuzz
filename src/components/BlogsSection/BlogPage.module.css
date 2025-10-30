@@ -4,6 +4,8 @@
   /* padding: 0.5rem; */
   /* max-width: 1400px; */
   margin: 0 auto;
+  padding: 1rem;
+  margin-top: 3rem;
 }
 
 /* Default layout (mobile-first) */
@@ -508,13 +510,13 @@
 }
 
 /* Container */
-.container {
+/* .container {
   width: 100%;
   padding: 0 0rem;
   margin: 0 auto;
-  /* max-width: 1400px; */
+
   box-sizing: border-box;
-}
+} */
 
 /* Layout: 4 Columns */
 .fourColumnRow {

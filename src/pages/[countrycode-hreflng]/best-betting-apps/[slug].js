@@ -226,7 +226,7 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
             </Head>
 
             {/* Removed inline HeaderThree; provided by CountryLayout */}
-            <div className='container' style={{ paddingRight: '0rem', paddingLeft: '0rem' }}>
+            <div className='container' style={{ paddingRight: '1rem', paddingLeft: '1rem' }}>
                 {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
                     <>
