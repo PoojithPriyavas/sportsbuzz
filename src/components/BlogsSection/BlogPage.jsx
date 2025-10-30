@@ -21,6 +21,7 @@ import AutoSlider from '../AutoSlider/AutoSlider';
 import UpcomingFootballMatches from '@/components/UpComing/UpComingFootball';
 import UpcomingMatches from '@/components/UpComing/UpComingMatches';
 import BettingCard from '@/components/OddsMultiply/BettingCard';
+import { usePathHelper } from '@/hooks/usePathHelper';
 
 export default function BlogsPage({
   initialPage = 1,
@@ -213,20 +214,24 @@ export default function BlogsPage({
     }
   }, [countryCode?.country_code]);
 
+  // Add this import at the top of the file:
+  // import { usePathHelper } from '@/hooks/usePathHelper';
+  const { buildPath } = usePathHelper();
+
   // Function to update URL without page reload
   const updateURL = (page, search, category, subcategory) => {
     if (!isMountedRef.current) return;
 
     const params = new URLSearchParams();
 
-    if (search && search.trim()) params.set('search', search);
+    if (search && search.trim()) params.set('search', search.trim());
     if (category) params.set('category', category.toString());
     if (subcategory) params.set('subcategory', subcategory.toString());
     if (page > 1) params.set('page', page.toString());
 
-    const newURL = `/blogs/pages/${page === 1 ? 'all-blogs' : `page-${page}`}${params.toString() ? `?${params.toString()}` : ''}`;
+    const rawPath = `/blogs/pages/${page === 1 ? 'all-blogs' : `page-${page}`}${params.toString() ? `?${params.toString()}` : ''}`;
 
-    router.push(newURL, { scroll: false });
+    router.push(buildPath(rawPath), { scroll: false });
   };
 
   const handleClearFilters = async () => {
@@ -238,16 +243,9 @@ export default function BlogsPage({
     // Clear search input field
     setSearchInput('');
 
-    // Get current pathname to extract the language prefix
-    const currentPath = window.location.pathname;
-    const pathParts = currentPath.split('/');
-    const languagePrefix = pathParts[1]; // e.g., 'en-in'
-
-    // Construct the correct URL with language prefix
-    const newURL = `/${languagePrefix}/blogs/pages/all-blogs`;
-
-    // Update URL immediately - this will trigger the URL sync effect
-    router.replace(newURL, { scroll: false });
+    // Use path helper to safely prefix the locale and avoid duplicates
+    const rawPath = `/blogs/pages/all-blogs`;
+    router.replace(buildPath(rawPath), { scroll: false });
   };
 
   // Updated pagination handlers to use API next/prev URLs
