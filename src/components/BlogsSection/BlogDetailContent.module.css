@@ -1,7 +1,7 @@
 .blogContent {
   /* max-width: 800px; */
   margin: 0 auto;
-  padding: 2rem 1rem;
+  /* padding: 2rem 1rem; */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   line-height: 1.7;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -466,7 +466,7 @@
 /* Responsive adjustments */
 @media (max-width: 1024px) {
   .blogContent {
-    padding: 1.5rem 1rem;
+    /* padding: 1.5rem 1rem; */
   }
 
   .description {

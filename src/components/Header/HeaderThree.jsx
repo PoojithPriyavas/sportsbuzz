@@ -116,7 +116,7 @@ function HeaderThree({ animationStage, languageValidation }) {
     // New: hold the selected language until the URL updates
     const [pendingLanguage, setPendingLanguage] = useState(null);
     const router = useRouter();
-    
+
     // Defaults for header labels (English source strings)
     const defaultHeaderLabels = {
         home: 'Home',
@@ -129,7 +129,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         language: 'Language',
         sport: 'Sport'
     };
-    
+
     // Helper: get static translations for a language from bettingOds.json
     const getStaticTranslationsForLanguage = (lang) => {
         try {
@@ -142,11 +142,11 @@ function HeaderThree({ animationStage, languageValidation }) {
             return null;
         }
     };
-    
+
     // Helper: translate header labels using static JSON first, then fallback to translateText per key
     const translateHeaderLabels = async (selectedLanguage) => {
         const staticMap = getStaticTranslationsForLanguage(selectedLanguage);
-    
+
         // If English, short-circuit to defaults
         if (selectedLanguage === 'en') {
             setTranslatedText({ ...defaultHeaderLabels });
@@ -164,9 +164,9 @@ function HeaderThree({ animationStage, languageValidation }) {
             }
             return;
         }
-    
+
         const keys = Object.keys(defaultHeaderLabels);
-        
+
         // Collect only the missing keys to batch translate
         const keysToTranslate = keys.filter(
             key => !(staticMap && typeof staticMap[key] === 'string' && staticMap[key].trim() !== '')
@@ -195,9 +195,9 @@ function HeaderThree({ animationStage, languageValidation }) {
                 results[key] = defaultHeaderLabels[key];
             }
         }
-    
+
         setTranslatedText(results);
-    
+
         // Cache final result
         try {
             localStorage.setItem(
@@ -836,13 +836,18 @@ function HeaderThree({ animationStage, languageValidation }) {
 
     // Function to parse URL path for country code and language
     const parseUrlPath = (pathname) => {
-        if (!pathname) return { countryCode: '', language: '' };
-
+        console.log("enters the parse url path funciton");
+        if (!pathname) {
+            console.log("enters the no path name case");
+            return { countryCode: '', language: '' }
+        };
+        console.log("enters the outside of the if block ")
         // Extract the first segment of the path (e.g., "en-lk" from "/en-lk/some/path")
         const firstSegment = pathname.replace(/^\//, '').split('/')[0];
-
+        console.log(firstSegment, "first segment")
         // Check if it matches the format: language-countrycode
         const match = firstSegment.match(/^([a-z]{2})-([a-z]{2})$/i);
+        console.log(match,"match in the parse url")
 
         if (match) {
             return {
@@ -1134,7 +1139,7 @@ function HeaderThree({ animationStage, languageValidation }) {
 
             // Keep categories translation logic separate (no change)
             console.log('[Translate] Header labels resolved; categories translation unchanged.');
-            
+
             // Keep current header labels (or previously cached) without API calls
             const cachedTranslationsKey = `cachedTranslations_${selectedLanguage}`;
             const cached = localStorage.getItem(cachedTranslationsKey);

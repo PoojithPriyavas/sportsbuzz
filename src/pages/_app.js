@@ -21,6 +21,27 @@ export default function App({ Component, pageProps }) {
     };
   }, [router.events]);
 
+  // Clear language from localStorage on tab/window close or page unload
+  useEffect(() => {
+    const clearLanguage = () => {
+      try {
+        localStorage.removeItem('language');
+      } catch (_) {}
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('pagehide', clearLanguage);
+      window.addEventListener('beforeunload', clearLanguage);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('pagehide', clearLanguage);
+        window.removeEventListener('beforeunload', clearLanguage);
+      }
+    };
+  }, []);
+
   return (
     <DataProvider>
       {/* Client-side redirect handler */}
