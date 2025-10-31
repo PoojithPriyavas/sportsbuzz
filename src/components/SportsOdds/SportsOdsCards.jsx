@@ -1,14 +1,14 @@
-// components/FootballOddsCard.jsx
+// components/FootballOddsCard.jsx - OPTIMIZED VERSION
 import React from 'react';
 import styles from './SportsOds.module.css';
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useGlobalData } from '../Context/ApiContext';
-import bettingOddsTranslations from './bettingOdds.json'; // Import the JSON file
+import bettingOddsTranslations from './bettingOdds.json';
 
 // Cache configuration
 const CACHE_CONFIG = {
-    DURATION: 5 * 60 * 1000, // 5 minutes
-    TRANSLATION_DURATION: 24 * 60 * 60 * 1000, // 24 hours for translations
+    DURATION: 5 * 60 * 1000,
+    TRANSLATION_DURATION: 24 * 60 * 60 * 1000,
     KEYS: {
         TOURNAMENT: 'betting_selectedTournament',
         CARDS: 'betting_transformedCards',
@@ -59,7 +59,7 @@ const CacheManager = {
     }
 };
 
-// Translation Manager - Centralized translation with JSON and caching
+// Translation Manager
 const TranslationManager = {
     defaultTexts: {
         bettingOdds: 'Betting Odds',
@@ -90,7 +90,6 @@ const TranslationManager = {
         const cached = CacheManager.get(cacheKey);
         
         if (cached && CacheManager.isValid(cached.timestamp, CACHE_CONFIG.TRANSLATION_DURATION)) {
-            console.log(`✓ Loaded translations from cache for language: ${language}`);
             return cached.translations;
         }
         
@@ -103,17 +102,14 @@ const TranslationManager = {
             translations,
             timestamp: Date.now()
         });
-        console.log(`✓ Saved translations to cache for language: ${language}`);
     },
 
-    // Get translations from JSON file by language code
     getFromJSON: (language) => {
         const translationEntry = bettingOddsTranslations.find(
             entry => entry.hreflang === language
         );
         
         if (translationEntry) {
-            console.log(`✓ Loaded translations from JSON for language: ${language}`);
             return translationEntry.translatedText;
         }
         
@@ -121,28 +117,21 @@ const TranslationManager = {
     },
 
     translate: async (language, translateTextFn) => {
-        // Return default English if language is 'en'
         if (language === 'en') {
             return TranslationManager.defaultTexts;
         }
 
-        // Try to load from cache first
         const cached = TranslationManager.loadFromCache(language);
         if (cached) {
             return cached;
         }
 
-        // Try to get from JSON file
         const jsonTranslations = TranslationManager.getFromJSON(language);
         if (jsonTranslations) {
-            // Save to cache for faster subsequent access
             TranslationManager.saveToCache(language, jsonTranslations);
             return jsonTranslations;
         }
 
-        // If not in JSON, fetch translations via API
-        console.log(`⟳ Fetching translations via API for language: ${language}`);
-        
         try {
             const translationPromises = Object.entries(TranslationManager.defaultTexts).map(
                 async ([key, text]) => {
@@ -154,7 +143,6 @@ const TranslationManager = {
             const translatedEntries = await Promise.all(translationPromises);
             const translations = Object.fromEntries(translatedEntries);
 
-            // Save to cache
             TranslationManager.saveToCache(language, translations);
 
             return translations;
@@ -250,8 +238,12 @@ async function fetchMarketData(token, sportEventId) {
 
 // Transform event to card format
 function transformEventToCard(event, marketData) {
-    const isLive = event.waitingLive || event.period > 0;
-    const startDate = new Date(event.startDate * 1000);
+    const safeEvent = event || {};
+    const isLive = Boolean(safeEvent.waitingLive) || Number(safeEvent.period) > 0;
+
+    const startDateSec = Number(safeEvent.startDate);
+    const startDate = Number.isFinite(startDateSec) ? new Date(startDateSec * 1000) : null;
+
     const defaultOdds = [
         { label: 'W1', value: 2.1 },
         { label: 'X', value: 3.2 },
@@ -263,33 +255,43 @@ function transformEventToCard(event, marketData) {
     if (marketData?.items?.length) {
         const desired = ['W1', 'X', 'W2'];
         odds = marketData.items
-            .filter(item => desired.includes(item.displayMulti?.en))
+            .filter(item => desired.includes(item?.displayMulti?.en))
             .map(item => ({
-                label: item.displayMulti.en,
-                value: item.oddsMarket
-            }));
+                label: item?.displayMulti?.en ?? '—',
+                value: Number(item?.oddsMarket) || null
+            }))
+            .filter(o => o.label && o.value);
+        if (odds.length === 0) {
+            odds = defaultOdds;
+        }
     }
 
+    const team1Name = safeEvent.opponent1NameLocalization || 'Team 1';
+    const team2Name = safeEvent.opponent2NameLocalization || 'Team 2';
+
+    const team1Logo = Array.isArray(safeEvent.imageOpponent1) ? safeEvent.imageOpponent1[0] : null;
+    const team2Logo = Array.isArray(safeEvent.imageOpponent2) ? safeEvent.imageOpponent2[0] : null;
+
     return {
-        id: event.sportEventId,
+        id: safeEvent.sportEventId || safeEvent.id || Math.random().toString(36).slice(2),
         logo: '🏆',
         provider: '22bet',
         isLive,
-        matchType: event.tournamentNameLocalization || 'Tournament',
-        matchInfo: `${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`,
+        matchType: safeEvent.tournamentNameLocalization || 'Tournament',
+        matchInfo: startDate ? `${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}` : 'Time TBD',
         team1: {
-            code: event.opponent1NameLocalization?.slice(0, 3).toUpperCase() || 'T1',
-            name: event.opponent1NameLocalization || 'Team 1',
-            logo: event.imageOpponent1[0]
+            code: team1Name?.slice(0, 3)?.toUpperCase() || 'T1',
+            name: team1Name,
+            logo: team1Logo
         },
         team2: {
-            code: event.opponent2NameLocalization?.slice(0, 3).toUpperCase() || 'T2',
-            name: event.opponent2NameLocalization || 'Team 2',
-            logo: event.imageOpponent2[0]
+            code: team2Name?.slice(0, 3)?.toUpperCase() || 'T2',
+            name: team2Name,
+            logo: team2Logo
         },
         oddsTitle: 'Match Winner',
         odds,
-        link: event.link
+        link: safeEvent.link || null
     };
 }
 
@@ -302,9 +304,13 @@ export default function BettingCards() {
     const [transformedCards, setTransformedCards] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [lastFetchTime, setLastFetchTime] = useState(0);
-    const [dataInitialized, setDataInitialized] = useState(false);
     const [translatedText, setTranslatedText] = useState(TranslationManager.defaultTexts);
-    const [translationsLoading, setTranslationsLoading] = useState(false);
+    console.log(transformedCards, "transformedCards")
+    // 🔥 FIX #1: Use ref to track initialization instead of state
+    const isInitialized = useRef(false);
+    const processingRef = useRef(false); // Prevent concurrent processing
+    const hasFetchedRef = useRef(false); // Track if we've made initial API call
+    const loadingTimeoutRef = useRef(null); // Timeout for loading state
 
     const { oneXTournament, oneXAccessToken, fetchOneXEventsIdData, oneXEventDetails, translateText, language } = useGlobalData();
 
@@ -318,25 +324,49 @@ export default function BettingCards() {
         }));
     }, [oneXTournament]);
 
-    // Optimized translation effect with JSON priority and caching
+    // 🔥 FIX #2: Stabilize getTransformedCards with proper dependencies
+    const getTransformedCards = useCallback(async (events, token) => {
+        if (!Array.isArray(events) || !token) return [];
+
+        const normalizeEvent = (detail) => {
+            // Try common shapes first, then fallback to raw detail
+            return detail?.items?.[0] || detail?.data?.items?.[0] || detail?.event || detail;
+        };
+
+        const cards = await Promise.all(
+            events.map(async (detail) => {
+                try {
+                    const event = normalizeEvent(detail);
+                    if (!event || !event.sportEventId) {
+                        return null;
+                    }
+                    const marketData = await fetchMarketData(token, event.sportEventId).catch(() => null);
+                    return transformEventToCard(event, marketData);
+                } catch (e) {
+                    console.warn('Skipping bad event detail:', e);
+                    return null;
+                }
+            })
+        );
+
+        return cards.filter(Boolean);
+    }, []); // No dependencies needed since params are passed directly
+
+    // 🔥 FIX #3: Optimize translation loading
     useEffect(() => {
         let isMounted = true;
 
         const loadTranslations = async () => {
-            setTranslationsLoading(true);
-            
             try {
                 const translations = await TranslationManager.translate(language, translateText);
                 
                 if (isMounted) {
                     setTranslatedText(translations);
-                    setTranslationsLoading(false);
                 }
             } catch (error) {
                 console.error('Failed to load translations:', error);
                 if (isMounted) {
                     setTranslatedText(TranslationManager.defaultTexts);
-                    setTranslationsLoading(false);
                 }
             }
         };
@@ -348,83 +378,161 @@ export default function BettingCards() {
         };
     }, [language, translateText]);
 
-    // Get transformed cards with caching
-    const getTransformedCards = useCallback(async (events) => {
-        if (!Array.isArray(events)) return [];
-        
-        const cards = await Promise.all(
-            events.map(async (event) => {
-                const marketData = await fetchMarketData(oneXAccessToken, event.sportEventId);
-                return transformEventToCard(event, marketData);
-            })
-        );
-
-        return cards;
-    }, [oneXAccessToken]);
-
-    // Initialize data from cache or fetch fresh
+    // 🔥 FIX #4: Single initialization effect with proper cache handling
     useEffect(() => {
-        if (dataInitialized) return;
-
-        const cachedTournament = CacheManager.get(CACHE_CONFIG.KEYS.TOURNAMENT);
-        const cachedCards = CacheManager.get(CACHE_CONFIG.KEYS.CARDS);
-        const cachedTimestamp = CacheManager.get(CACHE_CONFIG.KEYS.TIMESTAMP);
-
-        // Check if cache is valid
-        if (CacheManager.isValid(cachedTimestamp) && cachedCards && cachedTournament) {
-            console.log('✓ Loading betting data from cache');
-            setSelectedTournament(cachedTournament);
-            setTransformedCards(cachedCards);
-            setIsLoading(false);
-            setDataInitialized(true);
-            setLastFetchTime(cachedTimestamp);
+        // Don't run if already initialized OR missing required data
+        if (isInitialized.current || !oneXAccessToken || allTournaments.length === 0) {
             return;
         }
 
-        // Cache invalid or missing - fetch fresh data
-        if (allTournaments.length > 0 && oneXAccessToken) {
-            console.log('⟳ Cache invalid or missing - fetching fresh betting data');
+        const initializeData = async () => {
+            console.log('🔄 Initializing betting data...');
+            
+            // Check cache first
+            const cachedTournament = CacheManager.get(CACHE_CONFIG.KEYS.TOURNAMENT);
+            const cachedCards = CacheManager.get(CACHE_CONFIG.KEYS.CARDS);
+            const cachedTimestamp = CacheManager.get(CACHE_CONFIG.KEYS.TIMESTAMP);
+
+            // If cache is valid AND has data, use it
+            if (CacheManager.isValid(cachedTimestamp) && cachedCards && cachedCards.length > 0) {
+                console.log('✓ Loading betting data from cache');
+                setSelectedTournament(cachedTournament || allTournaments[0].id);
+                setTransformedCards(cachedCards);
+                setIsLoading(false);
+                setLastFetchTime(cachedTimestamp);
+                isInitialized.current = true;
+                hasFetchedRef.current = true;
+                return;
+            }
+
+            // No valid cache - fetch fresh data
+            console.log('⟳ Cache invalid/empty - fetching fresh betting data');
             const firstTournamentId = allTournaments[0].id;
             setSelectedTournament(firstTournamentId);
             setIsLoading(true);
-            fetchOneXEventsIdData(oneXAccessToken, firstTournamentId);
-            setDataInitialized(true);
-        }
-    }, [allTournaments, oneXAccessToken, fetchOneXEventsIdData, dataInitialized]);
+            
+            // Set a timeout to prevent infinite loading
+            loadingTimeoutRef.current = setTimeout(() => {
+                console.warn('⚠️ Loading timeout - no data received after 15 seconds');
+                setIsLoading(false);
+                hasFetchedRef.current = true;
+            }, 15000); // 15 second timeout
+            
+            try {
+                await fetchOneXEventsIdData(oneXAccessToken, firstTournamentId);
+                hasFetchedRef.current = true;
+            } catch (error) {
+                console.error('Failed to fetch events:', error);
+                setIsLoading(false);
+            }
+            
+            isInitialized.current = true;
+        };
 
-    // Process event details when they change
+        initializeData();
+
+        // Cleanup timeout on unmount
+        return () => {
+            if (loadingTimeoutRef.current) {
+                clearTimeout(loadingTimeoutRef.current);
+            }
+        };
+    }, [allTournaments, oneXAccessToken, fetchOneXEventsIdData]);
+
+    // 🔥 FIX #5: Process events only when needed with debouncing
     useEffect(() => {
-        if (!oneXEventDetails || oneXEventDetails.length === 0) {
+        console.log('📊 Event details changed:', {
+            hasDetails: !!oneXEventDetails,
+            detailsLength: oneXEventDetails?.length || 0,
+            isProcessing: processingRef.current,
+            hasFetched: hasFetchedRef.current
+        });
+
+        // If fetched empty, try cache fallback before showing "no events"
+        if ((!oneXEventDetails || oneXEventDetails.length === 0) && hasFetchedRef.current) {
+            const cachedEventDetails = CacheManager.get(CACHE_CONFIG.KEYS.EVENT_DETAILS);
+            if (Array.isArray(cachedEventDetails) && cachedEventDetails.length > 0) {
+                console.log('🔁 Using cached event details fallback');
+                (async () => {
+                    setIsLoading(true);
+                    try {
+                        const cards = await getTransformedCards(cachedEventDetails, oneXAccessToken);
+                        const timestamp = Date.now();
+                        setTransformedCards(cards);
+                        setLastFetchTime(timestamp);
+                        CacheManager.set(CACHE_CONFIG.KEYS.CARDS, cards);
+                        CacheManager.set(CACHE_CONFIG.KEYS.TIMESTAMP, timestamp);
+                    } catch (err) {
+                        console.error('Cached events processing failed:', err);
+                        setTransformedCards([]);
+                    } finally {
+                        setIsLoading(false);
+                    }
+                })();
+                return;
+            }
+
+            console.log('⚠️ No event details available after fetch');
             setTransformedCards([]);
             setIsLoading(false);
+
+            if (loadingTimeoutRef.current) {
+                clearTimeout(loadingTimeoutRef.current);
+                loadingTimeoutRef.current = null;
+            }
             return;
         }
+
+        // If nothing fetched yet, let the loading continue
+        if (!oneXEventDetails || oneXEventDetails.length === 0) {
+            // If nothing fetched yet, let the loading continue
+            return;
+        }
+
+        if (processingRef.current) {
+            console.log('⏸️ Already processing, skipping...');
+            return;
+        }
+
+        if (loadingTimeoutRef.current) {
+            clearTimeout(loadingTimeoutRef.current);
+            loadingTimeoutRef.current = null;
+        }
+
+        processingRef.current = true;
 
         const processEvents = async () => {
             console.log('⟳ Processing event details');
             setIsLoading(true);
-            
-            const cards = await getTransformedCards(oneXEventDetails);
-            const timestamp = Date.now();
-            
-            setTransformedCards(cards);
-            setIsLoading(false);
-            setLastFetchTime(timestamp);
 
-            // Save to cache
-            CacheManager.set(CACHE_CONFIG.KEYS.CARDS, cards);
-            CacheManager.set(CACHE_CONFIG.KEYS.TOURNAMENT, selectedTournament);
-            CacheManager.set(CACHE_CONFIG.KEYS.TIMESTAMP, timestamp);
-            CacheManager.set(CACHE_CONFIG.KEYS.EVENT_DETAILS, oneXEventDetails);
+            try {
+                const cards = await getTransformedCards(oneXEventDetails, oneXAccessToken);
+                const timestamp = Date.now();
+
+                console.log(`✓ Processed ${cards.length} cards`);
+
+                setTransformedCards(cards);
+                setLastFetchTime(timestamp);
+
+                CacheManager.set(CACHE_CONFIG.KEYS.CARDS, cards);
+                CacheManager.set(CACHE_CONFIG.KEYS.TOURNAMENT, selectedTournament);
+                CacheManager.set(CACHE_CONFIG.KEYS.TIMESTAMP, timestamp);
+                CacheManager.set(CACHE_CONFIG.KEYS.EVENT_DETAILS, oneXEventDetails);
+            } catch (error) {
+                console.error('Error processing events:', error);
+            } finally {
+                setIsLoading(false);
+                processingRef.current = false;
+            }
         };
 
         processEvents();
-    }, [oneXEventDetails, getTransformedCards, selectedTournament]);
+    }, [oneXEventDetails, oneXAccessToken, getTransformedCards, selectedTournament]);
 
-    // Tournament change handler with debouncing
+    // 🔥 FIX #6: Debounced tournament change handler
     const handleTournamentChange = useCallback((tournamentId) => {
         const now = Date.now();
-        const MIN_INTERVAL = 1000; // 1 second debounce
+        const MIN_INTERVAL = 1000;
 
         if (now - lastFetchTime < MIN_INTERVAL) {
             console.log('⏸ Debouncing tournament change');

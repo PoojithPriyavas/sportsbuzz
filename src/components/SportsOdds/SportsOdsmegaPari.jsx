@@ -250,8 +250,13 @@ async function fetchMarketData(token, sportEventId) {
 
 // Transform event to card format
 function transformEventToCard(event, marketData) {
-    const isLive = event.waitingLive || event.period > 0;
-    const startDate = new Date(event.startDate * 1000);
+    const normalized = normalizeEventDetail(event);
+    const isLive = normalized.waitingLive || (normalized.period > 0);
+    const startMs = typeof normalized.startDate === 'number'
+        ? (normalized.startDate > 1e12 ? normalized.startDate : normalized.startDate * 1000)
+        : Date.now();
+    const startDate = new Date(startMs);
+
     const defaultOdds = [
         { label: 'W1', value: 2.1 },
         { label: 'X', value: 3.2 },
@@ -263,33 +268,44 @@ function transformEventToCard(event, marketData) {
     if (marketData?.items?.length) {
         const desired = ['W1', 'X', 'W2'];
         odds = marketData.items
-            .filter(item => desired.includes(item.displayMulti?.en))
+            .filter(item => {
+                const label = item.displayMulti?.en || item.displayName?.en || item.name || item.marketLabel;
+                return desired.includes(label);
+            })
             .map(item => ({
-                label: item.displayMulti.en,
-                value: item.oddsMarket
-            }));
+                label: item.displayMulti?.en || item.displayName?.en || item.name || item.marketLabel,
+                value: item.oddsMarket ?? item.odds ?? item.price ?? null
+            }))
+            .filter(o => o.value !== null);
+
+        if (odds.length === 0) odds = defaultOdds;
     }
 
+    const team1Name = normalized.opponent1NameLocalization || 'Team 1';
+    const team2Name = normalized.opponent2NameLocalization || 'Team 2';
+    const team1Logo = Array.isArray(normalized.imageOpponent1) ? normalized.imageOpponent1[0] : null;
+    const team2Logo = Array.isArray(normalized.imageOpponent2) ? normalized.imageOpponent2[0] : null;
+
     return {
-        id: event.sportEventId,
+        id: normalized.sportEventId,
         logo: '🏆',
         provider: 'Megapari',
         isLive,
-        matchType: event.tournamentNameLocalization || 'Tournament',
+        matchType: normalized.tournamentNameLocalization || 'Tournament',
         matchInfo: `${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString()}`,
         team1: {
-            code: event.opponent1NameLocalization?.slice(0, 3).toUpperCase() || 'T1',
-            name: event.opponent1NameLocalization || 'Team 1',
-            logo: event.imageOpponent1[0]
+            code: (team1Name || 'T1').slice(0, 3).toUpperCase(),
+            name: team1Name,
+            logo: team1Logo
         },
         team2: {
-            code: event.opponent2NameLocalization?.slice(0, 3).toUpperCase() || 'T2',
-            name: event.opponent2NameLocalization || 'Team 2',
-            logo: event.imageOpponent2[0]
+            code: (team2Name || 'T2').slice(0, 3).toUpperCase(),
+            name: team2Name,
+            logo: team2Logo
         },
         oddsTitle: 'Match Winner',
         odds,
-        link: event.link
+        link: normalized.link
     };
 }
 
@@ -351,15 +367,18 @@ export default function SportsOdsMegaPari() {
     // Get transformed cards with caching
     const getTransformedCards = useCallback(async (events) => {
         if (!Array.isArray(events)) return [];
-
+    
         const cards = await Promise.all(
-            events.map(async (event) => {
-                const marketData = await fetchMarketData(oneXAccessToken, event.sportEventId);
-                return transformEventToCard(event, marketData);
-            })
+            events
+                .map(e => normalizeEventDetail(e))
+                .filter(e => !!e.sportEventId)
+                .map(async (normalized) => {
+                    const marketData = await fetchMarketData(oneXAccessToken, normalized.sportEventId);
+                    return transformEventToCard(normalized, marketData);
+                })
         );
-
-        return cards;
+    
+        return cards.filter(card => !!card.id && !!card.team1?.name && !!card.team2?.name);
     }, [oneXAccessToken]);
 
     // Initialize data from cache or fetch fresh
@@ -394,14 +413,25 @@ export default function SportsOdsMegaPari() {
 
     // Process event details when they change
     useEffect(() => {
-        if (!oneXEventDetails || oneXEventDetails.length === 0) {
-            setTransformedCards([]);
-            setIsLoading(false);
-            return;
-        }
+        const run = async () => {
+            const hasLiveData = Array.isArray(oneXEventDetails) && oneXEventDetails.length > 0;
 
-        const processEvents = async () => {
-            console.log('⟳ Processing Megapari event details');
+            if (!hasLiveData) {
+                const cachedDetails = CacheManager.get(CACHE_CONFIG.KEYS.EVENT_DETAILS);
+                const cachedTimestamp = CacheManager.get(CACHE_CONFIG.KEYS.TIMESTAMP);
+
+                if (cachedDetails && CacheManager.isValid(cachedTimestamp)) {
+                    const cards = await getTransformedCards(cachedDetails);
+                    setTransformedCards(cards);
+                    setIsLoading(false);
+                    return;
+                }
+
+                setTransformedCards([]);
+                setIsLoading(false);
+                return;
+            }
+
             setIsLoading(true);
 
             const cards = await getTransformedCards(oneXEventDetails);
@@ -418,7 +448,7 @@ export default function SportsOdsMegaPari() {
             CacheManager.set(CACHE_CONFIG.KEYS.EVENT_DETAILS, oneXEventDetails);
         };
 
-        processEvents();
+        run();
     }, [oneXEventDetails, getTransformedCards, selectedTournament]);
 
     // Tournament change handler with debouncing
@@ -745,3 +775,68 @@ const SportsOddsCard = React.memo(({ card, styles, translatedText, onSelectOdd, 
         </div>
     );
 });
+
+function normalizeEventDetail(raw) {
+    const sportEventId = raw.sportEventId || raw.id || raw.Eid || raw.gameId || raw.eventId;
+    const tournamentNameLocalization =
+        raw.tournamentNameLocalization || raw.tournamentName || raw.leagueName || raw.categoryName || raw.competitionName || 'Tournament';
+
+    const opp1Name =
+        raw.opponent1NameLocalization ||
+        raw.opponent1Name ||
+        raw.opponent1?.name ||
+        raw.homeName ||
+        raw.homeTeamName ||
+        raw.team1 ||
+        raw.team1Name ||
+        raw.home?.name ||
+        null;
+
+    const opp2Name =
+        raw.opponent2NameLocalization ||
+        raw.opponent2Name ||
+        raw.opponent2?.name ||
+        raw.awayName ||
+        raw.awayTeamName ||
+        raw.team2 ||
+        raw.team2Name ||
+        raw.away?.name ||
+        null;
+
+    const imageOpponent1 =
+        Array.isArray(raw.imageOpponent1) ? raw.imageOpponent1 :
+        raw.opponent1?.image ? [raw.opponent1.image] :
+        raw.homeLogo ? [raw.homeLogo] :
+        raw.team1Logo ? [raw.team1Logo] :
+        [];
+
+    const imageOpponent2 =
+        Array.isArray(raw.imageOpponent2) ? raw.imageOpponent2 :
+        raw.opponent2?.image ? [raw.opponent2.image] :
+        raw.awayLogo ? [raw.awayLogo] :
+        raw.team2Logo ? [raw.team2Logo] :
+        [];
+
+    const startDate =
+        typeof raw.startDate === 'number' ? raw.startDate :
+        typeof raw.ts === 'number' ? raw.ts :
+        typeof raw.start_time === 'number' ? raw.start_time :
+        null;
+
+    const waitingLive = !!raw.waitingLive;
+    const period = typeof raw.period === 'number' ? raw.period : 0;
+    const link = raw.link || raw.url || null;
+
+    return {
+        sportEventId,
+        tournamentNameLocalization,
+        opponent1NameLocalization: opp1Name || 'Team 1',
+        opponent2NameLocalization: opp2Name || 'Team 2',
+        imageOpponent1,
+        imageOpponent2,
+        startDate,
+        waitingLive,
+        period,
+        link
+    };
+}

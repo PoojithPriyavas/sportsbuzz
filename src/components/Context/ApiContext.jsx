@@ -688,6 +688,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
             const res = await fetch('/api/get-token-onex');
             const data = await res.json();
             if (res.ok) {
+                console.log("enters the response ok condition")
                 setOneXAccessToken(data.access_token);
                 // console.log(data.access_token, "token")
                 fetchOneXTournamentsData(data.access_token);
@@ -767,6 +768,10 @@ export const DataProvider = ({ children, countryDataHome }) => {
             return null;
         }
     }
+
+
+
+
 
     //-------------------END--->ONE-X BET SECTION----------------------//
 
