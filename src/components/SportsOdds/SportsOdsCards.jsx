@@ -308,17 +308,6 @@ export default function BettingCards() {
 
     const { oneXTournament, oneXAccessToken, fetchOneXEventsIdData, oneXEventDetails, translateText, language } = useGlobalData();
 
-    // Debug logging
-    console.log('=== BettingCards Render ===', {
-        oneXAccessToken: !!oneXAccessToken,
-        allTournamentsCount: oneXTournament?.items?.length || 0,
-        oneXEventDetailsCount: oneXEventDetails?.length || 0,
-        transformedCardsCount: transformedCards.length,
-        isLoading,
-        dataInitialized,
-        selectedTournament
-    });
-
     // Memoize tournaments list
     const allTournaments = useMemo(() => {
         if (!oneXTournament?.items) return [];
@@ -381,15 +370,8 @@ export default function BettingCards() {
         const cachedCards = CacheManager.get(CACHE_CONFIG.KEYS.CARDS);
         const cachedTimestamp = CacheManager.get(CACHE_CONFIG.KEYS.TIMESTAMP);
 
-        console.log('📦 Cache check:', {
-            hasCachedTournament: !!cachedTournament,
-            cachedCardsLength: cachedCards?.length || 0,
-            cacheValid: CacheManager.isValid(cachedTimestamp),
-            timestamp: cachedTimestamp
-        });
-
-        // Check if cache is valid AND has data
-        if (CacheManager.isValid(cachedTimestamp) && cachedCards && cachedCards.length > 0 && cachedTournament) {
+        // Check if cache is valid
+        if (CacheManager.isValid(cachedTimestamp) && cachedCards && cachedTournament) {
             console.log('✓ Loading betting data from cache');
             setSelectedTournament(cachedTournament);
             setTransformedCards(cachedCards);
@@ -399,76 +381,45 @@ export default function BettingCards() {
             return;
         }
 
-        // Cache invalid, missing, or empty - fetch fresh data
+        // Cache invalid or missing - fetch fresh data
         if (allTournaments.length > 0 && oneXAccessToken) {
             console.log('⟳ Cache invalid or missing - fetching fresh betting data');
-            console.log('📋 Available tournaments:', allTournaments.map(t => ({ id: t.id, name: t.name })));
-            
             const firstTournamentId = allTournaments[0].id;
-            console.log('🎯 Fetching data for tournament:', firstTournamentId);
-            
             setSelectedTournament(firstTournamentId);
             setIsLoading(true);
             fetchOneXEventsIdData(oneXAccessToken, firstTournamentId);
             setDataInitialized(true);
-        } else {
-            console.warn('⚠ Cannot initialize:', {
-                hasTournaments: allTournaments.length > 0,
-                hasToken: !!oneXAccessToken
-            });
         }
     }, [allTournaments, oneXAccessToken, fetchOneXEventsIdData, dataInitialized]);
 
     // Process event details when they change
     useEffect(() => {
-        console.log('🔄 Event details changed:', {
-            hasDetails: !!oneXEventDetails,
-            detailsLength: oneXEventDetails?.length || 0,
-            dataInitialized
-        });
-
         if (!oneXEventDetails || oneXEventDetails.length === 0) {
-            // Only set empty cards after initialization to avoid premature "no events" message
-            if (dataInitialized) {
-                console.log('⚠ No event details available after initialization');
-                setTransformedCards([]);
-                setIsLoading(false);
-            }
+            setTransformedCards([]);
+            setIsLoading(false);
             return;
         }
 
         const processEvents = async () => {
-            console.log('⟳ Processing event details:', oneXEventDetails.length, 'events');
+            console.log('⟳ Processing event details');
             setIsLoading(true);
             
-            try {
-                const cards = await getTransformedCards(oneXEventDetails);
-                const timestamp = Date.now();
-                
-                console.log('✓ Processed cards:', cards.length);
-                
-                setTransformedCards(cards);
-                setIsLoading(false);
-                setLastFetchTime(timestamp);
+            const cards = await getTransformedCards(oneXEventDetails);
+            const timestamp = Date.now();
+            
+            setTransformedCards(cards);
+            setIsLoading(false);
+            setLastFetchTime(timestamp);
 
-                // Save to cache only if we have cards
-                if (cards.length > 0) {
-                    console.log('💾 Saving to cache');
-                    CacheManager.set(CACHE_CONFIG.KEYS.CARDS, cards);
-                    CacheManager.set(CACHE_CONFIG.KEYS.TOURNAMENT, selectedTournament);
-                    CacheManager.set(CACHE_CONFIG.KEYS.TIMESTAMP, timestamp);
-                    CacheManager.set(CACHE_CONFIG.KEYS.EVENT_DETAILS, oneXEventDetails);
-                } else {
-                    console.warn('⚠ No cards to save to cache');
-                }
-            } catch (error) {
-                console.error('❌ Error processing events:', error);
-                setIsLoading(false);
-            }
+            // Save to cache
+            CacheManager.set(CACHE_CONFIG.KEYS.CARDS, cards);
+            CacheManager.set(CACHE_CONFIG.KEYS.TOURNAMENT, selectedTournament);
+            CacheManager.set(CACHE_CONFIG.KEYS.TIMESTAMP, timestamp);
+            CacheManager.set(CACHE_CONFIG.KEYS.EVENT_DETAILS, oneXEventDetails);
         };
 
         processEvents();
-    }, [oneXEventDetails, getTransformedCards, selectedTournament, dataInitialized]);
+    }, [oneXEventDetails, getTransformedCards, selectedTournament]);
 
     // Tournament change handler with debouncing
     const handleTournamentChange = useCallback((tournamentId) => {

@@ -171,9 +171,11 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                                 <BettingCard />
                                 <JoinTelegramButton />
                             </div>
-                            <div className={styles.fourthColumnRight}>
-                                {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
-                            </div>
+                            {activeOddBanners.length > 0 &&
+                                <div className={styles.fourthColumnRight}>
+                                    <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />
+                                </div>
+                            }
                         </div>
                         {sport === 'cricket' ? (
                             <>

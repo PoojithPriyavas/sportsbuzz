@@ -208,7 +208,7 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
             <HeaderThree animationStage={animationStage} />
 
             {/* HeaderThree moved to CountryLayout */}
-            <div className='container'  style={{ paddingRight: '0rem', paddingLeft: '0rem' }}>
+            <div className='container' style={{ paddingRight: '0rem', paddingLeft: '0rem' }}>
                 {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
                     <>
@@ -229,9 +229,11 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
                                 <BettingCard countryCode={countryCode} />
                                 <JoinTelegramButton countryCode={countryCode} />
                             </div>
-                            <div className={styles.fourthColumnRight}>
-                               {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
-                            </div>
+                            {activeOddBanners.length > 0 &&
+                                <div className={styles.fourthColumnRight}>
+                                    <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />
+                                </div>
+                            }
                         </div>
                         {sport === 'cricket' ? (
                             <>

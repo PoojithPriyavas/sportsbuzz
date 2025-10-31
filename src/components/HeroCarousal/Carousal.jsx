@@ -90,9 +90,9 @@ export default function HeroCarousal() {
   }
 
   // Don't render if no banners after loading
-  if (banners.length === 0) {
-    return <div className={styles.carouselWrapper} style={{ marginTop: '20px' }} />;
-  }
+  // if (banners.length === 0) {
+  //   return <div className={styles.carouselWrapper} style={{ marginTop: '20px' }} />;
+  // }
 
   // Helper function to safely handle autoplay
   const handleAutoplayStart = (swiper) => {
