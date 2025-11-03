@@ -493,10 +493,11 @@ function HeaderThree({ animationStage, languageValidation }) {
                     subcategories: subcategoryNames.map(text => ({ text })),
                 };
 
-                // Send grouped payload in one request
+                // Use the new dedicated function for header categories translation
+                console.log('[Categories] Using headerCategoryTranslateFunction for batch translation');
                 const groupedResults = await retryTranslation(
                     () => Promise.race([
-                        translateHeaders(payload, 'en', language),
+                        headerCategoryTranslateFunction(payload, 'en', language),
                         new Promise((_, reject) =>
                             setTimeout(() => reject(new Error('Translation timeout')), 15000)
                         )

@@ -546,6 +546,148 @@ export const DataProvider = ({ children, countryDataHome }) => {
     };
 
 
+    const headerCategoryTranslateFunction = async (textInput, from = 'en', toLang = language) => {
+        const langMap = {
+            English: 'en',
+            Malayalam: 'ml',
+        };
+        const to = langMap[toLang] || toLang;
+        const fromCode = langMap[from] || from;
+
+        // If source and target languages are the same, return the input as is
+        if (fromCode === to) {
+            if (typeof textInput === 'object' && textInput !== null && !Array.isArray(textInput)) {
+                // Handle grouped texts
+                const result = {};
+                Object.entries(textInput).forEach(([key, value]) => {
+                    result[key] = Array.isArray(value) ? value.map(item => typeof item === 'string' ? item : item.text) : value;
+                });
+                return result;
+            } else if (Array.isArray(textInput)) {
+                // Handle array of texts
+                return textInput.map(item => item.text || item);
+            } else {
+                // Handle single text
+                return textInput;
+            }
+        }
+
+        // Get cache key for this language pair
+        const cacheKey = `header-categories-${fromCode}-${to}`;
+        let translationCache = {};
+        
+        // Try to load from localStorage if available
+        if (typeof window !== 'undefined') {
+            try {
+                const savedCache = localStorage.getItem(cacheKey);
+                if (savedCache) {
+                    translationCache = JSON.parse(savedCache);
+                }
+            } catch (e) {
+                console.warn('Failed to load header categories translation cache from localStorage', e);
+            }
+        }
+
+        try {
+            // This function is specifically for header categories and subcategories
+            // It expects an object with 'categories' and 'subcategories' arrays
+            if (typeof textInput !== 'object' || textInput === null || Array.isArray(textInput)) {
+                console.warn('headerCategoryTranslateFunction expects an object with categories and subcategories');
+                return textInput;
+            }
+
+            // Check if we have all translations in cache
+            const uncachedItems = {};
+            let allCached = true;
+            
+            Object.entries(textInput).forEach(([key, values]) => {
+                if (!Array.isArray(values)) return;
+                
+                const uncachedTexts = values.filter(item => {
+                    const text = typeof item === 'string' ? item : item.text;
+                    return !translationCache[text];
+                }).map(item => typeof item === 'string' ? item : item.text);
+                
+                if (uncachedTexts.length > 0) {
+                    uncachedItems[key] = uncachedTexts.map(text => ({ text }));
+                    allCached = false;
+                }
+            });
+
+            // If everything is cached, return from cache
+            if (allCached) {
+                console.log('[Translation] Using cached header categories translations');
+                const result = {};
+                Object.entries(textInput).forEach(([key, values]) => {
+                    if (Array.isArray(values)) {
+                        result[key] = values.map(item => {
+                            const text = typeof item === 'string' ? item : item.text;
+                            return translationCache[text] || text;
+                        });
+                    } else {
+                        result[key] = values;
+                    }
+                });
+                return result;
+            }
+
+            // Make a single API call for all uncached items
+            console.log('[Translation] Making API call for header categories:', Object.keys(uncachedItems));
+            const response = await axios.post('/api/translate', {
+                textGroups: uncachedItems,
+                from: fromCode,
+                to,
+            });
+
+            const translatedGroups = response.data || {};
+            
+            // Update cache with new translations
+            Object.entries(translatedGroups).forEach(([key, translatedValues]) => {
+                const originalValues = uncachedItems[key];
+                if (Array.isArray(originalValues) && Array.isArray(translatedValues)) {
+                    originalValues.forEach((item, idx) => {
+                        const text = item.text;
+                        if (text && translatedValues[idx]) {
+                            translationCache[text] = translatedValues[idx];
+                        }
+                    });
+                }
+            });
+            
+            // Save updated cache to localStorage
+            if (typeof window !== 'undefined') {
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify(translationCache));
+                } catch (e) {
+                    console.warn('Failed to save header categories translation cache to localStorage', e);
+                }
+            }
+            
+            // Build final result using cache
+            const result = {};
+            Object.entries(textInput).forEach(([key, values]) => {
+                if (Array.isArray(values)) {
+                    result[key] = values.map(item => {
+                        const text = typeof item === 'string' ? item : item.text;
+                        return translationCache[text] || text;
+                    });
+                } else {
+                    result[key] = values;
+                }
+            });
+            
+            return result;
+        } catch (error) {
+            console.error('Header categories translation error:', error);
+            // Return original text(s) in case of error
+            const result = {};
+            Object.entries(textInput).forEach(([key, value]) => {
+                result[key] = Array.isArray(value) ? value.map(item => typeof item === 'string' ? item : item.text) : value;
+            });
+            return result;
+        }
+    };
+
     const translateHeaders = async (textInput, from = 'en', toLang = language) => {
         const langMap = {
             English: 'en',
@@ -592,8 +734,12 @@ export const DataProvider = ({ children, countryDataHome }) => {
         try {
             // Handle different input formats
             if (typeof textInput === 'object' && textInput !== null && !Array.isArray(textInput)) {
-                // New format: Handle grouped texts (for categories, subcategories)
-                // Use the same caching logic as translateText for objects
+                // Check if this is a categories/subcategories object
+                if (textInput.categories || textInput.subcategories) {
+                    // Use the dedicated function for header categories
+                    return await headerCategoryTranslateFunction(textInput, fromCode, to);
+                }
+                // Otherwise use the general translateText for other objects
                 return await translateText(textInput, fromCode, to);
             } else if (Array.isArray(textInput)) {
                 // Batch translation with de-duplication and order mapping
