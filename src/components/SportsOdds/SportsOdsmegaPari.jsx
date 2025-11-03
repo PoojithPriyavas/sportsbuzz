@@ -322,7 +322,9 @@ export default function SportsOdsMegaPari() {
     const [translatedText, setTranslatedText] = useState(TranslationManager.defaultTexts);
     const [translationsLoading, setTranslationsLoading] = useState(false);
 
-    const { oneXTournament, oneXAccessToken, fetchOneXEventsIdData, oneXEventDetails, translateText, language } = useGlobalData();
+    const { oneXTournament, oneXAccessToken, fetchOneXEventsIdData, oneXEventDetails, translateText, language, 
+            // ADD: use scoped context APIs
+            fetchOneXEventsIdDataScoped, oneXEventDetailsScoped } = useGlobalData();
 
     // Memoize tournaments list
     const allTournaments = useMemo(() => {
@@ -406,15 +408,16 @@ export default function SportsOdsMegaPari() {
             const firstTournamentId = allTournaments[0].id;
             setSelectedTournament(firstTournamentId);
             setIsLoading(true);
-            fetchOneXEventsIdData(oneXAccessToken, firstTournamentId);
+            fetchOneXEventsIdDataScoped(oneXAccessToken, firstTournamentId, 'megapari');
             setDataInitialized(true);
         }
-    }, [allTournaments, oneXAccessToken, fetchOneXEventsIdData, dataInitialized]);
+    }, [allTournaments, oneXAccessToken, fetchOneXEventsIdDataScoped, dataInitialized]);
 
     // Process event details when they change
     useEffect(() => {
         const run = async () => {
-            const hasLiveData = Array.isArray(oneXEventDetails) && oneXEventDetails.length > 0;
+            const scopedDetails = oneXEventDetailsScoped?.megapari;
+            const hasLiveData = Array.isArray(scopedDetails) && scopedDetails.length > 0;
 
             if (!hasLiveData) {
                 const cachedDetails = CacheManager.get(CACHE_CONFIG.KEYS.EVENT_DETAILS);
@@ -434,7 +437,7 @@ export default function SportsOdsMegaPari() {
 
             setIsLoading(true);
 
-            const cards = await getTransformedCards(oneXEventDetails);
+            const cards = await getTransformedCards(scopedDetails);
             const timestamp = Date.now();
 
             setTransformedCards(cards);
@@ -445,11 +448,11 @@ export default function SportsOdsMegaPari() {
             CacheManager.set(CACHE_CONFIG.KEYS.CARDS, cards);
             CacheManager.set(CACHE_CONFIG.KEYS.TOURNAMENT, selectedTournament);
             CacheManager.set(CACHE_CONFIG.KEYS.TIMESTAMP, timestamp);
-            CacheManager.set(CACHE_CONFIG.KEYS.EVENT_DETAILS, oneXEventDetails);
+            CacheManager.set(CACHE_CONFIG.KEYS.EVENT_DETAILS, scopedDetails);
         };
 
         run();
-    }, [oneXEventDetails, getTransformedCards, selectedTournament]);
+    }, [oneXEventDetailsScoped, getTransformedCards, selectedTournament]);
 
     // Tournament change handler with debouncing
     const handleTournamentChange = useCallback((tournamentId) => {
@@ -472,10 +475,11 @@ export default function SportsOdsMegaPari() {
         setIsDropdownOpen(false);
         setPaused(true);
 
-        fetchOneXEventsIdData(oneXAccessToken, tournamentId);
+        // Use scoped fetch to avoid cross-component updates
+        fetchOneXEventsIdDataScoped(oneXAccessToken, tournamentId, 'megapari');
 
         setTimeout(() => setPaused(false), 2000);
-    }, [lastFetchTime, oneXAccessToken, fetchOneXEventsIdData]);
+    }, [lastFetchTime, oneXAccessToken, fetchOneXEventsIdDataScoped]);
 
     // Get selected tournament name
     const selectedTournamentName = useMemo(() => {

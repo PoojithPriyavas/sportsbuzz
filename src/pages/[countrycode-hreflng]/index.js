@@ -34,6 +34,7 @@ import { useParams } from "next/navigation";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 import DebugPanel from "@/components/Common/DebugPanel"; // Import the DebugPanel component
+import CountryLayout from "@/components/layouts/CountryLayout";
 
 
 const geistSans = Geist({
@@ -227,7 +228,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                 {/* <DebugPanel /> */}
 
                 {/* {showOtherDivs && <RegionSelector countryCode={countryCode} locationDataHome={locationDataHome} />} */}
-                <HeaderThree animationStage={animationStage} languageValidation={languageValidation} />
+                {/* Removed inline HeaderThree; provided by CountryLayout */}
                 {showOtherDivs && (
                     <div
                         // style={{marginTop:'9.5rem'}}
@@ -294,8 +295,13 @@ export default function Home({ locationDataHome, isLocalhost }) {
                         </div>
                     </div>
                 )}
-                {showOtherDivs && <Footer />}
+                {/* Removed inline FooterTwo; provided by CountryLayout */}
             </>
         </>
     );
+}
+
+// Attach shared layout: HeaderThree → content → FooterTwo
+Home.getLayout = function getLayout(page) {
+    return <CountryLayout>{page}</CountryLayout>;
 }

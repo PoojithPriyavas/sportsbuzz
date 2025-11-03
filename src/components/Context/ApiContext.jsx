@@ -1,5 +1,5 @@
 'use client';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import CustomAxios from '../utilities/CustomAxios';
 import axios from 'axios';
 import { fetchTournaments } from '@/pages/api/get-tournaments';
@@ -63,6 +63,10 @@ export const DataProvider = ({ children, countryDataHome }) => {
     const [bannerLoading, setBannerLoading] = useState(true);
 
     const [currentTimezone, setCurrentTimezone] = useState('+0.00');
+    
+    // Translation cache to avoid repeat API calls
+    const [translationCache, setTranslationCache] = useState({});
+    const translationCacheRef = useRef({});
 
     const getTimezoneByCountryCode = (code) => {
         // console.log(code, "code in country data")
@@ -284,35 +288,242 @@ export const DataProvider = ({ children, countryDataHome }) => {
             }
         }
 
+        // Get cache key for this language pair
+        const cacheKey = `${fromCode}-${to}`;
+        if (!translationCacheRef.current[cacheKey]) {
+            translationCacheRef.current[cacheKey] = {};
+            // Try to load from localStorage if available
+            if (typeof window !== 'undefined') {
+                try {
+                    const savedCache = localStorage.getItem(`translation-cache-${cacheKey}`);
+                    if (savedCache) {
+                        translationCacheRef.current[cacheKey] = JSON.parse(savedCache);
+                    }
+                } catch (e) {
+                    console.warn('Failed to load translation cache from localStorage', e);
+                }
+            }
+        }
+
         try {
             // Handle different input formats
             if (typeof textInput === 'object' && textInput !== null && !Array.isArray(textInput)) {
                 // New format: Handle grouped texts (for header, categories, subcategories)
+                const textGroups = { ...textInput };
+                const uncachedGroups = {};
+                let allCached = true;
+                
+                // Check what we already have in cache
+                Object.entries(textGroups).forEach(([key, values]) => {
+                    if (Array.isArray(values)) {
+                        const uncachedValues = [];
+                        const cachedResults = [];
+                        
+                        values.forEach((item, index) => {
+                            const text = typeof item === 'string' ? item : item.text;
+                            if (text && translationCacheRef.current[cacheKey][text]) {
+                                cachedResults[index] = translationCacheRef.current[cacheKey][text];
+                            } else {
+                                uncachedValues.push({ text, index });
+                                allCached = false;
+                            }
+                        });
+                        
+                        if (uncachedValues.length > 0) {
+                            uncachedGroups[key] = uncachedValues.map(item => item.text);
+                        }
+                        
+                        // Store the cached results and their positions
+                        textGroups[key] = { cachedResults, originalValues: values };
+                    } else {
+                        // Handle non-array values
+                        if (values && translationCacheRef.current[cacheKey][values]) {
+                            textGroups[key] = translationCacheRef.current[cacheKey][values];
+                        } else {
+                            uncachedGroups[key] = values;
+                            allCached = false;
+                        }
+                    }
+                });
+                
+                // If everything was cached, return the cached results
+                if (allCached) {
+                    const result = {};
+                    Object.entries(textGroups).forEach(([key, value]) => {
+                        if (value && value.cachedResults && value.originalValues) {
+                            // Reconstruct the array from cached results
+                            result[key] = value.originalValues.map((_, i) => 
+                                value.cachedResults[i] || value.originalValues[i]);
+                        } else {
+                            result[key] = value;
+                        }
+                    });
+                    return result;
+                }
+                
+                // Only send uncached items to the API
                 const response = await axios.post('/api/translate', {
-                    textGroups: textInput,
+                    textGroups: uncachedGroups,
                     from: fromCode,
                     to,
                 });
-                return response.data;
+                
+                // Merge API results with cached results and update cache
+                const apiResults = response.data || {};
+                const result = {};
+                
+                Object.entries(textGroups).forEach(([key, value]) => {
+                    if (value && value.cachedResults && value.originalValues) {
+                        // Handle arrays with some cached items
+                        const apiResultsForKey = apiResults[key] || [];
+                        const uncachedForKey = uncachedGroups[key] || [];
+                        const mergedResults = [...value.originalValues];
+                        
+                        // Map uncached values back to their original positions
+                        let apiIndex = 0;
+                        value.originalValues.forEach((originalItem, i) => {
+                            const originalText = typeof originalItem === 'string' ? originalItem : originalItem.text;
+                            if (!value.cachedResults[i] && originalText) {
+                                if (apiResultsForKey[apiIndex]) {
+                                    mergedResults[i] = apiResultsForKey[apiIndex];
+                                    // Update cache
+                                    translationCacheRef.current[cacheKey][originalText] = apiResultsForKey[apiIndex];
+                                    apiIndex++;
+                                }
+                            } else {
+                                mergedResults[i] = value.cachedResults[i];
+                            }
+                        });
+                        
+                        result[key] = mergedResults;
+                    } else if (apiResults[key]) {
+                        // Handle non-array or fully uncached arrays
+                        result[key] = apiResults[key];
+                        // Update cache for non-array values
+                        if (typeof textInput[key] === 'string') {
+                            translationCacheRef.current[cacheKey][textInput[key]] = apiResults[key];
+                        }
+                    } else {
+                        // Use cached value
+                        result[key] = value;
+                    }
+                });
+                
+                // Save updated cache to localStorage
+                if (typeof window !== 'undefined') {
+                    try {
+                        localStorage.setItem(
+                            `translation-cache-${cacheKey}`, 
+                            JSON.stringify(translationCacheRef.current[cacheKey])
+                        );
+                    } catch (e) {
+                        console.warn('Failed to save translation cache to localStorage', e);
+                    }
+                }
+                
+                return result;
             } else if (Array.isArray(textInput)) {
-                // Batch translation
-                const texts = textInput.map(item => ({
-                    text: typeof item === 'string' ? item : item.text
-                }));
+                // Batch translation with caching
+                const textsToTranslate = [];
+                const cachedTranslations = [];
+                const originalIndices = [];
+                
+                // Check what we already have in cache
+                textInput.forEach((item, index) => {
+                    const text = typeof item === 'string' ? item : item.text;
+                    if (text && translationCacheRef.current[cacheKey][text]) {
+                        cachedTranslations[index] = translationCacheRef.current[cacheKey][text];
+                    } else if (text) {
+                        textsToTranslate.push({ text });
+                        originalIndices.push(index);
+                    } else {
+                        // Handle null/undefined items
+                        cachedTranslations[index] = item;
+                    }
+                });
+                
+                // If everything was cached, return the cached results
+                if (textsToTranslate.length === 0) {
+                    return textInput.map((_, i) => cachedTranslations[i] || textInput[i]);
+                }
+                
+                // Only send uncached items to the API
                 const response = await axios.post('/api/translate', {
-                    texts,
+                    texts: textsToTranslate,
                     from: fromCode,
                     to,
                 });
-                return response.data;
+                
+                // Merge API results with cached results
+                const apiResults = response.data || [];
+                const result = [...textInput]; // Create a copy to preserve original structure
+                
+                // Place API results in their original positions
+                apiResults.forEach((translation, i) => {
+                    const originalIndex = originalIndices[i];
+                    result[originalIndex] = translation;
+                    
+                    // Update cache
+                    const originalText = typeof textInput[originalIndex] === 'string' 
+                        ? textInput[originalIndex] 
+                        : textInput[originalIndex]?.text;
+                    if (originalText) {
+                        translationCacheRef.current[cacheKey][originalText] = translation;
+                    }
+                });
+                
+                // Fill in cached translations
+                textInput.forEach((_, i) => {
+                    if (cachedTranslations[i]) {
+                        result[i] = cachedTranslations[i];
+                    }
+                });
+                
+                // Save updated cache to localStorage
+                if (typeof window !== 'undefined') {
+                    try {
+                        localStorage.setItem(
+                            `translation-cache-${cacheKey}`, 
+                            JSON.stringify(translationCacheRef.current[cacheKey])
+                        );
+                    } catch (e) {
+                        console.warn('Failed to save translation cache to localStorage', e);
+                    }
+                }
+                
+                return result;
             } else {
-                // Single text translation
+                // Single text translation with caching
+                if (textInput && translationCacheRef.current[cacheKey][textInput]) {
+                    return translationCacheRef.current[cacheKey][textInput];
+                }
+                
                 const response = await axios.post('/api/translate', {
                     text: textInput,
                     from: fromCode,
                     to,
                 });
-                return response.data;
+                
+                const translation = response.data;
+                
+                // Update cache
+                if (textInput && translation) {
+                    translationCacheRef.current[cacheKey][textInput] = translation;
+                    
+                    // Save to localStorage
+                    if (typeof window !== 'undefined') {
+                        try {
+                            localStorage.setItem(
+                                `translation-cache-${cacheKey}`, 
+                                JSON.stringify(translationCacheRef.current[cacheKey])
+                            );
+                        } catch (e) {
+                            console.warn('Failed to save translation cache to localStorage', e);
+                        }
+                    }
+                }
+                
+                return translation;
             }
         } catch (error) {
             console.error('Translation error:', error);
@@ -361,22 +572,36 @@ export const DataProvider = ({ children, countryDataHome }) => {
             }
         }
 
+        // Get cache key for this language pair
+        const cacheKey = `${fromCode}-${to}`;
+        if (!translationCacheRef.current[cacheKey]) {
+            translationCacheRef.current[cacheKey] = {};
+            // Try to load from localStorage if available
+            if (typeof window !== 'undefined') {
+                try {
+                    const savedCache = localStorage.getItem(`translation-cache-${cacheKey}`);
+                    if (savedCache) {
+                        translationCacheRef.current[cacheKey] = JSON.parse(savedCache);
+                    }
+                } catch (e) {
+                    console.warn('Failed to load translation cache from localStorage', e);
+                }
+            }
+        }
+
         try {
             // Handle different input formats
             if (typeof textInput === 'object' && textInput !== null && !Array.isArray(textInput)) {
                 // New format: Handle grouped texts (for categories, subcategories)
-                const response = await axios.post('/api/translate', {
-                    textGroups: textInput,
-                    from: fromCode,
-                    to,
-                });
-                return response.data;
+                // Use the same caching logic as translateText for objects
+                return await translateText(textInput, fromCode, to);
             } else if (Array.isArray(textInput)) {
                 // Batch translation with de-duplication and order mapping
                 const originalTexts = textInput
                     .map(item => (typeof item === 'string' ? item : item?.text))
                     .filter(Boolean);
 
+                // De-duplicate texts to translate
                 const uniqueTexts = [];
                 const seen = new Set();
                 for (const t of originalTexts) {
@@ -386,28 +611,60 @@ export const DataProvider = ({ children, countryDataHome }) => {
                     }
                 }
 
+                // Check cache for each unique text
+                const textsToTranslate = [];
+                const translationMap = {};
+
+                uniqueTexts.forEach(text => {
+                    if (translationCacheRef.current[cacheKey][text]) {
+                        translationMap[text] = translationCacheRef.current[cacheKey][text];
+                    } else {
+                        textsToTranslate.push({ text });
+                    }
+                });
+
+                // If all texts are cached, use cache only
+                if (textsToTranslate.length === 0) {
+                    return originalTexts.map(t => translationMap[t] ?? t);
+                }
+
+                // Only send uncached texts to API
                 const response = await axios.post('/api/translate', {
-                    texts: uniqueTexts.map(text => ({ text })),
+                    texts: textsToTranslate,
                     from: fromCode,
                     to,
                 });
 
-                const translatedUnique = response.data || [];
-                const translationMap = {};
-                uniqueTexts.forEach((t, idx) => {
-                    translationMap[t] = translatedUnique[idx] ?? t;
+                const translatedNew = response.data || [];
+                
+                // Update translation map with new translations
+                textsToTranslate.forEach((item, idx) => {
+                    const originalText = item.text;
+                    const translation = translatedNew[idx];
+                    if (originalText && translation) {
+                        translationMap[originalText] = translation;
+                        // Update cache
+                        translationCacheRef.current[cacheKey][originalText] = translation;
+                    }
                 });
+
+                // Save updated cache to localStorage
+                if (typeof window !== 'undefined') {
+                    try {
+                        localStorage.setItem(
+                            `translation-cache-${cacheKey}`, 
+                            JSON.stringify(translationCacheRef.current[cacheKey])
+                        );
+                    } catch (e) {
+                        console.warn('Failed to save translation cache to localStorage', e);
+                    }
+                }
 
                 // Map back to original order/length
                 return originalTexts.map(t => translationMap[t] ?? t);
             } else {
-                // Single text translation
-                const response = await axios.post('/api/translate', {
-                    text: textInput,
-                    from: fromCode,
-                    to,
-                });
-                return response.data;
+                // Single text translation - use the same caching logic as translateText
+                return await translateText(textInput, fromCode, to);
             }
         } catch (error) {
             console.error('Translation error:', error);
@@ -768,6 +1025,41 @@ export const DataProvider = ({ children, countryDataHome }) => {
             return null;
         }
     }
+
+    // Scoped One-X event state and fetchers to avoid cross-component updates
+    const [oneXEventDetailsScoped, setOneXEventDetailsScoped] = useState({});
+    const [oneXEventIdsScoped, setOneXEventIdsScoped] = useState({});
+
+    const fetchOneXEventDetailsForAllIdsScoped = async (token, eventIds, scope) => {
+        try {
+            const detailPromises = eventIds.map(eventId =>
+                fetchOneXSportEventDetails({ token, eventId })
+            );
+            const results = await Promise.all(detailPromises);
+            const validDetails = results.filter(detail => detail !== null);
+            setOneXEventDetailsScoped(prev => ({ ...prev, [scope]: validDetails }));
+        } catch (error) {
+            console.error('Error fetching scoped event details:', error);
+            setOneXEventDetailsScoped(prev => ({ ...prev, [scope]: [] }));
+        }
+    };
+
+    console.log(oneXEventDetailsScoped.megapari, "scoped event details")
+    const fetchOneXEventsIdDataScoped = async (token, id, scope) => {
+        try {
+            const data = await fetchOneXEventsIds({ token, id });
+            if (data && data.items) {
+                setOneXEventIdsScoped(prev => ({ ...prev, [scope]: data.items }));
+                await fetchOneXEventDetailsForAllIdsScoped(token, data.items, scope);
+            } else {
+                setOneXEventIdsScoped(prev => ({ ...prev, [scope]: [] }));
+                console.warn("No event IDs returned (scoped)");
+            }
+        } catch (err) {
+            console.error('Failed to fetch scoped event IDs:', err);
+            setOneXEventIdsScoped(prev => ({ ...prev, [scope]: [] }));
+        }
+    };
 
 
 
@@ -1462,6 +1754,9 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 oneXEventDetails,
                 fetchMarketData,
                 fetchOneXMarketData,
+                oneXEventDetailsScoped,
+                oneXEventIdsScoped,
+                fetchOneXEventsIdDataScoped,
                 location,
                 fetchFootballDetails,
                 footBallMatchDetails,
