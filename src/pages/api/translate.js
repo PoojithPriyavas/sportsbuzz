@@ -80,24 +80,50 @@ export default async function handler(req, res) {
 
   try {
     if (textGroups) {
-      // Handle grouped texts - translate one at a time with retries
+      // Handle grouped texts - batch translate all texts in a group at once
       const groupedTranslations = {};
 
       for (const [groupName, groupTexts] of Object.entries(textGroups)) {
-        const translations = [];
-
-        for (const textItem of groupTexts) {
-          const textToTranslate = typeof textItem === 'string' ? textItem : textItem.text;
-          try {
-            const translated = await translateWithRetry(textToTranslate, from, to);
-            translations.push(translated);
-          } catch (err) {
-            console.error('API Error:', err.response || err);
-            translations.push(textToTranslate); // Fallback to original after max attempts
+        // Extract all texts from the group
+        const textsToTranslate = groupTexts.map(textItem => 
+          typeof textItem === 'string' ? textItem : textItem.text
+        ).join('\n');
+        
+        try {
+          // Translate all texts in one API call
+          const translatedBatch = await translateWithRetry(textsToTranslate, from, to);
+          
+          // Split the translated text back into individual items
+          const translations = translatedBatch.split('\n');
+          
+          // Ensure we have the same number of translations as original texts
+          if (translations.length === groupTexts.length) {
+            groupedTranslations[groupName] = translations;
+          } else {
+            // Fallback to individual translation if batch translation fails
+            console.warn(`Batch translation returned ${translations.length} items but expected ${groupTexts.length}. Falling back to individual translation.`);
+            const individualTranslations = [];
+            
+            for (const textItem of groupTexts) {
+              const textToTranslate = typeof textItem === 'string' ? textItem : textItem.text;
+              try {
+                const translated = await translateWithRetry(textToTranslate, from, to);
+                individualTranslations.push(translated);
+              } catch (err) {
+                console.error('API Error:', err.response || err);
+                individualTranslations.push(textToTranslate); // Fallback to original after max attempts
+              }
+            }
+            
+            groupedTranslations[groupName] = individualTranslations;
           }
+        } catch (err) {
+          console.error('Batch API Error:', err.response || err);
+          // Fallback to original texts if batch translation fails
+          groupedTranslations[groupName] = groupTexts.map(textItem => 
+            typeof textItem === 'string' ? textItem : textItem.text
+          );
         }
-
-        groupedTranslations[groupName] = translations;
       }
 
       return res.status(200).json(groupedTranslations);
