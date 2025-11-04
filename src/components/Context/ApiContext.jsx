@@ -180,7 +180,8 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
 
     // TRANSLATION API IMPLEMENTATION
-
+    
+// translation codes in apiContext
     const [language, setLanguage] = useState('en');
 
     // Replace the translateText function in ApiContext with this updated version

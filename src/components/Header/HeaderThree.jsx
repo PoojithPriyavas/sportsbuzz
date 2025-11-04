@@ -33,9 +33,7 @@ const Logo = React.memo(({ logoRef, buildPath, isTranslating, isNavigating, isLo
         isNavigating,
         isLogoLoaded
     });
-    useEffect(() => {
-        console.log("the new code is running")
-    }, []);
+
     // Mount/unmount logs
     useEffect(() => {
         console.log('[Logo] mounted', {
@@ -148,7 +146,7 @@ function HeaderThree({ animationStage, languageValidation }) {
     // Helper: translate header labels using static JSON first, then fallback to translateText per key
     const translateHeaderLabels = async (selectedLanguage) => {
         console.log('[HeaderThree] translateHeaderLabels called for', selectedLanguage);
-
+        
         // First check if we have a valid cache for this language
         try {
             const cachedData = localStorage.getItem(`cachedTranslations_${selectedLanguage}`);
@@ -164,7 +162,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         } catch (cacheError) {
             console.warn('Failed to read cached translations:', cacheError);
         }
-
+        
         const staticMap = getStaticTranslationsForLanguage(selectedLanguage);
 
         // If English, short-circuit to defaults
@@ -231,7 +229,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         } catch (cacheError) {
             console.warn('Failed to cache header translations:', cacheError);
         }
-
+        
         return results;
     };
 
@@ -495,11 +493,10 @@ function HeaderThree({ animationStage, languageValidation }) {
                     subcategories: subcategoryNames.map(text => ({ text })),
                 };
 
-                // Use the new dedicated function for header categories translation
-                console.log('[Categories] Using headerCategoryTranslateFunction for batch translation');
+                // Send grouped payload in one request
                 const groupedResults = await retryTranslation(
                     () => Promise.race([
-                        headerCategoryTranslateFunction(payload, 'en', language),
+                        translateHeaders(payload, 'en', language),
                         new Promise((_, reject) =>
                             setTimeout(() => reject(new Error('Translation timeout')), 15000)
                         )
@@ -869,7 +866,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         console.log(firstSegment, "first segment")
         // Check if it matches the format: language-countrycode
         const match = firstSegment.match(/^([a-z]{2})-([a-z]{2})$/i);
-        console.log(match, "match in the parse url")
+        console.log(match,"match in the parse url")
 
         if (match) {
             return {
@@ -977,7 +974,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         sport: 'Sport'
     });
     const [filteredList, setFilteredList] = useState([]);
-
+    
     // Track if we've already loaded translations for this language in the current session
     const translationLoadedRef = useRef({});
 
