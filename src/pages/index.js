@@ -272,7 +272,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
             <div>Scenario: {hreflangDetected && hasLanguageCountryFormat(typeof window !== 'undefined' ? window.location.pathname : '') ? '2' : '1'}</div>
           </div>
         )} */}
-
+{/* 
         <HeaderThree animationStage={animationStage} />
         {showOtherDivs && (
           <div
@@ -331,7 +331,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
             </div>
           </div>
         )}
-        {showOtherDivs && <Footer />}
+        {showOtherDivs && <Footer />} */}
       </>
     </>
   );
