@@ -12,7 +12,7 @@ export default function CountryLayout({ children }) {
       <main >
         {children}
       </main>
-      <FooterTwo countryCode={countryCode} />
+      {/* <FooterTwo countryCode={countryCode} /> */}
     </>
   );
 }

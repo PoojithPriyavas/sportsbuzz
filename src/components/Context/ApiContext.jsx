@@ -590,6 +590,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
         }
 
         try {
+            console.log("eners to the headerCategoryTranslateFunction")
             // This function is specifically for header categories and subcategories
             // It expects an object with 'categories' and 'subcategories' arrays
             if (typeof textInput !== 'object' || textInput === null || Array.isArray(textInput)) {

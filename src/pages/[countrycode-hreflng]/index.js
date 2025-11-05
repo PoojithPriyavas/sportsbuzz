@@ -229,7 +229,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
 
                 {/* {showOtherDivs && <RegionSelector countryCode={countryCode} locationDataHome={locationDataHome} />} */}
                 {/* Removed inline HeaderThree; provided by CountryLayout */}
-                {showOtherDivs && (
+                {/* {showOtherDivs && (
                     <div
                         // style={{marginTop:'9.5rem'}}
                         className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
@@ -294,7 +294,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                             </div>
                         </div>
                     </div>
-                )}
+                )} */}
                 {/* Removed inline FooterTwo; provided by CountryLayout */}
             </>
         </>
