@@ -2,7 +2,7 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
-import styles from "@/styles/Home.module.css";
+// import styles from "@/styles/Home.module.css";
 import Header from "@/components/Header/Header";
 import LiveScores from "@/components/LiveScoreSection/LiveScoreSection";
 import BonusTable from "@/components/BonusTable/BonusTable";
@@ -31,6 +31,7 @@ import HeaderThree from "@/components/Header/HeaderThree";
 import RegionSelector from "@/components/RegionSelector/RegionSelector";
 import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
+import styles from '../styles/globalHeader.module.css';
 
 // Import hreflang helper utilities
 // import {
@@ -51,62 +52,64 @@ const geistMono = Geist_Mono({
 
 import axios from 'axios';
 
-export async function getServerSideProps(context) {
-  try {
-    const locationRes = await fetch('https://admin.sportsbuz.com/api/locations');
+// export async function getServerSideProps(context) {
+//   try {
+//     const locationRes = await fetch('https://admin.sportsbuz.com/api/locations');
 
-    if (!locationRes.ok) {
-      throw new Error(`Location API failed: ${locationRes.status} ${locationRes.statusText}`);
-    }
+//     if (!locationRes.ok) {
+//       throw new Error(`Location API failed: ${locationRes.status} ${locationRes.statusText}`);
+//     }
 
-    const locationDataHome = await locationRes.json();
+//     const locationDataHome = await locationRes.json();
 
-    return {
-      props: {
-        locationDataHome
-      }
-    };
-  } catch (error) {
-    console.error("Error fetching data from location API:", error.message);
-    return {
-      props: {
-        locationDataHome: null,
-        isLocalhost: process.env.NODE_ENV === 'development'
-      }
-    };
-  }
-}
+//     return {
+//       props: {
+//         locationDataHome
+//       }
+//     };
+//   } catch (error) {
+//     console.error("Error fetching data from location API:", error.message);
+//     return {
+//       props: {
+//         locationDataHome: null,
+//         isLocalhost: process.env.NODE_ENV === 'development'
+//       }
+//     };
+//   }
+// }
 
-export default function Home({ locationDataHome, isLocalhost }) {
+export default function Home({ 
+  // locationDataHome, isLocalhost
+ }) {
   // console.log(locationDataHome, "location data home")
-  const {
-    blogCategories,
-    blogs,
-    sections,
-    apiResponse,
-    matchTypes,
-    teamImages,
-    upcomingMatches,
-    sport,
-    countryCode,
-    stages,
-    news,
-    activeOddBanners,
-    activeEvenBanners,
-    bannerLoading
-  } = useGlobalData();
+  // const {
+  //   blogCategories,
+  //   blogs,
+  //   sections,
+  //   apiResponse,
+  //   matchTypes,
+  //   teamImages,
+  //   upcomingMatches,
+  //   sport,
+  //   countryCode,
+  //   stages,
+  //   news,
+  //   activeOddBanners,
+  //   activeEvenBanners,
+  //   bannerLoading
+  // } = useGlobalData();
   // console.log(apiResponse,"api response")
   // console.log(blogs, "blogs in index")
 
-  const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
+  // const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
 
-  // console.log(sections, "best betting apps console");
+  // // console.log(sections, "best betting apps console");
 
-  const [loading, setLoading] = useState(true);
-  const [animationStage, setAnimationStage] = useState('loading');
-  const [showOtherDivs, setShowOtherDivs] = useState(false);
-  const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
-  const [hreflangDetected, setHreflangDetected] = useState(false);
+  // const [loading, setLoading] = useState(true);
+  // const [animationStage, setAnimationStage] = useState('loading');
+  // const [showOtherDivs, setShowOtherDivs] = useState(false);
+  // const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
+  // const [hreflangDetected, setHreflangDetected] = useState(false);
 
   // Check for hreflang tags and URL format on component mount
   // useEffect(() => {
@@ -137,70 +140,70 @@ export default function Home({ locationDataHome, isLocalhost }) {
   //   return () => clearTimeout(timer);
   // }, []);
 
-  useEffect(() => {
-    // Check if animation has been played before
-    const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
+  // useEffect(() => {
+  //   // Check if animation has been played before
+  //   const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
 
-    if (!hasPlayedAnimation) {
-      // First time - play the full animation sequence
-      const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
-      const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
-      const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
-      const timer4 = setTimeout(() => setShowOtherDivs(true), 6500);
+  //   if (!hasPlayedAnimation) {
+  //     // First time - play the full animation sequence
+  //     const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
+  //     const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
+  //     const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
+  //     const timer4 = setTimeout(() => setShowOtherDivs(true), 6500);
 
-      return () => {
-        clearTimeout(timer1);
-        clearTimeout(timer2);
-        clearTimeout(timer3);
-        clearTimeout(timer4);
-      };
-    } else {
-      // Animation already played - go directly to header and show content immediately
-      setAnimationStage('header');
-      setShowOtherDivs(true);
-      setLoading(false);
-    }
-  }, []);
+  //     return () => {
+  //       clearTimeout(timer1);
+  //       clearTimeout(timer2);
+  //       clearTimeout(timer3);
+  //       clearTimeout(timer4);
+  //     };
+  //   } else {
+  //     // Animation already played - go directly to header and show content immediately
+  //     setAnimationStage('header');
+  //     setShowOtherDivs(true);
+  //     setLoading(false);
+  //   }
+  // }, []);
 
-  // Original loading timer (keeping for compatibility)
-  useEffect(() => {
-    const timer1 = setTimeout(() => setLoading(false), 3000);
-    return () => clearTimeout(timer1);
-  }, []);
+  // // Original loading timer (keeping for compatibility)
+  // useEffect(() => {
+  //   const timer1 = setTimeout(() => setLoading(false), 3000);
+  //   return () => clearTimeout(timer1);
+  // }, []);
 
-  useEffect(() => {
-    if (showOtherDivs) {
-      const timeout = setTimeout(() => setHasAnimatedIn(true), 50);
-      return () => clearTimeout(timeout);
-    }
-  }, [showOtherDivs]);
+  // useEffect(() => {
+  //   if (showOtherDivs) {
+  //     const timeout = setTimeout(() => setHasAnimatedIn(true), 50);
+  //     return () => clearTimeout(timeout);
+  //   }
+  // }, [showOtherDivs]);
 
   // Generate hreflang links only if locationDataHome is available
-  const generateHreflangLinks = () => {
-    if (!locationDataHome || !Array.isArray(locationDataHome)) {
-      // console.warn('No location data available for hreflang generation');
-      return [];
-    }
+  // const generateHreflangLinks = () => {
+  //   if (!locationDataHome || !Array.isArray(locationDataHome)) {
+  //     // console.warn('No location data available for hreflang generation');
+  //     return [];
+  //   }
 
-    return locationDataHome.map(({ hreflang, country_code }) => {
-      // console.log(hreflang, "href lang home")
-      const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
-      const fullHrefLang = `${hreflang}-${country_code}`;
-      // console.log('Generated hreflang link:', { href, fullHrefLang });
+  //   return locationDataHome.map(({ hreflang, country_code }) => {
+  //     // console.log(hreflang, "href lang home")
+  //     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/`;
+  //     const fullHrefLang = `${hreflang}-${country_code}`;
+  //     // console.log('Generated hreflang link:', { href, fullHrefLang });
 
-      return {
-        key: fullHrefLang,
-        hreflang: fullHrefLang,
-        href: href
-      };
-    });
-  };
+  //     return {
+  //       key: fullHrefLang,
+  //       hreflang: fullHrefLang,
+  //       href: href
+  //     };
+  //   });
+  // };
 
-  const hreflangLinks = generateHreflangLinks();
+  // const hreflangLinks = generateHreflangLinks();
 
   return (
     <>
-      <Head>
+      {/* <Head>
         <title>Sportsbuz | Live Scores, Sports News & Betting Predictions</title>
         <meta
           name="description"
@@ -212,7 +215,6 @@ export default function Home({ locationDataHome, isLocalhost }) {
         />
         <meta name="author" content="Sportsbuz" />
         <link rel="alternate" href="https://sportsbuz.com/" hreflang="x-default" />
-        {/* Hreflang links - Critical for Scenario 2 */}
         {hreflangLinks.map(({ key, hreflang, href }) => (
           <link
             key={key}
@@ -222,10 +224,8 @@ export default function Home({ locationDataHome, isLocalhost }) {
           />
         ))}
 
-        {/* Canonical URL */}
         <link rel="canonical" href={`${baseUrl}${typeof window !== 'undefined' ? window.location.pathname : ''}`} />
 
-        {/* Open Graph (for Facebook, LinkedIn, etc.) */}
         <meta property="og:title" content="Sportsbuz | Live Scores & Betting Tips" />
         <meta
           property="og:description"
@@ -236,7 +236,6 @@ export default function Home({ locationDataHome, isLocalhost }) {
         <meta property="og:image" content="https://www.sportsbuz.com/images/logo.png" />
         <meta property="og:site_name" content="Sportsbuz" />
 
-        {/* Twitter Card (for Twitter/X) */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Sportsbuz | Live Scores & Predictions" />
         <meta
@@ -246,13 +245,11 @@ export default function Home({ locationDataHome, isLocalhost }) {
         <meta name="twitter:image" content="https://www.sportsbuz.com/images/logo.png" />
         <meta name="twitter:site" content="@sportsbuz" />
 
-        {/* Favicon */}
         <link rel="icon" href="/favicon.ico" />
 
-        {/* Additional meta for location-based handling */}
         <meta name="hreflang-detected" content={hreflangDetected ? 'true' : 'false'} />
 
-      </Head>
+      </Head> */}
 
       <>
         {/* Debug info in development */}
@@ -272,8 +269,8 @@ export default function Home({ locationDataHome, isLocalhost }) {
             <div>Scenario: {hreflangDetected && hasLanguageCountryFormat(typeof window !== 'undefined' ? window.location.pathname : '') ? '2' : '1'}</div>
           </div>
         )} */}
-{/* 
-        <HeaderThree animationStage={animationStage} />
+
+        {/* <HeaderThree animationStage={animationStage} />
         {showOtherDivs && (
           <div
             className={`${geistSans.variable} ${geistMono.variable} ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter} ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
@@ -332,6 +329,20 @@ export default function Home({ locationDataHome, isLocalhost }) {
           </div>
         )}
         {showOtherDivs && <Footer />} */}
+        <div
+          // ref={containerRef}
+          className={`${styles.loadingContainerOut}`}>
+          <div
+            // ref={loadingAnimationRef}
+            className={`${styles.loadingAnimationOut} `}
+          >
+            <div className={styles.loadingIconOut}>
+              <div className={styles.mainIconOut}>
+                <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInnerOut} />
+              </div>
+            </div>
+          </div>
+        </div>
       </>
     </>
   );

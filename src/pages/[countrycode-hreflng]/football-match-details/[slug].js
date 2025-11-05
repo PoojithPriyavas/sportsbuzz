@@ -88,7 +88,7 @@ export async function getServerSideProps(context) {
 
 export default function FootballMatchDetails({ countryDataHome, locationDataHome, resolvedUrl, }) {
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
-    const { activeOddBanners, bannerLoading } = useGlobalData();
+    const { activeOddBanners, bannerLoading, setShowOtherDivs,  showOtherDivs } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     const params = useParams();
@@ -108,7 +108,7 @@ export default function FootballMatchDetails({ countryDataHome, locationDataHome
         return () => clearTimeout(timer1);
     }, []);
     const [animationStage, setAnimationStage] = useState('loading');
-    const [showOtherDivs, setShowOtherDivs] = useState(false);
+    // const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
 

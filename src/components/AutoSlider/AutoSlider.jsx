@@ -9,10 +9,13 @@ import CustomAxios from '../utilities/CustomAxios';
 import axios from 'axios';
 import { useGlobalData } from '../Context/ApiContext';
 
-export default function AutoSlider({activeOddBanners, bannerLoading}) {
+export default function AutoSlider({ activeOddBanners, bannerLoading}) {
 
   const swiperRef = useRef(null);
-  const { countryCode } = useGlobalData()
+  const { countryCode, fetchBanners } = useGlobalData()
+  useEffect(() => {
+    fetchBanners()
+  }, [countryCode])
 
   // useEffect(() => {
   //   const fetchBanners = async () => {

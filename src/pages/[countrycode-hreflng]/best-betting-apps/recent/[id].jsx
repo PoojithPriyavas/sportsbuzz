@@ -121,6 +121,8 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
         activeOddBanners,
         activeEvenBanners,
         bannerLoading,
+        setShowOtherDivs,
+        showOtherDivs
 
         // bestSections,
 
@@ -132,7 +134,7 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
         return () => clearTimeout(timer1);
     }, []);
     const [animationStage, setAnimationStage] = useState('loading');
-    const [showOtherDivs, setShowOtherDivs] = useState(false);
+    // const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
 

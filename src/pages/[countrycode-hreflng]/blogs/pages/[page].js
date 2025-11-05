@@ -102,8 +102,10 @@ export default function BlogPages({
     supportedCountries,
     resolvedUrl,
     isLocalhost,
+    setShowOtherDivs,
+    showOtherDivs
 }) {
-    console.log(blogs," blogs from ssr")
+    console.log(blogs, " blogs from ssr")
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
     const router = useRouter();
     const [isValidating, setIsValidating] = useState(false);
@@ -119,7 +121,7 @@ export default function BlogPages({
 
     const [loading, setLoading] = useState(true);
     const [animationStage, setAnimationStage] = useState('loading');
-    const [showOtherDivs, setShowOtherDivs] = useState(false);
+    // const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
     // // Function to get default language for a country (first available language)

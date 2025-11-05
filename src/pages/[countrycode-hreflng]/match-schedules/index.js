@@ -93,7 +93,7 @@ export async function getServerSideProps(context) {
 export default function MatchSchedulerScreen({ countryDataHome, locationDataHome, resolvedUrl, }) {
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
 
-    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches, stages, activeOddBanners, activeEvenBanners, bannerLoading } = useGlobalData();
+    const { sport, apiResponse, teamImages, matchTypes, upcomingMatches, stages, activeOddBanners, activeEvenBanners, bannerLoading, setShowOtherDivs, showOtherDivs } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -102,7 +102,7 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
         return () => clearTimeout(timer1);
     }, []);
     const [animationStage, setAnimationStage] = useState('loading');
-    const [showOtherDivs, setShowOtherDivs] = useState(false);
+    // const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
 

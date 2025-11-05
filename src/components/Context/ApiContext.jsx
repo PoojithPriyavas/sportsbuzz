@@ -57,13 +57,15 @@ export const DataProvider = ({ children, countryDataHome }) => {
     // console.log(pathname, "path name")
     // const isUrlCountryPresent = pathname?.replace(/^,?\//, '').split('-');
     // console.log(isUrlCountryPresent[1], "is url")
+    const [showOtherDivs, setShowOtherDivs] = useState(false);
 
-    //  TIME ZONE IMPLEMENTATION
     const [banners, setBanners] = useState([]);
     const [bannerLoading, setBannerLoading] = useState(true);
 
+    //  TIME ZONE IMPLEMENTATION
+
     const [currentTimezone, setCurrentTimezone] = useState('+0.00');
-    
+
     // Translation cache to avoid repeat API calls
     const [translationCache, setTranslationCache] = useState({});
     const translationCacheRef = useRef({});
@@ -180,8 +182,8 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
 
     // TRANSLATION API IMPLEMENTATION
-    
-// translation codes in apiContext
+
+    // translation codes in apiContext
     const [language, setLanguage] = useState('en');
 
     // Replace the translateText function in ApiContext with this updated version
@@ -313,13 +315,13 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 const textGroups = { ...textInput };
                 const uncachedGroups = {};
                 let allCached = true;
-                
+
                 // Check what we already have in cache
                 Object.entries(textGroups).forEach(([key, values]) => {
                     if (Array.isArray(values)) {
                         const uncachedValues = [];
                         const cachedResults = [];
-                        
+
                         values.forEach((item, index) => {
                             const text = typeof item === 'string' ? item : item.text;
                             if (text && translationCacheRef.current[cacheKey][text]) {
@@ -329,11 +331,11 @@ export const DataProvider = ({ children, countryDataHome }) => {
                                 allCached = false;
                             }
                         });
-                        
+
                         if (uncachedValues.length > 0) {
                             uncachedGroups[key] = uncachedValues.map(item => item.text);
                         }
-                        
+
                         // Store the cached results and their positions
                         textGroups[key] = { cachedResults, originalValues: values };
                     } else {
@@ -346,14 +348,14 @@ export const DataProvider = ({ children, countryDataHome }) => {
                         }
                     }
                 });
-                
+
                 // If everything was cached, return the cached results
                 if (allCached) {
                     const result = {};
                     Object.entries(textGroups).forEach(([key, value]) => {
                         if (value && value.cachedResults && value.originalValues) {
                             // Reconstruct the array from cached results
-                            result[key] = value.originalValues.map((_, i) => 
+                            result[key] = value.originalValues.map((_, i) =>
                                 value.cachedResults[i] || value.originalValues[i]);
                         } else {
                             result[key] = value;
@@ -361,25 +363,25 @@ export const DataProvider = ({ children, countryDataHome }) => {
                     });
                     return result;
                 }
-                
+
                 // Only send uncached items to the API
                 const response = await axios.post('/api/translate', {
                     textGroups: uncachedGroups,
                     from: fromCode,
                     to,
                 });
-                
+
                 // Merge API results with cached results and update cache
                 const apiResults = response.data || {};
                 const result = {};
-                
+
                 Object.entries(textGroups).forEach(([key, value]) => {
                     if (value && value.cachedResults && value.originalValues) {
                         // Handle arrays with some cached items
                         const apiResultsForKey = apiResults[key] || [];
                         const uncachedForKey = uncachedGroups[key] || [];
                         const mergedResults = [...value.originalValues];
-                        
+
                         // Map uncached values back to their original positions
                         let apiIndex = 0;
                         value.originalValues.forEach((originalItem, i) => {
@@ -395,7 +397,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                                 mergedResults[i] = value.cachedResults[i];
                             }
                         });
-                        
+
                         result[key] = mergedResults;
                     } else if (apiResults[key]) {
                         // Handle non-array or fully uncached arrays
@@ -409,26 +411,26 @@ export const DataProvider = ({ children, countryDataHome }) => {
                         result[key] = value;
                     }
                 });
-                
+
                 // Save updated cache to localStorage
                 if (typeof window !== 'undefined') {
                     try {
                         localStorage.setItem(
-                            `translation-cache-${cacheKey}`, 
+                            `translation-cache-${cacheKey}`,
                             JSON.stringify(translationCacheRef.current[cacheKey])
                         );
                     } catch (e) {
                         console.warn('Failed to save translation cache to localStorage', e);
                     }
                 }
-                
+
                 return result;
             } else if (Array.isArray(textInput)) {
                 // Batch translation with caching
                 const textsToTranslate = [];
                 const cachedTranslations = [];
                 const originalIndices = [];
-                
+
                 // Check what we already have in cache
                 textInput.forEach((item, index) => {
                     const text = typeof item === 'string' ? item : item.text;
@@ -442,80 +444,80 @@ export const DataProvider = ({ children, countryDataHome }) => {
                         cachedTranslations[index] = item;
                     }
                 });
-                
+
                 // If everything was cached, return the cached results
                 if (textsToTranslate.length === 0) {
                     return textInput.map((_, i) => cachedTranslations[i] || textInput[i]);
                 }
-                
+
                 // Only send uncached items to the API
                 const response = await axios.post('/api/translate', {
                     texts: textsToTranslate,
                     from: fromCode,
                     to,
                 });
-                
+
                 // Merge API results with cached results
                 const apiResults = response.data || [];
                 const result = [...textInput]; // Create a copy to preserve original structure
-                
+
                 // Place API results in their original positions
                 apiResults.forEach((translation, i) => {
                     const originalIndex = originalIndices[i];
                     result[originalIndex] = translation;
-                    
+
                     // Update cache
-                    const originalText = typeof textInput[originalIndex] === 'string' 
-                        ? textInput[originalIndex] 
+                    const originalText = typeof textInput[originalIndex] === 'string'
+                        ? textInput[originalIndex]
                         : textInput[originalIndex]?.text;
                     if (originalText) {
                         translationCacheRef.current[cacheKey][originalText] = translation;
                     }
                 });
-                
+
                 // Fill in cached translations
                 textInput.forEach((_, i) => {
                     if (cachedTranslations[i]) {
                         result[i] = cachedTranslations[i];
                     }
                 });
-                
+
                 // Save updated cache to localStorage
                 if (typeof window !== 'undefined') {
                     try {
                         localStorage.setItem(
-                            `translation-cache-${cacheKey}`, 
+                            `translation-cache-${cacheKey}`,
                             JSON.stringify(translationCacheRef.current[cacheKey])
                         );
                     } catch (e) {
                         console.warn('Failed to save translation cache to localStorage', e);
                     }
                 }
-                
+
                 return result;
             } else {
                 // Single text translation with caching
                 if (textInput && translationCacheRef.current[cacheKey][textInput]) {
                     return translationCacheRef.current[cacheKey][textInput];
                 }
-                
+
                 const response = await axios.post('/api/translate', {
                     text: textInput,
                     from: fromCode,
                     to,
                 });
-                
+
                 const translation = response.data;
-                
+
                 // Update cache
                 if (textInput && translation) {
                     translationCacheRef.current[cacheKey][textInput] = translation;
-                    
+
                     // Save to localStorage
                     if (typeof window !== 'undefined') {
                         try {
                             localStorage.setItem(
-                                `translation-cache-${cacheKey}`, 
+                                `translation-cache-${cacheKey}`,
                                 JSON.stringify(translationCacheRef.current[cacheKey])
                             );
                         } catch (e) {
@@ -523,7 +525,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                         }
                     }
                 }
-                
+
                 return translation;
             }
         } catch (error) {
@@ -576,7 +578,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
         // Get cache key for this language pair
         const cacheKey = `header-categories-${fromCode}-${to}`;
         let translationCache = {};
-        
+
         // Try to load from localStorage if available
         if (typeof window !== 'undefined') {
             try {
@@ -601,15 +603,15 @@ export const DataProvider = ({ children, countryDataHome }) => {
             // Check if we have all translations in cache
             const uncachedItems = {};
             let allCached = true;
-            
+
             Object.entries(textInput).forEach(([key, values]) => {
                 if (!Array.isArray(values)) return;
-                
+
                 const uncachedTexts = values.filter(item => {
                     const text = typeof item === 'string' ? item : item.text;
                     return !translationCache[text];
                 }).map(item => typeof item === 'string' ? item : item.text);
-                
+
                 if (uncachedTexts.length > 0) {
                     uncachedItems[key] = uncachedTexts.map(text => ({ text }));
                     allCached = false;
@@ -642,7 +644,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
             });
 
             const translatedGroups = response.data || {};
-            
+
             // Update cache with new translations
             Object.entries(translatedGroups).forEach(([key, translatedValues]) => {
                 const originalValues = uncachedItems[key];
@@ -655,7 +657,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                     });
                 }
             });
-            
+
             // Save updated cache to localStorage
             if (typeof window !== 'undefined') {
                 try {
@@ -664,7 +666,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                     console.warn('Failed to save header categories translation cache to localStorage', e);
                 }
             }
-            
+
             // Build final result using cache
             const result = {};
             Object.entries(textInput).forEach(([key, values]) => {
@@ -677,7 +679,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                     result[key] = values;
                 }
             });
-            
+
             return result;
         } catch (error) {
             console.error('Header categories translation error:', error);
@@ -784,7 +786,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 });
 
                 const translatedNew = response.data || [];
-                
+
                 // Update translation map with new translations
                 textsToTranslate.forEach((item, idx) => {
                     const originalText = item.text;
@@ -800,7 +802,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 if (typeof window !== 'undefined') {
                     try {
                         localStorage.setItem(
-                            `translation-cache-${cacheKey}`, 
+                            `translation-cache-${cacheKey}`,
                             JSON.stringify(translationCacheRef.current[cacheKey])
                         );
                     } catch (e) {
@@ -836,28 +838,28 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
     //Fetch side banners
 
-    useEffect(() => {
-        const fetchBanners = async () => {
-            try {
-                setBannerLoading(true);
-                const response = await axios.get('https://admin.sportsbuz.com/api/side-banners', {
-                    params: {
-                        country_code: countryCode?.location?.id
-                    }
-                });
-                const data = response.data;
-                const countryWiseSideBanner = data.filter(data => data.location === countryCode?.location?.id)
-                // console.log(countryWiseSideBanner, "country wise side banner")
-                setBanners(countryWiseSideBanner);
-            } catch (error) {
-                console.error('Error fetching side banners:', error);
-                throw error;
-            } finally {
-                setBannerLoading(false);
-            }
-        };
-        fetchBanners();
-    }, [countryCode]);
+    // useEffect(() => {
+    const fetchBanners = async () => {
+        try {
+            setBannerLoading(true);
+            const response = await axios.get('https://admin.sportsbuz.com/api/side-banners', {
+                params: {
+                    country_code: countryCode?.location?.id
+                }
+            });
+            const data = response.data;
+            const countryWiseSideBanner = data.filter(data => data.location === countryCode?.location?.id)
+            // console.log(countryWiseSideBanner, "country wise side banner")
+            setBanners(countryWiseSideBanner);
+        } catch (error) {
+            console.error('Error fetching side banners:', error);
+            throw error;
+        } finally {
+            setBannerLoading(false);
+        }
+    };
+
+    // }, [countryCode]);
 
     const oddBanners = banners.filter((item, i) => (item.order_by % 2 !== 0));
     const activeOddBanners = oddBanners.filter(i => i.is_active === 'Active');
@@ -1936,7 +1938,11 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 activeOddBanners,
                 activeEvenBanners,
                 bannerLoading,
-                translateHeaders
+                setBannerLoading,
+                fetchBanners,
+                translateHeaders,
+                setShowOtherDivs,
+                showOtherDivs
             }}>
             {children}
         </DataContext.Provider>

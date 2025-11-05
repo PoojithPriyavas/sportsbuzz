@@ -82,7 +82,7 @@ export async function getServerSideProps(context) {
 
 export default function blogDetailsMain({ countryDataHome, locationDataHome, resolvedUrl, }) {
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
-    const { activeOddBanners, bannerLoading } = useGlobalData();
+    const { activeOddBanners, bannerLoading, setShowOtherDivs, showOtherDivs } = useGlobalData();
     const [loading, setLoading] = useState(true);
     useEffect(() => {
         // Fixed: Timer was setting loading to true instead of false
@@ -90,7 +90,7 @@ export default function blogDetailsMain({ countryDataHome, locationDataHome, res
         return () => clearTimeout(timer1);
     }, []);
     const [animationStage, setAnimationStage] = useState('loading');
-    const [showOtherDivs, setShowOtherDivs] = useState(false);
+    // const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
 

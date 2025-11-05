@@ -94,6 +94,8 @@ export default function Home({ locationDataHome, isLocalhost }) {
         activeEvenBanners,
         fetchBettingApps,
         bannerLoading,
+        setShowOtherDivs,
+        showOtherDivs
 
     } = useGlobalData();
     console.log(blogs, "blogs from api response")
@@ -117,7 +119,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
 
     const [loading, setLoading] = useState(true);
     const [animationStage, setAnimationStage] = useState('loading');
-    const [showOtherDivs, setShowOtherDivs] = useState(false);
+
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
     useEffect(() => {
         fetchBettingApps()

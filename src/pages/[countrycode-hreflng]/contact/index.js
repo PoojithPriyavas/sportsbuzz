@@ -23,6 +23,7 @@ import FooterTwo from "@/components/Footer/Footer";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
 import CountryLayout from "@/components/layouts/CountryLayout";
+import { useGlobalData } from "@/components/Context/ApiContext";
 export async function getServerSideProps(context) {
   // Log the request origin (helpful for debugging)
   // console.log('Request originated from:', context.req.headers['x-forwarded-for'] || context.req.connection.remoteAddress);
@@ -87,6 +88,7 @@ export async function getServerSideProps(context) {
 export default function ContactUs({ countryDataHome, locationDataHome, resolvedUrl, }) {
   const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
   const [loading, setLoading] = useState(true);
+  const { setShowOtherDivs, showOtherDivs } = useGlobalData();
 
   useEffect(() => {
     // Fixed: Timer was setting loading to true instead of false
@@ -94,7 +96,7 @@ export default function ContactUs({ countryDataHome, locationDataHome, resolvedU
     return () => clearTimeout(timer1);
   }, []);
   const [animationStage, setAnimationStage] = useState('loading');
-  const [showOtherDivs, setShowOtherDivs] = useState(false);
+  // const [showOtherDivs, setShowOtherDivs] = useState(false);
   const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
 
@@ -160,5 +162,5 @@ export default function ContactUs({ countryDataHome, locationDataHome, resolvedU
 }
 
 ContactUs.getLayout = function getLayout(page) {
-    return <CountryLayout>{page}</CountryLayout>;
+  return <CountryLayout>{page}</CountryLayout>;
 }

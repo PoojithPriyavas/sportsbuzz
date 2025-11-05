@@ -24,10 +24,10 @@ import HeaderThree from "@/components/Header/HeaderThree";
 import CountryLayout from "@/components/layouts/CountryLayout";
 
 export default function CricketMatchDetails() {
-    const { getCricketDetails, cricketDetails, location, countryCode, activeOddBanners, bannerLoading } = useGlobalData();
+    const { getCricketDetails, cricketDetails, location, countryCode, activeOddBanners, bannerLoading, setShowOtherDivs, showOtherDivs } = useGlobalData();
     const [loading, setLoading] = useState(true);
     const [animationStage, setAnimationStage] = useState('loading');
-    const [showOtherDivs, setShowOtherDivs] = useState(false);
+    // const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
     // Use useRouter instead of useParams for Pages Router

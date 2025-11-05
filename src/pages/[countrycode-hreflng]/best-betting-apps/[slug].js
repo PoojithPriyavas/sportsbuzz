@@ -114,7 +114,9 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
         activeOddBanners,
         activeEvenBanners,
         bannerLoading,
-        stages
+        stages,
+        setShowOtherDivs,
+        showOtherDivs
     } = useGlobalData();
     // console.log(sections, "shgdfs")
     const router = useRouter();
@@ -149,7 +151,7 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
         return () => clearTimeout(timer1);
     }, []);
     const [animationStage, setAnimationStage] = useState('loading');
-    const [showOtherDivs, setShowOtherDivs] = useState(false);
+    // const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
 

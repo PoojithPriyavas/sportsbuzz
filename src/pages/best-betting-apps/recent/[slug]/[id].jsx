@@ -4,7 +4,8 @@ import Head from "next/head";
 import BettingAppsTable from "@/components/BestBettingApps/BestBettingApps";
 import BettingAppsRecentTable from "@/components/BestBettingRecentApps/BestBettingRecentApps";
 import UpcomingMatches from "@/components/UpComing/UpComingMatches";
-import styles from '../../../../styles/Home.module.css';
+// import styles from '../../../../styles/Home.module.css';
+import styles from '../styles/globalHeader.module.css';
 import AutoSlider from "@/components/AutoSlider/AutoSlider";
 import TopNewsSection from "@/components/NewsSection/TopNews";
 // import BlogSlider from "@/components/BlogsSection/BlogSlider";
@@ -21,117 +22,118 @@ import HeaderTwo from "@/components/Header/HeaderTwo";
 import { fetchBestBettingAppsSSR } from "@/lib/fetchBestBettingAppsSSR";
 
 
-export async function getServerSideProps(context) {
-    // console.log(context, "contexxt")
-    const { req, query, params } = context;
-    // Parse the cookie to get country code
-    const countryCookie = req.cookies.countryData;
-    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    const countryCode = countryData?.country_code || 'LK';
+// export async function getServerSideProps(context) {
+//     // console.log(context, "contexxt")
+//     const { req, query, params } = context;
+//     // Parse the cookie to get country code
+//     const countryCookie = req.cookies.countryData;
+//     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
+//     const countryCode = countryData?.country_code || 'LK';
 
-    const sectionId = params.id;
-    // Fetch betting apps data based on country code
-    const bestSectionsTab = await fetchBestBettingAppsSSR(countryCode);
+//     const sectionId = params.id;
+//     // Fetch betting apps data based on country code
+//     const bestSectionsTab = await fetchBestBettingAppsSSR(countryCode);
 
-    return {
-        props: {
-            bestSectionsTab,
-            sectionId,
-            countryCode,
-        },
-    };
-}
+//     return {
+//         props: {
+//             bestSectionsTab,
+//             sectionId,
+//             countryCode,
+//         },
+//     };
+// }
 
 
-export default function BestBettingApps({ bestSectionsTab, sectionId }) {
+export default function BestBettingApps({
+    // bestSectionsTab, sectionId
+}) {
     // console.log(bestSections, "jjjjjj")
 
-    const [loading, setLoading] = useState(true);
-    const {
-        blogCategories,
-        blogs,
-        sections,
-        apiResponse,
-        matchTypes,
-        teamImages,
-        upcomingMatches,
-        sport,
-        countryCode,
-        bestSections,
-        stages,
-        activeOddBanners,
-        activeEvenBanners,
-        bannerLoading,
+    // const [loading, setLoading] = useState(true);
+    // const {
+    //     blogCategories,
+    //     blogs,
+    //     sections,
+    //     apiResponse,
+    //     matchTypes,
+    //     teamImages,
+    //     upcomingMatches,
+    //     sport,
+    //     countryCode,
+    //     bestSections,
+    //     stages,
+    //     activeOddBanners,
+    //     activeEvenBanners,
+    //     bannerLoading,
 
-    } = useGlobalData();
-    useEffect(() => {
-        // Fixed: Timer was setting loading to true instead of false
-        const timer1 = setTimeout(() => setLoading(false), 3000);
-        return () => clearTimeout(timer1);
-    }, []);
-    const [animationStage, setAnimationStage] = useState('loading');
-    const [showOtherDivs, setShowOtherDivs] = useState(false);
-    const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
+    // } = useGlobalData();
+    // useEffect(() => {
+    //     // Fixed: Timer was setting loading to true instead of false
+    //     const timer1 = setTimeout(() => setLoading(false), 3000);
+    //     return () => clearTimeout(timer1);
+    // }, []);
+    // const [animationStage, setAnimationStage] = useState('loading');
+    // const [showOtherDivs, setShowOtherDivs] = useState(false);
+    // const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
 
-    useEffect(() => {
-        // Check if animation has been played before
-        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
+    // useEffect(() => {
+    //     // Check if animation has been played before
+    //     const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
 
-        if (!hasPlayedAnimation) {
-            // First time - play the full animation sequence
-            const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
-            const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
-            const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
-            const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); // Show content after transition completes
+    //     if (!hasPlayedAnimation) {
+    //         // First time - play the full animation sequence
+    //         const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
+    //         const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
+    //         const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
+    //         const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); // Show content after transition completes
 
-            return () => {
-                clearTimeout(timer1);
-                clearTimeout(timer2);
-                clearTimeout(timer3);
-                clearTimeout(timer4);
-            };
-        } else {
-            // Animation already played - go directly to header and show content immediately
-            setAnimationStage('header');
-            setShowOtherDivs(true);
-            setLoading(false);
-        }
-    }, []);
+    //         return () => {
+    //             clearTimeout(timer1);
+    //             clearTimeout(timer2);
+    //             clearTimeout(timer3);
+    //             clearTimeout(timer4);
+    //         };
+    //     } else {
+    //         // Animation already played - go directly to header and show content immediately
+    //         setAnimationStage('header');
+    //         setShowOtherDivs(true);
+    //         setLoading(false);
+    //     }
+    // }, []);
 
-    // Original loading timer (keeping for compatibility)
-    useEffect(() => {
-        const timer1 = setTimeout(() => setLoading(false), 3000);
-        return () => clearTimeout(timer1);
-    }, []);
+    // // Original loading timer (keeping for compatibility)
+    // useEffect(() => {
+    //     const timer1 = setTimeout(() => setLoading(false), 3000);
+    //     return () => clearTimeout(timer1);
+    // }, []);
 
-    useEffect(() => {
-        if (showOtherDivs) {
-            const timeout = setTimeout(() => setHasAnimatedIn(true), 50); // slight delay triggers transition
-            return () => clearTimeout(timeout);
-        }
-    }, [showOtherDivs]);
+    // useEffect(() => {
+    //     if (showOtherDivs) {
+    //         const timeout = setTimeout(() => setHasAnimatedIn(true), 50); // slight delay triggers transition
+    //         return () => clearTimeout(timeout);
+    //     }
+    // }, [showOtherDivs]);
 
-    const sectionIdNumber = parseInt(sectionId); // Convert to number
-    const matchedSection = bestSectionsTab.find(section => section.id === sectionIdNumber);
+    // const sectionIdNumber = parseInt(sectionId); // Convert to number
+    // const matchedSection = bestSectionsTab.find(section => section.id === sectionIdNumber);
 
-    const metaTitle = matchedSection?.metatitle || 'Best Betting Apps';
-    const metaDescription = matchedSection?.meta_description?.replace(/<[^>]+>/g, '') || 'Discover top-rated betting apps with secure payments, live odds, and exclusive bonuses. Compare features, user reviews, and promotional offers to find your perfect mobile betting experience.';
-    console.log("meta title betting apps id:", metaTitle);
-    console.log("meta desc betting apps id:", metaDescription);
+    // const metaTitle = matchedSection?.metatitle || 'Best Betting Apps';
+    // const metaDescription = matchedSection?.meta_description?.replace(/<[^>]+>/g, '') || 'Discover top-rated betting apps with secure payments, live odds, and exclusive bonuses. Compare features, user reviews, and promotional offers to find your perfect mobile betting experience.';
+    // console.log("meta title betting apps id:", metaTitle);
+    // console.log("meta desc betting apps id:", metaDescription);
     return (
 
         <>
-            <Head>
+            {/* <Head>
                 <title>{metaTitle}</title>
                 <meta name="description" content={metaDescription} />
             </Head>
-            {/* <Header /> */}
-            {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
+          
             <HeaderTwo animationStage={animationStage} />
 
             <div className='container'>
-                {/* <LiveScores /> */}
+             
                 {sport === 'cricket' ? (
                     <>
                         {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
@@ -165,14 +167,28 @@ export default function BestBettingApps({ bestSectionsTab, sectionId }) {
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                        {/* <TopNewsSection /> */}
+                       
                     </div>
                 </div>
 
                 <BettingAppsRecentTable bestSections={bestSections} />
 
             </div>
-            <FooterTwo />
+            <FooterTwo /> */}
+            <div
+                // ref={containerRef}
+                className={`${styles.loadingContainerOut}`}>
+                <div
+                    // ref={loadingAnimationRef}
+                    className={`${styles.loadingAnimationOut} `}
+                >
+                    <div className={styles.loadingIconOut}>
+                        <div className={styles.mainIconOut}>
+                            <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInnerOut} />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </>
     )
 }

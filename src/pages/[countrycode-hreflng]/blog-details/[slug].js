@@ -34,7 +34,7 @@ export async function getServerSideProps(context) {
                     console.error('Error fetching country data:', error);
                     return null; // Return null on error
                 }),
-            
+
             fetch('https://admin.sportsbuz.com/api/locations/')
                 .then(async (response) => {
                     if (!response.ok) {
@@ -80,17 +80,17 @@ export async function getServerSideProps(context) {
 
 
 export default function BlogDetailsMain({ blog, locationDataHome, resolvedUrl }) {
-    console.log("blog in country :",blog)
+    console.log("blog in country :", blog)
     console.log("🔍 DEBUG - resolvedUrl:", resolvedUrl);
     console.log("🔍 DEBUG - locationDataHome:", locationDataHome);
-    
-    const { countryCode } = useGlobalData();
+
+    const { countryCode, setShowOtherDivs, showOtherDivs } = useGlobalData();
     const { "countrycode-hreflng": countryLang } = useParams();
     console.log("🔍 DEBUG - countryLang from useParams:", countryLang);
-    
+
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl); // Use resolvedUrl instead of countryLang
     const [animationStage, setAnimationStage] = useState('loading');
-    const [showOtherDivs, setShowOtherDivs] = useState(false);
+    // const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -142,7 +142,7 @@ export default function BlogDetailsMain({ blog, locationDataHome, resolvedUrl })
                 <meta property="og:image" content={blog.image_big || blog.image} />
             </Head>
             <div className={` ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
-                <BlogDetailsPage blog={blog} countryCode={countryCode}/>
+                <BlogDetailsPage blog={blog} countryCode={countryCode} />
             </div>
         </>
     );
