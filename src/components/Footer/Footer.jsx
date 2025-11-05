@@ -74,36 +74,36 @@ const FooterTwo = () => {
     };
 
     // Translate blog categories individually (remains the same)
-    useEffect(() => {
-        const translateBlogCategories = async () => {
-            if (!blogCategories || blogCategories.length === 0) return;
+    // useEffect(() => {
+    //     const translateBlogCategories = async () => {
+    //         if (!blogCategories || blogCategories.length === 0) return;
             
-            try {
-                const translatedCategories = await Promise.all(
-                    blogCategories.map(async (cat) => {
-                        const translatedCatName = await translateText(cat.name, 'en', language);
-                        const translatedSubs = await Promise.all(
-                            (cat.subcategories || []).map(async (sub) => ({
-                                ...sub,
-                                name: await translateText(sub.name, 'en', language),
-                            }))
-                        );
-                        return {
-                            ...cat,
-                            name: translatedCatName,
-                            subcategories: translatedSubs,
-                        };
-                    })
-                );
-                setTranslatedBlogCategories(translatedCategories);
-            } catch (error) {
-                console.error('Error translating blog categories:', error);
-                setTranslatedBlogCategories(blogCategories || []);
-            }
-        };
+    //         try {
+    //             const translatedCategories = await Promise.all(
+    //                 blogCategories.map(async (cat) => {
+    //                     const translatedCatName = await translateText(cat.name, 'en', language);
+    //                     const translatedSubs = await Promise.all(
+    //                         (cat.subcategories || []).map(async (sub) => ({
+    //                             ...sub,
+    //                             name: await translateText(sub.name, 'en', language),
+    //                         }))
+    //                     );
+    //                     return {
+    //                         ...cat,
+    //                         name: translatedCatName,
+    //                         subcategories: translatedSubs,
+    //                     };
+    //                 })
+    //             );
+    //             setTranslatedBlogCategories(translatedCategories);
+    //         } catch (error) {
+    //             console.error('Error translating blog categories:', error);
+    //             setTranslatedBlogCategories(blogCategories || []);
+    //         }
+    //     };
 
-        translateBlogCategories();
-    }, [blogCategories, language, translateText]);
+    //     translateBlogCategories();
+    // }, [blogCategories, language, translateText]);
 
     // Translate footer text using JSON first, then API fallback
     useEffect(() => {

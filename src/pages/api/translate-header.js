@@ -1,4 +1,4 @@
-// api/translate.js
+// api/translate-header.js
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
