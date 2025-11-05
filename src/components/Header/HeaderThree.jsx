@@ -129,7 +129,17 @@ function HeaderThree({ animationStage, languageValidation }) {
         language: 'Language',
         sport: 'Sport'
     };
-
+    const [translatedText, setTranslatedText] = useState({
+        home: 'Home',
+        apps: 'Best Betting Apps',
+        news: 'News',
+        schedule: 'Match Schedules',
+        cricket: 'Cricket',
+        football: 'Football',
+        contact: 'Contact Us',
+        language: 'Language',
+        sport: 'Sport'
+    });
     // Helper: get static translations for a language from bettingOds.json
     const getStaticTranslationsForLanguage = (lang) => {
         try {
@@ -146,7 +156,7 @@ function HeaderThree({ animationStage, languageValidation }) {
     // Helper: translate header labels using static JSON first, then fallback to translateText per key
     const translateHeaderLabels = async (selectedLanguage) => {
         console.log('[HeaderThree] translateHeaderLabels called for', selectedLanguage);
-        
+
         // First check if we have a valid cache for this language
         try {
             const cachedData = localStorage.getItem(`cachedTranslations_${selectedLanguage}`);
@@ -162,7 +172,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         } catch (cacheError) {
             console.warn('Failed to read cached translations:', cacheError);
         }
-        
+
         const staticMap = getStaticTranslationsForLanguage(selectedLanguage);
 
         // If English, short-circuit to defaults
@@ -229,7 +239,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         } catch (cacheError) {
             console.warn('Failed to cache header translations:', cacheError);
         }
-        
+
         return results;
     };
 
@@ -249,7 +259,7 @@ function HeaderThree({ animationStage, languageValidation }) {
     const [animationComplete, setAnimationComplete] = useState(false);
     const [shouldShowAnimation, setShouldShowAnimation] = useState(false);
 
-    // Categoires Section
+    // Categories Section
 
     const [translatedCategories, setTranslatedCategories] = useState([]);
     const [categoriesLoaded, setCategoriesLoaded] = useState(false);
@@ -354,7 +364,6 @@ function HeaderThree({ animationStage, languageValidation }) {
         }
     }, []);
 
-
     // OPTIMIZED: Initialize and cache categories
     useEffect(() => {
         if (!blogCategories || blogCategories.length === 0) return;
@@ -402,7 +411,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         }
     };
 
-
+    // Load categories from cache on component mount
     useEffect(() => {
         if (categoriesLoaded || (blogCategories && blogCategories.length > 0)) return;
 
@@ -424,169 +433,205 @@ function HeaderThree({ animationStage, languageValidation }) {
         }
     }, [categoriesLoaded, blogCategories]);
 
+    // 🆕 CRITICAL FIX: Load translated categories on component mount and route changes
+    useEffect(() => {
+        const loadTranslatedCategories = () => {
+            if (!language || !categoriesLoaded) return;
+
+            try {
+                const cachedCategoriesKey = `translatedCategories_${language}`;
+                const cachedCats = localStorage.getItem(cachedCategoriesKey);
+
+                if (cachedCats) {
+                    const parsed = JSON.parse(cachedCats);
+                    // Use cache if it's less than 1 hour old
+                    if (Date.now() - parsed.timestamp < 60 * 60 * 1000) {
+                        console.log('[Categories] Loading translated categories from cache for language:', language);
+                        setTranslatedCategories(parsed.categories);
+                        return;
+                    }
+                }
+
+                // If no cached translation exists and language is not English, translate
+                if (language !== 'en' && categoriesLoaded) {
+                    console.log('[Categories] No cached translation found, translating categories for:', language);
+                    translateCategoriesForLanguage(language);
+                }
+            } catch (error) {
+                console.error('Failed to load translated categories:', error);
+            }
+        };
+
+        loadTranslatedCategories();
+    }, [language, categoriesLoaded, pathname]); // 🆕 Added pathname dependency to reload on route changes
+
     const filteredCategories = React.useMemo(() => {
         if (!categoriesLoaded) return [];
         return translatedCategories.filter((cat) => cat.featured === false);
     }, [translatedCategories, categoriesLoaded]);
 
-    // Only translate categories; single call per language change with debounce and guards
+    // 🆕 NEW: Separate function to translate categories for a specific language
+    const translateCategoriesForLanguage = async (targetLanguage) => {
+        if (!categoriesLoaded || isTranslatingCategoriesRef.current) return;
+
+        const cachedKey = `translatedCategories_${targetLanguage}`;
+
+        try {
+            isTranslatingCategoriesRef.current = true;
+            console.log('[Categories] Translating for language:', targetLanguage);
+
+            // English short-circuit
+            if (targetLanguage === 'en') {
+                const originals = sourceCategories?.length ? sourceCategories : blogCategories;
+                if (originals && originals.length > 0) {
+                    setTranslatedCategories(originals);
+                    try {
+                        localStorage.setItem(cachedKey, JSON.stringify({
+                            categories: originals,
+                            timestamp: Date.now(),
+                            language: targetLanguage
+                        }));
+                    } catch (cacheError) {
+                        console.warn('Failed to cache English categories:', cacheError);
+                    }
+                }
+                return;
+            }
+
+            // Build grouped payload (categories + subcategories) from sourceCategories
+            const categoriesSource = (sourceCategories && sourceCategories.length > 0)
+                ? sourceCategories
+                : (blogCategories || []);
+
+            const categoryNames = categoriesSource
+                .map(cat => cat?.name)
+                .filter(name => !!name && name.trim() !== '' && name !== 'Home');
+
+            const subcategoryNames = categoriesSource.flatMap(cat =>
+                (cat.subcategories || [])
+                    .map(sub => sub?.name)
+                    .filter(name => !!name && name.trim() !== '')
+            );
+
+            const payload = {
+                categories: categoryNames.map(text => ({ text })),
+                subcategories: subcategoryNames.map(text => ({ text })),
+            };
+
+            // Send grouped payload in one request
+            const groupedResults = await retryTranslation(
+                () => Promise.race([
+                    translateHeaders(payload, 'en', targetLanguage),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Translation timeout')), 15000)
+                    )
+                ])
+            );
+
+            const translatedCategoriesArr = groupedResults?.categories || categoryNames;
+            const translatedSubcategoriesArr = groupedResults?.subcategories || subcategoryNames;
+
+            // Rehydrate translations back into original structure using index alignment
+            let subIdx = 0;
+            let catIdx = 0;
+            const updatedCategories = categoriesSource.map((category) => {
+                const name = (category.name !== 'Home')
+                    ? (translatedCategoriesArr[catIdx] ?? category.name)
+                    : category.name;
+
+                if (category.name !== 'Home') {
+                    catIdx += 1;
+                }
+
+                const subcategories = (category.subcategories || []).map(sub => {
+                    const translatedSubName = translatedSubcategoriesArr[subIdx] ?? sub.name;
+                    subIdx += 1;
+                    return { ...sub, name: translatedSubName };
+                });
+
+                return { ...category, name, subcategories };
+            });
+
+            setTranslatedCategories(updatedCategories);
+
+            try {
+                localStorage.setItem(cachedKey, JSON.stringify({
+                    categories: updatedCategories,
+                    timestamp: Date.now(),
+                    language: targetLanguage
+                }));
+            } catch (cacheError) {
+                console.warn('Failed to cache translated categories:', cacheError);
+            }
+        } catch (error) {
+            console.error('Grouped category translation error:', error);
+            // Fallback to current behavior if grouped call fails
+            try {
+                const categoriesSource = (sourceCategories && sourceCategories.length > 0)
+                    ? sourceCategories
+                    : (blogCategories || []);
+                const allTexts = [];
+                categoriesSource.forEach(category => {
+                    if (category.name && category.name.trim() !== '' && category.name !== 'Home') {
+                        allTexts.push(category.name);
+                    }
+                    if (category.subcategories?.length > 0) {
+                        category.subcategories.forEach(sub => {
+                            if (sub.name && sub.name.trim() !== '') {
+                                allTexts.push(sub.name);
+                            }
+                        });
+                    }
+                });
+                const uniqueTexts = Array.from(new Set(allTexts));
+                if (uniqueTexts.length === 0) return;
+
+                const translatedResults = await retryTranslation(
+                    () => translateHeaders(uniqueTexts.map(text => ({ text })), 'en', targetLanguage)
+                );
+
+                const translationMap = {};
+                uniqueTexts.forEach((t, idx) => {
+                    translationMap[t] = translatedResults[idx] || t;
+                });
+
+                const updatedCategories = categoriesSource.map(category => ({
+                    ...category,
+                    name: translationMap[category.name] || category.name,
+                    subcategories: (category.subcategories || []).map(sub => ({
+                        ...sub,
+                        name: translationMap[sub.name] || sub.name
+                    }))
+                }));
+
+                setTranslatedCategories(updatedCategories);
+
+                // Cache the fallback result too
+                try {
+                    localStorage.setItem(cachedKey, JSON.stringify({
+                        categories: updatedCategories,
+                        timestamp: Date.now(),
+                        language: targetLanguage
+                    }));
+                } catch (cacheError) {
+                    console.warn('Failed to cache fallback categories:', cacheError);
+                }
+            } catch (fallbackErr) {
+                console.error('Fallback translation failed:', fallbackErr);
+            }
+        } finally {
+            isTranslatingCategoriesRef.current = false;
+            lastCategoriesLangRef.current = targetLanguage;
+        }
+    };
+
+    // Only translate categories on explicit language change
     useEffect(() => {
         const doTranslateCategories = async () => {
             if (!categoriesLoaded || !isUserChangingLanguage || !pendingLanguage) return;
             if (lastCategoriesLangRef.current === language) return;
 
-            const cachedKey = `translatedCategories_${language}`;
-
-            try {
-                isTranslatingCategoriesRef.current = true;
-                console.log('[Categories] Translating for language:', language);
-
-                // Use cached if fresh
-                const cached = localStorage.getItem(cachedKey);
-                if (cached) {
-                    try {
-                        const parsed = JSON.parse(cached);
-                        if (Date.now() - parsed.timestamp < 60 * 60 * 1000) {
-                            setTranslatedCategories(parsed.categories);
-                            return;
-                        }
-                    } catch (e) {
-                        console.warn('Failed to parse cached categories:', e);
-                    }
-                }
-
-                // English short-circuit
-                if (language === 'en') {
-                    const originals = sourceCategories?.length ? sourceCategories : blogCategories;
-                    if (originals && originals.length > 0) {
-                        setTranslatedCategories(originals);
-                        try {
-                            localStorage.setItem(cachedKey, JSON.stringify({
-                                categories: originals,
-                                timestamp: Date.now(),
-                                language
-                            }));
-                        } catch (cacheError) {
-                            console.warn('Failed to cache English categories:', cacheError);
-                        }
-                    }
-                    return;
-                }
-
-                // Build grouped payload (categories + subcategories) from sourceCategories
-                const categoriesSource = (sourceCategories && sourceCategories.length > 0)
-                    ? sourceCategories
-                    : (blogCategories || []);
-
-                const categoryNames = categoriesSource
-                    .map(cat => cat?.name)
-                    .filter(name => !!name && name.trim() !== '' && name !== 'Home');
-
-                const subcategoryNames = categoriesSource.flatMap(cat =>
-                    (cat.subcategories || [])
-                        .map(sub => sub?.name)
-                        .filter(name => !!name && name.trim() !== '')
-                );
-
-                const payload = {
-                    categories: categoryNames.map(text => ({ text })),
-                    subcategories: subcategoryNames.map(text => ({ text })),
-                };
-
-                // Send grouped payload in one request
-                const groupedResults = await retryTranslation(
-                    () => Promise.race([
-                        translateHeaders(payload, 'en', language),
-                        new Promise((_, reject) =>
-                            setTimeout(() => reject(new Error('Translation timeout')), 15000)
-                        )
-                    ])
-                );
-
-                const translatedCategoriesArr = groupedResults?.categories || categoryNames;
-                const translatedSubcategoriesArr = groupedResults?.subcategories || subcategoryNames;
-
-                // Rehydrate translations back into original structure using index alignment
-                let subIdx = 0;
-                let catIdx = 0;
-                const updatedCategories = categoriesSource.map((category) => {
-                    const name = (category.name !== 'Home')
-                        ? (translatedCategoriesArr[catIdx] ?? category.name)
-                        : category.name;
-
-                    if (category.name !== 'Home') {
-                        catIdx += 1;
-                    }
-
-                    const subcategories = (category.subcategories || []).map(sub => {
-                        const translatedSubName = translatedSubcategoriesArr[subIdx] ?? sub.name;
-                        subIdx += 1;
-                        return { ...sub, name: translatedSubName };
-                    });
-
-                    return { ...category, name, subcategories };
-                });
-
-                setTranslatedCategories(updatedCategories);
-
-                try {
-                    localStorage.setItem(cachedKey, JSON.stringify({
-                        categories: updatedCategories,
-                        timestamp: Date.now(),
-                        language
-                    }));
-                } catch (cacheError) {
-                    console.warn('Failed to cache translated categories:', cacheError);
-                }
-            } catch (error) {
-                console.error('Grouped category translation error:', error);
-                // Fallback to current behavior if grouped call fails
-                try {
-                    const categoriesSource = (sourceCategories && sourceCategories.length > 0)
-                        ? sourceCategories
-                        : (blogCategories || []);
-                    const allTexts = [];
-                    categoriesSource.forEach(category => {
-                        if (category.name && category.name.trim() !== '' && category.name !== 'Home') {
-                            allTexts.push(category.name);
-                        }
-                        if (category.subcategories?.length > 0) {
-                            category.subcategories.forEach(sub => {
-                                if (sub.name && sub.name.trim() !== '') {
-                                    allTexts.push(sub.name);
-                                }
-                            });
-                        }
-                    });
-                    const uniqueTexts = Array.from(new Set(allTexts));
-                    if (uniqueTexts.length === 0) return;
-
-                    const translatedResults = await retryTranslation(
-                        () => translateHeaders(uniqueTexts.map(text => ({ text })), 'en', language)
-                    );
-
-                    const translationMap = {};
-                    uniqueTexts.forEach((t, idx) => {
-                        translationMap[t] = translatedResults[idx] || t;
-                    });
-
-                    const updatedCategories = categoriesSource.map(category => ({
-                        ...category,
-                        name: translationMap[category.name] || category.name,
-                        subcategories: (category.subcategories || []).map(sub => ({
-                            ...sub,
-                            name: translationMap[sub.name] || sub.name
-                        }))
-                    }));
-
-                    setTranslatedCategories(updatedCategories);
-                } catch (fallbackErr) {
-                    console.error('Fallback translation failed:', fallbackErr);
-                }
-            } finally {
-                isTranslatingCategoriesRef.current = false;
-                lastCategoriesLangRef.current = language;
-            }
+            await translateCategoriesForLanguage(language);
         };
 
         // Debounce/schedule translate on explicit language change
@@ -606,10 +651,9 @@ function HeaderThree({ animationStage, languageValidation }) {
                 clearTimeout(translateCategoriesTimeoutRef.current);
             }
         };
-    }, [language, isUserChangingLanguage, pendingLanguage, categoriesLoaded, sourceCategories, blogCategories, translateHeaders]);
+    }, [language, isUserChangingLanguage, pendingLanguage, categoriesLoaded]);
 
-
-    // NEW: Load translations on component mount
+    // 🆕 NEW: Load translations on component mount with persistence
     useEffect(() => {
         const loadInitialTranslations = async () => {
             if (!language) return;
@@ -630,33 +674,44 @@ function HeaderThree({ animationStage, languageValidation }) {
                     // If no cache exists, translate on mount
                     await translateContent(language);
                 }
-
-                // Load translated categories if available
-                const cachedCategoriesKey = `translatedCategories_${language}`;
-                const cachedCats = localStorage.getItem(cachedCategoriesKey);
-
-                if (cachedCats && categoriesLoaded) {
-                    const parsed = JSON.parse(cachedCats);
-                    setTranslatedCategories(parsed.categories);
-                    console.log('[Categories] Loaded initial categories from cache');
-                } else if (language === 'en' && categoriesLoaded) {
-                    // 🆕 SPECIAL CASE: For English, ensure we use original categories
-                    console.log('[Categories] English language, ensuring original categories');
-                    if (blogCategories && blogCategories.length > 0) {
-                        setTranslatedCategories(blogCategories);
-                    }
-                }
             } catch (error) {
                 console.error('Failed to load initial translations:', error);
             }
         };
 
         loadInitialTranslations();
-    }, [language, categoriesLoaded, blogCategories]);
+    }, [language]);
 
+    // 🆕 NEW: Save current translations to sessionStorage for cross-route persistence
+    useEffect(() => {
+        if (Object.keys(translatedText).length > 0) {
+            try {
+                sessionStorage.setItem('currentHeaderTranslations', JSON.stringify({
+                    language,
+                    translations: translatedText,
+                    timestamp: Date.now()
+                }));
+            } catch (error) {
+                console.warn('Failed to save translations to sessionStorage:', error);
+            }
+        }
+    }, [translatedText, language]);
 
-
-
+    // 🆕 NEW: Load from sessionStorage on mount for immediate restoration
+    useEffect(() => {
+        try {
+            const saved = sessionStorage.getItem('currentHeaderTranslations');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.language === language) {
+                    setTranslatedText(parsed.translations);
+                    console.log('[Header] Loaded translations from sessionStorage');
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load translations from sessionStorage:', error);
+        }
+    }, []);
 
     // Ensure header final state CSS applies on initial paint if animation has already played
     useEffect(() => {
@@ -744,8 +799,6 @@ function HeaderThree({ animationStage, languageValidation }) {
             const tl = gsap.timeline({
                 onComplete: () => {
                     setAnimationComplete(true);
-                    // NOTE: we already set headerAnimationPlayed earlier to prevent re-runs across navigation
-                    // localStorage.setItem('headerAnimationPlayed', 'true');
                 }
             });
 
@@ -866,7 +919,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         console.log(firstSegment, "first segment")
         // Check if it matches the format: language-countrycode
         const match = firstSegment.match(/^([a-z]{2})-([a-z]{2})$/i);
-        console.log(match,"match in the parse url")
+        console.log(match, "match in the parse url")
 
         if (match) {
             return {
@@ -955,26 +1008,8 @@ function HeaderThree({ animationStage, languageValidation }) {
     }, [mobileMenuOpen]);
 
 
-    // // Add this useEffect
-    // useEffect(() => {
-    //     setTranslatedCategories(blogCategories);
-    // }, [blogCategories]);
-
-
-
-    const [translatedText, setTranslatedText] = useState({
-        home: 'Home',
-        apps: 'Best Betting Apps',
-        news: 'News',
-        schedule: 'Match Schedules',
-        cricket: 'Cricket',
-        football: 'Football',
-        contact: 'Contact Us',
-        language: 'Language',
-        sport: 'Sport'
-    });
     const [filteredList, setFilteredList] = useState([]);
-    
+
     // Track if we've already loaded translations for this language in the current session
     const translationLoadedRef = useRef({});
 
@@ -1055,46 +1090,6 @@ function HeaderThree({ animationStage, languageValidation }) {
         router.push(newPath);
     };
 
-
-    // Updated handleLanguageChange function
-    // const handleLanguageChange = async (selectedLanguage) => {
-    //     if (selectedLanguage === language) return;
-
-    //     // Mark that the user is changing the language to prevent URL effect from overriding
-    //     setIsUserChangingLanguage(true);
-    //     setPendingLanguage(selectedLanguage);
-
-    //     // Immediately update UI state (dropdown selection)
-    //     setLanguage(selectedLanguage);
-    //     localStorage.setItem('language', selectedLanguage);
-
-    //     // Ensure next route doesn't rerun intro animation which hides the logo
-    //     try {
-    //         localStorage.setItem('headerAnimationPlayed', 'true');
-    //         document.documentElement.classList.add('header-played');
-    //     } catch (e) { }
-
-    //     // Close dropdowns
-    //     setExpandedLanguageSelector(false);
-    //     if (isMobile) {
-    //         setMobileMenuOpen(false);
-    //     }
-
-    //     // Prepare URL update
-    //     const currentPath = pathname;
-    //     const segments = currentPath.split('/').filter(Boolean);
-    //     const currentLangCountry = segments[0]?.split('-')[1] || 'in';
-    //     const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
-    //     const newPath = segments.length > 1
-    //         ? `/${newLangCountry}/${segments.slice(1).join('/')}`
-    //         : `/${newLangCountry}`;
-
-    //     // Set navigating state for visibility/logging and push route
-    //     setIsNavigating(true);
-    //     console.log('[Router] route push start', { newPath });
-    //     router.push(newPath);
-    // };
-
     // IMPROVED: Handle language change with better error handling
     const handleLanguageChange = async (selectedLanguage) => {
         if (selectedLanguage === language) return;
@@ -1140,17 +1135,9 @@ function HeaderThree({ animationStage, languageValidation }) {
             console.error('Language change translation failed:', error);
             // Continue with navigation even if translation fails
         }
-
-
     };
 
-
-
-
-
-
     // Separate translation logic into its own function
-    // OPTIMIZED: Improved translation function to only translate categories, not header labels
     const translateContent = async (selectedLanguage) => {
         try {
             console.log('[Translate] start', { selectedLanguage });
@@ -1159,8 +1146,8 @@ function HeaderThree({ animationStage, languageValidation }) {
             // Resolve header labels via bettingOds.json, fallback batch translateText
             await translateHeaderLabels(selectedLanguage);
 
-            // Keep categories translation logic separate (no change)
-            console.log('[Translate] Header labels resolved; categories translation unchanged.');
+            // Translate categories for the new language
+            await translateCategoriesForLanguage(selectedLanguage);
 
             // Keep current header labels (or previously cached) without API calls
             const cachedTranslationsKey = `cachedTranslations_${selectedLanguage}`;
@@ -1372,6 +1359,7 @@ function HeaderThree({ animationStage, languageValidation }) {
                         <div className={`${styles.mobileSubmenu} ${expandedLanguageSelector ? styles.open : ''}`}>
                             {filteredList.map((lang) => (
                                 <div
+                                    key={lang.hreflang}
                                     className={`${styles.mobileSubmenuItem} ${language === lang.hreflang ? styles.active : ''}`}
                                     onClick={() => handleLanguageChange(lang.hreflang)}
                                 >
@@ -1570,7 +1558,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         </div>
     );
 };
-// kkk
+
 export default HeaderThree;
 
 // Use layout effect on the client to avoid visible flicker / hidden state issues

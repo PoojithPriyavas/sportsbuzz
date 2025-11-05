@@ -634,7 +634,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
             // Make a single API call for all uncached items
             console.log('[Translation] Making API call for header categories:', Object.keys(uncachedItems));
-            const response = await axios.post('/api/translate', {
+            const response = await axios.post('/api/translate-header', {
                 textGroups: uncachedItems,
                 from: fromCode,
                 to,
@@ -776,7 +776,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 }
 
                 // Only send uncached texts to API
-                const response = await axios.post('/api/translate', {
+                const response = await axios.post('/api/translate-header', {
                     texts: textsToTranslate,
                     from: fromCode,
                     to,
