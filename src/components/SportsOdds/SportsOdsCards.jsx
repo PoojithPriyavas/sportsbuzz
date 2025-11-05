@@ -416,7 +416,7 @@ export default function BettingCards() {
                 console.warn('⚠️ Loading timeout - no data received after 15 seconds');
                 setIsLoading(false);
                 hasFetchedRef.current = true;
-            }, 15000); // 15 second timeout
+            }, 77000); // 15 second timeout
             
             try {
                 await fetchOneXEventsIdData(oneXAccessToken, firstTournamentId);

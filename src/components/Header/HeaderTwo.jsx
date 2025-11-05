@@ -1,30 +1,1173 @@
-import React, { useState, useEffect, useRef } from 'react';
+// import React, { useState, useEffect, useRef } from 'react';
+// import { gsap } from 'gsap';
+// import styles from './HeaderTwo.module.css';
+// import { usePathname } from 'next/navigation';
+// import { useGlobalData } from '../Context/ApiContext';
+// import { FaMoon, FaSun, FaChevronDown, FaBars, FaTimes } from 'react-icons/fa';
+// import Link from 'next/link';
+// import DynamicLink from '../Common/DynamicLink';
+// import axios from 'axios';
+
+// import FeaturedButton from '../FeaturedButton/FeaturedButton';
+
+// const HeaderTwo = ({ animationStage }) => {
+//     const [darkMode, setDarkMode] = useState(false);
+//     const [headerFixed, setHeaderFixed] = useState(false);
+//     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+//     const [isMobile, setIsMobile] = useState(false);
+//     const [expandedCategory, setExpandedCategory] = useState(null);
+
+//     // Mobile dropdown states
+//     const [expandedLanguageSelector, setExpandedLanguageSelector] = useState(false);
+//     const [expandedSportsSelector, setExpandedSportsSelector] = useState(false);
+
+//     // Animation state - FIXED: Initialize with safe defaults for SSR
+//     const [animationComplete, setAnimationComplete] = useState(false);
+//     const [shouldShowAnimation, setShouldShowAnimation] = useState(false);
+//     const [isClient, setIsClient] = useState(false);
+
+//     // GSAP refs
+//     const containerRef = useRef(null);
+//     const loadingAnimationRef = useRef(null);
+//     const logoRef = useRef(null);
+//     const navigationRef = useRef(null);
+//     const sidebarRef = useRef(null);
+
+//     // Timeline ref
+//     const timelineRef = useRef(null);
+
+//     const pathname = usePathname();
+//     const {
+//         blogCategories,
+//         translateText,
+//         setLanguage,
+//         language,
+//         location,
+//         countryCode,
+//         sport,
+//         setSport,
+//         apiResponse,
+//         blogs,
+//         sections,
+//         matchTypes,
+//         teamImages,
+//         upcomingMatches
+//     } = useGlobalData();
+//     console.log(countryCode, "country code value in header")
+//     // Initialize dark mode from localStorage
+//     useEffect(() => {
+//         if (typeof window !== 'undefined') {
+//             const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+//             setDarkMode(savedDarkMode);
+//             // Apply theme immediately
+//             if (savedDarkMode) {
+//                 document.documentElement.classList.add('dark-theme');
+//             } else {
+//                 document.documentElement.classList.remove('dark-theme');
+//             }
+//         }
+//     }, []);
+
+//     // Handle dark mode toggle
+//     const toggleDarkMode = () => {
+//         const newDarkMode = !darkMode;
+//         setDarkMode(newDarkMode);
+
+//         // Save to localStorage
+//         if (typeof window !== 'undefined') {
+//             localStorage.setItem('darkMode', newDarkMode.toString());
+//         }
+
+//         // Apply theme to document
+//         if (newDarkMode) {
+//             document.documentElement.classList.add('dark-theme');
+//         } else {
+//             document.documentElement.classList.remove('dark-theme');
+//         }
+
+//         // Close mobile menu if open
+//         if (isMobile) {
+//             setMobileMenuOpen(false);
+//         }
+//     };
+
+//     // Initialize client-side state and check localStorage
+//     useEffect(() => {
+//         setIsClient(true);
+//         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
+//         setAnimationComplete(hasPlayedAnimation);
+//         setShouldShowAnimation(!hasPlayedAnimation);
+//     }, []);
+
+//     // Initialize GSAP animation
+//     useEffect(() => {
+//         if (!isClient) return; // Wait for client-side hydration
+
+//         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
+
+//         if (hasPlayedAnimation) {
+//             // Animation already played - set final state immediately
+//             gsap.set(containerRef.current, {
+//                 height: '5rem',
+//                 overflow: 'visible',
+//                 display: 'flex',
+//                 alignItems: 'center',
+//                 justifyContent: 'space-between',
+//                 padding: '0 1rem'
+//             });
+
+//             // FIXED: Ensure loading animation is completely hidden
+//             if (loadingAnimationRef.current) {
+//                 gsap.set(loadingAnimationRef.current, {
+//                     opacity: 0,
+//                     scale: 0.5,
+//                     display: 'none',
+//                     visibility: 'hidden'
+//                 });
+//                 loadingAnimationRef.current.style.display = 'none';
+//                 loadingAnimationRef.current.style.visibility = 'hidden';
+//             }
+
+//             gsap.set(logoRef.current, {
+//                 position: 'relative',
+//                 bottom: 'auto',
+//                 left: 'auto',
+//                 opacity: 1,
+//                 x: 0,
+//                 y: 0,
+//                 visibility: 'visible'
+//             });
+
+//             gsap.set(navigationRef.current, {
+//                 opacity: 1,
+//                 display: 'flex'
+//             });
+
+//             // FIXED: Ensure states are set correctly
+//             setShouldShowAnimation(false);
+//             setAnimationComplete(true);
+
+//             return; // Exit early if animation already played
+//         }
+
+//         // Animation hasn't played yet - set initial states for animation
+//         setShouldShowAnimation(true);
+//         setAnimationComplete(false);
+
+//         gsap.set(containerRef.current, {
+//             height: '100vh',
+//             overflow: 'hidden',
+//             display: 'block',
+//             alignItems: 'stretch',
+//             justifyContent: 'flex-start',
+//             padding: '0'
+//         });
+
+//         if (loadingAnimationRef.current) {
+//             gsap.set(loadingAnimationRef.current, {
+//                 opacity: 1,
+//                 scale: 1,
+//                 display: 'flex',
+//                 visibility: 'visible'
+//             });
+//         }
+
+//         gsap.set(logoRef.current, {
+//             position: 'absolute',
+//             bottom: '2rem',
+//             left: '2rem',
+//             opacity: 0,
+//             x: 0,
+//             y: 80,
+//             visibility: 'hidden'
+//         });
+
+//         gsap.set(navigationRef.current, {
+//             opacity: 0,
+//             display: 'none'
+//         });
+
+//         // Create the main timeline
+//         const tl = gsap.timeline({
+//             onComplete: () => {
+//                 setAnimationComplete(true);
+//                 setShouldShowAnimation(false); // FIXED: Hide animation on complete
+//                 localStorage.setItem('headerAnimationPlayed', 'true');
+
+//                 // FIXED: Additional cleanup for loading animation
+//                 if (loadingAnimationRef.current) {
+//                     loadingAnimationRef.current.style.display = 'none';
+//                     loadingAnimationRef.current.style.visibility = 'hidden';
+//                 }
+//             }
+//         });
+
+//         // Step 1: Show loading animation (1 second)
+//         tl.to({}, { duration: 2 })
+
+//             // Step 2: Hide loading animation and show logo (0.5 seconds)
+//             .to(loadingAnimationRef.current, {
+//                 opacity: 0,
+//                 scale: 0.75,
+//                 duration: 0.75,
+//                 ease: "power2.inOut"
+//             })
+//             .to(logoRef.current, {
+//                 opacity: 1,
+//                 y: 0,
+//                 visibility: 'visible',
+//                 duration: 0.75,
+//                 ease: "power2.out"
+//             }, "-=0.3")
+
+//             // Step 3: Wait a moment then start transition (1 second wait)
+//             .to({}, { duration: 1 })
+
+//             // Step 4: Shrink container and move logo to header position (1.5 seconds)
+//             .to(containerRef.current, {
+//                 height: '5rem',
+//                 duration: 1.5,
+//                 ease: "power2.inOut"
+//             })
+//             .to(logoRef.current, {
+//                 bottom: '50%',
+//                 left: '1rem',
+//                 y: '50%',
+//                 duration: 1.5,
+//                 ease: "power2.inOut"
+//             }, "-=1.5")
+
+//             // Step 5: Convert logo to relative positioning after animation
+//             .set(logoRef.current, {
+//                 position: 'relative',
+//                 bottom: 'auto',
+//                 left: 'auto',
+//                 x: 0,
+//                 y: 0
+//             })
+
+//             // Step 6: Show navigation and set final states
+//             .set(containerRef.current, {
+//                 overflow: 'visible',
+//                 display: 'flex',
+//                 alignItems: 'center',
+//                 justifyContent: 'space-between',
+//                 padding: '0 1rem'
+//             })
+//             .set(navigationRef.current, {
+//                 display: 'flex'
+//             })
+//             .to(navigationRef.current, {
+//                 opacity: 1,
+//                 duration: 0.75,
+//                 ease: "power2.out"
+//             })
+//             // FIXED: Properly hide loading animation at the end
+//             .set(loadingAnimationRef.current, {
+//                 display: 'none',
+//                 visibility: 'hidden'
+//             });
+
+//         timelineRef.current = tl;
+
+//         // Cleanup function
+//         return () => {
+//             if (timelineRef.current) {
+//                 timelineRef.current.kill();
+//             }
+//         };
+//     }, [isClient]);
+
+//     // Function to reset animation (for development)
+//     const resetAnimation = () => {
+//         localStorage.removeItem('headerAnimationPlayed');
+//         window.location.reload();
+//     };
+
+//     // Check if mobile on mount and resize
+//     useEffect(() => {
+//         const checkMobile = () => {
+//             setIsMobile(window.innerWidth <= 768);
+//         };
+
+//         checkMobile();
+//         window.addEventListener('resize', checkMobile);
+
+//         return () => window.removeEventListener('resize', checkMobile);
+//     }, []);
+
+//     // Function to parse URL path for country code and language
+//     const parseUrlPath = (pathname) => {
+//         const parts = pathname.split('/').filter(part => part !== '');
+//         const countryCode = parts.length > 0 ? parts[0].toUpperCase() : '';
+//         const language = parts.length > 1 ? parts[1].toLowerCase() : '';
+//         return { countryCode, language };
+//     };
+
+//     // Handle URL-based country code and language
+//     useEffect(() => {
+//         if (!location || location.length === 0) return;
+
+//         const { countryCode: urlCountryCode, language: urlLanguage } = parseUrlPath(pathname);
+
+//         // Set language from URL if available and valid
+//         if (urlLanguage) {
+//             const isValidLanguage = location.some(loc => loc.hreflang === urlLanguage);
+//             if (isValidLanguage && language !== urlLanguage) {
+//                 setLanguage(urlLanguage);
+//                 localStorage.setItem('language', urlLanguage);
+//             }
+//         }
+
+//         // Set sport based on URL country code if available
+//         if (urlCountryCode) {
+//             const matchedLocation = location.find(loc => loc.country_code === urlCountryCode);
+//             if (matchedLocation?.sports) {
+//                 const apiSport = matchedLocation.sports.toLowerCase();
+//                 if (apiSport !== sport) {
+//                     setSport(apiSport);
+//                     localStorage.setItem('selectedSport', apiSport);
+//                 }
+//             }
+//         }
+//     }, [pathname, location, language, sport]);
+
+//     // Close mobile menu when clicking outside
+//     useEffect(() => {
+//         const handleClickOutside = (event) => {
+//             if (mobileMenuOpen && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+//                 setMobileMenuOpen(false);
+//             }
+//         };
+
+//         document.addEventListener('mousedown', handleClickOutside);
+//         return () => {
+//             document.removeEventListener('mousedown', handleClickOutside);
+//         };
+//     }, [mobileMenuOpen]);
+
+//     // Prevent body scroll when mobile menu is open
+//     useEffect(() => {
+//         if (mobileMenuOpen) {
+//             document.body.style.overflow = 'hidden';
+//         } else {
+//             document.body.style.overflow = 'unset';
+//         }
+
+//         return () => {
+//             document.body.style.overflow = 'unset';
+//         };
+//     }, [mobileMenuOpen]);
+
+//     const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
+//     const [translatedText, setTranslatedText] = useState({
+//         home: 'Home',
+//         apps: 'Best Betting Apps',
+//         news: 'News',
+//         schedule: 'Match Schedules',
+//         cricket: 'Cricket',
+//         football: 'Football',
+//         contact: 'Contact Us',
+//         language: 'Language',
+//         sport: 'Sport'
+//     });
+//     const [filteredList, setFilteredList] = useState([]);
+
+//     // Load saved language on component mount
+//     useEffect(() => {
+//         if (typeof window !== 'undefined') {
+//             const savedLanguage = localStorage.getItem('language');
+//             if (savedLanguage && savedLanguage !== language) {
+//                 setLanguage(savedLanguage);
+//             }
+//         }
+//     }, []);
+
+//     // Filter languages based on country code
+//     useEffect(() => {
+//         if (!location || !countryCode) return;
+
+//         const matched = location.filter(
+//             item => item.country_code === countryCode.country_code
+//         );
+
+//         const otherLanguages = location.filter(
+//             item => item.country_code !== countryCode.country_code
+//         );
+
+//         const combinedList = matched.length > 0
+//             ? [...matched, ...otherLanguages]
+//             : [...location.filter(item => item.country_code === 'IN'), ...otherLanguages];
+
+//         // Remove duplicates based on hreflang
+//         const uniqueList = combinedList.filter((item, index, self) =>
+//             index === self.findIndex(t => t.hreflang === item.hreflang)
+//         );
+
+//         setFilteredList(uniqueList);
+
+//         // Set language if not already set
+//         const savedLanguage = typeof window !== 'undefined' ? localStorage.getItem('language') : null;
+//         if (!savedLanguage && matched.length > 0 && language !== matched[0].hreflang) {
+//             setLanguage(matched[0].hreflang);
+//         }
+//     }, [location, countryCode]);
+
+//     useEffect(() => {
+//         const updateTranslations = async () => {
+//             try {
+//                 const [home, apps, news, schedule, cricket, football, contact, languageText, sportText] = await Promise.all([
+//                     translateText('Home', 'en', language),
+//                     translateText('Best Betting Apps', 'en', language),
+//                     translateText('News', 'en', language),
+//                     translateText('Match Schedules', 'en', language),
+//                     translateText('Cricket', 'en', language),
+//                     translateText('Football', 'en', language),
+//                     translateText('Contact', 'en', language),
+//                     translateText('Language', 'en', language),
+//                     translateText('Sport', 'en', language),
+//                 ]);
+
+//                 setTranslatedText(prev => ({
+//                     ...prev,
+//                     home, apps, news, schedule, cricket, football, contact,
+//                     language: languageText,
+//                     sport: sportText
+//                 }));
+
+//                 const translatedCategories = await Promise.all(
+//                     blogCategories.map(async (cat) => {
+//                         const translatedCatName = await translateText(cat.name, 'en', language);
+//                         const translatedSubs = await Promise.all(
+//                             (cat.subcategories || []).map(async (sub) => ({
+//                                 ...sub,
+//                                 name: await translateText(sub.name, 'en', language),
+//                             }))
+//                         );
+//                         return {
+//                             ...cat,
+//                             name: translatedCatName,
+//                             subcategories: translatedSubs,
+//                         };
+//                     })
+//                 );
+//                 setTranslatedCategories(translatedCategories);
+//             } catch (error) {
+//                 console.error('Translation error:', error);
+//             }
+//         };
+
+//         updateTranslations();
+//     }, [language, translateText, blogCategories]);
+
+//     const handleLanguageChange = (selectedLanguage) => {
+//         setLanguage(selectedLanguage);
+//         localStorage.setItem('language', selectedLanguage);
+//         setExpandedLanguageSelector(false);
+//         if (isMobile) {
+//             setMobileMenuOpen(false);
+//         }
+//     };
+
+//     // Optimized sport change handler with debouncing
+//     const [isChangingSport, setIsChangingSport] = useState(false);
+
+//     const handleSportChange = (selectedSport) => {
+//         // Prevent multiple rapid sport changes
+//         if (isChangingSport) return;
+
+//         // Set loading state
+//         setIsChangingSport(true);
+
+//         // First update localStorage to ensure consistency
+//         localStorage.setItem('selectedSport', selectedSport);
+
+//         // Close menus immediately for better UX
+//         setExpandedSportsSelector(false);
+//         if (isMobile) {
+//             setMobileMenuOpen(false);
+//         }
+
+//         // Delay the actual sport change to prevent UI freezing
+//         setTimeout(() => {
+//             // Then update state
+//             setSport(selectedSport);
+//             // Reset loading state after a short delay to ensure UI updates
+//             setTimeout(() => setIsChangingSport(false), 300);
+//         }, 50);
+//     };
+
+//     const capitalizeFirstLetter = (text) =>
+//         text?.charAt(0).toUpperCase() + text?.slice(1).toLowerCase();
+
+//     const toggleMobileMenu = () => {
+//         setMobileMenuOpen(!mobileMenuOpen);
+//     };
+
+//     const handleNavItemClick = () => {
+//         if (isMobile) {
+//             setMobileMenuOpen(false);
+//         }
+//     };
+
+//     const toggleCategory = (categoryId) => {
+//         setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
+//     };
+
+//     const toggleLanguageSelector = () => {
+//         setExpandedLanguageSelector(!expandedLanguageSelector);
+//         setExpandedSportsSelector(false);
+//     };
+
+//     const toggleSportsSelector = () => {
+//         setExpandedSportsSelector(!expandedSportsSelector);
+//         setExpandedLanguageSelector(false);
+//     };
+
+//     // Function to get current language display name
+//     const getCurrentLanguageDisplay = () => {
+//         const currentLang = filteredList.find(lang => lang.hreflang === language);
+//         return currentLang ? currentLang.language : 'Language';
+//     };
+
+//     // Function to get current sport display name
+//     const getCurrentSportDisplay = () => {
+//         return sport === 'cricket' ? translatedText.cricket : translatedText.football;
+//     };
+
+//     const renderMobileMenu = () => (
+//         <>
+//             {/* Mobile Overlay */}
+//             <div
+//                 className={`${styles.mobileOverlay} ${mobileMenuOpen ? styles.open : ''}`}
+//                 onClick={() => setMobileMenuOpen(false)}
+//             />
+
+//             {/* Mobile Sidebar */}
+//             <div
+//                 ref={sidebarRef}
+//                 className={`${styles.mobileSidebar} ${mobileMenuOpen ? styles.open : ''}`}
+//             >
+//                 {/* Mobile Header */}
+//                 <div className={styles.mobileHeader}>
+//                     <Link href='/' className={styles.logoContent}>
+//                         <div className={styles.logoIcon}>
+//                             <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
+//                         </div>
+//                     </Link>
+//                     <button
+//                         className={styles.mobileCloseButton}
+//                         onClick={() => setMobileMenuOpen(false)}
+//                     >
+//                         <FaTimes />
+//                     </button>
+//                 </div>
+
+//                 {/* Mobile Navigation Links */}
+//                 <div className={styles.mobileNavLinks}>
+//                     <Link
+//                         href="/"
+//                         className={`${styles.mobileNavItem} ${pathname === '/' ? styles.active : ''}`}
+//                         onClick={handleNavItemClick}
+//                     >
+//                         {translatedText.home}
+//                     </Link>
+
+//                     {countryCode?.location?.betting_apps == 'Active' && (
+//                         <Link
+//                             href="/best-betting-apps/current"
+//                             className={`${styles.mobileNavItem} ${pathname === '/best-betting-apps/current' ? styles.active : ''}`}
+//                             onClick={handleNavItemClick}
+//                         >
+//                             {translatedText.apps}
+//                         </Link>
+//                     )}
+
+//                     <Link
+//                         href="/match-schedules"
+//                         className={`${styles.mobileNavItem} ${pathname === '/match-schedules' ? styles.active : ''}`}
+//                         onClick={handleNavItemClick}
+//                     >
+//                         {translatedText.schedule}
+//                     </Link>
+
+//                     {/* Mobile Dropdown Categories */}
+//                     {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
+//                         <div key={cat.id} className={styles.mobileDropdown}>
+//                             <div
+//                                 className={styles.mobileDropdownHeader}
+//                                 onClick={() => toggleCategory(cat.id)}
+//                             >
+//                                 <DynamicLink
+//                                     href={`/blogs/pages/all-blogs?category=${cat.id}`}
+//                                     onClick={handleNavItemClick}
+//                                 >
+//                                     {capitalizeFirstLetter(cat.name)}
+//                                 </DynamicLink>
+//                                 {cat.subcategories?.length > 0 && (
+//                                     <FaChevronDown
+//                                         style={{
+//                                             transform: expandedCategory === cat.id ? 'rotate(180deg)' : 'rotate(0deg)',
+//                                             transition: 'transform 0.2s ease'
+//                                         }}
+//                                     />
+//                                 )}
+//                             </div>
+
+//                             {cat.subcategories?.length > 0 && (
+//                                 <div className={`${styles.mobileSubmenu} ${expandedCategory === cat.id ? styles.open : ''}`}>
+//                                     {cat.subcategories.map((sub) => (
+//                                         <DynamicLink
+//                                             key={sub.id}
+//                                             href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}
+//                                             className={styles.mobileSubmenuItem}
+//                                             onClick={handleNavItemClick}
+//                                         >
+//                                             {sub.name}
+//                                         </DynamicLink>
+//                                     ))}
+//                                 </div>
+//                             )}
+//                         </div>
+//                     ))}
+
+//                     <Link
+//                         href="/contact"
+//                         className={`${styles.mobileNavItem} ${pathname === '/contact' ? styles.active : ''}`}
+//                         onClick={handleNavItemClick}
+//                     >
+//                         {translatedText.contact}
+//                     </Link>
+
+//                     {/* Dark Mode Toggle in Mobile Menu */}
+//                     <div
+//                         className={styles.mobileNavItem}
+//                         onClick={toggleDarkMode}
+//                         style={{ cursor: 'pointer' }}
+//                     >
+//                         <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+//                             {darkMode ? <FaSun /> : <FaMoon />}
+//                             {darkMode ? 'Light Mode' : 'Dark Mode'}
+//                         </span>
+//                     </div>
+//                 </div>
+
+//                 {/* Mobile Dropdown-style Selectors */}
+//                 <div className={styles.mobileSelectors}>
+//                     {/* Language Dropdown */}
+//                     <div className={styles.mobileDropdown}>
+//                         <div
+//                             className={styles.mobileDropdownHeader}
+//                             onClick={toggleLanguageSelector}
+//                         >
+//                             <span>{translatedText.language}: {getCurrentLanguageDisplay()}</span>
+//                             <FaChevronDown
+//                                 style={{
+//                                     transform: expandedLanguageSelector ? 'rotate(180deg)' : 'rotate(0deg)',
+//                                     transition: 'transform 0.2s ease'
+//                                 }}
+//                             />
+//                         </div>
+//                         <div className={`${styles.mobileSubmenu} ${expandedLanguageSelector ? styles.open : ''}`}>
+//                             {filteredList.map((lang) => (
+//                                 <div
+//                                     key={lang.hreflang}
+//                                     className={`${styles.mobileSubmenuItem} ${language === lang.hreflang ? styles.active : ''}`}
+//                                     onClick={() => handleLanguageChange(lang.hreflang)}
+//                                 >
+//                                     {lang.language}
+//                                 </div>
+//                             ))}
+//                         </div>
+//                     </div>
+
+//                     {/* Sports Dropdown */}
+//                     <div className={styles.mobileDropdown}>
+//                         <div
+//                             className={styles.mobileDropdownHeader}
+//                             onClick={toggleSportsSelector}
+//                         >
+//                             <span>{translatedText.sport}: {getCurrentSportDisplay()}</span>
+//                             <FaChevronDown
+//                                 style={{
+//                                     transform: expandedSportsSelector ? 'rotate(180deg)' : 'rotate(0deg)',
+//                                     transition: 'transform 0.2s ease'
+//                                 }}
+//                             />
+//                         </div>
+//                         <div className={`${styles.mobileSubmenu} ${expandedSportsSelector ? styles.open : ''}`}>
+//                             <div
+//                                 className={`${styles.mobileSubmenuItem} ${sport === 'cricket' ? styles.active : ''}`}
+//                                 onClick={() => handleSportChange('cricket')}
+//                             >
+//                                 {isChangingSport && sport !== 'cricket' ? (
+//                                     <span className={styles.loadingIndicator}>
+//                                         {/* Loading... */}
+//                                     </span>
+//                                 ) : (
+//                                     translatedText.cricket
+//                                 )}
+//                             </div>
+//                             <div
+//                                 className={`${styles.mobileSubmenuItem} ${sport === 'football' ? styles.active : ''}`}
+//                                 onClick={() => handleSportChange('football')}
+//                             >
+//                                 {isChangingSport && sport !== 'football' ? (
+//                                     <span className={styles.loadingIndicator}>
+//                                         {/* Loading... */}
+//                                     </span>
+//                                 ) : (
+//                                     translatedText.football
+//                                 )}
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>
+
+//                 {/* Debug button to reset animation (remove in production) */}
+//                 {process.env.NODE_ENV === 'development' && (
+//                     <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.2)', marginTop: '1rem' }}>
+//                         <button
+//                             onClick={resetAnimation}
+//                             style={{
+//                                 background: 'rgba(255,255,255,0.1)',
+//                                 border: '1px solid rgba(255,255,255,0.3)',
+//                                 color: 'white',
+//                                 padding: '0.5rem 1rem',
+//                                 borderRadius: '4px',
+//                                 cursor: 'pointer'
+//                             }}
+//                         >
+//                             Reset Animation (Dev Only)
+//                         </button>
+//                     </div>
+//                 )}
+//             </div>
+//         </>
+//     );
+
+//     return (
+//         <div
+//             ref={containerRef}
+//             className={styles.loadingContainer}
+//         >
+//             {/* Loading Animation - FIXED: Only show when client-side and conditions are met */}
+//             {isClient && shouldShowAnimation && !animationComplete && (
+//                 <div
+//                     ref={loadingAnimationRef}
+//                     className={styles.loadingAnimation}
+//                     style={{
+//                         display: (isClient && shouldShowAnimation && !animationComplete) ? 'flex' : 'none',
+//                         visibility: (isClient && shouldShowAnimation && !animationComplete) ? 'visible' : 'hidden'
+//                     }}
+//                 >
+//                     <div className={styles.loadingIcon}>
+//                         <div className={styles.mainIcon}>
+//                             <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInner} />
+//                         </div>
+//                     </div>
+//                 </div>
+//             )}
+
+//             {/* SportsBuzz Logo */}
+//             <div ref={logoRef} className={styles.logo}>
+//                 <Link href='/' className={styles.logoContent}>
+//                     <div className={styles.logoIcon}>
+//                         <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
+//                     </div>
+//                 </Link>
+//             </div>
+
+//             {/* Header Navigation */}
+//             <div ref={navigationRef} className={styles.navigation}>
+//                 {/* Mobile Top Row - Only visible on mobile/tablet */}
+//                 <div className={styles.mobileTopRow}>
+//                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+//                         <FeaturedButton />
+//                         <button
+//                             className={styles.mobileMenuButton}
+//                             onClick={toggleMobileMenu}
+//                         >
+//                             <FaBars />
+//                         </button>
+//                     </div>
+//                 </div>
+
+//                 {/* Desktop Navigation */}
+//                 <div className={styles.leftSection}>
+//                     <div className={styles.divider}></div>
+//                     {/* Navigation Links */}
+//                     <div className={styles.navLinks}>
+//                         <Link href="/" className={`${styles.navItem} ${pathname === '/' ? styles.active : ''}`}>
+//                             {translatedText.home}
+//                         </Link>
+
+//                         {countryCode?.location?.betting_apps == 'Active' && (
+//                             <Link href="/best-betting-apps/current" className={`${styles.navItem} ${pathname === '/best-betting-apps/current' ? styles.active : ''}`}>
+//                                 {translatedText.apps}
+//                             </Link>
+//                         )}
+
+//                         <Link href="/match-schedules" className={`${styles.navItem} ${pathname === '/match-schedules' ? styles.active : ''}`}>
+//                             {translatedText.schedule}
+//                         </Link>
+
+//                         {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
+//                             <div key={cat.id} className={styles.dropdown}>
+//                                 <DynamicLink
+//                                     href={`/blogs/pages/all-blogs?category=${cat.id}`}
+//                                     className={styles.navItem}
+//                                 >
+//                                     {capitalizeFirstLetter(cat.name)} <FaChevronDown />
+//                                 </DynamicLink>
+
+//                                 {cat.subcategories?.length > 0 && (
+//                                     <ul className={styles.submenu}>
+//                                         {cat.subcategories.map((sub) => (
+//                                             <li key={sub.id}>
+//                                                 <DynamicLink
+//                                                     href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}
+//                                                     className={styles.submenuItem}
+//                                                 >
+//                                                     {sub.name}
+//                                                 </DynamicLink>
+//                                             </li>
+//                                         ))}
+//                                     </ul>
+//                                 )}
+//                             </div>
+//                         ))}
+
+//                         <FeaturedButton />
+//                     </div>
+//                 </div>
+
+//                 {/* Desktop Right Section */}
+//                 <div className={styles.rightSection}>
+//                     <select
+//                         className={styles.languageSelector}
+//                         value={language}
+//                         onChange={(e) => handleLanguageChange(e.target.value)}
+//                     >
+//                         {filteredList.map((lang) => (
+//                             <option key={lang.hreflang} value={lang.hreflang}>
+//                                 {lang.language}
+//                             </option>
+//                         ))}
+//                     </select>
+
+//                     <div className={styles.sportsSelectorWrapper}>
+//                         {/* {isChangingSport && (
+//                             <span className={styles.loadingIndicator}>Loading...</span>
+//                         )} */}
+//                         <select
+//                             className={`${styles.sportsSelector} ${isChangingSport ? styles.disabled : ''}`}
+//                             value={sport}
+//                             onChange={(e) => handleSportChange(e.target.value)}
+//                             disabled={isChangingSport}
+//                         >
+//                             <option value="cricket">{translatedText.cricket}</option>
+//                             <option value="football">{translatedText.football}</option>
+//                         </select>
+//                     </div>
+
+//                     {/* Dark Mode Toggle Button for Desktop */}
+//                     <button
+//                         className={styles.darkModeButton}
+//                         onClick={toggleDarkMode}
+//                         title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+//                     >
+//                         {darkMode ? <FaSun /> : <FaMoon />}
+//                     </button>
+
+//                     <Link href="/contact" className={`${styles.navItem} ${pathname === '/contact' ? styles.active : ''}`}>
+//                         {translatedText.contact}
+//                     </Link>
+//                 </div>
+//             </div>
+
+//             {/* Render Mobile Menu */}
+//             {renderMobileMenu()}
+//         </div>
+//     );
+// };
+
+// export default HeaderTwo;
+
+
+
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 import styles from './HeaderTwo.module.css';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useGlobalData } from '../Context/ApiContext';
 import { FaMoon, FaSun, FaChevronDown, FaBars, FaTimes } from 'react-icons/fa';
-import Link from 'next/link';
-import DynamicLink from '../Common/DynamicLink';
-import axios from 'axios';
-
+import { usePathHelper } from '@/hooks/usePathHelper';
 import FeaturedButton from '../FeaturedButton/FeaturedButton';
+import DynamicLink from '../Common/DynamicLink';
+import bettingOds from './bettingOds.json';
 
-const HeaderTwo = ({ animationStage }) => {
+function getCookie(name) {
+    if (typeof document === 'undefined') return null;
+
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        try {
+            return JSON.parse(decodeURIComponent(parts.pop().split(';').shift()));
+        } catch (error) {
+            console.error('Error parsing cookie:', error);
+            return null;
+        }
+    }
+    return null;
+}
+
+// Top-level component: Logo
+const Logo = React.memo(({ logoRef, buildPath, isTranslating, isNavigating, isLogoLoaded }) => {
+    // Add render-time logging
+    console.log('[Logo] render', {
+        isTranslating,
+        isNavigating,
+        isLogoLoaded
+    });
+
+    // Mount/unmount logs
+    useEffect(() => {
+        console.log('[Logo] mounted', {
+            isTranslating,
+            isNavigating
+        });
+        return () => {
+            console.log('[Logo] unmounted');
+        };
+    }, [isTranslating, isNavigating]);
+
+    const handleImgLoad = () => {
+        console.log('[Logo] image loaded: /sportsbuz.png');
+    };
+
+    const handleImgError = (e) => {
+        console.error('[Logo] image load error', e?.target?.src);
+    };
+
+    // Force visible when translating or navigating
+    const forceVisible = isTranslating || isNavigating;
+
+    return (
+        <div
+            ref={logoRef}
+            className={styles.logo}
+            data-translating={String(isTranslating)}
+            data-navigating={String(isNavigating)}
+            style={{
+                // keep logo above overlays
+                zIndex: 1000,
+                opacity: 1,
+                visibility: 'visible',
+                position: 'relative'
+            }}
+        >
+            <DynamicLink
+                href="/"
+                className={styles.logoContent}
+                onClick={() => console.log('[Logo] click -> navigating to home')}
+            >
+                <div className={styles.logoIcon} style={{ zIndex: 1000 }}>
+                    <img
+                        src="/sportsbuz.png"
+                        alt="Sportsbuz Logo"
+                        className={styles.logoIconInner}
+                        style={{
+                            // always visible; do not allow any hidden/opacity effects to hide it
+                            opacity: 1,
+                            visibility: 'visible',
+                            display: 'block',
+                            zIndex: 1000,
+                            // small safeguard to keep dimensions stable
+                            transform: 'translateZ(0)'
+                        }}
+                        onLoad={handleImgLoad}
+                        onError={handleImgError}
+                    />
+                </div>
+            </DynamicLink>
+        </div>
+    );
+});
+
+function HeaderThree({ animationStage, languageValidation }) {
+    // console.log(animationStage, "animationStage value");
     const [darkMode, setDarkMode] = useState(false);
     const [headerFixed, setHeaderFixed] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState(null);
+    // Add isTranslating state
+    const [isTranslating, setIsTranslating] = useState(false);
+    // New: track navigation state for logging and forcing logo visibility
+    const [isNavigating, setIsNavigating] = useState(false);
+    // New: track if logo image was successfully preloaded
+    const [isLogoLoaded, setIsLogoLoaded] = useState(false);
+    // New: track when the user is actively changing language to prevent URL effect from overriding
+    const [isUserChangingLanguage, setIsUserChangingLanguage] = useState(false);
+    // New: hold the selected language until the URL updates
+    const [pendingLanguage, setPendingLanguage] = useState(null);
+    const router = useRouter();
+
+    // Defaults for header labels (English source strings)
+    const defaultHeaderLabels = {
+        home: 'Home',
+        apps: 'Best Betting Apps',
+        news: 'News',
+        schedule: 'Match Schedules',
+        cricket: 'Cricket',
+        football: 'Football',
+        contact: 'Contact Us',
+        language: 'Language',
+        sport: 'Sport'
+    };
+    const [translatedText, setTranslatedText] = useState({
+        home: 'Home',
+        apps: 'Best Betting Apps',
+        news: 'News',
+        schedule: 'Match Schedules',
+        cricket: 'Cricket',
+        football: 'Football',
+        contact: 'Contact Us',
+        language: 'Language',
+        sport: 'Sport'
+    });
+    // Helper: get static translations for a language from bettingOds.json
+    const getStaticTranslationsForLanguage = (lang) => {
+        try {
+            const entry = Array.isArray(bettingOds)
+                ? bettingOds.find(item => item?.hreflang === lang)
+                : null;
+            return entry?.translatedText || null;
+        } catch (e) {
+            console.warn('Error reading bettingOds.json:', e);
+            return null;
+        }
+    };
+
+    // Helper: translate header labels using static JSON first, then fallback to translateText per key
+    const translateHeaderLabels = async (selectedLanguage) => {
+        console.log('[HeaderThree] translateHeaderLabels called for', selectedLanguage);
+
+        // First check if we have a valid cache for this language
+        try {
+            const cachedData = localStorage.getItem(`cachedTranslations_${selectedLanguage}`);
+            if (cachedData) {
+                const parsed = JSON.parse(cachedData);
+                // Use cache if it's less than 1 hour old
+                if (Date.now() - parsed.timestamp < 60 * 60 * 1000) {
+                    console.log('[HeaderThree] Using cached translations for', selectedLanguage);
+                    setTranslatedText(parsed.translations);
+                    return parsed.translations;
+                }
+            }
+        } catch (cacheError) {
+            console.warn('Failed to read cached translations:', cacheError);
+        }
+
+        const staticMap = getStaticTranslationsForLanguage(selectedLanguage);
+
+        // If English, short-circuit to defaults
+        if (selectedLanguage === 'en') {
+            setTranslatedText({ ...defaultHeaderLabels });
+            try {
+                localStorage.setItem(
+                    `cachedTranslations_${selectedLanguage}`,
+                    JSON.stringify({
+                        language: selectedLanguage,
+                        translations: { ...defaultHeaderLabels },
+                        timestamp: Date.now()
+                    })
+                );
+            } catch (cacheError) {
+                console.warn('Failed to cache English translations:', cacheError);
+            }
+            return defaultHeaderLabels;
+        }
+
+        const keys = Object.keys(defaultHeaderLabels);
+
+        // Collect only the missing keys to batch translate
+        const keysToTranslate = keys.filter(
+            key => !(staticMap && typeof staticMap[key] === 'string' && staticMap[key].trim() !== '')
+        );
+        const textsToTranslate = keysToTranslate.map(key => defaultHeaderLabels[key]);
+
+        let translatedResults = [];
+        if (textsToTranslate.length > 0) {
+            try {
+                translatedResults = await translateHeaders(textsToTranslate, 'en', selectedLanguage);
+            } catch (err) {
+                console.warn('translateText batch failed for header labels', err);
+                translatedResults = textsToTranslate; // final fallback
+            }
+        }
+
+        const results = {};
+        let idx = 0;
+        for (const key of keys) {
+            if (staticMap && typeof staticMap[key] === 'string' && staticMap[key].trim() !== '') {
+                results[key] = staticMap[key];
+            } else if (keysToTranslate.includes(key)) {
+                results[key] = translatedResults[idx] || defaultHeaderLabels[key];
+                idx += 1;
+            } else {
+                results[key] = defaultHeaderLabels[key];
+            }
+        }
+
+        setTranslatedText(results);
+
+        // Cache final result
+        try {
+            localStorage.setItem(
+                `cachedTranslations_${selectedLanguage}`,
+                JSON.stringify({
+                    language: selectedLanguage,
+                    translations: results,
+                    timestamp: Date.now()
+                })
+            );
+        } catch (cacheError) {
+            console.warn('Failed to cache header translations:', cacheError);
+        }
+
+        return results;
+    };
+
+    // Use the usePathHelper hook
+    const { pathPrefix, buildPath } = usePathHelper();
+
+    // Add a function to generate URLs efficiently
+    const getUrl = (path) => {
+        return buildPath(path);
+    };
 
     // Mobile dropdown states
     const [expandedLanguageSelector, setExpandedLanguageSelector] = useState(false);
     const [expandedSportsSelector, setExpandedSportsSelector] = useState(false);
 
-    // Animation state - FIXED: Initialize with safe defaults for SSR
+    // Animation state
     const [animationComplete, setAnimationComplete] = useState(false);
     const [shouldShowAnimation, setShouldShowAnimation] = useState(false);
-    const [isClient, setIsClient] = useState(false);
+
+    // Categories Section
+
+    const [translatedCategories, setTranslatedCategories] = useState([]);
+    const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+    const [categoriesCacheKey, setCategoriesCacheKey] = useState('');
+    // Keep an immutable source list for translations
+    const [sourceCategories, setSourceCategories] = useState([]);
+    // Prevent duplicate translation calls
+    const isTranslatingCategoriesRef = useRef(false);
+    const lastCategoriesLangRef = useRef(null);
+    const translateCategoriesTimeoutRef = useRef(null)
 
     // GSAP refs
     const containerRef = useRef(null);
@@ -39,7 +1182,7 @@ const HeaderTwo = ({ animationStage }) => {
     const pathname = usePathname();
     const {
         blogCategories,
-        translateText,
+        translateHeaders,
         setLanguage,
         language,
         location,
@@ -51,9 +1194,21 @@ const HeaderTwo = ({ animationStage }) => {
         sections,
         matchTypes,
         teamImages,
-        upcomingMatches
+        upcomingMatches,
+        countryCodeCookie,
+        setCountryCodeCookie,
+        hreflang,
+        locationData,
+        setLocationData,
+        countryData,
+        setCountryData,
+        setHreflang,
+        country,
+        setCountry,
+        translateText
     } = useGlobalData();
-    console.log(countryCode, "country code value in header")
+    console.log(blogCategories, "blog categories in header")
+
     // Initialize dark mode from localStorage
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -91,184 +1246,537 @@ const HeaderTwo = ({ animationStage }) => {
         }
     };
 
-    // Initialize client-side state and check localStorage
     useEffect(() => {
-        setIsClient(true);
-        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
-        setAnimationComplete(hasPlayedAnimation);
-        setShouldShowAnimation(!hasPlayedAnimation);
+        // Get data from cookies after component mounts
+        const locationCookie = getCookie('locationData');
+        const countryCookie = getCookie('countryData');
+
+        setLocationData(locationCookie);
+        setCountryData(countryCookie);
+
+        // Set initial values based on cookie data
+        if (locationData?.filtered_locations?.length > 0) {
+            const firstLocation = locationData.filtered_locations[0];
+            setCountry(firstLocation.country);
+            setHreflang(firstLocation.hreflang);
+        }
     }, []);
 
-    // Initialize GSAP animation
+    // OPTIMIZED: Initialize and cache categories
     useEffect(() => {
-        if (!isClient) return; // Wait for client-side hydration
+        if (!blogCategories || blogCategories.length === 0) return;
 
-        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
+        // Create a stable cache key based on categories content
+        const newCacheKey = JSON.stringify(blogCategories.map(cat => ({
+            id: cat.id,
+            name: cat.name,
+            featured: cat.featured,
+            subcategories: cat.subcategories?.map(sub => sub.id) || []
+        })));
 
-        if (hasPlayedAnimation) {
-            // Animation already played - set final state immediately
-            gsap.set(containerRef.current, {
-                height: '5rem',
-                overflow: 'visible',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '0 1rem'
-            });
+        // Only update if categories actually changed
+        if (newCacheKey !== categoriesCacheKey) {
+            console.log('[Categories] Updating categories cache');
+            setTranslatedCategories(blogCategories);
+            setSourceCategories(blogCategories);
+            setCategoriesCacheKey(newCacheKey);
+            setCategoriesLoaded(true);
 
-            // FIXED: Ensure loading animation is completely hidden
-            if (loadingAnimationRef.current) {
-                gsap.set(loadingAnimationRef.current, {
-                    opacity: 0,
-                    scale: 0.5,
-                    display: 'none',
-                    visibility: 'hidden'
-                });
-                loadingAnimationRef.current.style.display = 'none';
-                loadingAnimationRef.current.style.visibility = 'hidden';
+            // Cache in localStorage for persistence
+            try {
+                localStorage.setItem('cachedCategories', JSON.stringify({
+                    categories: blogCategories,
+                    timestamp: Date.now(),
+                    cacheKey: newCacheKey
+                }));
+            } catch (error) {
+                console.warn('Failed to cache categories:', error);
             }
-
-            gsap.set(logoRef.current, {
-                position: 'relative',
-                bottom: 'auto',
-                left: 'auto',
-                opacity: 1,
-                x: 0,
-                y: 0,
-                visibility: 'visible'
-            });
-
-            gsap.set(navigationRef.current, {
-                opacity: 1,
-                display: 'flex'
-            });
-
-            // FIXED: Ensure states are set correctly
-            setShouldShowAnimation(false);
-            setAnimationComplete(true);
-
-            return; // Exit early if animation already played
         }
+    }, [blogCategories, categoriesCacheKey]);
 
-        // Animation hasn't played yet - set initial states for animation
-        setShouldShowAnimation(true);
-        setAnimationComplete(false);
-
-        gsap.set(containerRef.current, {
-            height: '100vh',
-            overflow: 'hidden',
-            display: 'block',
-            alignItems: 'stretch',
-            justifyContent: 'flex-start',
-            padding: '0'
-        });
-
-        if (loadingAnimationRef.current) {
-            gsap.set(loadingAnimationRef.current, {
-                opacity: 1,
-                scale: 1,
-                display: 'flex',
-                visibility: 'visible'
-            });
+    // Add this helper function for retrying failed translations
+    const retryTranslation = async (fn, retries = 3, delay = 1000) => {
+        try {
+            return await fn();
+        } catch (error) {
+            if (retries > 0) {
+                console.log(`Retrying translation... ${retries} attempts left`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return retryTranslation(fn, retries - 1, delay * 2);
+            }
+            throw error;
         }
+    };
 
-        gsap.set(logoRef.current, {
-            position: 'absolute',
-            bottom: '2rem',
-            left: '2rem',
-            opacity: 0,
-            x: 0,
-            y: 80,
-            visibility: 'hidden'
-        });
+    // Load categories from cache on component mount
+    useEffect(() => {
+        if (categoriesLoaded || (blogCategories && blogCategories.length > 0)) return;
 
-        gsap.set(navigationRef.current, {
-            opacity: 0,
-            display: 'none'
-        });
-
-        // Create the main timeline
-        const tl = gsap.timeline({
-            onComplete: () => {
-                setAnimationComplete(true);
-                setShouldShowAnimation(false); // FIXED: Hide animation on complete
-                localStorage.setItem('headerAnimationPlayed', 'true');
-
-                // FIXED: Additional cleanup for loading animation
-                if (loadingAnimationRef.current) {
-                    loadingAnimationRef.current.style.display = 'none';
-                    loadingAnimationRef.current.style.visibility = 'hidden';
+        try {
+            const cached = localStorage.getItem('cachedCategories');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                // Use cache if it's less than 24 hours old
+                if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
+                    console.log('[Categories] Loading categories from cache');
+                    setTranslatedCategories(parsed.categories);
+                    setSourceCategories(parsed.categories);
+                    setCategoriesCacheKey(parsed.cacheKey);
+                    setCategoriesLoaded(true);
                 }
             }
-        });
+        } catch (error) {
+            console.warn('Failed to load cached categories:', error);
+        }
+    }, [categoriesLoaded, blogCategories]);
 
-        // Step 1: Show loading animation (1 second)
-        tl.to({}, { duration: 2 })
+    // 🆕 CRITICAL FIX: Load translated categories on component mount and route changes
+    useEffect(() => {
+        const loadTranslatedCategories = () => {
+            if (!language || !categoriesLoaded) return;
 
-            // Step 2: Hide loading animation and show logo (0.5 seconds)
-            .to(loadingAnimationRef.current, {
-                opacity: 0,
-                scale: 0.75,
-                duration: 0.75,
-                ease: "power2.inOut"
-            })
-            .to(logoRef.current, {
-                opacity: 1,
-                y: 0,
-                visibility: 'visible',
-                duration: 0.75,
-                ease: "power2.out"
-            }, "-=0.3")
+            try {
+                const cachedCategoriesKey = `translatedCategories_${language}`;
+                const cachedCats = localStorage.getItem(cachedCategoriesKey);
 
-            // Step 3: Wait a moment then start transition (1 second wait)
-            .to({}, { duration: 1 })
+                if (cachedCats) {
+                    const parsed = JSON.parse(cachedCats);
+                    // Use cache if it's less than 1 hour old
+                    if (Date.now() - parsed.timestamp < 60 * 60 * 1000) {
+                        console.log('[Categories] Loading translated categories from cache for language:', language);
+                        setTranslatedCategories(parsed.categories);
+                        return;
+                    }
+                }
 
-            // Step 4: Shrink container and move logo to header position (1.5 seconds)
-            .to(containerRef.current, {
-                height: '5rem',
-                duration: 1.5,
-                ease: "power2.inOut"
-            })
-            .to(logoRef.current, {
-                bottom: '50%',
-                left: '1rem',
-                y: '50%',
-                duration: 1.5,
-                ease: "power2.inOut"
-            }, "-=1.5")
+                // If no cached translation exists and language is not English, translate
+                if (language !== 'en' && categoriesLoaded) {
+                    console.log('[Categories] No cached translation found, translating categories for:', language);
+                    translateCategoriesForLanguage(language);
+                }
+            } catch (error) {
+                console.error('Failed to load translated categories:', error);
+            }
+        };
 
-            // Step 5: Convert logo to relative positioning after animation
-            .set(logoRef.current, {
-                position: 'relative',
-                bottom: 'auto',
-                left: 'auto',
-                x: 0,
-                y: 0
-            })
+        loadTranslatedCategories();
+    }, [language, categoriesLoaded, pathname]); // 🆕 Added pathname dependency to reload on route changes
 
-            // Step 6: Show navigation and set final states
-            .set(containerRef.current, {
-                overflow: 'visible',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '0 1rem'
-            })
-            .set(navigationRef.current, {
-                display: 'flex'
-            })
-            .to(navigationRef.current, {
-                opacity: 1,
-                duration: 0.75,
-                ease: "power2.out"
-            })
-            // FIXED: Properly hide loading animation at the end
-            .set(loadingAnimationRef.current, {
-                display: 'none',
-                visibility: 'hidden'
+    const filteredCategories = React.useMemo(() => {
+        if (!categoriesLoaded) return [];
+        return translatedCategories.filter((cat) => cat.featured === false);
+    }, [translatedCategories, categoriesLoaded]);
+
+    // 🆕 NEW: Separate function to translate categories for a specific language
+    const translateCategoriesForLanguage = async (targetLanguage) => {
+        if (!categoriesLoaded || isTranslatingCategoriesRef.current) return;
+
+        const cachedKey = `translatedCategories_${targetLanguage}`;
+
+        try {
+            isTranslatingCategoriesRef.current = true;
+            console.log('[Categories] Translating for language:', targetLanguage);
+
+            // English short-circuit
+            if (targetLanguage === 'en') {
+                const originals = sourceCategories?.length ? sourceCategories : blogCategories;
+                if (originals && originals.length > 0) {
+                    setTranslatedCategories(originals);
+                    try {
+                        localStorage.setItem(cachedKey, JSON.stringify({
+                            categories: originals,
+                            timestamp: Date.now(),
+                            language: targetLanguage
+                        }));
+                    } catch (cacheError) {
+                        console.warn('Failed to cache English categories:', cacheError);
+                    }
+                }
+                return;
+            }
+
+            // Build grouped payload (categories + subcategories) from sourceCategories
+            const categoriesSource = (sourceCategories && sourceCategories.length > 0)
+                ? sourceCategories
+                : (blogCategories || []);
+
+            const categoryNames = categoriesSource
+                .map(cat => cat?.name)
+                .filter(name => !!name && name.trim() !== '' && name !== 'Home');
+
+            const subcategoryNames = categoriesSource.flatMap(cat =>
+                (cat.subcategories || [])
+                    .map(sub => sub?.name)
+                    .filter(name => !!name && name.trim() !== '')
+            );
+
+            const payload = {
+                categories: categoryNames.map(text => ({ text })),
+                subcategories: subcategoryNames.map(text => ({ text })),
+            };
+
+            // Send grouped payload in one request
+            const groupedResults = await retryTranslation(
+                () => Promise.race([
+                    translateHeaders(payload, 'en', targetLanguage),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Translation timeout')), 77000)
+                    )
+                ])
+            );
+
+            const translatedCategoriesArr = groupedResults?.categories || categoryNames;
+            const translatedSubcategoriesArr = groupedResults?.subcategories || subcategoryNames;
+
+            // Rehydrate translations back into original structure using index alignment
+            let subIdx = 0;
+            let catIdx = 0;
+            const updatedCategories = categoriesSource.map((category) => {
+                const name = (category.name !== 'Home')
+                    ? (translatedCategoriesArr[catIdx] ?? category.name)
+                    : category.name;
+
+                if (category.name !== 'Home') {
+                    catIdx += 1;
+                }
+
+                const subcategories = (category.subcategories || []).map(sub => {
+                    const translatedSubName = translatedSubcategoriesArr[subIdx] ?? sub.name;
+                    subIdx += 1;
+                    return { ...sub, name: translatedSubName };
+                });
+
+                return { ...category, name, subcategories };
             });
 
-        timelineRef.current = tl;
+            setTranslatedCategories(updatedCategories);
+
+            try {
+                localStorage.setItem(cachedKey, JSON.stringify({
+                    categories: updatedCategories,
+                    timestamp: Date.now(),
+                    language: targetLanguage
+                }));
+            } catch (cacheError) {
+                console.warn('Failed to cache translated categories:', cacheError);
+            }
+        } catch (error) {
+            console.error('Grouped category translation error:', error);
+            // Fallback to current behavior if grouped call fails
+            try {
+                const categoriesSource = (sourceCategories && sourceCategories.length > 0)
+                    ? sourceCategories
+                    : (blogCategories || []);
+                const allTexts = [];
+                categoriesSource.forEach(category => {
+                    if (category.name && category.name.trim() !== '' && category.name !== 'Home') {
+                        allTexts.push(category.name);
+                    }
+                    if (category.subcategories?.length > 0) {
+                        category.subcategories.forEach(sub => {
+                            if (sub.name && sub.name.trim() !== '') {
+                                allTexts.push(sub.name);
+                            }
+                        });
+                    }
+                });
+                const uniqueTexts = Array.from(new Set(allTexts));
+                if (uniqueTexts.length === 0) return;
+
+                const translatedResults = await retryTranslation(
+                    () => translateHeaders(uniqueTexts.map(text => ({ text })), 'en', targetLanguage)
+                );
+
+                const translationMap = {};
+                uniqueTexts.forEach((t, idx) => {
+                    translationMap[t] = translatedResults[idx] || t;
+                });
+
+                const updatedCategories = categoriesSource.map(category => ({
+                    ...category,
+                    name: translationMap[category.name] || category.name,
+                    subcategories: (category.subcategories || []).map(sub => ({
+                        ...sub,
+                        name: translationMap[sub.name] || sub.name
+                    }))
+                }));
+
+                setTranslatedCategories(updatedCategories);
+
+                // Cache the fallback result too
+                try {
+                    localStorage.setItem(cachedKey, JSON.stringify({
+                        categories: updatedCategories,
+                        timestamp: Date.now(),
+                        language: targetLanguage
+                    }));
+                } catch (cacheError) {
+                    console.warn('Failed to cache fallback categories:', cacheError);
+                }
+            } catch (fallbackErr) {
+                console.error('Fallback translation failed:', fallbackErr);
+            }
+        } finally {
+            isTranslatingCategoriesRef.current = false;
+            lastCategoriesLangRef.current = targetLanguage;
+        }
+    };
+
+    // Only translate categories on explicit language change
+    useEffect(() => {
+        const doTranslateCategories = async () => {
+            if (!categoriesLoaded || !isUserChangingLanguage || !pendingLanguage) return;
+            if (lastCategoriesLangRef.current === language) return;
+
+            await translateCategoriesForLanguage(language);
+        };
+
+        // Debounce/schedule translate on explicit language change
+        const schedule = () => {
+            if (translateCategoriesTimeoutRef.current) {
+                clearTimeout(translateCategoriesTimeoutRef.current);
+            }
+            translateCategoriesTimeoutRef.current = setTimeout(doTranslateCategories, 500);
+        };
+
+        if (isUserChangingLanguage && pendingLanguage && categoriesLoaded) {
+            schedule();
+        }
+
+        return () => {
+            if (translateCategoriesTimeoutRef.current) {
+                clearTimeout(translateCategoriesTimeoutRef.current);
+            }
+        };
+    }, [language, isUserChangingLanguage, pendingLanguage, categoriesLoaded]);
+
+    // 🆕 NEW: Load translations on component mount with persistence
+    useEffect(() => {
+        const loadInitialTranslations = async () => {
+            if (!language) return;
+
+            try {
+                // Try to load cached translations first
+                const cachedTranslationsKey = `cachedTranslations_${language}`;
+                const cached = localStorage.getItem(cachedTranslationsKey);
+
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    setTranslatedText(prev => ({
+                        ...prev,
+                        ...parsed.translations
+                    }));
+                    console.log('[Translate] Loaded initial translations from cache');
+                } else {
+                    // If no cache exists, translate on mount
+                    await translateContent(language);
+                }
+            } catch (error) {
+                console.error('Failed to load initial translations:', error);
+            }
+        };
+
+        loadInitialTranslations();
+    }, [language]);
+
+    // 🆕 NEW: Save current translations to sessionStorage for cross-route persistence
+    useEffect(() => {
+        if (Object.keys(translatedText).length > 0) {
+            try {
+                sessionStorage.setItem('currentHeaderTranslations', JSON.stringify({
+                    language,
+                    translations: translatedText,
+                    timestamp: Date.now()
+                }));
+            } catch (error) {
+                console.warn('Failed to save translations to sessionStorage:', error);
+            }
+        }
+    }, [translatedText, language]);
+
+    // 🆕 NEW: Load from sessionStorage on mount for immediate restoration
+    useEffect(() => {
+        try {
+            const saved = sessionStorage.getItem('currentHeaderTranslations');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.language === language) {
+                    setTranslatedText(parsed.translations);
+                    console.log('[Header] Loaded translations from sessionStorage');
+                }
+            }
+        } catch (error) {
+            console.warn('Failed to load translations from sessionStorage:', error);
+        }
+    }, []);
+
+    // Ensure header final state CSS applies on initial paint if animation has already played
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const played = localStorage.getItem('headerAnimationPlayed') === 'true';
+            if (played) {
+                document.documentElement.classList.add('header-played');
+            }
+        }
+    }, []);
+
+    // Preload the logo image to avoid flicker on route changes and log status
+    useEffect(() => {
+        console.log('[Logo] preload start');
+        const img = new Image();
+        img.src = '/sportsbuz.png';
+        img.onload = () => {
+            setIsLogoLoaded(true);
+            console.log('[Logo] preload complete');
+        };
+        img.onerror = (err) => {
+            console.error('[Logo] preload error', err);
+        };
+    }, []);
+
+    // Track route changes and log navigation stages
+    useEffect(() => {
+        console.log('[Router] pathname changed', { pathname });
+        // Navigation completed when pathname updates
+        setIsNavigating(false);
+    }, [pathname]);
+
+    // Handle navigation start
+    const handleNavigationStart = (url) => {
+        setIsNavigating(true);
+        console.log('[Router] navigation start', { url });
+    };
+
+    // Initialize GSAP animation
+    useIsomorphicLayoutEffect(() => {
+        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed') === 'true';
+        // Set initial states IMMEDIATELY to prevent flash
+        gsap.set(containerRef.current, {
+            height: hasPlayedAnimation ? '5rem' : '100vh',
+            overflow: hasPlayedAnimation ? 'visible' : 'hidden',
+            display: hasPlayedAnimation ? 'flex' : 'block',
+            alignItems: hasPlayedAnimation ? 'center' : 'stretch',
+            justifyContent: hasPlayedAnimation ? 'space-between' : 'flex-start',
+            padding: hasPlayedAnimation ? '0 1rem' : '0'
+        });
+
+        gsap.set(loadingAnimationRef.current, {
+            opacity: hasPlayedAnimation ? 0 : 1,
+            scale: hasPlayedAnimation ? 0.5 : 1,
+            display: hasPlayedAnimation ? 'none' : 'flex'
+        });
+
+        // Keep the logo visible immediately; allow position animation only for first run
+        gsap.set(logoRef.current, {
+            position: hasPlayedAnimation ? 'relative' : 'absolute',
+            bottom: hasPlayedAnimation ? 'auto' : '2rem',
+            left: hasPlayedAnimation ? 'auto' : '2rem',
+            opacity: 1, // ensure visible
+            x: 0,
+            y: hasPlayedAnimation ? 0 : 80
+            // removed visibility toggle to prevent hidden logo on route changes
+        });
+        console.log('[GSAP] initial state applied to logo', { hasPlayedAnimation });
+
+        gsap.set(navigationRef.current, {
+            opacity: hasPlayedAnimation ? 1 : 0,
+            display: hasPlayedAnimation ? 'flex' : 'none'
+        });
+
+        if (!hasPlayedAnimation) {
+            setShouldShowAnimation(true);
+
+            // Mark animation as played immediately to avoid overlay/logo hidden on next routes
+            try {
+                localStorage.setItem('headerAnimationPlayed', 'true');
+                document.documentElement.classList.add('header-played');
+            } catch (e) { }
+
+            // Create the main timeline
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    setAnimationComplete(true);
+                }
+            });
+
+            // Step 1: Show loading animation (1 second)
+            tl.to({}, { duration: 2 })
+
+                // Step 2: Hide loading animation and show logo (0.5 seconds)
+                .to(loadingAnimationRef.current, {
+                    opacity: 0,
+                    scale: 0.75,
+                    duration: 0.75,
+                    ease: "power2.inOut"
+                })
+                .to(logoRef.current, {
+                    opacity: 1,
+                    y: 0,
+                    visibility: 'visible',
+                    duration: 0.75,
+                    ease: "power2.out"
+                }, "-=0.3")
+
+                // Step 3: Wait a moment then start transition (1 second wait)
+                .to({}, { duration: 1 })
+
+                // Step 4: Shrink container and move logo to header position (1.5 seconds)
+                .to(containerRef.current, {
+                    height: '5rem',
+                    duration: 1.5,
+                    ease: "power2.inOut"
+                })
+                .to(logoRef.current, {
+                    bottom: '50%',
+                    left: '1rem',
+                    y: '50%',
+                    duration: 1.5,
+                    ease: "power2.inOut"
+                }, "-=1.5")
+
+                // Step 5: Convert logo to relative positioning after animation
+                .set(logoRef.current, {
+                    position: 'relative',
+                    bottom: 'auto',
+                    left: 'auto',
+                    x: 0,
+                    y: 0
+                })
+
+                // Step 6: Show navigation and set final states
+                .set(containerRef.current, {
+                    overflow: 'visible',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0 1rem'
+                })
+                .set(navigationRef.current, {
+                    display: 'flex'
+                })
+                .to(navigationRef.current, {
+                    opacity: 1,
+                    duration: 0.75,
+                    ease: "power2.out"
+                })
+                .set(loadingAnimationRef.current, {
+                    display: 'none'
+                });
+
+            timelineRef.current = tl;
+            tl.eventCallback('onStart', () => {
+                console.log('[GSAP] timeline started for logo/header');
+            });
+            tl.eventCallback('onComplete', () => {
+                console.log('[GSAP] timeline completed for logo/header');
+                setAnimationComplete(true);
+            });
+        } else {
+            // Animation already played - already set to final state above
+            setShouldShowAnimation(false);
+            setAnimationComplete(true);
+        }
 
         // Cleanup function
         return () => {
@@ -276,7 +1784,7 @@ const HeaderTwo = ({ animationStage }) => {
                 timelineRef.current.kill();
             }
         };
-    }, [isClient]);
+    }, []);
 
     // Function to reset animation (for development)
     const resetAnimation = () => {
@@ -298,10 +1806,27 @@ const HeaderTwo = ({ animationStage }) => {
 
     // Function to parse URL path for country code and language
     const parseUrlPath = (pathname) => {
-        const parts = pathname.split('/').filter(part => part !== '');
-        const countryCode = parts.length > 0 ? parts[0].toUpperCase() : '';
-        const language = parts.length > 1 ? parts[1].toLowerCase() : '';
-        return { countryCode, language };
+        console.log("enters the parse url path funciton");
+        if (!pathname) {
+            console.log("enters the no path name case");
+            return { countryCode: '', language: '' }
+        };
+        console.log("enters the outside of the if block ")
+        // Extract the first segment of the path (e.g., "en-lk" from "/en-lk/some/path")
+        const firstSegment = pathname.replace(/^\//, '').split('/')[0];
+        console.log(firstSegment, "first segment")
+        // Check if it matches the format: language-countrycode
+        const match = firstSegment.match(/^([a-z]{2})-([a-z]{2})$/i);
+        console.log(match, "match in the parse url")
+
+        if (match) {
+            return {
+                language: match[1].toLowerCase(),
+                countryCode: match[2].toLowerCase()
+            };
+        }
+
+        return { countryCode: '', language: '' };
     };
 
     // Handle URL-based country code and language
@@ -313,15 +1838,19 @@ const HeaderTwo = ({ animationStage }) => {
         // Set language from URL if available and valid
         if (urlLanguage) {
             const isValidLanguage = location.some(loc => loc.hreflang === urlLanguage);
-            if (isValidLanguage && language !== urlLanguage) {
+            // Only set language from URL if it's valid, differs from current, and user isn't in the middle of changing it
+            if (isValidLanguage && language !== urlLanguage && !isUserChangingLanguage) {
                 setLanguage(urlLanguage);
                 localStorage.setItem('language', urlLanguage);
             }
         }
 
-        // Set sport based on URL country code if available
-        if (urlCountryCode) {
-            const matchedLocation = location.find(loc => loc.country_code === urlCountryCode);
+        // Respect user-selected sport: only set from URL if no user choice
+        const userSelectedSport = typeof window !== 'undefined' ? localStorage.getItem('selectedSport') : null;
+
+        // Set sport based on URL country code only if user hasn't manually selected one
+        if (urlCountryCode && !userSelectedSport) {
+            const matchedLocation = location.find(loc => loc.country_code.toLowerCase() === urlCountryCode);
             if (matchedLocation?.sports) {
                 const apiSport = matchedLocation.sports.toLowerCase();
                 if (apiSport !== sport) {
@@ -330,7 +1859,24 @@ const HeaderTwo = ({ animationStage }) => {
                 }
             }
         }
-    }, [pathname, location, language, sport]);
+    }, [pathname, location, language, isUserChangingLanguage]);
+
+    // New: Start translation only after the URL reflects the pending language
+    useEffect(() => {
+        if (!isUserChangingLanguage || !pendingLanguage) return;
+
+        const { language: urlLanguage } = parseUrlPath(pathname);
+        if (urlLanguage === pendingLanguage) {
+            translateContent(pendingLanguage)
+                .catch(error => {
+                    console.error('Translation error:', error);
+                })
+                .finally(() => {
+                    setIsUserChangingLanguage(false);
+                });
+            setPendingLanguage(null);
+        }
+    }, [pathname, isUserChangingLanguage, pendingLanguage]);
 
     // Close mobile menu when clicking outside
     useEffect(() => {
@@ -359,26 +1905,35 @@ const HeaderTwo = ({ animationStage }) => {
         };
     }, [mobileMenuOpen]);
 
-    const [translatedCategories, setTranslatedCategories] = useState(blogCategories);
-    const [translatedText, setTranslatedText] = useState({
-        home: 'Home',
-        apps: 'Best Betting Apps',
-        news: 'News',
-        schedule: 'Match Schedules',
-        cricket: 'Cricket',
-        football: 'Football',
-        contact: 'Contact Us',
-        language: 'Language',
-        sport: 'Sport'
-    });
+
     const [filteredList, setFilteredList] = useState([]);
 
-    // Load saved language on component mount
+    // Track if we've already loaded translations for this language in the current session
+    const translationLoadedRef = useRef({});
+
+    // Load saved language and cached translations on component mount
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const savedLanguage = localStorage.getItem('language');
+            const cachedTranslations = localStorage.getItem('cachedTranslations');
+
             if (savedLanguage && savedLanguage !== language) {
                 setLanguage(savedLanguage);
+            }
+
+            // If we have cached translations for the current language, use them immediately
+            if (cachedTranslations) {
+                try {
+                    const parsed = JSON.parse(cachedTranslations);
+                    if (parsed.language === language) {
+                        setTranslatedText(prev => ({
+                            ...prev,
+                            ...parsed.translations
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Error parsing cached translations:', error);
+                }
             }
         }
     }, []);
@@ -413,88 +1968,116 @@ const HeaderTwo = ({ animationStage }) => {
         }
     }, [location, countryCode]);
 
-    useEffect(() => {
-        const updateTranslations = async () => {
-            try {
-                const [home, apps, news, schedule, cricket, football, contact, languageText, sportText] = await Promise.all([
-                    translateText('Home', 'en', language),
-                    translateText('Best Betting Apps', 'en', language),
-                    translateText('News', 'en', language),
-                    translateText('Match Schedules', 'en', language),
-                    translateText('Cricket', 'en', language),
-                    translateText('Football', 'en', language),
-                    translateText('Contact', 'en', language),
-                    translateText('Language', 'en', language),
-                    translateText('Sport', 'en', language),
-                ]);
+    // Add this function to handle URL updates
+    const updateUrlWithLanguage = (selectedLanguage) => {
+        const currentPath = pathname;
+        const segments = currentPath.split('/').filter(Boolean);
 
-                setTranslatedText(prev => ({
-                    ...prev,
-                    home, apps, news, schedule, cricket, football, contact,
-                    language: languageText,
-                    sport: sportText
-                }));
+        // Get the current country code from the URL
+        const currentLangCountry = segments[0]?.split('-')[1] || 'in'; // default to 'in' if not found
 
-                const translatedCategories = await Promise.all(
-                    blogCategories.map(async (cat) => {
-                        const translatedCatName = await translateText(cat.name, 'en', language);
-                        const translatedSubs = await Promise.all(
-                            (cat.subcategories || []).map(async (sub) => ({
-                                ...sub,
-                                name: await translateText(sub.name, 'en', language),
-                            }))
-                        );
-                        return {
-                            ...cat,
-                            name: translatedCatName,
-                            subcategories: translatedSubs,
-                        };
-                    })
-                );
-                setTranslatedCategories(translatedCategories);
-            } catch (error) {
-                console.error('Translation error:', error);
-            }
-        };
+        // Create the new language-country code
+        const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
 
-        updateTranslations();
-    }, [language, translateText, blogCategories]);
+        // Reconstruct the URL
+        const newPath = segments.length > 1
+            ? `/${newLangCountry}/${segments.slice(1).join('/')}`
+            : `/${newLangCountry}`;
 
-    const handleLanguageChange = (selectedLanguage) => {
+        // Use router to update the URL immediately
+        router.push(newPath);
+    };
+
+    // IMPROVED: Handle language change with better error handling
+    const handleLanguageChange = async (selectedLanguage) => {
+        if (selectedLanguage === language) return;
+        const currentPath = pathname;
+        const segments = currentPath.split('/').filter(Boolean);
+        const currentLangCountry = segments[0]?.split('-')[1] || 'in';
+        const newLangCountry = `${selectedLanguage}-${currentLangCountry}`;
+        const newPath = segments.length > 1
+            ? `/${newLangCountry}/${segments.slice(1).join('/')}`
+            : `/${newLangCountry}`;
+
+        // Navigate
+        setIsNavigating(true);
+        console.log('[Router] route push start', { newPath });
+        router.push(newPath);
+
+        console.log('[Language] Changing to:', selectedLanguage);
+
+        // Mark that the user is changing the language
+        setIsUserChangingLanguage(true);
+        setPendingLanguage(selectedLanguage);
+
+        // Immediately update UI state
         setLanguage(selectedLanguage);
         localStorage.setItem('language', selectedLanguage);
+
+        // Ensure next route doesn't rerun intro animation
+        try {
+            localStorage.setItem('headerAnimationPlayed', 'true');
+            document.documentElement.classList.add('header-played');
+        } catch (e) { }
+
+        // Close dropdowns
         setExpandedLanguageSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);
         }
+
+        try {
+            // Start translation in background
+            await translateContent(selectedLanguage);
+        } catch (error) {
+            console.error('Language change translation failed:', error);
+            // Continue with navigation even if translation fails
+        }
     };
 
-    // Optimized sport change handler with debouncing
-    const [isChangingSport, setIsChangingSport] = useState(false);
+    // Separate translation logic into its own function
+    const translateContent = async (selectedLanguage) => {
+        try {
+            console.log('[Translate] start', { selectedLanguage });
+            setIsTranslating(true);
+
+            // Resolve header labels via bettingOds.json, fallback batch translateText
+            await translateHeaderLabels(selectedLanguage);
+
+            // Translate categories for the new language
+            await translateCategoriesForLanguage(selectedLanguage);
+
+            // Keep current header labels (or previously cached) without API calls
+            const cachedTranslationsKey = `cachedTranslations_${selectedLanguage}`;
+            const cached = localStorage.getItem(cachedTranslationsKey);
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    if (Date.now() - parsed.timestamp < 60 * 60 * 1000) {
+                        setTranslatedText(prev => ({
+                            ...prev,
+                            ...parsed.translations
+                        }));
+                    }
+                } catch (e) {
+                    console.warn('Failed to parse cached translations:', e);
+                }
+            }
+        } catch (error) {
+            console.error('Translation error:', error);
+        } finally {
+            setIsTranslating(false);
+            console.log('[Translate] end', { selectedLanguage });
+        }
+    };
 
     const handleSportChange = (selectedSport) => {
-        // Prevent multiple rapid sport changes
-        if (isChangingSport) return;
-
-        // Set loading state
-        setIsChangingSport(true);
-
-        // First update localStorage to ensure consistency
+        setSport(selectedSport);
         localStorage.setItem('selectedSport', selectedSport);
-
-        // Close menus immediately for better UX
         setExpandedSportsSelector(false);
         if (isMobile) {
             setMobileMenuOpen(false);
         }
-
-        // Delay the actual sport change to prevent UI freezing
-        setTimeout(() => {
-            // Then update state
-            setSport(selectedSport);
-            // Reset loading state after a short delay to ensure UI updates
-            setTimeout(() => setIsChangingSport(false), 300);
-        }, 50);
     };
 
     const capitalizeFirstLetter = (text) =>
@@ -504,11 +2087,15 @@ const HeaderTwo = ({ animationStage }) => {
         setMobileMenuOpen(!mobileMenuOpen);
     };
 
-    const handleNavItemClick = () => {
+    const handleCategoryToggle = React.useCallback((categoryId) => {
+        setExpandedCategory(prev => prev === categoryId ? null : categoryId);
+    }, []);
+
+    const handleNavItemClick = React.useCallback(() => {
         if (isMobile) {
             setMobileMenuOpen(false);
         }
-    };
+    }, [isMobile]);
 
     const toggleCategory = (categoryId) => {
         setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
@@ -524,16 +2111,21 @@ const HeaderTwo = ({ animationStage }) => {
         setExpandedLanguageSelector(false);
     };
 
-    // Function to get current language display name
-    const getCurrentLanguageDisplay = () => {
+    // OPTIMIZED: Memoized category capitalization
+    const getCategoryDisplayName = React.useCallback((category) => {
+        return category?.name?.charAt(0).toUpperCase() + category?.name?.slice(1).toLowerCase() || '';
+    }, []);
+
+    // OPTIMIZED: Memoized current language display
+    const getCurrentLanguageDisplay = React.useCallback(() => {
         const currentLang = filteredList.find(lang => lang.hreflang === language);
         return currentLang ? currentLang.language : 'Language';
-    };
+    }, [filteredList, language]);
 
-    // Function to get current sport display name
-    const getCurrentSportDisplay = () => {
+    // OPTIMIZED: Memoized current sport display  
+    const getCurrentSportDisplay = React.useCallback(() => {
         return sport === 'cricket' ? translatedText.cricket : translatedText.football;
-    };
+    }, [sport, translatedText.cricket, translatedText.football]);
 
     const renderMobileMenu = () => (
         <>
@@ -550,11 +2142,11 @@ const HeaderTwo = ({ animationStage }) => {
             >
                 {/* Mobile Header */}
                 <div className={styles.mobileHeader}>
-                    <Link href='/' className={styles.logoContent}>
+                    <a href={buildPath("/")} className={styles.logoContent}>
                         <div className={styles.logoIcon}>
                             <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
                         </div>
-                    </Link>
+                    </a>
                     <button
                         className={styles.mobileCloseButton}
                         onClick={() => setMobileMenuOpen(false)}
@@ -565,91 +2157,85 @@ const HeaderTwo = ({ animationStage }) => {
 
                 {/* Mobile Navigation Links */}
                 <div className={styles.mobileNavLinks}>
-                    <Link
-                        href="/"
-                        className={`${styles.mobileNavItem} ${pathname === '/' ? styles.active : ''}`}
+                    <a
+                        href={buildPath("/")}
+                        className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.home}
-                    </Link>
+                    </a>
 
                     {countryCode?.location?.betting_apps == 'Active' && (
-                        <Link
-                            href="/best-betting-apps/current"
-                            className={`${styles.mobileNavItem} ${pathname === '/best-betting-apps/current' ? styles.active : ''}`}
+                        <a
+                            href={buildPath("/best-betting-apps/current")}
+                            className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/best-betting-apps/current` ? styles.active : ''}`}
                             onClick={handleNavItemClick}
                         >
                             {translatedText.apps}
-                        </Link>
+                        </a>
                     )}
 
-                    <Link
-                        href="/match-schedules"
-                        className={`${styles.mobileNavItem} ${pathname === '/match-schedules' ? styles.active : ''}`}
+                    <a
+                        href={buildPath("/match-schedules")}
+                        className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/match-schedules` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.schedule}
-                    </Link>
+                    </a>
 
                     {/* Mobile Dropdown Categories */}
-                    {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
-                        <div key={cat.id} className={styles.mobileDropdown}>
-                            <div
-                                className={styles.mobileDropdownHeader}
-                                onClick={() => toggleCategory(cat.id)}
-                            >
-                                <DynamicLink
-                                    href={`/blogs/pages/all-blogs?category=${cat.id}`}
-                                    onClick={handleNavItemClick}
+                    {categoriesLoaded ? (
+                        filteredCategories.map((cat) => (
+                            <div key={cat.id} className={styles.mobileDropdown}>
+                                <div
+                                    className={styles.mobileDropdownHeader}
+                                    onClick={() => handleCategoryToggle(cat.id)}
                                 >
-                                    {capitalizeFirstLetter(cat.name)}
-                                </DynamicLink>
+                                    <a
+                                        href={buildPath(`/blogs/pages/all-blogs?category=${cat.id}`)}
+                                        onClick={handleNavItemClick}
+                                    >
+                                        {getCategoryDisplayName(cat)}
+                                    </a>
+                                    {cat.subcategories?.length > 0 && (
+                                        <FaChevronDown
+                                            style={{
+                                                transform: expandedCategory === cat.id ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                transition: 'transform 0.2s ease'
+                                            }}
+                                        />
+                                    )}
+                                </div>
+
                                 {cat.subcategories?.length > 0 && (
-                                    <FaChevronDown
-                                        style={{
-                                            transform: expandedCategory === cat.id ? 'rotate(180deg)' : 'rotate(0deg)',
-                                            transition: 'transform 0.2s ease'
-                                        }}
-                                    />
+                                    <div className={`${styles.mobileSubmenu} ${expandedCategory === cat.id ? styles.open : ''}`}>
+                                        {cat.subcategories.map((sub) => (
+                                            <a
+                                                key={sub.id}
+                                                href={buildPath(`/blogs/pages/all-blogs?subcategory=${sub.id}`)}
+                                                className={styles.mobileSubmenuItem}
+                                                onClick={handleNavItemClick}
+                                            >
+                                                {getCategoryDisplayName(sub)}
+                                            </a>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
-
-                            {cat.subcategories?.length > 0 && (
-                                <div className={`${styles.mobileSubmenu} ${expandedCategory === cat.id ? styles.open : ''}`}>
-                                    {cat.subcategories.map((sub) => (
-                                        <DynamicLink
-                                            key={sub.id}
-                                            href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}
-                                            className={styles.mobileSubmenuItem}
-                                            onClick={handleNavItemClick}
-                                        >
-                                            {sub.name}
-                                        </DynamicLink>
-                                    ))}
-                                </div>
-                            )}
+                        ))
+                    ) : (
+                        <div className={styles.loadingCategories}>
+                            Loading categories...
                         </div>
-                    ))}
+                    )}
 
-                    <Link
-                        href="/contact"
-                        className={`${styles.mobileNavItem} ${pathname === '/contact' ? styles.active : ''}`}
+                    <a
+                        href={buildPath("/contact")}
+                        className={`${styles.mobileNavItem} ${pathname === `${pathPrefix}/contact` ? styles.active : ''}`}
                         onClick={handleNavItemClick}
                     >
                         {translatedText.contact}
-                    </Link>
-
-                    {/* Dark Mode Toggle in Mobile Menu */}
-                    <div
-                        className={styles.mobileNavItem}
-                        onClick={toggleDarkMode}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            {darkMode ? <FaSun /> : <FaMoon />}
-                            {darkMode ? 'Light Mode' : 'Dark Mode'}
-                        </span>
-                    </div>
+                    </a>
                 </div>
 
                 {/* Mobile Dropdown-style Selectors */}
@@ -700,25 +2286,13 @@ const HeaderTwo = ({ animationStage }) => {
                                 className={`${styles.mobileSubmenuItem} ${sport === 'cricket' ? styles.active : ''}`}
                                 onClick={() => handleSportChange('cricket')}
                             >
-                                {isChangingSport && sport !== 'cricket' ? (
-                                    <span className={styles.loadingIndicator}>
-                                        {/* Loading... */}
-                                    </span>
-                                ) : (
-                                    translatedText.cricket
-                                )}
+                                {translatedText.cricket}
                             </div>
                             <div
                                 className={`${styles.mobileSubmenuItem} ${sport === 'football' ? styles.active : ''}`}
                                 onClick={() => handleSportChange('football')}
                             >
-                                {isChangingSport && sport !== 'football' ? (
-                                    <span className={styles.loadingIndicator}>
-                                        {/* Loading... */}
-                                    </span>
-                                ) : (
-                                    translatedText.football
-                                )}
+                                {translatedText.football}
                             </div>
                         </div>
                     </div>
@@ -749,34 +2323,22 @@ const HeaderTwo = ({ animationStage }) => {
     return (
         <div
             ref={containerRef}
-            className={styles.loadingContainer}
+            className={`${styles.loadingContainer} ${headerFixed ? styles.fixedHeader : ''}`}
         >
-            {/* Loading Animation - FIXED: Only show when client-side and conditions are met */}
-            {isClient && shouldShowAnimation && !animationComplete && (
-                <div
-                    ref={loadingAnimationRef}
-                    className={styles.loadingAnimation}
-                    style={{
-                        display: (isClient && shouldShowAnimation && !animationComplete) ? 'flex' : 'none',
-                        visibility: (isClient && shouldShowAnimation && !animationComplete) ? 'visible' : 'hidden'
-                    }}
-                >
-                    <div className={styles.loadingIcon}>
-                        <div className={styles.mainIcon}>
-                            <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInner} />
-                        </div>
+            {/* Loading Animation - Only show during initial animation */}
+            <div
+                ref={loadingAnimationRef}
+                className={`${styles.loadingAnimation} ${shouldShowAnimation ? '' : styles.hidden}`}
+            >
+                <div className={styles.loadingIcon}>
+                    <div className={styles.mainIcon}>
+                        <img src="/sportsbuz.gif" alt="Loading" className={styles.iconInner} />
                     </div>
                 </div>
-            )}
+            </div>
 
             {/* SportsBuzz Logo */}
-            <div ref={logoRef} className={styles.logo}>
-                <Link href='/' className={styles.logoContent}>
-                    <div className={styles.logoIcon}>
-                        <img src="/sportsbuz.png" alt="Sportsbuz Logo" className={styles.logoIconInner} />
-                    </div>
-                </Link>
-            </div>
+            <Logo logoRef={logoRef} buildPath={buildPath} isTranslating={isTranslating} isNavigating={isNavigating} isLogoLoaded={isLogoLoaded} />
 
             {/* Header Navigation */}
             <div ref={navigationRef} className={styles.navigation}>
@@ -784,6 +2346,14 @@ const HeaderTwo = ({ animationStage }) => {
                 <div className={styles.mobileTopRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <FeaturedButton />
+                        {/* Dark Mode Toggle Button for Mobile Top Row */}
+                        <button
+                            className={styles.darkModeButton}
+                            onClick={toggleDarkMode}
+                            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                        >
+                            {darkMode ? <FaSun /> : <FaMoon />}
+                        </button>
                         <button
                             className={styles.mobileMenuButton}
                             onClick={toggleMobileMenu}
@@ -798,39 +2368,39 @@ const HeaderTwo = ({ animationStage }) => {
                     <div className={styles.divider}></div>
                     {/* Navigation Links */}
                     <div className={styles.navLinks}>
-                        <Link href="/" className={`${styles.navItem} ${pathname === '/' ? styles.active : ''}`}>
+                        <a href={buildPath("/")} className={`${styles.navItem} ${pathname === `${pathPrefix}/` ? styles.active : ''}`}>
                             {translatedText.home}
-                        </Link>
+                        </a>
 
                         {countryCode?.location?.betting_apps == 'Active' && (
-                            <Link href="/best-betting-apps/current" className={`${styles.navItem} ${pathname === '/best-betting-apps/current' ? styles.active : ''}`}>
+                            <a href={buildPath("/best-betting-apps/current")} className={`${styles.navItem} ${pathname === `${pathPrefix}/best-betting-apps/current` ? styles.active : ''}`}>
                                 {translatedText.apps}
-                            </Link>
+                            </a>
                         )}
 
-                        <Link href="/match-schedules" className={`${styles.navItem} ${pathname === '/match-schedules' ? styles.active : ''}`}>
+                        <a href={buildPath("/match-schedules")} className={`${styles.navItem} ${pathname === `${pathPrefix}/match-schedules` ? styles.active : ''}`}>
                             {translatedText.schedule}
-                        </Link>
+                        </a>
 
-                        {translatedCategories.filter((cat) => cat.featured === false).map((cat) => (
+                        {categoriesLoaded && filteredCategories.map((cat) => (
                             <div key={cat.id} className={styles.dropdown}>
-                                <DynamicLink
-                                    href={`/blogs/pages/all-blogs?category=${cat.id}`}
+                                <a
+                                    href={buildPath(`/blogs/pages/all-blogs?category=${cat.id}`)}
                                     className={styles.navItem}
                                 >
-                                    {capitalizeFirstLetter(cat.name)} <FaChevronDown />
-                                </DynamicLink>
+                                    {getCategoryDisplayName(cat)} <FaChevronDown />
+                                </a>
 
                                 {cat.subcategories?.length > 0 && (
                                     <ul className={styles.submenu}>
                                         {cat.subcategories.map((sub) => (
                                             <li key={sub.id}>
-                                                <DynamicLink
-                                                    href={`/blogs/pages/all-blogs?subcategory=${sub.id}`}
+                                                <a
+                                                    href={buildPath(`/blogs/pages/all-blogs?subcategory=${sub.id}`)}
                                                     className={styles.submenuItem}
                                                 >
-                                                    {sub.name}
-                                                </DynamicLink>
+                                                    {getCategoryDisplayName(sub)}
+                                                </a>
                                             </li>
                                         ))}
                                     </ul>
@@ -844,6 +2414,7 @@ const HeaderTwo = ({ animationStage }) => {
 
                 {/* Desktop Right Section */}
                 <div className={styles.rightSection}>
+
                     <select
                         className={styles.languageSelector}
                         value={language}
@@ -856,20 +2427,14 @@ const HeaderTwo = ({ animationStage }) => {
                         ))}
                     </select>
 
-                    <div className={styles.sportsSelectorWrapper}>
-                        {/* {isChangingSport && (
-                            <span className={styles.loadingIndicator}>Loading...</span>
-                        )} */}
-                        <select
-                            className={`${styles.sportsSelector} ${isChangingSport ? styles.disabled : ''}`}
-                            value={sport}
-                            onChange={(e) => handleSportChange(e.target.value)}
-                            disabled={isChangingSport}
-                        >
-                            <option value="cricket">{translatedText.cricket}</option>
-                            <option value="football">{translatedText.football}</option>
-                        </select>
-                    </div>
+                    <select
+                        className={styles.sportsSelector}
+                        value={sport}
+                        onChange={(e) => handleSportChange(e.target.value)}
+                    >
+                        <option value="cricket">{translatedText.cricket}</option>
+                        <option value="football">{translatedText.football}</option>
+                    </select>
 
                     {/* Dark Mode Toggle Button for Desktop */}
                     <button
@@ -880,16 +2445,19 @@ const HeaderTwo = ({ animationStage }) => {
                         {darkMode ? <FaSun /> : <FaMoon />}
                     </button>
 
-                    <Link href="/contact" className={`${styles.navItem} ${pathname === '/contact' ? styles.active : ''}`}>
+                    <a href={buildPath("/contact")} className={`${styles.navItem} ${pathname === `${pathPrefix}/contact` ? styles.active : ''}`}>
                         {translatedText.contact}
-                    </Link>
+                    </a>
                 </div>
             </div>
 
-            {/* Render Mobile Menu */}
+            {/* Mobile Menu */}
             {renderMobileMenu()}
         </div>
     );
 };
 
-export default HeaderTwo;
+export default HeaderThree;
+
+// Use layout effect on the client to avoid visible flicker / hidden state issues
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;

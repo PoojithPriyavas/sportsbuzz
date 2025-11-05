@@ -204,7 +204,7 @@ function HeaderThree({ animationStage, languageValidation }) {
         let translatedResults = [];
         if (textsToTranslate.length > 0) {
             try {
-                translatedResults = await translateText(textsToTranslate, 'en', selectedLanguage);
+                translatedResults = await translateHeaders(textsToTranslate, 'en', selectedLanguage);
             } catch (err) {
                 console.warn('translateText batch failed for header labels', err);
                 translatedResults = textsToTranslate; // final fallback
@@ -523,7 +523,7 @@ function HeaderThree({ animationStage, languageValidation }) {
                 () => Promise.race([
                     translateHeaders(payload, 'en', targetLanguage),
                     new Promise((_, reject) =>
-                        setTimeout(() => reject(new Error('Translation timeout')), 15000)
+                        setTimeout(() => reject(new Error('Translation timeout')), 77000)
                     )
                 ])
             );
