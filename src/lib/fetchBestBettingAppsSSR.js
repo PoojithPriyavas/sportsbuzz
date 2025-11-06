@@ -1,16 +1,21 @@
-// lib/fetchBettingAppsSSR.js
-import CustomAxios from "../components/utilities/CustomAxios";
 import axios from "axios";
-
-export async function fetchBestBettingAppsSSR(countryCode) {
+export async function fetchBestBettingAppsSSR({countryCode, slug}) {
+    console.log('fetchBestBettingAppsSSR called with:', { countryCode, slug });
+    
     try {
+        const params = {
+            country_code: countryCode.toUpperCase(),
+            slug: slug
+        };
+        
+        console.log('API params:', params); 
+        
         const response = await axios.get('https://admin.sportsbuz.com/api/best-betting-headings', {
-            params: {
-                country_code: countryCode,
-                filter_by: 'previous_month',
-            },
+            params
         });
 
+        console.log('API response:', response.data); 
+        
         const data = response.data;
         if (Array.isArray(data.results)) {
             return data.results;
@@ -20,6 +25,7 @@ export async function fetchBestBettingAppsSSR(countryCode) {
         }
     } catch (error) {
         console.error('SSR Betting Apps fetch failed:', error.message);
+        console.error('Error details:', error.response?.data); 
         return [];
     }
 }

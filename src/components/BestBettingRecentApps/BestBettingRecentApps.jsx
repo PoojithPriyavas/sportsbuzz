@@ -9,10 +9,10 @@ export default function BestBettingRecentApps({ bestSections = [] }) {
     const [copiedId, setCopiedId] = useState(null);
     const [darkMode, setDarkMode] = useState(false);
     const { language } = useGlobalData();
-    
+
     // Using bestSections directly without translation
     const displaySections = bestSections;
-    
+
     // Initialize dark mode from localStorage
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -35,12 +35,12 @@ export default function BestBettingRecentApps({ bestSections = [] }) {
 
         // Listen for localStorage changes
         window.addEventListener('storage', handleStorageChange);
-        
+
         // Listen for direct class changes on document
         const observer = new MutationObserver(handleClassChange);
-        observer.observe(document.documentElement, { 
-            attributes: true, 
-            attributeFilter: ['class'] 
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
         });
 
         return () => {
@@ -55,7 +55,7 @@ export default function BestBettingRecentApps({ bestSections = [] }) {
             setTimeout(() => setCopiedId(null), 2000);
         });
     };
-    
+
     if (displaySections.length === 0) return null;
 
     return (
@@ -64,8 +64,8 @@ export default function BestBettingRecentApps({ bestSections = [] }) {
             <div className={styles.cardGrid}>
                 {displaySections.map((section) => {
                     const imageUrl = `https://admin.sportsbuz.com${section.best_betting_apps?.[0]?.image || ''}`;
-                    const linkPath = `/best-betting-apps/recent/${section.slug}/${encodeURIComponent(section.id)}`;
-
+                    const linkPath = `/best-betting-apps/recent/${section.slug}`;
+                    console.log(linkPath,"link path")
                     return (
                         <DynamicLink href={linkPath} key={section.id} className={styles.card}>
                             <img

@@ -21,17 +21,17 @@ import { fetchBestBettingAppsSSR } from "@/lib/fetchBestBettingAppsSSR";
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
 import CountryLayout from "@/components/layouts/CountryLayout";
-
+import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
+import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 
 export async function getServerSideProps(context) {
-    // console.log(context, "contexxt")
     const { req, query, params, resolvedUrl } = context;
 
     let countryDataHome = null;
     let locationDataHome = null;
+    const queryValue = query;
 
     try {
-        // Fetch country and location data with proper error handling
         const [countryRes, locationRes] = await Promise.all([
             fetch('https://admin.sportsbuz.com/api/get-country-code/')
                 .then(async (response) => {
@@ -42,7 +42,7 @@ export async function getServerSideProps(context) {
                 })
                 .catch((error) => {
                     console.error('Error fetching country data:', error);
-                    return null; // Return null on error
+                    return null;
                 }),
 
             fetch('https://admin.sportsbuz.com/api/locations/')
@@ -54,7 +54,7 @@ export async function getServerSideProps(context) {
                 })
                 .catch((error) => {
                     console.error('Error fetching location data:', error);
-                    return null; // Return null on error
+                    return null;
                 })
         ]);
 
@@ -63,31 +63,38 @@ export async function getServerSideProps(context) {
 
     } catch (error) {
         console.error('Error in Promise.all:', error);
-        // Continue with null values if both APIs fail
     }
 
-    // Parse the cookie to get country code
-    const countryCookie = req.cookies.countryData;
-    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    const countryCodes = countryData?.country_code || 'LK';
+    // const countryCookie = req.cookies.countryData;
+    // const countryData = countryCookie ? JSON.parse(countryCookie) : null;
+    // const countryCodes = countryData?.country_code || 'LK';
     const hrefLanCookie = req.cookies.lanTagValues;
     const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
 
-    const sectionId = params.id;
+    // FIXED: Pass parameters with correct names
 
-    // Fetch betting apps data based on country code
+    const hreflang = queryValue['countrycode-hreflng']; // "en-in"
+    const countryCodes = hreflang ? hreflang.split('-')[1] : null; // "in"
+
+    const slug = queryValue.slug;
     let bestSections = null;
+
     try {
-        bestSections = await fetchBestBettingAppsSSR(countryCodes);
+        console.log('Fetching with params:', { countryCode: countryCodes, slug }); // Debug log
+        bestSections = await fetchBestBettingAppsSSR({
+            countryCode: countryCodes,
+            slug
+        });
+        console.log('bestSections result:', bestSections);
     } catch (error) {
         console.error('Error fetching best sections:', error);
-        bestSections = null; // or provide a default value
+        bestSections = [];
     }
 
     return {
         props: {
             bestSections,
-            sectionId,
+            queryValue,
             countryCodes,
             hrefLanData,
             resolvedUrl,
@@ -98,8 +105,9 @@ export async function getServerSideProps(context) {
 }
 
 
-export default function BestBettingApps({ bestSections, sectionId, countryCodes, hrefLanData, resolvedUrl, isLocalhost, locationDataHome }) {
-
+export default function BestBettingApps({ bestSections, queryValue, countryCodes, hrefLanData, resolvedUrl, isLocalhost, locationDataHome }) {
+    console.log(bestSections, "api response from the betting apps recent");
+    console.log(queryValue, "query value");
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     // const countryCode = countryData?.country_code || 'IN';
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
@@ -122,44 +130,41 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
         activeEvenBanners,
         bannerLoading,
         setShowOtherDivs,
-        showOtherDivs
+        showOtherDivs,
 
         // bestSections,
 
     } = useGlobalData();
 
-    useEffect(() => {
-        // Fixed: Timer was setting loading to true instead of false
-        const timer1 = setTimeout(() => setLoading(false), 3000);
-        return () => clearTimeout(timer1);
-    }, []);
     const [animationStage, setAnimationStage] = useState('loading');
     // const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
 
     useEffect(() => {
-        // Check if animation has been played before
-        const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
+        // Check if animation has been played before (only in browser environment)
+        if (typeof window !== 'undefined') {
+            const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
 
-        if (!hasPlayedAnimation) {
-            // First time - play the full animation sequence
-            const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
-            const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
-            const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
-            const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); // Show content after transition completes
+            if (!hasPlayedAnimation) {
+                // First time - play the full animation sequence
+                const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
+                const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
+                const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
+                const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); // Show content after transition completes
 
-            return () => {
-                clearTimeout(timer1);
-                clearTimeout(timer2);
-                clearTimeout(timer3);
-                clearTimeout(timer4);
-            };
-        } else {
-            // Animation already played - go directly to header and show content immediately
-            setAnimationStage('header');
-            setShowOtherDivs(true);
-            setLoading(false);
+                return () => {
+                    clearTimeout(timer1);
+                    clearTimeout(timer2);
+                    clearTimeout(timer3);
+                    clearTimeout(timer4);
+                };
+            } else {
+                // Animation already played - go directly to header and show content immediately
+                setAnimationStage('header');
+                setShowOtherDivs(true);
+                setLoading(false);
+            }
         }
     }, []);
 
@@ -176,24 +181,53 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
         }
     }, [showOtherDivs]);
 
-    const sectionIdNumber = parseInt(sectionId); // Convert to number
-    const matchedSection = bestSections.find(section => section.id === sectionIdNumber);
+    // const sectionIdNumber = parseInt(sectionId); // Convert to number
+    // const matchedSection = bestSections.find(section => section.id === sectionIdNumber);
 
-    const metaTitle = matchedSection?.metatitle || 'Best Betting Apps';
-    const metaDescription = matchedSection?.meta_description?.replace(/<[^>]+>/g, '') || 'Discover the best betting apps available in India.';
+    // const metaTitle = matchedSection?.metatitle || 'Best Betting Apps';
+    // const metaDescription = matchedSection?.meta_description?.replace(/<[^>]+>/g, '') || 'Discover the best betting apps available in India.';
 
-    console.log("meta title in country :", metaTitle);
-    console.log("meta desc in country :", metaDescription);
+    // console.log("meta title in country :", metaTitle);
+    // console.log("meta desc in country :", metaDescription);
+    // At the top of your component
+    const stripHtml = (html) => {
+        if (!html) return '';
+        return html.replace(/<[^>]*>/g, '').trim();
+    };
+
     return (
         <>
             <Head>
-                <title>{metaTitle}</title>
-                <meta name="description" content={metaDescription} />
-                {/* {hrefLanData.map(({ hreflang, country_code }) => {
-                  
+                <title>{bestSections[0]?.metatitle}</title>
+                <meta name="description" content={stripHtml(bestSections[0]?.meta_description)} />
+                <meta name="keywords" content={bestSections[0]?.keywords || ''} />
+
+                {/* Open Graph Meta Tags */}
+                <meta property="og:title" content={bestSections[0]?.metatitle} />
+                <meta property="og:description" content={stripHtml(bestSections[0]?.meta_description)} />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+                <meta property="og:image" content={`${typeof window !== 'undefined' ? window.location.origin : 'https://sportsbuz.com'}/sportsbuz.png`} />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:site_name" content="Sportsbuz" />
+
+                {/* Twitter Card Meta Tags */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={bestSections[0]?.metatitle} />
+                <meta name="twitter:description" content={stripHtml(bestSections[0]?.meta_description)} />
+                <meta name="twitter:image" content={`${typeof window !== 'undefined' ? window.location.origin : 'https://sportsbuz.com'}/sportsbuz.png`} />
+
+                {/* Additional SEO Meta Tags */}
+                <meta name="robots" content="index, follow" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+                <link rel="canonical" href={typeof window !== 'undefined' ? window.location.href : ''} />
+
+                {/* Hreflang Tags */}
+                {hrefLanData?.map(({ hreflang, country_code }) => {
                     const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-                    console.log('Generated link:', { href, fullHrefLang });
 
                     return (
                         <link
@@ -203,15 +237,13 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
                             hreflang={fullHrefLang}
                         />
                     );
-                })} */}
+                })}
             </Head>
-            {/* <Header /> */}
-            {/* <LoadingScreen onFinish={() => setLoading(false)} /> */}
-            <HeaderThree animationStage={animationStage} />
 
-            {/* HeaderThree moved to CountryLayout */}
+            {/* Removed inline HeaderThree; provided by CountryLayout */}
+
             <div className='container' style={{ paddingRight: '0rem', paddingLeft: '0rem' }}>
-                {/* <LiveScores /> */}
+
                 {sport === 'cricket' ? (
                     <>
                         {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
@@ -223,7 +255,7 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
                 )}
                 <div className={styles.fourColumnRow}>
                     <div className={styles.leftThreeColumns}>
-                        <RecentAppsDetails bestSections={bestSections} sectionId={sectionId} countryCode={countryCode} />
+                        <RecentAppsDetails bestSections={bestSections[0]} />
                     </div>
                     <div className={styles.fourthColumn} >
                         <div className={styles.fourthColumnTwoColumns}>
@@ -244,14 +276,16 @@ export default function BestBettingApps({ bestSections, sectionId, countryCodes,
                         ) : (
                             <UpcomingFootballMatches countryCode={countryCode} />
                         )}
-                        {/* <TopNewsSection /> */}
+
+                        {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
+                        <SportsOdsMegaPari />
                     </div>
                 </div>
 
                 <BettingAppsRecentTable bestSections={bestSections} countryCode={countryCode} />
             </div>
 
-            {/* FooterTwo moved to CountryLayout */}
+
         </>
     )
 }

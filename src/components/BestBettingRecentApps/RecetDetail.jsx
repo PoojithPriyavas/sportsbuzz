@@ -6,9 +6,10 @@ import Head from 'next/head';
 import { useGlobalData } from '../Context/ApiContext';
 import { useRouter } from 'next/router';
 
-export default function RecentAppsDetails({ bestSections = [], sectionId }) {
+export default function RecentAppsDetails({ bestSections = [] }) {
+    
     // console.log(sectionId, "best sections id")
-    // console.log("called the recent id betting apps :",bestSections)
+    console.log("called the recent id betting apps :",bestSections)
     // const router = useRouter();
     // const sectionId = router.query.id;
     const [isMobile, setIsMobile] = useState(false);
@@ -94,10 +95,10 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
             setTranslatedSections(translated);
         };
 
-        if (bestSections.length > 0 && sectionId) {
+        if (bestSections.length > 0 ) {
             translateSections();
         }
-    }, [bestSections, language, translateText, sectionId]);
+    }, [bestSections, language, translateText]);
 
     const handleCopy = (code, id) => {
         navigator.clipboard.writeText(code).then(() => {
@@ -107,15 +108,15 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
     };
 
     // Match only the section with the same ID from URL
-    const matchedSection = translatedSections.find(
-        (section) => String(section.id) === String(sectionId)
-    );
+    // const matchedSection = translatedSections.find(
+    //     (section) => String(section.id) === String(sectionId)
+    // );
 
     // console.log(matchedSection, "trabdkdkd")
 
-    if (!matchedSection) {
-        return <div className={styles.wrapper}>No section found for ID: {sectionId}</div>;
-    }
+    // if (!matchedSection) {
+    //     return <div className={styles.wrapper}>No section found for ID: {sectionId}</div>;
+    // }
 
     const renderMobileCards = (apps) => (
         <>
@@ -178,7 +179,7 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
             </div>
             <div
                 className={styles.description}
-                dangerouslySetInnerHTML={{ __html: matchedSection.description }}
+                dangerouslySetInnerHTML={{ __html: bestSections.description }}
             />
         </>
     );
@@ -253,7 +254,7 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
             </div>
             <div
                 className={styles.description}
-                dangerouslySetInnerHTML={{ __html: matchedSection.description }}
+                dangerouslySetInnerHTML={{ __html: bestSections.description }}
             />
         </>
     );
@@ -261,11 +262,11 @@ export default function RecentAppsDetails({ bestSections = [], sectionId }) {
     return (
         <>
             <div className={styles.wrapper}>
-                {matchedSection.best_betting_apps?.length > 0 && (
+                {bestSections.best_betting_apps?.length > 0 && (
                     <>
                         {isMobile
-                            ? renderMobileCards(matchedSection.best_betting_apps)
-                            : renderDesktopTable(matchedSection.best_betting_apps)
+                            ? renderMobileCards(bestSections.best_betting_apps)
+                            : renderDesktopTable(bestSections.best_betting_apps)
                         }
                     </>
                 )}
