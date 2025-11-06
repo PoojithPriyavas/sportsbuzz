@@ -23,9 +23,14 @@ import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
 import CountryLayout from "@/components/layouts/CountryLayout";
 
-export async function getServerSideProps({ req, resolvedUrl }) {
+export async function getServerSideProps({ req, query, resolvedUrl }) {
     // Parse the cookie to get country code
     const countryCookie = req.cookies.countryData;
+
+    const hreflangquery = query['countrycode-hreflng']; // "en-in"
+    const countryCodes = hreflangquery ? hreflangquery.split('-')[1] : null; // "in"
+    console.log(countryCodes, "country codes in the best betting apps main page");
+
     const countryData = countryCookie ? JSON.parse(countryCookie) : null;
     const countryCode = countryData?.country_code || 'LK';
     const hrefLanCookie = req.cookies.lanTagValues;
@@ -72,7 +77,7 @@ export async function getServerSideProps({ req, resolvedUrl }) {
     // Fetch betting apps data based on country code
     let sectionsRes = null;
     try {
-        sectionsRes = await fetchBettingAppsSSR(countryDataHome);
+        sectionsRes = await fetchBettingAppsSSR(countryCodes);
     } catch (error) {
         console.error('Error fetching betting apps:', error);
         sectionsRes = null; // or provide a default value
@@ -86,18 +91,20 @@ export async function getServerSideProps({ req, resolvedUrl }) {
             resolvedUrl,
             isLocalhost: process.env.NODE_ENV === 'development',
             countryDataHome,
-            locationDataHome
+            locationDataHome,
+            countryCodes
         },
     };
 }
 
 
-export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome }) {
+export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome, countryCodes }) {
+    const countryCodeValue = countryCodes.toUpperCase();
     console.log(locationDataHome, "href lan data in bset bettingapps")
-    console.log(countryDataHome, "country code from ssr")
+  
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     console.log(sectionsRes, "sections in country page")
-    // const countryCode = countryData?.country_code || 'IN';
+
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
     const [loading, setLoading] = useState(true);
     const {
@@ -118,11 +125,10 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
         setShowOtherDivs,
         showOtherDivs
     } = useGlobalData();
-    // console.log(sections, "shgdfs")
+
     const router = useRouter();
     const { countryCode: routeCountryCode, hreflang: routeLang } = router.query;
-    // console.log('router.query:', router.query);
-    // console.log('hrefLanData:', hrefLanData);
+
 
     useEffect(() => {
         if (!routeCountryCode || !routeLang || !hrefLanData) return;
@@ -146,25 +152,21 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
 
 
     useEffect(() => {
-        // Fixed: Timer was setting loading to true instead of false
         const timer1 = setTimeout(() => setLoading(false), 3000);
         return () => clearTimeout(timer1);
     }, []);
     const [animationStage, setAnimationStage] = useState('loading');
-    // const [showOtherDivs, setShowOtherDivs] = useState(false);
     const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
 
 
     useEffect(() => {
-        // Check if animation has been played before
         const hasPlayedAnimation = localStorage.getItem('headerAnimationPlayed');
 
         if (!hasPlayedAnimation) {
-            // First time - play the full animation sequence
             const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
             const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
             const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
-            const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); // Show content after transition completes
+            const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); 
 
             return () => {
                 clearTimeout(timer1);
@@ -173,14 +175,12 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
                 clearTimeout(timer4);
             };
         } else {
-            // Animation already played - go directly to header and show content immediately
             setAnimationStage('header');
             setShowOtherDivs(true);
             setLoading(false);
         }
     }, []);
 
-    // Original loading timer (keeping for compatibility)
     useEffect(() => {
         const timer1 = setTimeout(() => setLoading(false), 3000);
         return () => clearTimeout(timer1);
@@ -188,7 +188,7 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
 
     useEffect(() => {
         if (showOtherDivs) {
-            const timeout = setTimeout(() => setHasAnimatedIn(true), 50); // slight delay triggers transition
+            const timeout = setTimeout(() => setHasAnimatedIn(true), 50); 
             return () => clearTimeout(timeout);
         }
     }, [showOtherDivs]);
@@ -227,9 +227,7 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
                 <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
             </Head>
 
-            {/* Removed inline HeaderThree; provided by CountryLayout */}
             <div className='container' style={{ paddingRight: '1rem', paddingLeft: '1rem' }}>
-                {/* <LiveScores /> */}
                 {sport === 'cricket' ? (
                     <>
                         {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
@@ -266,25 +264,12 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
                         ) : (
                             <UpcomingFootballMatches />
                         )}
-                        {/* <TopNewsSection /> */}
                     </div>
                 </div>
-                {/* <div className={styles.mainContent}>
-                    <div className={styles.leftSection}>
-
-                    </div>
-
-                    <div className={styles.rightSection}>
-
-                        <UpcomingMatches />
-                        <div className={styles.bannerPlaceholder}>Multiple Banner Part</div>
-
-                    </div>
-                </div> */}
-                <BettingAppsRecentTable bestSections={bestSections} countryCode={countryCode} />
+             
+                <BettingAppsRecentTable bestSections={bestSections}  />
 
             </div>
-            {/* Removed inline FooterTwo; provided by CountryLayout */}
         </>
     )
 }

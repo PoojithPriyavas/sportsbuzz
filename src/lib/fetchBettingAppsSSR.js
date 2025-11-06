@@ -6,7 +6,7 @@ export async function fetchBettingAppsSSR(countryCode) {
   try {
     const response = await axios.get('https://admin.sportsbuz.com/api/best-betting-headings', {
       params: {
-        country_code: countryCode,
+        country_code: countryCode.toUpperCase(),
         filter_by: 'current_month',
       },
     });

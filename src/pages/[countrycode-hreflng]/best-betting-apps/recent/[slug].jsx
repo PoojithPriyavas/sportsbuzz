@@ -207,7 +207,7 @@ export default function BestBettingApps({ bestSections, queryValue, countryCodes
                 <meta property="og:description" content={stripHtml(bestSections[0]?.meta_description)} />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
-                <meta property="og:image" content={`${typeof window !== 'undefined' ? window.location.origin : 'https://sportsbuz.com'}/sportsbuz.png`} />
+                <meta property="og:image" content={`${typeof window !== 'undefined' ? window.location.origin : 'https://sportsbuz.com'}/favicon.ico`} />
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />
                 <meta property="og:site_name" content="Sportsbuz" />
@@ -216,7 +216,7 @@ export default function BestBettingApps({ bestSections, queryValue, countryCodes
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={bestSections[0]?.metatitle} />
                 <meta name="twitter:description" content={stripHtml(bestSections[0]?.meta_description)} />
-                <meta name="twitter:image" content={`${typeof window !== 'undefined' ? window.location.origin : 'https://sportsbuz.com'}/sportsbuz.png`} />
+                <meta name="twitter:image" content={`${typeof window !== 'undefined' ? window.location.origin : 'https://sportsbuz.com'}/favicon.ico`} />
 
                 {/* Additional SEO Meta Tags */}
                 <meta name="robots" content="index, follow" />
