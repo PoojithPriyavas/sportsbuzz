@@ -102,9 +102,10 @@ export default function BlogPages({
     supportedCountries,
     resolvedUrl,
     isLocalhost,
-    setShowOtherDivs,
-    showOtherDivs
+
 }) {
+
+    const { setShowOtherDivs, showOtherDivs } = useGlobalData();
     console.log(blogs, " blogs from ssr")
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
     const router = useRouter();

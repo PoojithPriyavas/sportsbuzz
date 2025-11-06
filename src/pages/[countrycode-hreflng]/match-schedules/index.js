@@ -151,7 +151,7 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                 <link rel="alternate" href="https://sportsbuz.com/match-schedules/" hreflang="x-default" />
             </Head>
             {/* Removed inline HeaderThree; provided by CountryLayout */}
-            {/* <div className='container'>
+            <div className='container'>
                 {sport === 'cricket' ? (
                     <>
                         {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
@@ -194,7 +194,7 @@ export default function MatchSchedulerScreen({ countryDataHome, locationDataHome
                     <div className={styles.rightSection}></div>
                 </div>
                 <BettingAppsRecentTable />
-            </div> */}
+            </div>
             {/* Removed inline FooterTwo; provided by CountryLayout */}
         </>
     )
