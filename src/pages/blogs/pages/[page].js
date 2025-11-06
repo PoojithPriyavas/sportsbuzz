@@ -6,7 +6,7 @@ import Head from "next/head";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import FooterTwo from "@/components/Footer/Footer";
 import HeaderTwo from "@/components/Header/HeaderTwo";
-import styles from '../styles/globalHeader.module.css';
+import styles from '../../../styles/globalHeader.module.css';
 import { fetchBlogsSSR } from "@/lib/ftechBlogsSSR";
 
 import axios from 'axios';

@@ -7,7 +7,7 @@ import FooterTwo from "@/components/Footer/Footer";
 import NewsSectionCards from "@/components/NewsSection/NewsSection";
 import HeaderTwo from "@/components/Header/HeaderTwo";
 // import styles from '../../styles/Home.module.css';
-import styles from '../styles/globalHeader.module.css';
+import styles from '../../styles/globalHeader.module.css';
 import BettingCards from "@/components/OddsMultiply/BettingCard";
 import JoinTelegramButton from "@/components/JoinTelegram/JoinTelegramButton";
 import AutoSlider from "@/components/AutoSlider/AutoSlider";

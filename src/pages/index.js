@@ -32,7 +32,6 @@ import RegionSelector from "@/components/RegionSelector/RegionSelector";
 import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 import styles from '../styles/globalHeader.module.css';
-
 // Import hreflang helper utilities
 // import {
 //   hasHreflangTags,
@@ -78,9 +77,9 @@ import axios from 'axios';
 //   }
 // }
 
-export default function Home({ 
+export default function Home({
   // locationDataHome, isLocalhost
- }) {
+}) {
   // console.log(locationDataHome, "location data home")
   // const {
   //   blogCategories,

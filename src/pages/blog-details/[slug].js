@@ -4,7 +4,7 @@ import Header from "@/components/Loader/Loader";
 import FooterTwo from "@/components/Footer/Footer";
 import Head from "next/head";
 // import styles from '../../styles/Home.module.css';
-import styles from '../styles/globalHeader.module.css';
+import styles from '../../styles/globalHeader.module.css';
 // import { getBlogData } from "@/lib/blogs"; // create this to fetch blogs
 import { useGlobalData } from '@/components/Context/ApiContext';
 import HeaderTwo from "@/components/Header/HeaderTwo";
