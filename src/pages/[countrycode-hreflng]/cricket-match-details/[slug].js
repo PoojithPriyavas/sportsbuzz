@@ -22,9 +22,12 @@ import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import HeaderThree from "@/components/Header/HeaderThree";
 import CountryLayout from "@/components/layouts/CountryLayout";
+import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
+import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
+import JoinTelegramButton from "@/components/JoinTelegram/JoinTelegramButton";
 
 export default function CricketMatchDetails() {
-    const { getCricketDetails, cricketDetails, location, countryCode, activeOddBanners, bannerLoading, setShowOtherDivs, showOtherDivs } = useGlobalData();
+    const { getCricketDetails, cricketDetails, location, countryCode, activeOddBanners, bannerLoading, setShowOtherDivs, showOtherDivs ,upcomingMatches} = useGlobalData();
     const [loading, setLoading] = useState(true);
     const [animationStage, setAnimationStage] = useState('loading');
     // const [showOtherDivs, setShowOtherDivs] = useState(false);
@@ -104,9 +107,27 @@ export default function CricketMatchDetails() {
                         <CricketDashboard cricketDetails={cricketDetails} />
                     </div>
                     <div className={styles.fourthColumn}>
-                        <BettingCard />
-                        {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
-                        <TopNewsSection />
+                        <div className={styles.fourthColumnTwoColumns}>
+                            <div className={styles.fourthColumnLeft}>
+                                <BettingCard />
+                                <JoinTelegramButton />
+                            </div>
+                            {activeOddBanners.length > 0 &&
+                                <div className={styles.fourthColumnRight}>
+                                    <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />
+                                </div>
+                            }
+                        </div>
+                        {sport === 'cricket' ? (
+                            <>
+                                <UpcomingMatches upcomingMatches={upcomingMatches} />
+                            </>
+                        ) : (
+                            <UpcomingFootballMatches />
+                        )}
+                        {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
+                        <SportsOdsMegaPari />
+
                     </div>
                 </div>
                 <div className={styles.mainContent}>

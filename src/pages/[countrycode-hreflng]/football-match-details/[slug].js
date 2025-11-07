@@ -23,6 +23,9 @@ import { useGlobalData } from "@/components/Context/ApiContext";
 import axios from "axios";
 import HeaderThree from "@/components/Header/HeaderThree";
 import CountryLayout from "@/components/layouts/CountryLayout";
+import JoinTelegramButton from "@/components/JoinTelegram/JoinTelegramButton";
+import UpcomingMatches from "@/components/UpComing/UpComingMatches";
+import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
 
 export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
@@ -88,7 +91,7 @@ export async function getServerSideProps(context) {
 
 export default function FootballMatchDetails({ countryDataHome, locationDataHome, resolvedUrl, }) {
     const languageValidation = useLanguageValidation(locationDataHome, resolvedUrl);
-    const { activeOddBanners, bannerLoading, setShowOtherDivs,  showOtherDivs } = useGlobalData();
+    const { activeOddBanners, bannerLoading, setShowOtherDivs, showOtherDivs, upcomingMatches } = useGlobalData();
     const [loading, setLoading] = useState(true);
 
     const params = useParams();
@@ -171,10 +174,28 @@ export default function FootballMatchDetails({ countryDataHome, locationDataHome
                     <div className={styles.leftThreeColumns}>
                         <MatchDetails />
                     </div>
-                    <div className={styles.fourthColumn} >
-                        <BettingCard />
-                        {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
-                        <TopNewsSection />
+                    <div className={styles.fourthColumn}>
+                        <div className={styles.fourthColumnTwoColumns}>
+                            <div className={styles.fourthColumnLeft}>
+                                <BettingCard />
+                                <JoinTelegramButton />
+                            </div>
+                            {activeOddBanners.length > 0 &&
+                                <div className={styles.fourthColumnRight}>
+                                    <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />
+                                </div>
+                            }
+                        </div>
+                        {sport === 'cricket' ? (
+                            <>
+                                <UpcomingMatches upcomingMatches={upcomingMatches} />
+                            </>
+                        ) : (
+                            <UpcomingFootballMatches />
+                        )}
+                        {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
+                        <SportsOdsMegaPari />
+
                     </div>
                 </div>
                 <div className={styles.mainContent}>
