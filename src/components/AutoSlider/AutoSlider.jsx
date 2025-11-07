@@ -12,10 +12,11 @@ import { useGlobalData } from '../Context/ApiContext';
 export default function AutoSlider({ activeOddBanners, bannerLoading}) {
 
   const swiperRef = useRef(null);
-  const { countryCode, fetchBanners } = useGlobalData()
-  useEffect(() => {
-    fetchBanners()
-  }, [countryCode])
+  const { countryCode } = useGlobalData()
+  // useEffect(() => {
+  //   console.log("enteres this use effect")
+  //   fetchBanners()
+  // }, [countryCode])
 
   // useEffect(() => {
   //   const fetchBanners = async () => {

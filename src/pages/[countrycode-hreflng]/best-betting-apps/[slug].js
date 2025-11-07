@@ -22,6 +22,8 @@ import { fetchBettingAppsSSR } from '@/lib/fetchBettingAppsSSR';
 import { useLanguageValidation } from "@/hooks/useLanguageValidation";
 import axios from "axios";
 import CountryLayout from "@/components/layouts/CountryLayout";
+import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
+import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 
 export async function getServerSideProps({ req, query, resolvedUrl }) {
     // Parse the cookie to get country code
@@ -101,7 +103,7 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
 export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome, countryCodes }) {
     const countryCodeValue = countryCodes.toUpperCase();
     console.log(locationDataHome, "href lan data in bset bettingapps")
-  
+
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     console.log(sectionsRes, "sections in country page")
 
@@ -123,9 +125,9 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
         bannerLoading,
         stages,
         setShowOtherDivs,
-        showOtherDivs
+        showOtherDivs,
     } = useGlobalData();
-
+console.log(activeOddBanners,"active odd", activeEvenBanners,"active even")
     const router = useRouter();
     const { countryCode: routeCountryCode, hreflang: routeLang } = router.query;
 
@@ -166,7 +168,7 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
             const timer1 = setTimeout(() => setAnimationStage('logoReveal'), 2000);
             const timer2 = setTimeout(() => setAnimationStage('transition'), 3500);
             const timer3 = setTimeout(() => setAnimationStage('header'), 5000);
-            const timer4 = setTimeout(() => setShowOtherDivs(true), 6500); 
+            const timer4 = setTimeout(() => setShowOtherDivs(true), 6500);
 
             return () => {
                 clearTimeout(timer1);
@@ -188,7 +190,7 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
 
     useEffect(() => {
         if (showOtherDivs) {
-            const timeout = setTimeout(() => setHasAnimatedIn(true), 50); 
+            const timeout = setTimeout(() => setHasAnimatedIn(true), 50);
             return () => clearTimeout(timeout);
         }
     }, [showOtherDivs]);
@@ -220,6 +222,7 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
                         />
                     );
                 })}
+                <meta property="og:image" content={`${typeof window !== 'undefined' ? window.location.origin : 'https://sportsbuz.com'}/favicon.ico`} />
                 <meta property="og:title" content={sectionsRes?.[0]?.metatitle || 'Best Betting Apps'} />
                 <meta property="og:description" content={sectionsRes?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
                 <meta name="twitter:title" content={sectionsRes?.[0]?.metatitle || 'Best Betting Apps'} />
@@ -264,10 +267,12 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
                         ) : (
                             <UpcomingFootballMatches />
                         )}
+                        {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
+                        <SportsOdsMegaPari />
                     </div>
                 </div>
-             
-                <BettingAppsRecentTable bestSections={bestSections}  />
+
+                <BettingAppsRecentTable bestSections={bestSections} />
 
             </div>
         </>

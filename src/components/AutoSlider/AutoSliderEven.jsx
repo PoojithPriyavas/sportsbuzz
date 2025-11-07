@@ -15,10 +15,10 @@ export default function AutoSliderEven({ activeEvenBanners, bannerLoading }) {
   // const [banners, setBanners] = useState([]);
   // const [loading, setLoading] = useState(true);
   const swiperRef = useRef(null);
-  const { countryCode, fetchBanners } = useGlobalData()
-  useEffect(() => {
-    fetchBanners()
-  }, [countryCode])
+  const { countryCode } = useGlobalData()
+  // useEffect(() => {
+  //   fetchBanners()
+  // }, [countryCode])
 
   // useEffect(() => {
   //   const fetchBanners = async () => {

@@ -589,7 +589,7 @@ export default function TestLive() {
                                                 <div className={styles.teamLogo}>
                                                     <img
                                                         src={`https://lsm-static-prod.livescore.com/medium/${team1?.Img}`}
-                                                        alt={event.translatedTeam1}
+                                                        // alt={event.translatedTeam1}
                                                         className={styles.logoImage}
                                                         loading="lazy"
                                                         decoding="async"
@@ -608,7 +608,7 @@ export default function TestLive() {
                                                 <div className={styles.teamLogo}>
                                                     <img
                                                         src={`https://lsm-static-prod.livescore.com/medium/${team2?.Img}`}
-                                                        alt={event.translatedTeam2}
+                                                        // alt={event.translatedTeam2}
                                                         className={styles.logoImage}
                                                         loading="lazy"
                                                         decoding="async"

@@ -22,7 +22,8 @@ import UpcomingFootballMatches from '@/components/UpComing/UpComingFootball';
 import UpcomingMatches from '@/components/UpComing/UpComingMatches';
 import BettingCard from '@/components/OddsMultiply/BettingCard';
 import { usePathHelper } from '@/hooks/usePathHelper';
-
+import AutoSliderEven from '../AutoSlider/AutoSliderEven';
+import SportsOdsMegaPari from '../SportsOdds/SportsOdsmegaPari';
 export default function BlogsPage({
   initialPage = 1,
   searchTerm: initialSearchTerm = '',
@@ -52,7 +53,11 @@ export default function BlogsPage({
     totalBlogs,
     nextUrl,
     prevUrl,
+    activeEvenBanners,
+    activeOddBanners,
+    bannerLoading
   } = useGlobalData();
+  console.log(activeEvenBanners, "active even banner in blog")
 
   // Parse URL parameters - these are the source of truth
   const categoryIdParam = searchParams.get('category');
@@ -486,21 +491,29 @@ export default function BlogsPage({
             <div className={styles.fourthColumnTwoColumns}>
               <div className={styles.fourthColumnLeft}>
                 <JoinTelegramButton />
-                <div className={styles.bettingCardWrapper}>
-                  <BettingCard />
+                <br/>
+                <BettingCard />
+                <JoinTelegramButton />
+              </div>
+              {activeOddBanners.length > 0 &&
+                <div className={styles.fourthColumnRight}>
+                  <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />
                 </div>
-              </div>
-              <div className={styles.fourthColumnRight}>
-                {sport === 'cricket' ? (
-                  <UpcomingMatches upcomingMatches={upcomingMatches} />
-                ) : (
-                  <UpcomingFootballMatches />
-                )}
-              </div>
+              }
             </div>
+            {sport === 'cricket' ? (
+              <>
+                <UpcomingMatches upcomingMatches={upcomingMatches} />
+              </>
+            ) : (
+              <UpcomingFootballMatches />
+            )}
+            {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
+            <SportsOdsMegaPari />
+
           </div>
         </div>
-      </div >
+      </div>
     </>
   );
 }

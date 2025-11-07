@@ -369,7 +369,7 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
                 <div className={styles.team}>
                   <div className={styles.teamInfo}>
                     {team1Img && (
-                      <img src={team1Img} alt={team1.teamSName} className={styles.flag} loading="lazy" decoding="async" />
+                      <img src={team1Img}  className={styles.flag} loading="lazy" decoding="async" />
                     )}
                     <span>{match.translatedTeam1Name}</span>
                   </div>
@@ -384,7 +384,7 @@ export default function LiveScores({ apiResponse = [], matchTypes = [], teamImag
                 <div className={styles.team}>
                   <div className={styles.teamInfo}>
                     {team2Img && (
-                      <img src={team2Img} alt={team2.teamSName} className={styles.flag} loading="lazy" decoding="async" />
+                      <img src={team2Img} className={styles.flag} loading="lazy" decoding="async" />
                     )}
                     <span>{match.translatedTeam2Name}</span>
                   </div>

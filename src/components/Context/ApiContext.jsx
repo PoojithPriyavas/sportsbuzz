@@ -60,6 +60,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
     const [showOtherDivs, setShowOtherDivs] = useState(false);
 
     const [banners, setBanners] = useState([]);
+
     const [bannerLoading, setBannerLoading] = useState(true);
 
     //  TIME ZONE IMPLEMENTATION
@@ -838,28 +839,30 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
     //Fetch side banners
 
-    // useEffect(() => {
-    const fetchBanners = async () => {
-        try {
-            setBannerLoading(true);
-            const response = await axios.get('https://admin.sportsbuz.com/api/side-banners', {
-                params: {
-                    country_code: countryCode?.location?.id
-                }
-            });
-            const data = response.data;
-            const countryWiseSideBanner = data.filter(data => data.location === countryCode?.location?.id)
-            // console.log(countryWiseSideBanner, "country wise side banner")
-            setBanners(countryWiseSideBanner);
-        } catch (error) {
-            console.error('Error fetching side banners:', error);
-            throw error;
-        } finally {
-            setBannerLoading(false);
-        }
-    };
-
-    // }, [countryCode]);
+    useEffect(() => {
+        const fetchBanners = async () => {
+            console.log("fetch banners calling")
+            try {
+                setBannerLoading(true);
+                const response = await axios.get('https://admin.sportsbuz.com/api/side-banners', {
+                    params: {
+                        country_code: countryCode?.location?.id
+                    }
+                });
+                const data = response.data;
+                const countryWiseSideBanner = data.filter(data => data.location === countryCode?.location?.id)
+                console.log(countryWiseSideBanner, "country wise banner")
+                // console.log(countryWiseSideBanner, "country wise side banner")
+                setBanners(countryWiseSideBanner);
+            } catch (error) {
+                console.error('Error fetching side banners:', error);
+                throw error;
+            } finally {
+                setBannerLoading(false);
+            }
+        };
+        fetchBanners()
+    }, [countryCode]);
 
     const oddBanners = banners.filter((item, i) => (item.order_by % 2 !== 0));
     const activeOddBanners = oddBanners.filter(i => i.is_active === 'Active');
@@ -1939,7 +1942,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
                 activeEvenBanners,
                 bannerLoading,
                 setBannerLoading,
-                fetchBanners,
+                // fetchBanners,
                 translateHeaders,
                 setShowOtherDivs,
                 showOtherDivs

@@ -19,6 +19,7 @@ import { useGlobalData } from '../Context/ApiContext';
 
 export default function BlogDetailsPage({ blog }) {
     const { countryCode, activeOddBanners, activeEvenBanners, bannerLoading } = useGlobalData()
+    console.log(activeOddBanners,"active odd banner")
     return (
         <div >
 
