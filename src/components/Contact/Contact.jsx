@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useGlobalData } from '../Context/ApiContext';
+import contactTranslations from './contactTranslations.json';
 
 // Mock components for demonstration
 const JoinTelegramButton = () => (
@@ -17,21 +18,6 @@ const JoinTelegramButton = () => (
         Join Our Telegram
     </div>
 );
-
-const CustomAxios = {
-    post: (url, data, config) => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (Math.random() > 0.2) {
-                    resolve({ data: { success: true } });
-                } else {
-                    reject(new Error('Network error'));
-                }
-            }, 1000);
-        });
-    }
-};
-
 
 const ContactUsPage = () => {
     const [formData, setFormData] = useState({
@@ -53,10 +39,12 @@ const ContactUsPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
-    const { settings, language, translateText } = useGlobalData();
-    const contact = settings?.[0] || {};
+    const [isTranslating, setIsTranslating] = useState(false);
     
-    // Add translation state
+    const { settings, language, debugTranslateText } = useGlobalData();
+    const contact = settings?.[0] || {};
+    const previousLanguage = useRef(null);
+
     const [translatedText, setTranslatedText] = useState({
         contactUs: 'Contact Us',
         getInTouch: 'Get in touch',
@@ -92,90 +80,239 @@ const ContactUsPage = () => {
         address: 'Address',
         addressDetails: 'Colombo, Sri Lanka',
         followUs: 'Follow Us',
-        contactDescription: 'Have questions or need assistance? Fill out the form below and our team will get back to you as soon as possible.'
+        contactDescription: 'Have questions or need assistance? Fill out the form below and our team will get back to you as soon as possible.',
+        selectCountry: '-- Select Country --',
+        selectSubject: '-- Select Subject --',
+        subjects: {
+            generalInquiry: 'General Inquiry',
+            technicalSupport: 'Technical Support',
+            salesPricing: 'Sales & Pricing',
+            partnershipOpportunities: 'Partnership Opportunities',
+            mediaPress: 'Media & Press',
+            bugReport: 'Bug Report',
+            featureRequest: 'Feature Request',
+            accountIssues: 'Account Issues',
+            billingQuestions: 'Billing Questions',
+            other: 'Other'
+        },
+        countries: {
+            unitedStates: 'United States',
+            canada: 'Canada',
+            unitedKingdom: 'United Kingdom',
+            germany: 'Germany',
+            france: 'France',
+            spain: 'Spain',
+            italy: 'Italy',
+            australia: 'Australia',
+            japan: 'Japan',
+            china: 'China',
+            india: 'India',
+            brazil: 'Brazil',
+            mexico: 'Mexico',
+            netherlands: 'Netherlands',
+            sweden: 'Sweden',
+            norway: 'Norway',
+            denmark: 'Denmark',
+            belgium: 'Belgium',
+            switzerland: 'Switzerland',
+            austria: 'Austria',
+            portugal: 'Portugal',
+            ireland: 'Ireland',
+            southKorea: 'South Korea',
+            singapore: 'Singapore',
+            newZealand: 'New Zealand',
+            southAfrica: 'South Africa',
+            argentina: 'Argentina',
+            chile: 'Chile',
+            israel: 'Israel',
+            uae: 'UAE',
+            saudiArabia: 'Saudi Arabia',
+            other: 'Other'
+        }
     });
-    
+
+    // Helper function to get translation from JSON or API
+    const getTranslation = async (text, targetLanguage) => {
+        const languageData = contactTranslations.find(
+            item => item.hreflang === targetLanguage
+        );
+
+        if (languageData && languageData.translatedText) {
+            const keyMapping = {
+                'Contact Us': 'contactUs',
+                'Get in touch': 'getInTouch',
+                'First Name': 'firstName',
+                'Last Name': 'lastName',
+                'Email': 'email',
+                'Telegram ID': 'telegram',
+                'Company (Optional)': 'company',
+                'Job Title (Optional)': 'jobTitle',
+                'Country': 'country',
+                'Subject': 'subject',
+                'Message': 'message',
+                'How did you hear about us? (Optional)': 'howDidYouHear',
+                'Subscribe to our newsletter': 'newsletter',
+                'Submit': 'submit',
+                'Submitting...': 'submitting',
+                'Thank you! Your message has been sent successfully.': 'successMessage',
+                'First name is required': 'firstNameRequired',
+                'Last name is required': 'lastNameRequired',
+                'Email is required': 'emailRequired',
+                'Please enter a valid email address': 'emailInvalid',
+                'Telegram ID is required': 'telegramRequired',
+                'Please select a subject': 'subjectRequired',
+                'Message is required': 'messageRequired',
+                'Message must be at least 10 characters': 'messageLength',
+                'Contact Info': 'contactInfo',
+                'Email Label': 'emailLabel',
+                'Response within 24 hours': 'responseTime',
+                'Telegram Label': 'telegramLabel',
+                '24/7 Support': 'telegramSupport',
+                'Office Hours': 'officeHours',
+                'Monday - Friday, 9am - 6pm': 'workingHours',
+                'Address': 'address',
+                'Colombo, Sri Lanka': 'addressDetails',
+                'Follow Us': 'followUs',
+                'Have questions or need assistance? Fill out the form below and our team will get back to you as soon as possible.': 'contactDescription',
+                '-- Select Country --': 'selectCountry',
+                '-- Select Subject --': 'selectSubject'
+            };
+
+            const jsonKey = keyMapping[text];
+            if (jsonKey && languageData.translatedText[jsonKey]) {
+                return languageData.translatedText[jsonKey];
+            }
+        }
+
+        return await debugTranslateText(text, 'en', targetLanguage);
+    };
+
+    // Translate UI labels when language changes
     useEffect(() => {
         const translateLabels = async () => {
+            if (previousLanguage.current === language) return;
+            setIsTranslating(true);
+            previousLanguage.current = language;
+
             try {
-                // Translate each text individually
-                const translations = {
-                    contactUs: await translateText('Contact Us', 'en', language),
-                    getInTouch: await translateText('Get in touch', 'en', language),
-                    firstName: await translateText('First Name', 'en', language),
-                    lastName: await translateText('Last Name', 'en', language),
-                    email: await translateText('Email', 'en', language),
-                    telegram: await translateText('Telegram ID', 'en', language),
-                    company: await translateText('Company (Optional)', 'en', language),
-                    jobTitle: await translateText('Job Title (Optional)', 'en', language),
-                    country: await translateText('Country', 'en', language),
-                    subject: await translateText('Subject', 'en', language),
-                    message: await translateText('Message', 'en', language),
-                    howDidYouHear: await translateText('How did you hear about us? (Optional)', 'en', language),
-                    newsletter: await translateText('Subscribe to our newsletter', 'en', language),
-                    submit: await translateText('Submit', 'en', language),
-                    submitting: await translateText('Submitting...', 'en', language),
-                    successMessage: await translateText('Thank you! Your message has been sent successfully.', 'en', language),
-                    firstNameRequired: await translateText('First name is required', 'en', language),
-                    lastNameRequired: await translateText('Last name is required', 'en', language),
-                    emailRequired: await translateText('Email is required', 'en', language),
-                    emailInvalid: await translateText('Please enter a valid email address', 'en', language),
-                    telegramRequired: await translateText('Telegram ID is required', 'en', language),
-                    subjectRequired: await translateText('Please select a subject', 'en', language),
-                    messageRequired: await translateText('Message is required', 'en', language),
-                    messageLength: await translateText('Message must be at least 10 characters', 'en', language),
-                    contactInfo: await translateText('Contact Info', 'en', language),
-                    emailLabel: await translateText('Email', 'en', language),
-                    responseTime: await translateText('Response within 24 hours', 'en', language),
-                    telegramLabel: await translateText('Telegram', 'en', language),
-                    telegramSupport: await translateText('24/7 Support', 'en', language),
-                    officeHours: await translateText('Office Hours', 'en', language),
-                    workingHours: await translateText('Monday - Friday, 9am - 6pm', 'en', language),
-                    address: await translateText('Address', 'en', language),
-                    addressDetails: await translateText('Colombo, Sri Lanka', 'en', language),
-                    followUs: await translateText('Follow Us', 'en', language),
-                    contactDescription: await translateText('Have questions or need assistance? Fill out the form below and our team will get back to you as soon as possible.', 'en', language)
-                };
+                // Get language data from JSON
+                const languageData = contactTranslations.find(
+                    item => item.hreflang === language
+                );
 
-                // Update translations in state
-                setTranslatedText(prev => ({
-                    ...prev,
-                    ...translations
-                }));
+                if (languageData && languageData.translatedText) {
+                    // Use translations from JSON file directly
+                    setTranslatedText({
+                        contactUs: languageData.translatedText.contactUs,
+                        getInTouch: languageData.translatedText.getInTouch,
+                        firstName: languageData.translatedText.firstName,
+                        lastName: languageData.translatedText.lastName,
+                        email: languageData.translatedText.email,
+                        telegram: languageData.translatedText.telegram,
+                        company: languageData.translatedText.company,
+                        jobTitle: languageData.translatedText.jobTitle,
+                        country: languageData.translatedText.country,
+                        subject: languageData.translatedText.subject,
+                        message: languageData.translatedText.message,
+                        howDidYouHear: languageData.translatedText.howDidYouHear,
+                        newsletter: languageData.translatedText.newsletter,
+                        submit: languageData.translatedText.submit,
+                        submitting: languageData.translatedText.submitting,
+                        successMessage: languageData.translatedText.successMessage,
+                        firstNameRequired: languageData.translatedText.firstNameRequired,
+                        lastNameRequired: languageData.translatedText.lastNameRequired,
+                        emailRequired: languageData.translatedText.emailRequired,
+                        emailInvalid: languageData.translatedText.emailInvalid,
+                        telegramRequired: languageData.translatedText.telegramRequired,
+                        subjectRequired: languageData.translatedText.subjectRequired,
+                        messageRequired: languageData.translatedText.messageRequired,
+                        messageLength: languageData.translatedText.messageLength,
+                        contactInfo: languageData.translatedText.contactInfo,
+                        emailLabel: languageData.translatedText.emailLabel,
+                        responseTime: languageData.translatedText.responseTime,
+                        telegramLabel: languageData.translatedText.telegramLabel,
+                        telegramSupport: languageData.translatedText.telegramSupport,
+                        officeHours: languageData.translatedText.officeHours,
+                        workingHours: languageData.translatedText.workingHours,
+                        address: languageData.translatedText.address,
+                        addressDetails: languageData.translatedText.addressDetails,
+                        followUs: languageData.translatedText.followUs,
+                        contactDescription: languageData.translatedText.contactDescription,
+                        selectCountry: languageData.translatedText.selectCountry,
+                        selectSubject: languageData.translatedText.selectSubject,
+                        subjects: languageData.translatedText.subjects || translatedText.subjects,
+                        countries: languageData.translatedText.countries || translatedText.countries
+                    });
+                } else {
+                    // Fallback to API translation if JSON not found
+                    const [
+                        contactUs, getInTouch, firstName, lastName, email, telegram,
+                        company, jobTitle, country, subject, message, howDidYouHear,
+                        newsletter, submit, submitting, successMessage, firstNameRequired,
+                        lastNameRequired, emailRequired, emailInvalid, telegramRequired,
+                        subjectRequired, messageRequired, messageLength, contactInfo,
+                        emailLabel, responseTime, telegramLabel, telegramSupport,
+                        officeHours, workingHours, address, addressDetails, followUs,
+                        contactDescription, selectCountry, selectSubject
+                    ] = await Promise.all([
+                        getTranslation('Contact Us', language),
+                        getTranslation('Get in touch', language),
+                        getTranslation('First Name', language),
+                        getTranslation('Last Name', language),
+                        getTranslation('Email', language),
+                        getTranslation('Telegram ID', language),
+                        getTranslation('Company (Optional)', language),
+                        getTranslation('Job Title (Optional)', language),
+                        getTranslation('Country', language),
+                        getTranslation('Subject', language),
+                        getTranslation('Message', language),
+                        getTranslation('How did you hear about us? (Optional)', language),
+                        getTranslation('Subscribe to our newsletter', language),
+                        getTranslation('Submit', language),
+                        getTranslation('Submitting...', language),
+                        getTranslation('Thank you! Your message has been sent successfully.', language),
+                        getTranslation('First name is required', language),
+                        getTranslation('Last name is required', language),
+                        getTranslation('Email is required', language),
+                        getTranslation('Please enter a valid email address', language),
+                        getTranslation('Telegram ID is required', language),
+                        getTranslation('Please select a subject', language),
+                        getTranslation('Message is required', language),
+                        getTranslation('Message must be at least 10 characters', language),
+                        getTranslation('Contact Info', language),
+                        getTranslation('Email Label', language),
+                        getTranslation('Response within 24 hours', language),
+                        getTranslation('Telegram Label', language),
+                        getTranslation('24/7 Support', language),
+                        getTranslation('Office Hours', language),
+                        getTranslation('Monday - Friday, 9am - 6pm', language),
+                        getTranslation('Address', language),
+                        getTranslation('Colombo, Sri Lanka', language),
+                        getTranslation('Follow Us', language),
+                        getTranslation('Have questions or need assistance? Fill out the form below and our team will get back to you as soon as possible.', language),
+                        getTranslation('-- Select Country --', language),
+                        getTranslation('-- Select Subject --', language)
+                    ]);
 
-                // Cache translations
-                localStorage.setItem('contactPageTranslations', JSON.stringify({
-                    language,
-                    translations
-                }));
-
-            } catch (error) {
-                console.error('Error translating contact page labels:', error);
+                    setTranslatedText(prev => ({
+                        ...prev,
+                        contactUs, getInTouch, firstName, lastName, email, telegram,
+                        company, jobTitle, country, subject, message, howDidYouHear,
+                        newsletter, submit, submitting, successMessage, firstNameRequired,
+                        lastNameRequired, emailRequired, emailInvalid, telegramRequired,
+                        subjectRequired, messageRequired, messageLength, contactInfo,
+                        emailLabel, responseTime, telegramLabel, telegramSupport,
+                        officeHours, workingHours, address, addressDetails, followUs,
+                        contactDescription, selectCountry, selectSubject
+                    }));
+                }
+            } finally {
+                setIsTranslating(false);
             }
         };
 
-        // Check for cached translations first
-        const cachedTranslations = localStorage.getItem('contactPageTranslations');
-        if (cachedTranslations) {
-            try {
-                const parsed = JSON.parse(cachedTranslations);
-                if (parsed.language === language) {
-                    setTranslatedText(prev => ({
-                        ...prev,
-                        ...parsed.translations
-                    }));
-                } else {
-                    // Language changed, update translations
-                    translateLabels();
-                }
-            } catch (error) {
-                console.error('Error parsing cached translations:', error);
-                translateLabels();
-            }
-        } else {
-            translateLabels();
-        }
-    }, [language, translateText]);
+        translateLabels();
+    }, [language, debugTranslateText]);
 
     // Check for dark mode on mount and listen for changes
     useEffect(() => {
@@ -183,10 +320,8 @@ const ContactUsPage = () => {
             setIsDarkMode(document.documentElement.classList.contains('dark-theme'));
         };
 
-        // Initial check
         checkDarkMode();
 
-        // Create observer to watch for class changes on document element
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
@@ -195,13 +330,11 @@ const ContactUsPage = () => {
             });
         });
 
-        // Start observing
         observer.observe(document.documentElement, {
             attributes: true,
             attributeFilter: ['class']
         });
 
-        // Cleanup
         return () => observer.disconnect();
     }, []);
 
@@ -216,26 +349,17 @@ const ContactUsPage = () => {
         return () => window.removeEventListener('resize', checkScreenSize);
     }, []);
 
-    const categories = [
-        'United States', 'Canada', 'United Kingdom', 'Germany', 'France', 'Spain', 'Italy',
-        'Australia', 'Japan', 'China', 'India', 'Brazil', 'Mexico', 'Netherlands', 'Sweden',
-        'Norway', 'Denmark', 'Belgium', 'Switzerland', 'Austria', 'Portugal', 'Ireland',
-        'South Korea', 'Singapore', 'New Zealand', 'South Africa', 'Argentina', 'Chile',
-        'Israel', 'UAE', 'Saudi Arabia', 'Other'
-    ];
+    // Get translated categories from translatedText.countries
+    const getTranslatedCategories = () => {
+        if (!translatedText.countries) return [];
+        return Object.values(translatedText.countries);
+    };
 
-    const subjects = [
-        'General Inquiry',
-        'Technical Support',
-        'Sales & Pricing',
-        'Partnership Opportunities',
-        'Media & Press',
-        'Bug Report',
-        'Feature Request',
-        'Account Issues',
-        'Billing Questions',
-        'Other'
-    ];
+    // Get translated subjects from translatedText.subjects
+    const getTranslatedSubjects = () => {
+        if (!translatedText.subjects) return [];
+        return Object.values(translatedText.subjects);
+    };
 
     const validate = () => {
         const newErrors = {};
@@ -440,11 +564,8 @@ const ContactUsPage = () => {
             backgroundColor: colors.inputBackground,
             color: colors.textPrimary,
             transition: 'border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease',
-            outline: 'none'
-        },
-        inputFocus: {
-            borderColor: colors.inputFocus,
-            boxShadow: `0 0 0 1px ${colors.inputFocus}`
+            outline: 'none',
+            boxSizing: 'border-box'
         },
         select: {
             width: '100%',
@@ -460,7 +581,8 @@ const ContactUsPage = () => {
             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23${isDarkMode ? 'ffffff' : '333333'}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'right 16px center',
-            backgroundSize: '16px'
+            backgroundSize: '16px',
+            boxSizing: 'border-box'
         },
         textarea: {
             width: '100%',
@@ -473,7 +595,8 @@ const ContactUsPage = () => {
             transition: 'border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease',
             outline: 'none',
             minHeight: '150px',
-            resize: 'vertical'
+            resize: 'vertical',
+            boxSizing: 'border-box'
         },
         error: {
             color: colors.errorColor,
@@ -508,11 +631,6 @@ const ContactUsPage = () => {
             transition: 'all 0.3s ease',
             width: '100%',
             marginTop: '10px'
-        },
-        submitButtonHover: {
-            backgroundColor: colors.buttonHover,
-            transform: 'translateY(-2px)',
-            boxShadow: '0 6px 20px rgba(52, 152, 219, 0.3)'
         },
         submitButtonDisabled: {
             backgroundColor: '#bdc3c7',
@@ -589,16 +707,14 @@ const ContactUsPage = () => {
             color: 'white',
             fontSize: '1.2rem',
             transition: 'transform 0.3s ease, background-color 0.3s ease',
-            cursor: 'pointer'
-        },
-        socialIconHover: {
-            transform: 'translateY(-3px)',
-            backgroundColor: colors.buttonHover
+            cursor: 'pointer',
+            textDecoration: 'none'
         },
         row: {
             display: 'flex',
             gap: '20px',
-            marginBottom: '20px'
+            marginBottom: '20px',
+            flexDirection: isMobile ? 'column' : 'row'
         },
         column: {
             flex: 1
@@ -752,7 +868,7 @@ const ContactUsPage = () => {
                                 {errors.telegram && <div style={styles.error}>{errors.telegram}</div>}
                             </div>
 
-                            <div style={styles.row}>
+                            {/* <div style={styles.row}>
                                 <div style={styles.column}>
                                     <div style={styles.formGroup}>
                                         <label style={styles.label} htmlFor="company">{translatedText.company}</label>
@@ -781,7 +897,7 @@ const ContactUsPage = () => {
                                         />
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div style={styles.formGroup}>
                                 <label style={styles.label} htmlFor="category">{translatedText.country}</label>
@@ -792,8 +908,8 @@ const ContactUsPage = () => {
                                     onChange={handleChange}
                                     style={styles.select}
                                 >
-                                    <option value="">-- Select Country --</option>
-                                    {categories.map((category, index) => (
+                                    <option value="">{translatedText.selectCountry}</option>
+                                    {getTranslatedCategories().map((category, index) => (
                                         <option key={index} value={category}>{category}</option>
                                     ))}
                                 </select>
@@ -809,8 +925,8 @@ const ContactUsPage = () => {
                                     onChange={handleChange}
                                     style={styles.select}
                                 >
-                                    <option value="">-- Select Subject --</option>
-                                    {subjects.map((subject, index) => (
+                                    <option value="">{translatedText.selectSubject}</option>
+                                    {getTranslatedSubjects().map((subject, index) => (
                                         <option key={index} value={subject}>{subject}</option>
                                     ))}
                                 </select>
@@ -829,7 +945,7 @@ const ContactUsPage = () => {
                                 ></textarea>
                                 {errors.message && <div style={styles.error}>{errors.message}</div>}
                             </div>
-
+{/* 
                             <div style={styles.formGroup}>
                                 <label style={styles.label} htmlFor="howDidYouHear">{translatedText.howDidYouHear}</label>
                                 <input
@@ -853,7 +969,7 @@ const ContactUsPage = () => {
                                     style={styles.checkbox}
                                 />
                                 <label htmlFor="newsletter" style={styles.checkboxLabel}>{translatedText.newsletter}</label>
-                            </div>
+                            </div> */}
 
                             <button
                                 type="submit"

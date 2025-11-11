@@ -8,6 +8,7 @@ import { useGlobalData } from '../Context/ApiContext';
 
 const MatchCard = () => {
   const { footBallMatchDetails, lineUp, translateText, language, matchTeams } = useGlobalData();
+  console.log(footBallMatchDetails,"football match details")
 
   const [translatedText, setTranslatedText] = useState({
     stadium: 'Stadium',
@@ -99,6 +100,7 @@ const MatchCard = () => {
 
   // Show loading state initially
   if (!footBallMatchDetails || !lineUp) {
+    console.log("enters this if condition in the match detaials")
     return (
       <div className={styles.matchCard}>
         <div className={styles.noDataSection}>

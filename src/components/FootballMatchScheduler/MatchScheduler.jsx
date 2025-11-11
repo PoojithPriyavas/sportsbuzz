@@ -340,6 +340,7 @@ export default function MatchScheduler() {
     }, [matchSchedule, translatedText.allLeagues]);
 
     const handleMatchClick = async (eid) => {
+        console.log("clicked the match deail code")
         
         await Promise.all([
             fetchFootballDetails(eid),

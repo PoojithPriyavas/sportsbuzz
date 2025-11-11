@@ -1225,6 +1225,8 @@ export const DataProvider = ({ children, countryDataHome }) => {
     const [footBallMatchDetails, setFootballMatchDetails] = useState([]);
 
     const fetchFootballDetails = async (id) => {
+        console.log("api is being called");
+        console.log(id, "this is the eid");
         try {
             const response = await axios.get(`/api/get-football-match-details?Eid=${id}`);
             setFootballMatchDetails(response.data);

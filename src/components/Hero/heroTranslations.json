@@ -1,0 +1,86 @@
+[
+    {
+        "hreflang": "en",
+        "translatedText": {
+            "title": "CONTACT US",
+            "subtitle": "Get in touch with our team. We're here to help you with any questions, feedback, or partnership opportunities you may have."
+        }
+    },
+    {
+        "hreflang": "de",
+        "translatedText": {
+            "title": "KONTAKTIEREN SIE UNS",
+            "subtitle": "Nehmen Sie Kontakt mit unserem Team auf. Wir helfen Ihnen gerne bei allen Fragen, Feedback oder Partnerschaftsmöglichkeiten."
+        }
+    },
+    {
+        "hreflang": "es",
+        "translatedText": {
+            "title": "CONTÁCTENOS",
+            "subtitle": "Póngase en contacto con nuestro equipo. Estamos aquí para ayudarle con cualquier pregunta, comentario u oportunidad de asociación que pueda tener."
+        }
+    },
+    {
+        "hreflang": "fr",
+        "translatedText": {
+            "title": "CONTACTEZ-NOUS",
+            "subtitle": "Entrez en contact avec notre équipe. Nous sommes là pour vous aider avec toutes vos questions, commentaires ou opportunités de partenariat."
+        }
+    },
+    {
+        "hreflang": "pt",
+        "translatedText": {
+            "title": "CONTATE-NOS",
+            "subtitle": "Entre em contato com nossa equipe. Estamos aqui para ajudá-lo com qualquer dúvida, feedback ou oportunidade de parceria que você possa ter."
+        }
+    },
+    {
+        "hreflang": "it",
+        "translatedText": {
+            "title": "CONTATTACI",
+            "subtitle": "Entra in contatto con il nostro team. Siamo qui per aiutarti con qualsiasi domanda, feedback o opportunità di partnership che potresti avere."
+        }
+    },
+    {
+        "hreflang": "el",
+        "translatedText": {
+            "title": "ΕΠΙΚΟΙΝΩΝΗΣΤΕ ΜΑΖΙ ΜΑΣ",
+            "subtitle": "Επικοινωνήστε με την ομάδα μας. Είμαστε εδώ για να σας βοηθήσουμε με οποιεσδήποτε ερωτήσεις, σχόλια ή ευκαιρίες συνεργασίας μπορεί να έχετε."
+        }
+    },
+    {
+        "hreflang": "hu",
+        "translatedText": {
+            "title": "LÉPJEN KAPCSOLATBA VELÜNK",
+            "subtitle": "Vegye fel a kapcsolatot csapatunkkal. Azért vagyunk itt, hogy segítsünk bármilyen kérdésben, visszajelzésben vagy partneri lehetőségben."
+        }
+    },
+    {
+        "hreflang": "ar",
+        "translatedText": {
+            "title": "اتصل بنا",
+            "subtitle": "تواصل مع فريقنا. نحن هنا لمساعدتك في أي أسئلة أو ملاحظات أو فرص شراكة قد تكون لديك."
+        }
+    },
+    {
+        "hreflang": "hi",
+        "translatedText": {
+            "title": "हमसे संपर्क करें",
+            "subtitle": "हमारी टीम से संपर्क करें। हम यहां आपकी किसी भी प्रश्न, फीडबैक या साझेदारी के अवसरों में मदद के लिए हैं।"
+        }
+    },
+    {
+        "hreflang": "zh",
+        "translatedText": {
+            "title": "联系我们",
+            "subtitle": "与我们的团队取得联系。我们在这里帮助您解决任何问题、反馈或合作机会。"
+        }
+    },
+    {
+        "hreflang": "ja",
+        "translatedText": {
+            "title": "お問い合わせ",
+            "subtitle": "チームにお問い合わせください。ご質問、フィードバック、またはパートナーシップの機会について、お手伝いいたします。"
+        }
+    }
+]
