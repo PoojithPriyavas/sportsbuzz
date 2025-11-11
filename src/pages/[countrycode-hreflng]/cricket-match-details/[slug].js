@@ -27,7 +27,7 @@ import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 import JoinTelegramButton from "@/components/JoinTelegram/JoinTelegramButton";
 
 export default function CricketMatchDetails() {
-    const { getCricketDetails, cricketDetails, location, countryCode, activeOddBanners, bannerLoading, setShowOtherDivs, showOtherDivs ,upcomingMatches} = useGlobalData();
+    const { getCricketDetails, cricketDetails, location, countryCode, activeOddBanners, bannerLoading, setShowOtherDivs, showOtherDivs ,upcomingMatches,UpcomingFootballMatches} = useGlobalData();
     const [loading, setLoading] = useState(true);
     const [animationStage, setAnimationStage] = useState('loading');
     // const [showOtherDivs, setShowOtherDivs] = useState(false);

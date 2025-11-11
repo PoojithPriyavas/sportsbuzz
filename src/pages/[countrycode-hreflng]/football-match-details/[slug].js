@@ -3,7 +3,6 @@ import LiveScores from "@/components/LiveScoreSection/LiveScoreSection";
 import Head from "next/head";
 import BettingAppsTable from "@/components/BestBettingApps/BestBettingApps";
 import BettingAppsRecentTable from "@/components/BestBettingRecentApps/BestBettingRecentApps";
-import UpcomingMatches from "@/components/UpComing/UpComingMatches";
 import styles from '../../../styles/Home.module.css';
 import AutoSlider from "@/components/AutoSlider/AutoSlider";
 import TopNewsSection from "@/components/NewsSection/TopNews";
@@ -26,6 +25,8 @@ import CountryLayout from "@/components/layouts/CountryLayout";
 import JoinTelegramButton from "@/components/JoinTelegram/JoinTelegramButton";
 import UpcomingMatches from "@/components/UpComing/UpComingMatches";
 import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
+import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
+import SportsOdsMegaPari from "@/components/SportsOdds/SportsOdsmegaPari";
 
 export async function getServerSideProps(context) {
     // Log the request origin (helpful for debugging)
