@@ -4,8 +4,8 @@ import Head from "next/head";
 import BettingAppsTable from "@/components/BestBettingApps/BestBettingApps";
 import BettingAppsRecentTable from "@/components/BestBettingRecentApps/BestBettingRecentApps";
 import UpcomingMatches from "@/components/UpComing/UpComingMatches";
-// import styles from '../../styles/Home.module.css';
-import styles from '../../styles/globalHeader.module.css';
+// import styles from '../../../../styles/Home.module.css';
+import styles from '../../../../styles/globalHeader.module.css';
 import AutoSlider from "@/components/AutoSlider/AutoSlider";
 import TopNewsSection from "@/components/NewsSection/TopNews";
 // import BlogSlider from "@/components/BlogsSection/BlogSlider";
@@ -17,27 +17,17 @@ import JoinTelegramButton from '@/components/JoinTelegram/JoinTelegramButton';
 import FooterTwo from "@/components/Footer/Footer";
 import { useGlobalData } from "@/components/Context/ApiContext";
 import UpcomingFootballMatches from "@/components/UpComing/UpComingFootball";
+import RecentAppsDetails from "@/components/BestBettingRecentApps/RecetDetail";
 import HeaderTwo from "@/components/Header/HeaderTwo";
-
-import { fetchBettingAppsSSR } from '@/lib/fetchBettingAppsSSR';
-import AutoSliderEven from "@/components/AutoSlider/AutoSliderEven";
+import { fetchBestBettingAppsSSR } from "@/lib/fetchBestBettingAppsSSR";
 
 
-export async function getServerSideProps({ req, query, resolvedUrl }) {
-    // Parse the cookie to get country code
-    const countryCookie = req.cookies.countryData;
-
-    const hreflangquery = query['countrycode-hreflng']; // "en-in"
-    const countryCodes = hreflangquery ? hreflangquery.split('-')[1] : null; // "in"
-    console.log(countryCodes, "country codes in the best betting apps main page");
-
-    const countryData = countryCookie ? JSON.parse(countryCookie) : null;
-    const countryCode = countryData?.country_code || 'LK';
-    const hrefLanCookie = req.cookies.lanTagValues;
-    const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
+export async function getServerSideProps(context) {
+    const { req, query, params, resolvedUrl } = context;
 
     let countryDataHome = null;
     let locationDataHome = null;
+    const queryValue = query;
 
     try {
         const [countryRes, locationRes] = await Promise.all([
@@ -50,7 +40,7 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
                 })
                 .catch((error) => {
                     console.error('Error fetching country data:', error);
-                    return null; // Return null on error
+                    return null;
                 }),
 
             fetch('https://admin.sportsbuz.com/api/locations/')
@@ -62,45 +52,61 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
                 })
                 .catch((error) => {
                     console.error('Error fetching location data:', error);
-                    return null; // Return null on error
+                    return null;
                 })
         ]);
 
-        countryDataHome = countryRes?.country_code || 'LK';
+        countryDataHome = countryRes;
         locationDataHome = locationRes;
 
     } catch (error) {
         console.error('Error in Promise.all:', error);
-        // Continue with null values if both APIs fail
     }
 
-    // Fetch betting apps data based on country code
-    let sectionsRes = null;
+    // const countryCookie = req.cookies.countryData;
+    // const countryData = countryCookie ? JSON.parse(countryCookie) : null;
+    // const countryCodes = countryData?.country_code || 'LK';
+    const hrefLanCookie = req.cookies.lanTagValues;
+    const hrefLanData = hrefLanCookie ? JSON.parse(hrefLanCookie) : null;
+
+    // FIXED: Pass parameters with correct names
+
+    const hreflang = queryValue['countrycode-hreflng']; // "en-in"
+    const countryCodes = hreflang ? hreflang.split('-')[1] : null; // "in"
+
+    const slug = queryValue.slug;
+    let bestSections = null;
+
     try {
-        sectionsRes = await fetchBettingAppsSSR(countryCodes);
+        console.log('Fetching with params:', { countryCode: countryCodes, slug }); // Debug log
+        bestSections = await fetchBestBettingAppsSSR({
+            countryCode: countryCodes,
+            slug
+        });
+        console.log('bestSections result:', bestSections);
     } catch (error) {
-        console.error('Error fetching betting apps:', error);
-        sectionsRes = null; // or provide a default value
+        console.error('Error fetching best sections:', error);
+        bestSections = [];
     }
 
     return {
         props: {
-            sectionsRes,
-            countryCode,
+            bestSections,
+            queryValue,
+            countryCodes,
             hrefLanData,
             resolvedUrl,
             isLocalhost: process.env.NODE_ENV === 'development',
-            countryDataHome,
-            locationDataHome,
-            countryCodes
+            locationDataHome
         },
     };
 }
 
 
-export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData, resolvedUrl, isLocalhost, countryDataHome, locationDataHome, countryCodes }) {
-
-    // console.log(sectionsTab, "sections tab")
+export default function BestBettingApps({
+    bestSections, queryValue, countryCodes, hrefLanData, resolvedUrl, isLocalhost, locationDataHome
+}) {
+    // console.log(bestSections, "jjjjjj")
 
     // const [loading, setLoading] = useState(true);
     // const {
@@ -118,9 +124,8 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
     //     activeOddBanners,
     //     activeEvenBanners,
     //     bannerLoading,
-    // } = useGlobalData();
-    // // console.log(sections, "shgdfs")
 
+    // } = useGlobalData();
     // useEffect(() => {
     //     // Fixed: Timer was setting loading to true instead of false
     //     const timer1 = setTimeout(() => setLoading(false), 3000);
@@ -169,24 +174,52 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
     //     }
     // }, [showOtherDivs]);
 
+    // const sectionIdNumber = parseInt(sectionId); // Convert to number
+    // const matchedSection = bestSectionsTab.find(section => section.id === sectionIdNumber);
 
+    // const metaTitle = matchedSection?.metatitle || 'Best Betting Apps';
+    // const metaDescription = matchedSection?.meta_description?.replace(/<[^>]+>/g, '') || 'Discover top-rated betting apps with secure payments, live odds, and exclusive bonuses. Compare features, user reviews, and promotional offers to find your perfect mobile betting experience.';
+    // console.log("meta title betting apps id:", metaTitle);
+    // console.log("meta desc betting apps id:", metaDescription);
+    const stripHtml = (html) => {
+        if (!html) return '';
+        return html.replace(/<[^>]*>/g, '').trim();
+    };
     return (
+
         <>
             <Head>
-                <title>{sectionsRes?.[0]?.metatitle || 'Best Betting Apps'}</title>
-                <meta
-                    name="description"
-                    content={
-                        sectionsRes?.[0]?.meta_description
-                            ? sectionsRes[0].meta_description.replace(/<[^>]+>/g, '').slice(0, 160)
-                            : 'Explore the best betting apps in India for July 2025.'
-                    }
-                />
-                <link rel="alternate" href="https://sportsbuz.com/best-betting-apps/current/" hreflang="x-default" />
+                <title>{bestSections[0]?.metatitle}</title>
+                <meta name="description" content={stripHtml(bestSections[0]?.meta_description)} />
+                <meta name="keywords" content={bestSections[0]?.keywords || ''} />
 
-                {locationDataHome?.map(({ hreflang, country_code }) => {
-                    const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/best-betting-apps/current`;
+                {/* Open Graph Meta Tags */}
+                <meta property="og:title" content={bestSections[0]?.metatitle} />
+                <meta property="og:description" content={stripHtml(bestSections[0]?.meta_description)} />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
+                <meta property="og:image" content={`${typeof window !== 'undefined' ? window.location.origin : 'https://sportsbuz.com'}/favicon.ico`} />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:site_name" content="Sportsbuz" />
+
+                {/* Twitter Card Meta Tags */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={bestSections[0]?.metatitle} />
+                <meta name="twitter:description" content={stripHtml(bestSections[0]?.meta_description)} />
+                <meta name="twitter:image" content={`${typeof window !== 'undefined' ? window.location.origin : 'https://sportsbuz.com'}/favicon.ico`} />
+
+                {/* Additional SEO Meta Tags */}
+                <meta name="robots" content="index, follow" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+                <link rel="canonical" href={typeof window !== 'undefined' ? window.location.href : ''} />
+
+                {/* Hreflang Tags */}
+                {hrefLanData?.map(({ hreflang, country_code }) => {
+                    const href = `${baseUrl}/${country_code.toLowerCase()}/${hreflang}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
+
                     return (
                         <link
                             key={fullHrefLang}
@@ -196,14 +229,8 @@ export default function BestBettingApps({ sectionsRes, countryCode, hrefLanData,
                         />
                     );
                 })}
-                <meta property="og:image" content={`${typeof window !== 'undefined' ? window.location.origin : 'https://sportsbuz.com'}/favicon.ico`} />
-                <meta property="og:title" content={sectionsRes?.[0]?.metatitle || 'Best Betting Apps'} />
-                <meta property="og:description" content={sectionsRes?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
-                <meta name="twitter:title" content={sectionsRes?.[0]?.metatitle || 'Best Betting Apps'} />
-                <meta name="twitter:description" content={sectionsRes?.[0]?.meta_description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
-                <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
             </Head>
-
+            
             <div
                 // ref={containerRef}
                 className={`${styles.loadingContainerOut}`}>

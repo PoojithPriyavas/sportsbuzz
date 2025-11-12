@@ -95,39 +95,11 @@ export default function FootballMatchDetails() {
 
     return (
         <>
-            {/* <Head>
+            <Head>
                 <title>Match Details</title>
                 <meta name="description" content="Your site description here" />
             </Head>
-     
-            <HeaderTwo animationStage={animationStage} />
 
-            <div className='container'>
-              
-                <div className={styles.fourColumnRow}>
-                    <div className={styles.leftThreeColumns}>
-                        <MatchDetails />
-                    </div>
-                    <div className={styles.fourthColumn} >
-                        <BettingCard />
-                      {activeOddBanners.length > 0 && <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />}
-                        <TopNewsSection />
-                    </div>
-                </div>
-                <div className={styles.mainContent}>
-                    <div className={styles.leftSection}>
-
-                    </div>
-
-                    <div className={styles.rightSection}>
-
-
-                    </div>
-                </div>
-
-
-            </div>
-            <FooterTwo /> */}
             <div
                 // ref={containerRef}
                 className={`${styles.loadingContainerOut}`}>

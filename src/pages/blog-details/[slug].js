@@ -9,29 +9,73 @@ import styles from '../../styles/globalHeader.module.css';
 import { useGlobalData } from '@/components/Context/ApiContext';
 import HeaderTwo from "@/components/Header/HeaderTwo";
 
-// export async function getServerSideProps(context) {
-//     const slug = context.params.slug;
+export async function getServerSideProps(context) {
+    const { resolvedUrl } = context;
+    const slug = context.params.slug;
 
-//     try {
-//         const res = await fetch(`https://admin.sportsbuz.com/api/blog-detail/${slug}`);
-//         if (!res.ok) {
-//             return { notFound: true };
-//         }
+    let countryDataHome = null;
+    let locationDataHome = null;
 
-//         const blog = await res.json();
+    try {
+        const [countryRes, locationRes] = await Promise.all([
+            fetch('https://admin.sportsbuz.com/api/get-country-code/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('Error fetching country data:', error);
+                    return null; // Return null on error
+                }),
 
-//         return {
-//             props: { blog },
-//         };
-//     } catch (error) {
-//         console.error('Failed to fetch blog:', error);
-//         return { notFound: true };
-//     }
-// }
+            fetch('https://admin.sportsbuz.com/api/locations/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .catch((error) => {
+                    console.error('Error fetching location data:', error);
+                    return null; // Return null on error
+                })
+        ]);
+
+        countryDataHome = countryRes;
+        locationDataHome = locationRes;
+
+    } catch (error) {
+        console.error('Error in Promise.all:', error);
+        // Continue with null values if both APIs fail
+    }
+
+    try {
+        const res = await fetch(`https://admin.sportsbuz.com/api/blog-detail/${slug}`);
+        if (!res.ok) {
+            return { notFound: true };
+        }
+
+        const blog = await res.json();
+
+        return {
+            props: {
+                blog,
+                countryDataHome,
+                locationDataHome,
+                resolvedUrl, // Add resolvedUrl to props
+            },
+        };
+    } catch (error) {
+        console.error('Failed to fetch blog:', error);
+        return { notFound: true };
+    }
+}
 
 
 export default function BlogDetailsMain({
-    // blog 
+    blog, locationDataHome, resolvedUrl
 
 }) {
     // console.log("blog deatails meta data : ", blog)
@@ -81,7 +125,7 @@ export default function BlogDetailsMain({
     // }, [showOtherDivs]);
     return (
         <>
-            {/* <Head>
+            <Head>
                 <title>{blog.meta_title || "Sports Buzz | Blog Details"}</title>
                 <meta name="description" content={blog.meta_desc} />
                 <meta name="keywords" content={blog.tags?.join(", ")} />
@@ -89,11 +133,6 @@ export default function BlogDetailsMain({
                 <meta property="og:description" content={blog.meta_desc} />
                 <meta property="og:image" content={blog.image_big || blog.image} />
             </Head>
-             <HeaderTwo animationStage={animationStage} />
-            <div className={` ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
-                <BlogDetailsPage blog={blog} />
-            </div>
-            {showOtherDivs && <FooterTwo />} */}
             <div
                 // ref={containerRef}
                 className={`${styles.loadingContainerOut}`}>

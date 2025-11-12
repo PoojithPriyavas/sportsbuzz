@@ -11,94 +11,95 @@ import { fetchBlogsSSR } from "@/lib/ftechBlogsSSR";
 
 import axios from 'axios';
 
-// export async function getServerSideProps({ req, query, resolvedUrl }) {
-//     let blogs = [];
-//     let countryDataHome = null;
-//     let locationDataHome = null;
+export async function getServerSideProps({ req, query, resolvedUrl }) {
+    let blogs = [];
+    let countryDataHome = null;
+    let locationDataHome = null;
 
-//     try {
-//         const [countryRes, locationRes] = await Promise.all([
-//             fetch('https://admin.sportsbuz.com/api/get-country-code/')
-//                 .then(async (response) => {
-//                     if (!response.ok) {
-//                         throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
-//                     }
-//                     const data = await response.json();
-//                     return { data, headers: response.headers, status: response.status, url: response.url };
-//                 })
-//                 .catch((error) => {
-//                     console.error('Error fetching country data:', error);
-//                     return null;
-//                 }),
+    try {
+        const [countryRes, locationRes] = await Promise.all([
+            fetch('https://admin.sportsbuz.com/api/get-country-code/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Country API failed: ${response.status} ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    return { data, headers: response.headers, status: response.status, url: response.url };
+                })
+                .catch((error) => {
+                    console.error('Error fetching country data:', error);
+                    return null;
+                }),
 
-//             fetch('https://admin.sportsbuz.com/api/locations/')
-//                 .then(async (response) => {
-//                     if (!response.ok) {
-//                         throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
-//                     }
-//                     const data = await response.json();
-//                     return { data, headers: response.headers, status: response.status, url: response.url };
-//                 })
-//                 .catch((error) => {
-//                     console.error('Error fetching location data:', error);
-//                     return null;
-//                 })
-//         ]);
+            fetch('https://admin.sportsbuz.com/api/locations/')
+                .then(async (response) => {
+                    if (!response.ok) {
+                        throw new Error(`Location API failed: ${response.status} ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    return { data, headers: response.headers, status: response.status, url: response.url };
+                })
+                .catch((error) => {
+                    console.error('Error fetching location data:', error);
+                    return null;
+                })
+        ]);
 
-//         countryDataHome = countryRes?.data || null;
-//         locationDataHome = locationRes?.data || null;
+        countryDataHome = countryRes?.data || null;
+        locationDataHome = locationRes?.data || null;
 
-//         const {
-//             category: categoryIdParam,
-//             subcategory: subcategoryIdParam,
-//             search: searchTerm = ''
-//         } = query;
+        const {
+            category: categoryIdParam,
+            subcategory: subcategoryIdParam,
+            search: searchTerm = ''
+        } = query;
 
-//         try {
-//             blogs = await fetchBlogsSSR({
-//                 countryCode: countryDataHome?.country_code || 'LK',
-//                 search: searchTerm,
-//                 category: categoryIdParam ? parseInt(categoryIdParam, 10) : null,
-//                 subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam, 10) : null,
-//             });
-//         } catch (blogError) {
-//             console.error('Error fetching blogs:', blogError);
-//             blogs = []; // Keep empty array as fallback
-//         }
+        try {
+            blogs = await fetchBlogsSSR({
+                countryCode: countryDataHome?.country_code || 'LK',
+                search: searchTerm,
+                category: categoryIdParam ? parseInt(categoryIdParam, 10) : null,
+                subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam, 10) : null,
+            });
+        } catch (blogError) {
+            console.error('Error fetching blogs:', blogError);
+            blogs = []; // Keep empty array as fallback
+        }
 
-//         // Debug logs (remove in production)
-//         // console.log('=== API RESPONSE DATA ===');
-//         // console.log('Country Data:', JSON.stringify(countryDataHome, null, 2));
-//         // console.log('Location Data:', JSON.stringify(locationDataHome, null, 2));
-//         // console.log('Country Response Headers:', countryRes ? Object.fromEntries(countryRes.headers) : 'N/A');
-//         // console.log('Location Response Headers:', locationRes ? Object.fromEntries(locationRes.headers) : 'N/A');
+        // Debug logs (remove in production)
+        // console.log('=== API RESPONSE DATA ===');
+        // console.log('Country Data:', JSON.stringify(countryDataHome, null, 2));
+        // console.log('Location Data:', JSON.stringify(locationDataHome, null, 2));
+        // console.log('Country Response Headers:', countryRes ? Object.fromEntries(countryRes.headers) : 'N/A');
+        // console.log('Location Response Headers:', locationRes ? Object.fromEntries(locationRes.headers) : 'N/A');
 
-//     } catch (error) {
-//         console.error("API Error Details:", {
-//             message: error.message,
-//             name: error.name,
-//             stack: error.stack
-//         });
-//     }
+    } catch (error) {
+        console.error("API Error Details:", {
+            message: error.message,
+            name: error.name,
+            stack: error.stack
+        });
+    }
 
-//     return {
-//         props: {
-//             blogs,
-//             countryDataHome,
-//             locationDataHome,
-//             resolvedUrl,
-//             isLocalhost: process.env.NODE_ENV === 'development'
-//         }
-//     };
-// }
+    return {
+        props: {
+            blogs,
+            countryDataHome,
+            locationDataHome,
+            resolvedUrl,
+            isLocalhost: process.env.NODE_ENV === 'development'
+        }
+    };
+}
+
 export default function BlogPages({
-    // // blogs,
-    // countryDataHome,
-    // locationDataHome,
-    // // supportedLanguages,
-    // // supportedCountries,
-    // resolvedUrl,
-    // isLocalhost, 
+    blogs,
+    countryDataHome,
+    locationDataHome,
+    supportedLanguages,
+    supportedCountries,
+    resolvedUrl,
+    isLocalhost,
 }) {
     // const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     // const countryCode = countryDataHome?.country_code || 'LK';
@@ -155,17 +156,16 @@ export default function BlogPages({
 
     return (
         <>
-            {/* <Head>
+            <Head>
                 <title>Sports Buzz | Blogs</title>
                 <meta name="description" content="Explore the latest sports blogs, match analysis, and breaking sports news curated for fans worldwide." />
                 <meta name="keywords" content="sports blogs, football news, cricket updates, match analysis, sports buzz" />
                 <meta name="author" content="Sports Buzz" />
 
-                {locationDataHome?.map(({ hreflang, country_code }) => {
-                  
+                {locationDataHome && Array.isArray(locationDataHome) && locationDataHome.map(({ hreflang, country_code }) => {
+                    {/* console.log(hreflang, "href lang"); */ }
                     const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/blogs/pages/all-blogs`;
                     const fullHrefLang = `${hreflang}-${country_code}`;
-              
 
                     return (
                         <link
@@ -177,27 +177,25 @@ export default function BlogPages({
                     );
                 })}
 
-               
+                <link rel="alternate" href={`${baseUrl}/blogs/pages/all-blogs`} hreflang="x-default" />
+
+                {/* Open Graph (Facebook, LinkedIn) */}
                 <meta property="og:title" content="Sports Buzz | Blogs" />
                 <meta property="og:description" content="Stay updated with the latest sports blogs and match breakdowns from around the world." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content="https://www.sportsbuz.com/blogs/pages/all-blogs" />
                 <meta property="og:image" content="https://www.sportsbuz.com/images/social-preview.jpg" />
 
-                
+                {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content="Sports Buzz | Blogs" />
                 <meta name="twitter:description" content="Latest sports blogs, news and insights — only on Sports Buzz." />
                 <meta name="twitter:image" content="https://www.sportsbuz.com/images/social-preview.jpg" />
-                <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
-                 <link rel="alternate" href="https://sportsbuz.com/blogs/pages/1" hreflang="x-default" />
-            </Head>
 
-            <HeaderTwo animationStage={animationStage} />
-            <div className='container'>
-                <BlogsPage blogs={blogs} />
-            </div>
-            <FooterTwo /> */}
+                <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
+                <link rel="alternate" href="https://sportsbuz.com/blogs/pages/1" hreflang="x-default" />
+            </Head>
+            
             <div
                 // ref={containerRef}
                 className={`${styles.loadingContainerOut}`}>

@@ -76,66 +76,12 @@ export default function MatchSchedulerScreen() {
     // }, [showOtherDivs]);
     return (
         <>
-            {/* <Head>
-                <title>Match Schedules</title>
-                <meta name="description" content="Your site description here" />
+            <Head>
+                <title>Match Schedules – Live Cricket, Football and Betting Odds</title>
+                <meta name="description" content="Stay ahead with the latest match schedules, betting odds, and sports predictions. Bet on your favorite games with expert insights and top gambling odds. Never miss a game" />
                 <link rel="alternate" href="https://sportsbuz.com/match-schedules/" hreflang="x-default" />
             </Head>
-           
-            <HeaderTwo animationStage={animationStage} />
-            <div className='container'>
-                {sport === 'cricket' ? (
-                    <>
-                        {apiResponse && <LiveScores apiResponse={apiResponse} matchTypes={matchTypes} teamImages={teamImages} />}
-                    </>
-                ) : (
-                    <>
-                        {stages && <TestLive />}
-                    </>
-
-                )}
-                <div className={styles.fourColumnRow}>
-                    <div className={styles.leftThreeColumns}>
-                        <MatchScheduler />
-                    </div>
-                    <div className={styles.fourthColumn}>
-                        <div className={styles.fourthColumnTwoColumns}>
-                            <div className={styles.fourthColumnLeft}>
-                                <BettingCard />
-                                <JoinTelegramButton />
-                            </div>
-                            {activeOddBanners.length > 0 &&
-                                <div className={styles.fourthColumnRight}>
-                                    <AutoSlider activeOddBanners={activeOddBanners} bannerLoading={bannerLoading} />
-                                </div>
-                            }
-                        </div>
-                        {sport === 'cricket' ? (
-                            <>
-                                <UpcomingMatches upcomingMatches={upcomingMatches} />
-                            </>
-                        ) : (
-                            <UpcomingFootballMatches />
-                        )}
-                        {activeEvenBanners.length > 0 && <AutoSliderEven activeEvenBanners={activeEvenBanners} bannerLoading={bannerLoading} />}
-                        <SportsOdsMegaPari />
-                    </div>
-                </div>
-                <div className={styles.mainContent}>
-                    <div className={styles.leftSection}>
-
-                    </div>
-
-                    <div className={styles.rightSection}>
-
-                     
-
-                    </div>
-                </div>
-                <BettingAppsRecentTable />
-
-            </div>
-            <FooterTwo /> */}
+            
             <div
                 // ref={containerRef}
                 className={`${styles.loadingContainerOut}`}>
