@@ -1,3 +1,4 @@
+import styles from '../../styles/globalHeader.module.css';
 export default function Terms() {
     return (
         <>
