@@ -751,7 +751,7 @@ const SportsOddsCard = React.memo(({ card, styles, translatedText, onSelectOdd, 
                                     {translatedText.potentialWinnings}
                                 </div>
                                 <div className={styles.potentialWinAmount}>
-                                    ₹{win}
+                                    {win}
                                 </div>
                             </div>
                         )}
@@ -770,7 +770,7 @@ const SportsOddsCard = React.memo(({ card, styles, translatedText, onSelectOdd, 
                 {success ? (
                     <span style={{ color: '#22c55e' }}>
                         {translatedText.betSuccess}<br />
-                        ₹{betAmount} on {getOddLabel(selectedOdd.label)} • {translatedText.potentialProfit}: ₹{(parseFloat(win) - parseFloat(betAmount)).toFixed(2)}
+                        {betAmount} on {getOddLabel(selectedOdd.label)} • {translatedText.potentialProfit}: {(parseFloat(win) - parseFloat(betAmount)).toFixed(2)}
                     </span>
                 ) : (
                     translatedText.selectOdds

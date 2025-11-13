@@ -644,7 +644,7 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                                 <div className={styles.potentialWinLabel}>
                                     {translatedText.potentialWinnings}
                                 </div>
-                                <div className={styles.potentialWinAmount}>₹{win}</div>
+                                <div className={styles.potentialWinAmount}>{win}</div>
                             </div>
                         )}
                     </div>
@@ -655,7 +655,7 @@ function BettingCard({ card, styles, translatedText, onSelectOdd, onBetPlaced })
                 {success ? (
                     <span style={{ color: '#22c55e' }}>
                         {translatedText.betSuccess}<br />
-                        ₹{betAmount} on {getOddLabel(selectedOdd.label)} • {translatedText.potentialProfit}: ₹{(parseFloat(win) - parseFloat(betAmount)).toFixed(2)}
+                        {betAmount} on {getOddLabel(selectedOdd.label)} • {translatedText.potentialProfit}: {(parseFloat(win) - parseFloat(betAmount)).toFixed(2)}
                     </span>
                 ) : (
                     translatedText.selectOdds
