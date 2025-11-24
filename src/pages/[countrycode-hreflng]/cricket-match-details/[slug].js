@@ -35,7 +35,9 @@ export default function CricketMatchDetails() {
 
     // Use useRouter instead of useParams for Pages Router
     const router = useRouter();
+    console.log(router,"router value in cricket details")
     const { slug: matchId, 'countrycode-hreflng': countryLang } = router.query;
+    console.log(matchId,"match id cricket")
 
     const languageValidation = useLanguageValidation(location, countryLang);
 
@@ -48,7 +50,7 @@ export default function CricketMatchDetails() {
             return;
         }
         getCricketDetails(matchId);
-    }, [router.isReady, matchId, getCricketDetails]);
+    }, [router.isReady, matchId]);
 
 
     useEffect(() => {
