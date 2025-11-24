@@ -39,7 +39,7 @@ module.exports = {
       priority: 0.3,
     });
     extraPaths.push({
-      loc: `${config.siteUrl}/privacy`,
+      loc: `${config.siteUrl}/policy`,
       changefreq: 'yearly',
       priority: 0.3,
     });
