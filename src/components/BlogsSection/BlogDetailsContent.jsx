@@ -7,6 +7,7 @@ import Head from 'next/head';
 import JoinTelegramButton from '../JoinTelegram/JoinTelegramButton';
 
 export default function BlogDetailContent({ blog }) {
+  // console.log(blog,"blog detail")
   // Removed translation functionality - using blog directly
   
   if (!blog) {

@@ -2,22 +2,25 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useGlobalData } from '../Context/ApiContext';
 import contactTranslations from './contactTranslations.json';
+import { useRouter } from 'next/navigation';
 
 // Mock components for demonstration
-const JoinTelegramButton = () => (
-    <div style={{
-        backgroundColor: '#0088cc',
-        color: 'white',
-        padding: '12px 20px',
-        borderRadius: '8px',
-        textAlign: 'center',
-        cursor: 'pointer',
-        marginTop: '20px',
-        fontWeight: '600'
-    }}>
-        Join Our Telegram
-    </div>
-);
+// const JoinTelegramButton = (link) => (
+
+//     <div onClick={()=>link.link} style={{
+//         backgroundColor: '#0088cc',
+//         color: 'white',
+//         padding: '12px 20px',
+//         borderRadius: '8px',
+//         textAlign: 'center',
+//         cursor: 'pointer',
+//         marginTop: '20px',
+//         fontWeight: '600',
+//         cursor:'pointer'
+//     }}>
+//         Join Our Telegram
+//     </div>
+// );
 
 const ContactUsPage = () => {
     const [formData, setFormData] = useState({
@@ -40,9 +43,11 @@ const ContactUsPage = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
     const [isTranslating, setIsTranslating] = useState(false);
-    
+    const router = useRouter();
+
     const { settings, language, debugTranslateText } = useGlobalData();
     const contact = settings?.[0] || {};
+    console.log(settings, "settings ")
     const previousLanguage = useRef(null);
 
     const [translatedText, setTranslatedText] = useState({
@@ -741,10 +746,25 @@ const ContactUsPage = () => {
                 <div style={styles.contactDetails}>
                     <div style={styles.contactTitle}>{translatedText.telegramLabel}</div>
                     <div style={styles.contactText}>
-                        {contact.telegram_link ? contact.telegram_link.replace('https://t.me/', '@') : '@sportsbuz'}<br />
-                        {translatedText.telegramSupport}
+                        {/* {contact.telegram_link ? contact.telegram_link.replace('https://t.me/', '@') : '@sportsbuz'}<br /> */}
+                        {/* {translatedText.telegramSupport} */}
                     </div>
-                    <JoinTelegramButton />
+                    <a href={contact?.telegram_link} target='_blank'>
+                        <div style={{
+                            backgroundColor: '#0088cc',
+                            color: 'white',
+                            padding: '12px 20px',
+                            borderRadius: '8px',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            marginTop: '20px',
+                            fontWeight: '600',
+                            cursor: 'pointer'
+                        }}>
+                            Join Our Telegram
+                        </div>
+                    </a>
+
                 </div>
             </div>
 
@@ -763,7 +783,8 @@ const ContactUsPage = () => {
                 <div style={styles.contactDetails}>
                     <div style={styles.contactTitle}>{translatedText.address}</div>
                     <div style={styles.contactText}>
-                        {translatedText.addressDetails}
+                        {/* {translatedText.addressDetails} */}
+                        {contact?.address}
                     </div>
                 </div>
             </div>
@@ -945,7 +966,7 @@ const ContactUsPage = () => {
                                 ></textarea>
                                 {errors.message && <div style={styles.error}>{errors.message}</div>}
                             </div>
-{/* 
+                            {/* 
                             <div style={styles.formGroup}>
                                 <label style={styles.label} htmlFor="howDidYouHear">{translatedText.howDidYouHear}</label>
                                 <input

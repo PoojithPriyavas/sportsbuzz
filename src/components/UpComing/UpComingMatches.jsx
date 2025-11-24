@@ -6,12 +6,14 @@ import styles from './UpComingMatches.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faClock, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { useGlobalData } from '../Context/ApiContext';
+import { useRouter } from 'next/navigation';
+import DynamicLink from '../Common/DynamicLink';
 
 export default function UpcomingMatches({ upcomingMatches = [] }) {
     const { language, translateText } = useGlobalData();
     const [filter, setFilter] = useState('all');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    
+
     const [translatedText, setTranslatedText] = useState({
         cricketSchedules: 'Cricket Schedules',
         filter: 'Filter',
@@ -20,6 +22,7 @@ export default function UpcomingMatches({ upcomingMatches = [] }) {
         vs: 'vs',
         noMatches: 'No matches found for the selected filter'
     });
+    const router = useRouter();
 
     useEffect(() => {
         const translateLabels = async () => {
@@ -32,10 +35,10 @@ export default function UpcomingMatches({ upcomingMatches = [] }) {
                 { text: 'vs', to: language },
                 { text: 'No matches found for the selected filter', to: language }
             ];
-            
+
             // Get translations in a single API call
             const translations = await translateText(textsToTranslate, 'en', language);
-            
+
             // Update state with the translated texts
             setTranslatedText({
                 cricketSchedules: translations[0],
@@ -91,20 +94,23 @@ export default function UpcomingMatches({ upcomingMatches = [] }) {
             <div className={styles.matchesContainer}>
                 {filteredMatches.length > 0 ? (
                     filteredMatches.map(match => (
-                        <div key={match.matchId} className={styles.card}>
-                            <div className={styles.labels}>
-                                <span className={styles.intl}>{match.type}</span>
-                                <span className={styles.upcoming}>{translatedText.upcoming}</span>
+                        <DynamicLink href={`/cricket-match-details/${match.matchId}`}>
+                            <div key={match.matchId} className={styles.card} >
+                                <div className={styles.labels}>
+                                    <span className={styles.intl}>{match.type}</span>
+                                    <span className={styles.upcoming}>{translatedText.upcoming}</span>
+                                </div>
+                                <div className={styles.teams}>
+                                    {match.team1} <strong>{translatedText.vs}</strong> {match.team2}
+                                </div>
+                                <div className={styles.details}>
+                                    <span>{match.seriesName}</span><br /><br />
+                                    <span><FontAwesomeIcon icon={faCalendar} /> {match.dateStr}</span>&nbsp;&nbsp;
+                                    <span><FontAwesomeIcon icon={faClock} /> {match.timeStr}</span>
+                                </div>
                             </div>
-                            <div className={styles.teams}>
-                                {match.team1} <strong>{translatedText.vs}</strong> {match.team2}
-                            </div>
-                            <div className={styles.details}>
-                                <span>{match.seriesName}</span><br /><br />
-                                <span><FontAwesomeIcon icon={faCalendar} /> {match.dateStr}</span>&nbsp;&nbsp;
-                                <span><FontAwesomeIcon icon={faClock} /> {match.timeStr}</span>
-                            </div>
-                        </div>
+                        </DynamicLink>
+
                     ))
                 ) : (
                     <div className={styles.noMatches}>{translatedText.noMatches}</div>
