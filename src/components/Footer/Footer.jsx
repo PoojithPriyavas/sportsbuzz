@@ -284,7 +284,7 @@ const FooterTwo = () => {
                     </div>
                     <div className={styles.bottomRight}>
                         <a href={buildPath("/terms")}>{translatedText.terms}</a>
-                        <a href={buildPath("/privacy")}>{translatedText.privacy}</a>
+                        <a href={buildPath("/policy")}>{translatedText.privacy}</a>
                     </div>
                 </div>
             </div>
