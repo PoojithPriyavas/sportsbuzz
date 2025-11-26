@@ -1309,7 +1309,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
     } = {}) => {
         console.log("fetch blogs is being called in home and stored in the ")
         // Don't fetch if no country code
-        if (!countryCodeParam) {
+        if (!hrefCountryCode) {
             console.warn('No country code available for fetching blogs');
             return;
         }
@@ -1317,9 +1317,9 @@ export const DataProvider = ({ children, countryDataHome }) => {
         // Add a check to prevent using outdated country code
         if (validatedLocationData &&
             validatedLocationData.country_code &&
-            validatedLocationData.country_code !== countryCodeParam) {
+            validatedLocationData.country_code !== hrefCountryCode) {
             console.log('ApiContext: Skipping fetch with outdated country code', {
-                requested: countryCodeParam,
+                requested: hrefCountryCode,
                 current: validatedLocationData.country_code
             });
             return;
@@ -1370,11 +1370,11 @@ export const DataProvider = ({ children, countryDataHome }) => {
         } finally {
             setIsLoading(false);
         }
-    }, [countryCode?.country_code, validatedLocationData]);
+    }, [hrefCountryCode, validatedLocationData]);
 
 
     const fetchBlogs = useCallback(async ({
-        countryCodeParam = countryCode?.country_code,
+        countryCodeParam = hrefCountryCode,
         search = '',
         category = null,
         subcategory = null,
@@ -1382,7 +1382,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
     } = {}) => {
         console.log("fetch blogs is being called in home and stored in the ")
         // Don't fetch if no country code
-        if (!countryCodeParam) {
+        if (!hrefCountryCode) {
             console.warn('No country code available for fetching blogs');
             return;
         }
@@ -1390,9 +1390,9 @@ export const DataProvider = ({ children, countryDataHome }) => {
         // Add a check to prevent using outdated country code
         if (validatedLocationData &&
             validatedLocationData.country_code &&
-            validatedLocationData.country_code !== countryCodeParam) {
+            validatedLocationData.country_code !== hrefCountryCode) {
             console.log('ApiContext: Skipping fetch with outdated country code', {
-                requested: countryCodeParam,
+                requested: hrefCountryCode,
                 current: validatedLocationData.country_code
             });
             return;
@@ -1402,7 +1402,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
         try {
             const params = {
-                country_code: countryCodeParam,
+                country_code: hrefCountryCode,
                 // page: page
             };
 
@@ -1443,7 +1443,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
         } finally {
             setIsLoading(false);
         }
-    }, [countryCode?.country_code, validatedLocationData]);
+    }, [hrefCountryCode, validatedLocationData]);
 
 
 
