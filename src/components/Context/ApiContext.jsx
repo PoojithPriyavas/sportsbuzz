@@ -82,7 +82,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
     const [countryCode, setCountryCode] = useState({});
     const paramsValue = useParams()
-    const paramsCountryHrefLang = paramsValue['countrycode-hreflng']
+    const paramsCountryHrefLang = paramsValue?.['countrycode-hreflng']
 
     console.log(paramsCountryHrefLang, "params value after")
 
@@ -185,7 +185,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
     // ------------------------------------ country code value based on the url value strat----------------------------------/////
 
-    const paramsCountryCodeValue = paramsCountryHrefLang.split('-')[1]
+    const paramsCountryCodeValue = paramsCountryHrefLang?.split('-')[1]
 
     const hrefCountryCode = paramsCountryCodeValue ? paramsCountryCodeValue.toUpperCase() : (countryCode?.country_code || 'LK')
 

@@ -1,45 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://sportsbuz.com/</loc>
-    <lastmod>2025-11-12</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://sportsbuz.com/match-schedules</loc>
-    <lastmod>2025-11-12</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sportsbuz.com/best-betting-apps/current</loc>
-    <lastmod>2025-11-12</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://sportsbuz.com/blogs/pages/all-blogs</loc>
-    <lastmod>2025-11-12</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://sportsbuz.com/contact</loc>
-    <lastmod>2025-11-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://sportsbuz.com/terms</loc>
-    <lastmod>2025-11-12</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://sportsbuz.com/policy</loc>
-    <lastmod>2025-11-12</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url><loc>https://sportsbuz.com</loc><lastmod>2025-11-26T14:30:11.690Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/contact</loc><lastmod>2025-11-26T14:30:11.692Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/match-schedules</loc><lastmod>2025-11-26T14:30:11.692Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/policy</loc><lastmod>2025-11-26T14:30:11.692Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/terms</loc><lastmod>2025-11-26T14:30:11.692Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-in</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-in/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-in/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-in/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-in/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-de</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-de/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-de/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-de/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-de/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-es</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-es/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-es/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-es/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-es/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-pt</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-pt/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-pt/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-pt/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-pt/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-it</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-it/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-it/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-it/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-it/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-gr</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-gr/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-gr/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-gr/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-gr/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-nz</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-nz/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-nz/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-nz/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-nz/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-ae</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-ae/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-ae/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-ae/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-ae/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-ca</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-ca/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-ca/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-ca/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-ca/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-ie</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-ie/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-ie/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-ie/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-ie/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-pe</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-pe/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-pe/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-pe/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-pe/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-ar</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-ar/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-ar/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-ar/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-ar/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-br</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-br/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-br/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-br/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-br/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-gb</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-gb/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-gb/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-gb/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-gb/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-bd</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-bd/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-bd/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-bd/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-bd/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-at</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-at/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-at/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-at/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-at/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-hu</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-hu/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-hu/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-hu/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-hu/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/en-lk</loc><changefreq>daily</changefreq><priority>1</priority></url>
+<url><loc>https://sportsbuz.com/en-lk/match-schedules</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
+<url><loc>https://sportsbuz.com/en-lk/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+<url><loc>https://sportsbuz.com/en-lk/blogs/pages/all-blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://sportsbuz.com/en-lk/best-betting-apps/current</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+<url><loc>https://sportsbuz.com/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+<url><loc>https://sportsbuz.com/policy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
