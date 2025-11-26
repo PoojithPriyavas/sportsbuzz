@@ -13,7 +13,7 @@ import { useCallback } from 'react';
 import { parseUrlPath } from '../utilities/ParseUrl';
 import { usePathname } from 'next/navigation';
 import { sriLankaFallbackData, processCountryCodeResponse } from '@/utils/countryFallback';
-
+import { useParams } from 'next/navigation';
 
 const DataContext = createContext();
 
@@ -81,8 +81,10 @@ export const DataProvider = ({ children, countryDataHome }) => {
     // GET COUNTRY CODE API IMPLEMENTATION
 
     const [countryCode, setCountryCode] = useState({});
+    const paramsValue = useParams()
+    const paramsCountryHrefLang = paramsValue['countrycode-hreflng']
 
-
+    console.log(paramsCountryHrefLang, "params value after")
 
     const getCountryCode = async () => {
         try {
@@ -182,6 +184,11 @@ export const DataProvider = ({ children, countryDataHome }) => {
     };
 
 
+    const paramsCountryCodeValue =  paramsCountryHrefLang.split('-')[1]
+
+    const hrefCountryCode = paramsCountryCodeValue ? paramsCountryCodeValue.toUpperCase() : (countryCode?.country_code || 'LK')
+
+    console.log(hrefCountryCode, "href country code")
     // TRANSLATION API IMPLEMENTATION
 
     // translation codes in apiContext
@@ -1291,7 +1298,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
     };
 
     const fetchBlogsForPage = useCallback(async ({
-        countryCodeParam = countryCode?.country_code,
+        countryCodeParam = hrefCountryCode,
         search = '',
         category = null,
         subcategory = null,
@@ -1319,7 +1326,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
 
         try {
             const params = {
-                country_code: countryCodeParam,
+                country_code: hrefCountryCode,
                 // page: page
             };
 

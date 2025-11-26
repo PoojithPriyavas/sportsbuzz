@@ -2,6 +2,7 @@ import CustomAxios from '../components/utilities/CustomAxios';
 import axios from 'axios';
 
 export async function fetchBlogsSSR({ countryCode, search = '', category = null, subcategory = null }) {
+  console.log(countryCode,"country code in blogs ssr")
   try {
     const params = {
       country_code: countryCode,

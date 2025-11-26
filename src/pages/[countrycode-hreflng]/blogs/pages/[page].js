@@ -17,6 +17,9 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
     let blogs = [];
     let countryDataHome = null;
     let locationDataHome = null;
+    const queryValue = query;
+    const hreflang = queryValue['countrycode-hreflng']; // "en-in"
+    const countryCodes = hreflang ? hreflang.split('-')[1] : null; // "in"
 
     try {
         const [countryRes, locationRes] = await Promise.all([
@@ -58,7 +61,7 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
 
         try {
             blogs = await fetchBlogsSSR({
-                countryCode: countryDataHome?.country_code || 'LK',
+                countryCode: countryCodes || 'LK',
                 search: searchTerm,
                 category: categoryIdParam ? parseInt(categoryIdParam, 10) : null,
                 subcategory: subcategoryIdParam ? parseInt(subcategoryIdParam, 10) : null,
@@ -86,7 +89,7 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
     return {
         props: {
             blogs,
-            countryDataHome,
+            countryCodes,
             locationDataHome,
             resolvedUrl,
             isLocalhost: process.env.NODE_ENV === 'development'
@@ -96,7 +99,7 @@ export async function getServerSideProps({ req, query, resolvedUrl }) {
 
 export default function BlogPages({
     blogs,
-    countryDataHome,
+    countryCodes,
     locationDataHome,
     supportedLanguages,
     supportedCountries,
@@ -111,7 +114,7 @@ export default function BlogPages({
     const router = useRouter();
     const [isValidating, setIsValidating] = useState(false);
     const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
-    const countryCode = countryDataHome?.country_code || 'LK';
+    const countryCode = countryCodes || 'LK';
 
     const locationParts = resolvedUrl.replace(/^,?\//, '').split('/');
     const [countryPart, langPart] = locationParts[0].split('-'); // Fixed: country comes first, then language
