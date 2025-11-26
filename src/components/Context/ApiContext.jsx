@@ -183,12 +183,15 @@ export const DataProvider = ({ children, countryDataHome }) => {
         }
     };
 
+    // ------------------------------------ country code value based on the url value strat----------------------------------/////
 
-    const paramsCountryCodeValue =  paramsCountryHrefLang.split('-')[1]
+    const paramsCountryCodeValue = paramsCountryHrefLang.split('-')[1]
 
     const hrefCountryCode = paramsCountryCodeValue ? paramsCountryCodeValue.toUpperCase() : (countryCode?.country_code || 'LK')
 
     console.log(hrefCountryCode, "href country code")
+    // ------------------------------------ country code value based on the url value end----------------------------------/////
+
     // TRANSLATION API IMPLEMENTATION
 
     // translation codes in apiContext
