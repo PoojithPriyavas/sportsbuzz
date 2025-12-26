@@ -1380,6 +1380,7 @@ export const DataProvider = ({ children, countryDataHome }) => {
         subcategory = null,
         page = 1
     } = {}) => {
+        console.log(hrefCountryCode, "code params in blogs")
         console.log("fetch blogs is being called in home and stored in the ")
         // Don't fetch if no country code
         if (!hrefCountryCode) {
@@ -1859,18 +1860,21 @@ export const DataProvider = ({ children, countryDataHome }) => {
         }
     }, []);
 
-
+    useEffect(() => {
+        fetchBettingApps(hrefCountryCode);
+        fetchBestBettingAppsPrevious(hrefCountryCode);
+    }, [hrefCountryCode])
     useEffect(() => {
         if (countryCode?.country_code) {
             // console.log('Country code available, fetching initial blogs:', countryCode.country_code);
             fetchBlogs({ countryCodeParam: countryCode.country_code });
-            fetchBettingApps(countryCode.country_code);
-            fetchBestBettingAppsPrevious(countryCode.country_code);
+            // fetchBettingApps(countryCode.country_code);
+            // fetchBestBettingAppsPrevious(hrefCountryCode);
         } else if (countryDataHome?.country_code) {
             console.log('Country code available from SSR, fetching initial blogs:', countryDataHome.country_code);
             fetchBlogs({ countryCodeParam: countryDataHome.country_code });
-            fetchBettingApps(countryDataHome.country_code);
-            fetchBestBettingAppsPrevious(countryDataHome.country_code);
+            // fetchBettingApps(countryDataHome.country_code);
+            // fetchBestBettingAppsPrevious(hrefCountryCode);
         }
     }, [countryCode?.country_code, countryDataHome?.country_code]);
 
