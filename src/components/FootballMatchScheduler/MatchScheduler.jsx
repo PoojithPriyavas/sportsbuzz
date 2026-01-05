@@ -34,6 +34,7 @@ export default function MatchScheduler() {
     const [isInitialized, setIsInitialized] = useState(false);
     const [isLoadingMatches, setIsLoadingMatches] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const [hasUserInteracted, setHasUserInteracted] = useState(false);
     const { pushDynamic, buildPath, pathPrefix } = useDynamicRouter();
     const {
         matchSchedule,
@@ -303,10 +304,11 @@ export default function MatchScheduler() {
 
     const matchData = transformMatchData();
 
-    // Auto-select first league with matches for the current date
+    // Auto-select first league with matches for the current date (only on initial load)
     useEffect(() => {
         const comps = selectedDate ? (matchData[selectedDate] || []) : [];
-        if (activeLeague === '' && comps.length > 0) {
+        // Only auto-select if user hasn't interacted yet
+        if (!hasUserInteracted && activeLeague === '' && comps.length > 0) {
             const firstValid = comps.find(
                 c => Array.isArray(c.matches) && c.matches.length > 0 && c.competition
             );
@@ -319,7 +321,8 @@ export default function MatchScheduler() {
             );
             setActiveLeague(firstValid ? firstValid.competition : '');
         }
-    }, [selectedDate, matchData]);
+    }, [selectedDate, matchData, hasUserInteracted]);
+    
     const displayMatches = useCallback((date) => {
         if (!date) return [];
         let matches = matchData[date] || [];
@@ -340,13 +343,18 @@ export default function MatchScheduler() {
     }, [matchSchedule, translatedText.allLeagues]);
 
     const handleMatchClick = async (eid) => {
-        console.log("clicked the match deail code")
+        console.log("clicked the match detail code")
         
         await Promise.all([
             fetchFootballDetails(eid),
             fetchFootBallLineUp(eid)
         ]);
-       await pushDynamic(`/football-match-details/${eid}`);
+        await pushDynamic(`/football-match-details/${eid}`);
+    };
+
+    const handleLeagueClick = (league) => {
+        setHasUserInteracted(true);
+        setActiveLeague(league === translatedText.allLeagues ? '' : league);
     };
 
     if (currentTimezone === '+0.00' || !countryCode.country_code) {
@@ -397,7 +405,7 @@ export default function MatchScheduler() {
                     <div
                         key={league}
                         className={`${styles.leagueChip} ${activeLeague === league || (league === translatedText.allLeagues && activeLeague === '') ? styles.active : ''}`}
-                        onClick={() => setActiveLeague(league === translatedText.allLeagues ? '' : league)}
+                        onClick={() => handleLeagueClick(league)}
                     >
                         {league}
                     </div>
