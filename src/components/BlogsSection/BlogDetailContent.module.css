@@ -290,9 +290,11 @@
 }
 
 .description table tbody,
-.description table thead {
+.description table thead,
+.description table tr {
   display: table;
   width: 100%;
+  table-layout: fixed;
 }
 
 .description thead {
@@ -311,6 +313,10 @@
   letter-spacing: 0.05em;
   border-bottom: 2px solid #1d4ed8;
   text-align: center;
+}
+
+.description table p{
+  margin-bottom: 0px !important;
 }
 
 .description tbody tr {
@@ -769,7 +775,7 @@
 
   .description th:first-child,
   .description td:first-child {
-    padding-left: 1rem;
+    /* padding-left: 1rem; */
     position: sticky;
     left: 0;
     background: inherit;
@@ -777,7 +783,7 @@
   }
 
   .description thead th:first-child {
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    /* background: linear-gradient(135deg, #3b82f6, #1d4ed8); */
   }
 
   .description tbody tr:nth-child(odd) td:first-child {
