@@ -3,7 +3,7 @@ module.exports = {
   siteUrl: 'https://sportsbuz.com',
   generateRobotsTxt: true,
   sitemapSize: 7000,
-  exclude: ['/404', '/500'],
+  exclude: ['/404', '/500', '/server-sitemap.xml'],
 
   additionalPaths: async (config) => {
     const locales = [
@@ -32,7 +32,6 @@ module.exports = {
       }
     }
 
-    // Add any global pages (non-locale)
     extraPaths.push({
       loc: `${config.siteUrl}/terms-and-conditions`,
       changefreq: 'yearly',
@@ -49,7 +48,7 @@ module.exports = {
 
   robotsTxtOptions: {
     additionalSitemaps: [
-      'https://sportsbuz.com/my-custom-sitemap-1.xml',
+      'https://sportsbuz.com/server-sitemap.xml',
     ],
   },
 };

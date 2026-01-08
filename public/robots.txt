@@ -7,4 +7,4 @@ Host: https://sportsbuz.com
 
 # Sitemaps
 Sitemap: https://sportsbuz.com/sitemap.xml
-Sitemap: https://sportsbuz.com/my-custom-sitemap-1.xml
+Sitemap: https://sportsbuz.com/server-sitemap.xml
