@@ -101,7 +101,7 @@ export default function BlogPages({
     resolvedUrl,
     isLocalhost,
 }) {
-    // const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
+    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
     // const countryCode = countryDataHome?.country_code || 'LK';
     // const { blogs } = useGlobalData();
     // console.log(blogs,"blogs data")

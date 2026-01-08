@@ -34,12 +34,12 @@ module.exports = {
 
     // Add any global pages (non-locale)
     extraPaths.push({
-      loc: `${config.siteUrl}/terms`,
+      loc: `${config.siteUrl}/terms-and-conditions`,
       changefreq: 'yearly',
       priority: 0.3,
     });
     extraPaths.push({
-      loc: `${config.siteUrl}/policy`,
+      loc: `${config.siteUrl}/privacy-policy`,
       changefreq: 'yearly',
       priority: 0.3,
     });

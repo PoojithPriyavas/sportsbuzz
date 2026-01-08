@@ -348,7 +348,7 @@ export default function Home({
 }
 
 // Add this import at the top of the file
-import DebugPanel from '../components/Common/DebugPanel';
+// import DebugPanel from '../components/Common/DebugPanel';
 
 // In your component's return statement, add the DebugPanel
 // Find the closing tag of your main container and add it right before that
