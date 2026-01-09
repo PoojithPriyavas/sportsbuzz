@@ -100,7 +100,7 @@ export default function Home({
   // console.log(apiResponse,"api response")
   // console.log(blogs, "blogs in index")
 
-  // const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
+  // const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://sportsbuz.com';
 
   // // console.log(sections, "best betting apps console");
 
@@ -231,8 +231,8 @@ export default function Home({
           content="Catch live scores and expert predictions for cricket, football and more. Your ultimate sports companion."
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.sportsbuz.com/" />
-        <meta property="og:image" content="https://www.sportsbuz.com/images/logo.png" />
+        <meta property="og:url" content="https://sportsbuz.com/" />
+        <meta property="og:image" content="https://sportsbuz.com/images/logo.png" />
         <meta property="og:site_name" content="Sportsbuz" />
 
         <meta name="twitter:card" content="summary_large_image" />
@@ -241,7 +241,7 @@ export default function Home({
           name="twitter:description"
           content="Live sports scores, news, and betting predictions for cricket, football and more — only on Sportsbuz."
         />
-        <meta name="twitter:image" content="https://www.sportsbuz.com/images/logo.png" />
+        <meta name="twitter:image" content="https://sportsbuz.com/images/logo.png" />
         <meta name="twitter:site" content="@sportsbuz" />
 
         <link rel="icon" href="/favicon.ico" />

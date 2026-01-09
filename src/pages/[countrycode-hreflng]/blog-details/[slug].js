@@ -70,6 +70,7 @@ export async function getServerSideProps(context) {
                 countryDataHome,
                 locationDataHome,
                 resolvedUrl, // Add resolvedUrl to props
+                isLocalhost: process.env.NODE_ENV === 'development'
             },
         };
     } catch (error) {
@@ -79,12 +80,14 @@ export async function getServerSideProps(context) {
 }
 
 
-export default function BlogDetailsMain({ blog, locationDataHome, resolvedUrl }) {
+export default function BlogDetailsMain({ blog, locationDataHome, resolvedUrl, isLocalhost }) {
     console.log("blog in country :", blog)
     console.log("🔍 DEBUG - resolvedUrl:", resolvedUrl);
     console.log("🔍 DEBUG - locationDataHome:", locationDataHome);
+    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://sportsbuz.com';
 
     const { countryCode, setShowOtherDivs, showOtherDivs } = useGlobalData();
+
     const { "countrycode-hreflng": countryLang } = useParams();
     console.log("🔍 DEBUG - countryLang from useParams:", countryLang);
 
@@ -140,6 +143,23 @@ export default function BlogDetailsMain({ blog, locationDataHome, resolvedUrl })
                 <meta property="og:title" content={blog.meta_title} />
                 <meta property="og:description" content={blog.meta_desc} />
                 <meta property="og:image" content={blog.image_big || blog.image} />
+                {locationDataHome && Array.isArray(locationDataHome) && locationDataHome.map(({ hreflang, country_code }) => {
+                    {/* console.log(hreflang, "href lang"); */ }
+                    const href = `${baseUrl}/${hreflang}-${country_code.toLowerCase()}/blog-details/${blog.slug}`;
+                    const fullHrefLang = `${hreflang}-${country_code}`;
+
+                    return (
+                        <link
+                            key={fullHrefLang}
+                            rel="alternate"
+                            href={href}
+                            hreflang={fullHrefLang}
+                        />
+                    );
+                })}
+
+                <link rel="canonical" href={`${baseUrl}${resolvedUrl}`} />
+                <link rel="alternate" href={`https://sportsbuz.com/blog-details/${blog.slug}`} hreflang="x-default" />
             </Head>
             <div className={` ${animationStage === 'header' ? styles.visible : styles.hidden} ${styles.fadeUpEnter}   ${hasAnimatedIn ? styles.fadeUpEnterActive : ''} ${styles.offHeader} container`}>
                 <BlogDetailsPage blog={blog} countryCode={countryCode} />

@@ -16,7 +16,8 @@ export const getServerSideProps = async (ctx) => {
       // Ensure we handle cases where hreflang or country_code might be missing
       if (!country_code || !hreflang) return [];
 
-      const countryLang = `${hreflang}-${country_code.toLowerCase()}`;
+      // const countryLang = `${hreflang}-${country_code.toLowerCase()}`;
+       const countryLang = `en-${country_code.toLowerCase()}`;
       const countryFields = [];
 
       // --- Betting Apps ---

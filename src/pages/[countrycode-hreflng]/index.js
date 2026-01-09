@@ -101,7 +101,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
     console.log(blogs, "blogs from api response")
     console.log(locationDataHome, "location data for best betting apps")
     // console.log(blogs, "blogs in country home")
-    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://www.sportsbuz.com';
+    const baseUrl = isLocalhost ? 'http://localhost:3000' : 'https://sportsbuz.com';
     const router = useRouter();
     const { "countrycode-hreflng": countryLang } = useParams();
     // console.log(countryLang, "params value");
@@ -207,8 +207,8 @@ export default function Home({ locationDataHome, isLocalhost }) {
                     content="Catch live scores and expert predictions for cricket, football and more. Your ultimate sports companion."
                 />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://www.sportsbuz.com/" />
-                <meta property="og:image" content="https://www.sportsbuz.com/images/logo.png" />
+                <meta property="og:url" content="https://sportsbuz.com/" />
+                <meta property="og:image" content="https://sportsbuz.com/images/logo.png" />
                 <meta property="og:site_name" content="Sportsbuz" />
 
                 {/* Twitter Card (for Twitter/X) */}
@@ -218,7 +218,7 @@ export default function Home({ locationDataHome, isLocalhost }) {
                     name="twitter:description"
                     content="Live sports scores, news, and betting predictions for cricket, football and more — only on Sportsbuz."
                 />
-                <meta name="twitter:image" content="https://www.sportsbuz.com/images/logo.png" />
+                <meta name="twitter:image" content="https://sportsbuz.com/images/logo.png" />
                 <meta name="twitter:site" content="@sportsbuz" />
 
                 {/* Favicon */}
