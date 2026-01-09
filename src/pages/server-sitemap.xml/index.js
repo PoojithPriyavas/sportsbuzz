@@ -22,35 +22,61 @@ export const getServerSideProps = async (ctx) => {
       // --- Betting Apps ---
       try {
         const bettingAppsRes = await axios.get('https://admin.sportsbuz.com/api/best-betting-headings', {
-            params: {
-              country_code: country_code.toUpperCase(),
-              filter_by: 'current_month',
-            },
+          params: {
+            country_code: country_code.toUpperCase(),
+            filter_by: 'current_month',
+          },
         });
-        
+
         const bettingApps = bettingAppsRes.data?.results || [];
-        
+
         // Only add the betting apps page if we have results
         if (Array.isArray(bettingApps) && bettingApps.length > 0) {
-            countryFields.push({
-                loc: `${baseUrl}/${countryLang}/best-betting-apps/current`,
-                lastmod: new Date().toISOString(), // Or use updated_at from the first app if available
-                changefreq: 'daily',
-                priority: 0.8,
-            });
+          countryFields.push({
+            loc: `${baseUrl}/${countryLang}/best-betting-apps/current`,
+            lastmod: new Date().toISOString(), // Or use updated_at from the first app if available
+            changefreq: 'daily',
+            priority: 0.8,
+          });
         }
       } catch (error) {
         console.error(`Error fetching betting apps for ${country_code}:`, error.message);
       }
+      try {
+        const bettingAppsRes = await axios.get('https://admin.sportsbuz.com/api/best-betting-headings', {
+          params: {
+            country_code: country_code.toUpperCase(),
+            filter_by: 'previous_month',
+          },
+        });
 
+        const bettingApps = bettingAppsRes.data?.results || [];
+
+        // Only add the betting apps page if we have results
+        if (Array.isArray(bettingApps) && bettingApps.length > 0) {
+          bettingApps.forEach((apps) => {
+            if(apps.slug){
+              countryFields.push({
+                loc: `${baseUrl}/${countryLang}/best-betting-apps/recent/${apps.slug}`,
+                lastmod: new Date().toISOString(), // Or use updated_at from the first app if available
+                changefreq: 'daily',
+                priority: 0.8,
+              });
+            }
+          })
+
+        }
+      } catch (error) {
+        console.error(`Error fetching betting apps for ${country_code}:`, error.message);
+      }
       // --- Blogs ---
       try {
         const blogsRes = await axios.get('https://admin.sportsbuz.com/api/get-blogs', {
-            params: {
-                country_code: country_code,
-            }
+          params: {
+            country_code: country_code,
+          }
         });
-        
+
         const blogs = blogsRes.data?.results || [];
 
         if (Array.isArray(blogs)) {
@@ -82,4 +108,4 @@ export const getServerSideProps = async (ctx) => {
   return getServerSideSitemapLegacy(ctx, fields);
 };
 
-export default function Sitemap() {}
+export default function Sitemap() { }
