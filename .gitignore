@@ -42,3 +42,4 @@ next-env.d.ts
 
 #site-map
 public/sitemap*.xml
+public/sitemap-0.xml
