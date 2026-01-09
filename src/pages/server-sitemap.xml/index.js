@@ -72,9 +72,9 @@ export const getServerSideProps = async (ctx) => {
       // --- Blogs ---
       try {
         const blogsRes = await axios.get('https://admin.sportsbuz.com/api/get-blogs', {
-          params: {
-            country_code: country_code,
-          }
+          // params: {
+          //   country_code: country_code,
+          // }
         });
 
         const blogs = blogsRes.data?.results || [];
