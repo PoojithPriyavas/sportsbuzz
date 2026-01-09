@@ -49,7 +49,7 @@ const FooterTwo = () => {
         availability: '24/7 Sports Updates',
         copyright: '© 2025 SportsBuz. All rights reserved.',
         disclaimer: 'Play responsibly. 18+ only. Gambling can be addictive.',
-        terms: 'terms & conditions',
+        terms: 'Terms & Conditions',
         privacy: 'Privacy Policy',
         description: 'Your ultimate destination for live cricket & football scores, match predictions, betting tips, and comprehensive sports analysis. Stay updated with the latest sports news and insights.'
     });
@@ -128,7 +128,7 @@ const FooterTwo = () => {
                     availability: await getTranslation('availability', '24/7 Sports Updates'),
                     copyright: await getTranslation('copyright', '© 2025 SportsBuz. All rights reserved.'),
                     disclaimer: await getTranslation('disclaimer', 'Play responsibly. 18+ only. Gambling can be addictive.'),
-                    terms: await getTranslation('terms', 'terms & conditions'),
+                    terms: await getTranslation('terms', 'Terms & Conditions'),
                     privacy: await getTranslation('privacy', 'Privacy Policy'),
                     description: await getTranslation('description', 'Your ultimate destination for live cricket & football scores, match predictions, betting tips, and comprehensive sports analysis. Stay updated with the latest sports news and insights.')
                 };
