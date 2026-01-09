@@ -390,7 +390,7 @@ export default function BlogsPage({
               </div>
             </div>
 
-            <div className={styles.blogGrid}>
+            <div >
               {isLoading ? (
                 <div className={styles.loadingMessage}>
                   <p>Loading blogs...</p>
@@ -399,47 +399,79 @@ export default function BlogsPage({
                 <div className={styles.loadingMessage}>
                   <p>Initializing...</p>
                 </div>
-              ) : blogsForPage && Array.isArray(blogsForPage) && blogsForPage.length > 0 ? (
-                blogsForPage.map((blog, index) => (
-                  <DynamicLink
-                    key={`blog-${blog.id}-${currentPage}-${index}`}
-                    href={`/blog-details/${blog?.slug}`}
-                    className={styles.blogCard}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className={styles.blogImage}>
-                      <img
-                        src={blog?.image}
-                        alt={blog?.alt || blog?.title}
-                        loading="lazy"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
+              ) :
+                blogsForPage && Array.isArray(blogsForPage) && blogsForPage.length > 0 ? (
+                  <div className={styles.blogGrid}>
+                    {blogsForPage.map((blog, index) => (
+                      <DynamicLink
+                        key={`blog-${blog.id}-${currentPage}-${index}`}
+                        href={`/blog-details/${blog?.slug}`}
+                        className={styles.blogCard}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <div className={styles.blogImage}>
+                          <img
+                            src={blog?.image}
+                            alt={blog?.alt || blog?.title}
+                            loading="lazy"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                        <div className={styles.blogContent}>
+                          <h5>{blog?.title}</h5>
+                          <p>
+                            {blog?.author} <span>{blog?.date}</span>
+                          </p>
+                          <span className={styles.readMore}>{translations.readMore}</span>
+                        </div>
+                      </DynamicLink>
+                    ))}
+                  </div>
+                ) : (
+                  <div className={styles.noBlogsContainer}>
+                    <div className={styles.iconWrapper}>
+                      <svg
+                        className={styles.nonsearchIcon}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle
+                          cx="11"
+                          cy="11"
+                          r="6"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M20 20L15.5 15.5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
                     </div>
-                    <div className={styles.blogContent}>
-                      <h5>{blog?.title}</h5>
-                      <p>
-                        {blog?.author} <span>{blog?.date}</span>
-                      </p>
-                      <span className={styles.readMore}>{translations.readMore}</span>
-                    </div>
-                  </DynamicLink>
-                ))
-              ) : (
-                <div className={styles.noBlogsMessage}>
-                  <p>No blogs found matching your criteria.</p>
-                  {hasActiveFilters && (
-                    <button
-                      onClick={handleClearFilters}
-                      className={styles.clearFilterButton}
-                      style={{ marginTop: '10px' }}
-                    >
-                      {translations.clearFilter}
-                    </button>
-                  )}
-                </div>
-              )}
+
+                    <h3 className={styles.title}>
+                      We couldn't find any blogs matching your criteria.
+                    </h3>
+
+                    <p className={styles.description}>
+                      Try adjusting your filters or search terms to find what you're looking for.
+                    </p>
+
+                    {hasActiveFilters && (
+                      <button
+                        onClick={handleClearFilters}
+                        className={styles.resetButton}
+                      >
+                        Reset Filters
+                      </button>
+                    )}
+                  </div>
+                )}
             </div>
 
             {showPagination && !isLoading && (
@@ -491,7 +523,7 @@ export default function BlogsPage({
             <div className={styles.fourthColumnTwoColumns}>
               <div className={styles.fourthColumnLeft}>
                 <JoinTelegramButton />
-                <br/>
+                <br />
                 <BettingCard />
                 <JoinTelegramButton />
               </div>
